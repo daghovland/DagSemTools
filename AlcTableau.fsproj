@@ -1,0 +1,16 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="ALC.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="IriTools" Version="1.1.0" />
+    </ItemGroup>
+
+</Project>
