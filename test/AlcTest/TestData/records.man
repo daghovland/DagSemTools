@@ -1,0 +1,152 @@
+Prefix: : <https://rdf.equinor.com/ontology/record-rules/>
+Prefix: dc: <http://purl.org/dc/elements/1.1/>
+Prefix: owl: <http://www.w3.org/2002/07/owl#>
+Prefix: prov: <http://www.w3.org/ns/prov#>
+Prefix: rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+Prefix: rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+Prefix: rec: <https://rdf.equinor.com/ontology/record/>
+Prefix: skos: <http://www.w3.org/2004/02/skos/core#>
+Prefix: xml: <http://www.w3.org/XML/1998/namespace>
+Prefix: xsd: <http://www.w3.org/2001/XMLSchema#>
+
+
+
+Ontology: <https://rdf.equinor.com/ontology/record-rules/>
+<https://rdf.equinor.com/ontology/record/2022-12-05>
+Import: <https://rdf.equinor.com/ontology/record-syntax/>
+
+Annotations: 
+    rdfs:comment "This ontology does not make sense to apply to individual records, and does not give rules for individual records. Rather, the provenance from several records can be collected in a single graph, and then this ontology can be used on that graph to calculate head and scopes based on this. "
+
+AnnotationProperty: rdfs:comment
+
+    
+Datatype: xsd:string
+
+    
+ObjectProperty: rec:hasNewerSuperRecordInf
+
+    Annotations: 
+        rdfs:comment "These are all the super records which replaces the asserted super record."
+    
+    SubPropertyChain: 
+        rec:isInSubRecordTreeOf o rec:replacedBy
+    
+    Domain: 
+        rec:Record
+    
+    Range: 
+        rec:Record
+    
+    
+ObjectProperty: rec:isInScope
+
+    
+ObjectProperty: rec:isInScopeInf
+
+    Annotations: 
+        rdfs:comment "These are the scopes that a record inherits from its super-records, union with the explicit given scopes"
+    
+    SubPropertyChain: 
+        rec:isInSubRecordTreeOf o rec:isInScope
+    
+    Domain: 
+        rec:Record
+    
+    
+ObjectProperty: rec:isInSubRecordTreeOf
+
+    Annotations: 
+        rdfs:comment "This is the transitive closure of the relation rec:isSubRecordOf."
+    
+    SubPropertyOf: 
+        rec:hasNewerSuperRecordInf
+    
+    Characteristics: 
+        Transitive
+    
+    Domain: 
+        rec:Record
+    
+    Range: 
+        rec:Record
+    
+    
+ObjectProperty: rec:isSubRecordOf
+
+    SubPropertyOf: 
+        rec:isInSubRecordTreeOf
+    
+    
+ObjectProperty: rec:replacedBy
+
+    Annotations: 
+        rdfs:comment "This is the transitive closure of the inverse relation rec:replaces."
+    
+    Characteristics: 
+        Transitive
+    
+    Domain: 
+        rec:Record
+    
+    Range: 
+        rec:Record
+    
+    
+ObjectProperty: rec:replaces
+
+    SubPropertyOf: 
+         inverse (rec:replacedBy)
+    
+    
+Class: owl:Restricton
+
+    
+Class: owl:Thing
+
+    
+Class: rec:NewestRecord
+
+    Annotations: 
+        rdfs:comment "This is a record which has not been replaced, and is therefore the newest."
+    
+    EquivalentTo: 
+        rec:replacedBy max 0 owl:Thing
+    
+    SubClassOf: 
+        rec:Record
+    
+    DisjointWith: 
+        rec:ReplacedRecord
+    
+    
+Class: rec:Record
+
+    
+Class: rec:ReplacedRecord
+
+    Annotations: 
+        rdfs:comment "This is a record which has been replaced."
+    
+    EquivalentTo: 
+        rec:replacedBy some rec:Record
+    
+    SubClassOf: 
+        rec:Record
+    
+    DisjointWith: 
+        rec:NewestRecord
+    
+    
+Individual: _:genid2147483648
+
+    Types: 
+        owl:Restricton
+    
+    
+Individual: _:genid2147483649
+
+    Types: 
+        owl:Restricton
+    
+    

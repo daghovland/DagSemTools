@@ -1,0 +1,23 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <RootNamespace>Parsers</RootNamespace>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="Syntax.fs" />
+        <Compile Include="Parser.fs" />
+        
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\AlcTableau.fsproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="FParsec" Version="1.1.1" />
+    </ItemGroup>
+
+</Project>

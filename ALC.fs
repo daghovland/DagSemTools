@@ -3,6 +3,7 @@
 open IriTools
 
 module ALC =
+    
     type Role = IriReference
     
     type Concept =
