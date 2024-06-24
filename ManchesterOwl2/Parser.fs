@@ -56,6 +56,32 @@ module Parser =
         let IRIchar = satisfy (fun c -> c <> '>')
         pstring "<" >>. (manyChars IRIchar) .>> pstring ">" |>> (fun s -> FullIri (IriReference s))
         
+    let IriParser: Parser<IRI, Unit> = fullIri <|> abbreviatedIRI
+    
+    let atomicRestrictionParser : Parser<restriction, Unit> =
+        IriParser |>> (fun iri -> AtomicRestriction (Class iri))
+    let negativeRestrictionParser : Parser<restriction, Unit> =
+        pstring "not" >>. atomicRestrictionParser |>> (fun restriction -> NegativeRestriction restriction)
+    // let rec restrictionParser : Parser<restriction, Unit> =
+    //     existentialRestrictionParser <|> universalRestrictionParser <|> negativeRestrictionParser <|> atomicRestrictionParser
+    // and existentialRestrictionParser : Parser<restriction, Unit> =
+    //     IriParser .>> pstring "some" >>. restrictionParser |>> (fun restriction -> ExistentialRestriction restriction)
+    //
+    // and universalRestrictionParser : Parser<restriction, Unit> =
+    //     IriParser .>> pstring "only" >>. restrictionParser |>> (fun restriction -> ExistentialRestriction restriction)
+    //
+    // and conjunctionParser : Parser<conjunction, Unit> =
+    //     pipe2 IriParser restrictionListParser (fun iri restrictionList -> conjunction (iri, restrictionList))
+    //
+    // and restrictionListParser : Parser<restriction list, Unit> =
+    //     pstring "that" >>. sepBy restrictionParser (pstring "and") |>> (fun  restrictionList -> restrictionList)
+    //
+    //
+    // and descriptionParser : Parser<description, Unit> =
+    //     sepBy conjunctionParser (pstring "or") |>> (fun conjunctionList -> ConjunctionList conjunctionList)
+    //
+    let SubClassOfParser : Parser<ClassFrameElement, Unit> =
+        pstring "SubClassOf:" >>. sepBy IriParser (pstring ",") |>> (fun irilist -> SubClassOf irilist)       
     
     let test p str =
         match run p str with

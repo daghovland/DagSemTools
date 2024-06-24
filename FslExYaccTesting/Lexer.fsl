@@ -2,22 +2,51 @@
 
 // Opens methods related to fslex.exe
 open FSharp.Text.Lexing
+open IriTools
+
+let lexeme = LexBuffer<_>.LexemeString
 
 let newline (lexbuf: LexBuffer<_>) = 
   lexbuf.StartPos <- lexbuf.StartPos.NextLine
-
 }
 
 // Regular expressions
 let whitespace = [' ' '\t' ]
 let newline = ('\n' | '\r' '\n')
+let digit = ['0'-'9']
+
+let scheme = ("http" | "https")
+let host = ['a'-'z' '.']+
+let authority = host + (':' + ['0'-'9']+)?
+let ucschar = ['\u00A0'-'\uD7FF' '\uF900'-'\uFDCF' ]
+let pctencoded = '%' digit digit
+let iunreserved = ['a'-'z' 'A'-'Z' '0'-'9' '-' '.' '_' '~'] | ucschar | pctencoded
+let ihierpart = (iunreserved | '/')+
+let iri = (scheme + "://" + authority + ihierpart + ('?' + ihierpart)? + ('#' + ihierpart)? )
+
+let fullIri = '<' + scheme +  "://" + authority +  [^'>' ' ' '\t']* + '>'
+let prefix = [^ ' ' ':' '\t' ' ' '\n' '\r' '<' '>']+
+let local = [^ ' ' '\t' ' ' '\n' '\r' '<' '>']+
+let prefixedIri = prefix + ':' + prefix
 
 rule tokenstream = parse
 // --------------------------
 | "hello" 		{ Parser.HELLO }
 // --------------------------
 | whitespace	{ tokenstream lexbuf }
-| newline	{ newline lexbuf; tokenstream lexbuf }
+| newline	    { newline lexbuf; tokenstream lexbuf }
+| scheme        { Parser.SCHEME }
+| fullIri       { Parser.FULLIRI ( string (lexeme lexbuf)) }
+| prefixedIri    { Parser.PREFIXEDIRI (string (lexeme lexbuf)) }
+| "inverse"      { Parser.INVERSE }
+| "or"           { Parser.OR }
+| "and"          { Parser.AND }
+| "not"      { Parser.NOT }
+| "some"      { Parser.SOME }
+| "only"      { Parser.ONLY }
+| "that"     { Parser.THAT }
+| "("        { Parser.LPAREN }
+| ")"        { Parser.RPAREN }
 // --------------------------
 | _    		{ failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
 | eof   	{ Parser.EOF }
