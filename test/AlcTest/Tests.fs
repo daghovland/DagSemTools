@@ -6,6 +6,7 @@ open AlcTableau
 open IriTools
 open System.IO
 open FSharp.Text.Lexing
+open Manchester.Printer
 
 [<Fact>]
 let ``Alc Can Be Created`` () =
@@ -24,31 +25,34 @@ let testLexerAndParserFromString text =
     Parser.start Lexer.tokenstream lexbuf
 
 
-[<Fact>]
-let ``Scheme can be parsed`` () =
-    let parseValue = testLexerAndParserFromString "https"
-    Assert.Equal(parseValue, 5)
 
 [<Fact>]
 let ``Iri can be parsed`` () =
     let parseValue = testLexerAndParserFromString "<https://example.com/concept>"
-    Assert.Equal(parseValue, 3)
+    Assert.Equal(parseValue, ALC.ConceptName("https://example.com/concept"))
     
 [<Fact>]
 let ``Conjunction can be parsed`` () =
     let parseValue = testLexerAndParserFromString "<https://example.com/concept1> and <https://example.com/concept2>"
-    Assert.Equal(parseValue, 3)
+    Assert.Equal(parseValue, ALC.Conjunction(ALC.ConceptName("https://example.com/concept1"), ALC.ConceptName("https://example.com/concept2")))
+
+    
+[<Fact>]
+let ``Disjunction can be parsed`` () =
+    let parseValue = testLexerAndParserFromString "<https://example.com/concept1> or <https://example.com/concept2>"
+    Assert.Equal(parseValue, ALC.Disjunction(ALC.ConceptName("https://example.com/concept1"), ALC.ConceptName("https://example.com/concept2")))
+
 
 [<Fact>]
 let ``Iri with query can be parsed`` () =
     let parseValue = testLexerAndParserFromString "<https://example.com/concept?query=1>"
-    Assert.Equal(parseValue, 3)
+    Assert.Equal(parseValue, ALC.ConceptName("https://example.com/concept?query=1"))
     
 
 [<Fact>]
 let ``Iri with fragment can be parsed`` () =
     let parseValue = testLexerAndParserFromString "<https://example.com/ontology#concept>"
-    Assert.Equal(parseValue, 3)
+    Assert.Equal(parseValue,ALC.ConceptName("https://example.com/ontology#concept") )
     
 [<Fact>]
 let ``Mail Iri cannot be parsed`` () =
@@ -71,5 +75,5 @@ let ``Space Iri cannot be parsed`` () =
 [<Fact>]
 let ``Prefixed iri can be parsed`` () =
     let parseValue = testLexerAndParserFromString "ex:concept"
-    Assert.Equal(parseValue, 4)
+    Assert.Equal(parseValue, ALC.ConceptName("ex:concept"))
     

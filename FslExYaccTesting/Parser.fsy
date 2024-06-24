@@ -17,6 +17,8 @@ open AlcTableau.ALC
 %token LPAREN
 %token RPAREN
 %token THAT
+%token LT
+%token GT
 %token <string> FULLIRI
 %token <string> ABBREVIATETEDIRI
 %token <string> PREFIXEDIRI
@@ -52,7 +54,7 @@ primary:
     | LPAREN description RPAREN { $2 }
 
 Iri: 
-    | FULLIRI { $1 }
+    | LT FULLIRI GT { $2 }
     | ABBREVIATETEDIRI { $1 }
     | PREFIXEDIRI { $1 } 
 

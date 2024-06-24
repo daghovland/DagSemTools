@@ -24,7 +24,7 @@ let iunreserved = ['a'-'z' 'A'-'Z' '0'-'9' '-' '.' '_' '~'] | ucschar | pctencod
 let ihierpart = (iunreserved | '/')+
 let iri = (scheme + "://" + authority + ihierpart + ('?' + ihierpart)? + ('#' + ihierpart)? )
 
-let fullIri = '<' + scheme +  "://" + authority +  [^'>' ' ' '\t']* + '>'
+let fullIri = scheme +  "://" + authority +  [^'>' ' ' '\t']* 
 let prefix = [^ ' ' ':' '\t' ' ' '\n' '\r' '<' '>']+
 let local = [^ ' ' '\t' ' ' '\n' '\r' '<' '>']+
 let prefixedIri = prefix + ':' + prefix
@@ -47,6 +47,8 @@ rule tokenstream = parse
 | "that"     { Parser.THAT }
 | "("        { Parser.LPAREN }
 | ")"        { Parser.RPAREN }
+| "<"        { Parser.LT }
+| ">"        { Parser.GT }
 // --------------------------
 | _    		{ failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
 | eof   	{ Parser.EOF }

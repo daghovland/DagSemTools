@@ -23,6 +23,7 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AlcTableau.fsproj" />
+        <ProjectReference Include="..\ManchesterOwl2/ManchesterOwl2.fsproj" />
     </ItemGroup>
     
 </Project>

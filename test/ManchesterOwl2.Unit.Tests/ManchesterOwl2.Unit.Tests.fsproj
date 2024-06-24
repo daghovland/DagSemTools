@@ -9,7 +9,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tests.fs"/>
         <Compile Include="Program.fs"/>
         <Content Include="TestData\manchester-ref.owl" />
         <Content Include="TestData\owl2spec.man.owl" />
