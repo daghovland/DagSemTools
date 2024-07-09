@@ -13,8 +13,8 @@ module ALC =
         | Disjunction of Left: Concept * Right: Concept
         | Conjunction of Left: Concept * Right: Concept
         | Negation of Concept
-        | Existential of Role * Concept
-        | Universal of Role * Concept
+        | Existential of Role: Role * Constraint: Concept
+        | Universal of Role: Role * Constraint: Concept
         | Top
         | Bottom
         override this.Equals(obj) =

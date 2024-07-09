@@ -1,5 +1,7 @@
 ﻿%{
+open System
 open IriTools
+open AlcTableau
 open AlcTableau.ALC
 %}
 
@@ -8,7 +10,7 @@ open AlcTableau.ALC
 
 // Regular tokens
 %token HELLO
-%token INVERSE
+%token CLASS
 %token SOME
 %token ONLY
 %token AND
@@ -16,6 +18,11 @@ open AlcTableau.ALC
 %token NOT
 %token LPAREN
 %token RPAREN
+%token INVERSE
+%token ANNOTATIONS
+%token PREFIX
+%token ONTOLOGY
+%token IMPORT
 %token THAT
 %token LT
 %token GT
@@ -29,9 +36,12 @@ open AlcTableau.ALC
 
 // This is the type of the data produced by a successful reduction of the 'start'
 // symbol:
-%type < AlcTableau.ALC.Concept > description
 %type < AlcTableau.ALC.Concept > start
 %type < IriTools.IriReference > Iri
+
+%left SOME ONLY 
+%left AND
+%left OR
 
 %%
 
@@ -40,18 +50,29 @@ open AlcTableau.ALC
 start: description EOF { $1 }
 
 description:
-    | conjunction OR conjunction { AlcTableau.ALC.Disjunction($1, $3) }
+    | description OR conjunction { AlcTableau.ALC.Disjunction($1, $3) }
     | conjunction { $1 }
     
     
 conjunction:
-    | primary AND primary { AlcTableau.ALC.Conjunction($1, $3) }
+    | conjunction AND primary { AlcTableau.ALC.Conjunction($1, $3) }
     | primary { $1 }
+
+restriction:
+    | objectPropertyExpression SOME primary { printfn "Rule: Existential(%A, %A)"; AlcTableau.ALC.Existential($1, $3) }
+    | objectPropertyExpression ONLY primary { AlcTableau.ALC.Universal($1, $3) }
 
 primary:
     | NOT primary { AlcTableau.ALC.Negation($2) }
     | Iri { AlcTableau.ALC.ConceptName($1) }
     | LPAREN description RPAREN { $2 }
+
+classFrame: 
+    | CLASS Iri  { }
+
+objectPropertyExpression:
+    | Iri { AlcTableau.ALC.Role($1)}
+    | INVERSE Iri { failwith "Inverse not supported"  }
 
 Iri: 
     | LT FULLIRI GT { $2 }

@@ -13,6 +13,8 @@ let testLexerAndParserFromString text expectedCount =
 
     printfn "countFromParser: result = %s, expected %s" (Manchester.Printer.toString countFromParser) expectedCount
 
+
+
 let testLexerAndParserFromFile (fileName:string) expectedCount = 
     use textReader = new System.IO.StreamReader(fileName)
     let lexbuf = LexBuffer<char>.FromTextReader textReader
@@ -23,6 +25,8 @@ let testLexerAndParserFromFile (fileName:string) expectedCount =
 
 testLexerAndParserFromString "ex:hello" "ex:hello"
 testLexerAndParserFromString "ex:hello and ex:hello" "ex:hello and ex:hello"
+
+testLexerAndParserFromString "ex:prop some ex:hello" "ex:prop some ex:hello"
 
 let testFile = Path.Combine(__SOURCE_DIRECTORY__, "test.txt")
 File.WriteAllText(testFile, "<https://example.com/concept>")
