@@ -11,6 +11,8 @@ open AlcTableau.ALC
 // Regular tokens
 %token HELLO
 %token CLASS
+%token SUBCLASSOF
+%token EQUIVALENTTO
 %token SOME
 %token ONLY
 %token AND
@@ -18,6 +20,7 @@ open AlcTableau.ALC
 %token NOT
 %token LPAREN
 %token RPAREN
+%token COMMA
 %token INVERSE
 %token ANNOTATIONS
 %token PREFIX
@@ -59,16 +62,28 @@ conjunction:
     | primary { $1 }
 
 restriction:
-    | objectPropertyExpression SOME primary { printfn "Rule: Existential(%A, %A)"; AlcTableau.ALC.Existential($1, $3) }
+    | objectPropertyExpression SOME primary { AlcTableau.ALC.Existential($1, $3) }
     | objectPropertyExpression ONLY primary { AlcTableau.ALC.Universal($1, $3) }
 
 primary:
     | NOT primary { AlcTableau.ALC.Negation($2) }
+    | restriction { $1 }
     | Iri { AlcTableau.ALC.ConceptName($1) }
     | LPAREN description RPAREN { $2 }
 
-classFrame: 
-    | CLASS Iri  { }
+classFrame: CLASS Iri classExpressionList { $3 (AlcTableau.ALC.ConceptName $2) }
+
+classExpressionList:  
+    classExpression { $1 }
+    | classExpression classExpressionList { fun superclass -> Seq.append ($1 superclass) ($2 superclass) }
+
+classExpression:
+    SUBCLASSOF descriptionAnnotatedList { fun superclass ->  Seq.map (fun subclass -> AlcTableau.ALC.Inclusion(subclass, superclass)) $2 }
+    | EQUIVALENTTO descriptionAnnotatedList { fun superclass ->  Seq.map (fun subclass -> AlcTableau.ALC.Equivalence(subclass, superclass)) $2 }
+
+descriptionAnnotatedList:
+    | description {[$1]}
+    | description COMMA descriptionAnnotatedList { $1 :: $3 }
 
 objectPropertyExpression:
     | Iri { AlcTableau.ALC.Role($1)}

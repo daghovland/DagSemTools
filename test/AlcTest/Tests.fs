@@ -42,11 +42,6 @@ let ``Disjunction can be parsed`` () =
     let parseValue = testLexerAndParserFromString "<https://example.com/concept1> or <https://example.com/concept2>"
     Assert.Equal(parseValue, ALC.Disjunction(ALC.ConceptName("https://example.com/concept1"), ALC.ConceptName("https://example.com/concept2")))
 
-    
-[<Fact>]
-let ``Universal can be parsed`` () =
-    let parseValue = testLexerAndParserFromString "<https://example.com/concept1> or <https://example.com/concept2>"
-    Assert.Equal(parseValue, ALC.Disjunction(ALC.ConceptName("https://example.com/concept1"), ALC.ConceptName("https://example.com/concept2")))
 
 
 [<Fact>]

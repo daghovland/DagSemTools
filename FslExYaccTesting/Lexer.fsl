@@ -43,10 +43,13 @@ rule tokenstream = parse
 | "Prefix:"   { Parser.PREFIX }
 | "Ontology:" { Parser.ONTOLOGY }
 | "Import:"   {Parser.IMPORT}
+| "SubClassOf:" {Parser.SUBCLASSOF}
+| "EquivalentTo:" {Parser.EQUIVALENTTO}
 | "("        { Parser.LPAREN }
 | ")"        { Parser.RPAREN }
 | "<"        { Parser.LT }
 | ">"        { Parser.GT }
+| ","       { Parser.COMMA }
 // --------------------------
 | _    		{ failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
 | eof   	{ Parser.EOF }
