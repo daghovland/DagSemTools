@@ -44,6 +44,28 @@ let ``Disjunction can be parsed`` () =
 
 
 [<Fact>]
+let ``Parenthesized expression can be parsed`` () =
+    let parseValue = testLexerAndParserFromString "( <https://example.com/concept1> )"
+    Assert.Equal(parseValue, ALC.ConceptName("https://example.com/concept1"))
+    
+[<Fact>]
+let ``Negation can be parsed`` () =
+    let parseValue = testLexerAndParserFromString "not <https://example.com/concept1>"
+    Assert.Equal(parseValue, ALC.Negation(ALC.ConceptName("https://example.com/concept1")))
+
+
+[<Fact>]
+let ``Existential can be parsed`` () =
+    let parseValue = testLexerAndParserFromString "<https://example.com/property1> some <https://example.com/concept1>"
+    Assert.Equal(parseValue, ALC.Existential(ALC.Role("https://example.com/property1"), ALC.ConceptName("https://example.com/concept1")))
+
+[<Fact>]
+let ``Universal can be parsed`` () =
+    let parseValue = testLexerAndParserFromString "<https://example.com/property1> only <https://example.com/concept1>"
+    Assert.Equal(parseValue, ALC.Universal(ALC.Role("https://example.com/property1"), ALC.ConceptName("https://example.com/concept1")))
+
+
+[<Fact>]
 let ``Iri with query can be parsed`` () =
     let parseValue = testLexerAndParserFromString "<https://example.com/concept?query=1>"
     Assert.Equal(parseValue, ALC.ConceptName("https://example.com/concept?query=1"))
