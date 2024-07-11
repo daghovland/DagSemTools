@@ -9,11 +9,16 @@ open FSharp.Text.Lexing
 open Manchester.Printer
 
     
-
+#nowarn "3391"
 let testLexerAndParserFromString text = 
     let lexbuf = LexBuffer<char>.FromString text
     Parser.start Lexer.tokenstream lexbuf
 
+
+let testLexerAndParserFromFile (fileName:string)  = 
+    use textReader = new System.IO.StreamReader(fileName)
+    let lexbuf = LexBuffer<char>.FromTextReader textReader
+    Parser.start Lexer.tokenstream lexbuf
 
 
 [<Fact>]
@@ -154,9 +159,21 @@ let ``Space Iri cannot be parsed`` () =
 [<Fact>]
 let ``Prefixed iri can be parsed`` () =
     let parseValue = testLexerAndParserFromString """
-    Prefix: 
-    ex: <http://example.com> 
+    Prefix: ex: <http://example.com> 
     Ontology: ex:ontology"""
     Assert.Equal<ALC.TBox>(parseValue, [])
     
+[<Fact>]
+let ``Versioned ontology IRI can be parsed`` () =
+    let parseValue = testLexerAndParserFromString """
+    Prefix: : <http://ex.com/owl/families#>
+    Prefix: g: <http://ex.com/owl2/families#>
+
+    Ontology: <http://example.com/owl/families> <http://example.com/owl/families-v1>
+    """
+    Assert.Equal<ALC.TBox>(parseValue, [])
+[<Fact>]
+let ``Reference example can be parsed`` () =
+    let parseValue = testLexerAndParserFromFile "TestData/manchester-ref.owl"
+    Assert.IsType<ALC.TBox>(parseValue)
     

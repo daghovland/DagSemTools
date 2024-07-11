@@ -30,7 +30,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\AlcTableau.fsproj" />
-      <ProjectReference Include="..\..\FslExYaccTesting\FslExYaccTesting.fsproj" />
+      <ProjectReference Include="..\..\Manchester\Manchester.fsproj" />
     </ItemGroup>
 
 </Project>

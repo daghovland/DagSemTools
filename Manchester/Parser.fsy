@@ -76,9 +76,21 @@ prefixDeclarationList :
 prefixDeclaration : 
     TOKENPREFIX PREFIXNAME LT FULLIRI GT {printfn $"Parsed prefix declaration {$2}"; prefixMap <- prefixMap.Add($2, $4) }
 
+ontologyVersion:
+    ONTOLOGY Iri Iri {printfn "Parsed ontology iri and versioned iri" }
+    | ONTOLOGY Iri { }
+    | ONTOLOGY { }
+
 ontology :
-    ONTOLOGY Iri frameList { printfn "Parsed non-empty ontology"; $3 }
-    | ONTOLOGY Iri {printfn "Parsed empty  Ontology" ; [] }
+    ontologyVersion frameList { printfn "Parsed non-empty ontology"; $2 }
+    | ontologyVersion { printfn "Parsed empty ontology"; [] }
+
+importDeclarationList:
+    importDeclaration importDeclarationList {}
+    | importDeclaration {}
+
+importDeclaration: 
+    | IMPORT Iri { }
 
 frameList : 
     classFrame frameList {$1 @ $2 }

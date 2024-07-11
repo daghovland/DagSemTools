@@ -9,8 +9,12 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="TestData\manchester-ref.owl" />
-        <Content Include="TestData\owl2spec.man.owl" />
+        <Content Include="TestData\manchester-ref.owl"> 
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="TestData\owl2spec.man.owl" >
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
         <Content Include="TestData\pizza.man.owl">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
@@ -34,7 +38,7 @@
 
     <ItemGroup>
         <ProjectReference Include="..\..\AlcTableau.fsproj" />
-        <ProjectReference Include="..\..\FslExYaccTesting\FslExYaccTesting.fsproj" />
+        <ProjectReference Include="..\..\Manchester\Manchester.fsproj" />
     </ItemGroup>
 
 

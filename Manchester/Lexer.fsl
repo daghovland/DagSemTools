@@ -46,11 +46,11 @@ rule tokenstream = parse
 | "<"        { Parser.LT }
 | ">"        { Parser.GT }
 | ","       { Parser.COMMA }
-| ":"         { Parser.COLON }
 | scheme        { Parser.SCHEME }
 | fullIri       { printfn "Token fullIri"; Parser.FULLIRI ( string (lexeme lexbuf)) }
 | prefix       { printfn "Token prefixname"; Parser.PREFIXNAME ( string ( lexeme lexbuf ))}
 | local         { printfn "Token local"; Parser.LOCAL (string (lexeme lexbuf)) }
+| ":"         { printfn "Token :"; Parser.COLON }
 // --------------------------
 | _    		{ failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
 | eof   	{ Parser.EOF }
