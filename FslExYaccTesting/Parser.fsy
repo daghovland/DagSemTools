@@ -123,7 +123,7 @@ objectPropertyExpression:
     | INVERSE Iri { failwith "Inverse not supported"  }
 
 Iri: 
-    | LT FULLIRI GT { printfn "Parsed full Iri"; $2 }
+    | LT FULLIRI GT { printfn "Parsed full Iri"; new IriReference( $2 ) }
     | LOCAL { new IriReference( prefixMap[""] + $1 ) }
     | PREFIXNAME LOCAL {printfn $"Parsed prefixed Iri {$1}";  new IriReference( prefixMap[$1] + $2  )} 
 

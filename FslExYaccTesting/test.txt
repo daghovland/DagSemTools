@@ -1,0 +1,4 @@
+
+    Ontology: <https://example.com/ontology> 
+    Class: <https://example.com/concept>
+    

@@ -5,6 +5,7 @@
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
     <ItemGroup>
+        <Compile Include="Printer.fs" />
         <FsYacc Include="Parser.fsy">
             <OtherFlags>--module Parser</OtherFlags>
         </FsYacc>
@@ -23,7 +24,6 @@
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AlcTableau.fsproj" />
-        <ProjectReference Include="..\ManchesterOwl2/ManchesterOwl2.fsproj" />
     </ItemGroup>
     
 </Project>
