@@ -11,7 +11,7 @@ let newline (lexbuf: LexBuffer<_>) =
 }
 
 // Regular expressions
-let whitespace = [' ' '\t' ]
+let whitespace = [' ' '\t' '\n' '\r']
 let newline = ('\n' | '\r' '\n')
 let digit = ['0'-'9']
 
@@ -20,36 +20,37 @@ let host = ['a'-'z' '.']+
 let authority = host + (':' + ['0'-'9']+)?
 
 let fullIri = scheme +  "://" + authority +  [^'>' ' ' '\t']* 
-let prefix = [^ ' ' ':' '\t' ' ' '\n' '\r' '<' '>']+
-let local = [^ ' ' '\t' ' ' '\n' '\r' '<' '>']+
-let prefixedIri = prefix + ':' + prefix
+let prefix = ([^ ' ' ':' '\t' ' ' '\n' '\r' '<' '>']*) ':'
+let local = [^ ' ' ':' '\t' ' ' '\n' '\r' '<' '>']+
 
 rule tokenstream = parse
 // --------------------------
 | whitespace	{ tokenstream lexbuf }
 | newline	    { newline lexbuf; tokenstream lexbuf }
-| scheme        { Parser.SCHEME }
-| fullIri       { printfn "Token fullIri"; Parser.FULLIRI ( string (lexeme lexbuf)) }
-| prefixedIri    { printfn "Token prefixedIri"; Parser.PREFIXEDIRI (string (lexeme lexbuf)) }
 | "inverse"      { Parser.INVERSE }
 | "or"           { Parser.OR }
 | "and"          { Parser.AND }
-| "not"      { Parser.NOT }
+| "not"      { printfn "Token not"; Parser.NOT }
 | "some"      { printfn "Token SOME"; Parser.SOME }
 | "only"      { printfn "Token ONLY";Parser.ONLY }
 | "that"     { Parser.THAT }
 | "Class:"    { Parser.CLASS }
 | "Annotations:" {Parser.ANNOTATIONS }
-| "Prefix:"   { Parser.PREFIX }
-| "Ontology:" { Parser.ONTOLOGY }
+| "Prefix:"   { printfn "Token Prefix"; Parser.TOKENPREFIX }
+| "Ontology:" { printfn "Token Ontology"; Parser.ONTOLOGY }
 | "Import:"   {Parser.IMPORT}
-| "SubClassOf:" {Parser.SUBCLASSOF}
+| "SubClassOf:" {printfn  "Token subclass"; Parser.SUBCLASSOF}
 | "EquivalentTo:" {Parser.EQUIVALENTTO}
-| "("        { Parser.LPAREN }
+| "("        { printfn "Token ("; Parser.LPAREN }
 | ")"        { Parser.RPAREN }
 | "<"        { Parser.LT }
 | ">"        { Parser.GT }
 | ","       { Parser.COMMA }
+| ":"         { Parser.COLON }
+| scheme        { Parser.SCHEME }
+| fullIri       { printfn "Token fullIri"; Parser.FULLIRI ( string (lexeme lexbuf)) }
+| prefix       { printfn "Token prefixname"; Parser.PREFIXNAME ( string ( lexeme lexbuf ))}
+| local         { printfn "Token local"; Parser.LOCAL (string (lexeme lexbuf)) }
 // --------------------------
 | _    		{ failwith ("ParseError" + LexBuffer<_>.LexemeString lexbuf) }
 | eof   	{ Parser.EOF }

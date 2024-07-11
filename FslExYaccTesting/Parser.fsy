@@ -3,13 +3,22 @@ open System
 open IriTools
 open AlcTableau
 open AlcTableau.ALC
+
+let mutable prefixMap : Map<string, string> = Map([
+    ("rdf:", "https://www.w3.org/1999/02/22-rdf-syntax-ns");
+    ("rdfs:", "https://www.w3.org/2000/01/rdf-schema");
+    ("owl:", "https://www.w3.org/2002/07/owl");
+    ("xsd:", "https://www.w3.org/2001/XMLSchema")
+    ])
+
+type classExpressionType = AlcTableau.ALC.Concept -> TBox
 %}
 
 // The start token becomes a parser function in the compiled code:
 %start start
 
 // Regular tokens
-%token HELLO
+%token ONTOLOGY
 %token CLASS
 %token SUBCLASSOF
 %token EQUIVALENTTO
@@ -21,17 +30,17 @@ open AlcTableau.ALC
 %token LPAREN
 %token RPAREN
 %token COMMA
+%token COLON
 %token INVERSE
 %token ANNOTATIONS
-%token PREFIX
-%token ONTOLOGY
+%token TOKENPREFIX
 %token IMPORT
 %token THAT
 %token LT
 %token GT
 %token <string> FULLIRI
-%token <string> ABBREVIATETEDIRI
-%token <string> PREFIXEDIRI
+%token <string> LOCAL
+%token <string> PREFIXNAME
 %token SCHEME 
 
 // Misc tokens
@@ -39,8 +48,12 @@ open AlcTableau.ALC
 
 // This is the type of the data produced by a successful reduction of the 'start'
 // symbol:
-%type < AlcTableau.ALC.Concept > start
 %type < IriTools.IriReference > Iri
+%type < AlcTableau.ALC.TBox > start
+%type < AlcTableau.ALC.TBox > classFrame
+%type < AlcTableau.ALC.TBox > frameList
+%type < classExpressionType > classExpression
+%type < AlcTableau.ALC.Concept list > descriptionAnnotatedList
 
 %left SOME ONLY 
 %left AND
@@ -50,7 +63,26 @@ open AlcTableau.ALC
 
 // These are the rules of the grammar along with the F# code of the 
 // actions executed as rules are reduced.  
-start: description EOF { $1 }
+start: ontologyDocument EOF { $1 }
+
+ontologyDocument : 
+    prefixDeclarationList ontology { printfn "Parsed ontology with prefixes";  $2 } 
+    | ontology { printfn "Parsed ontology without prefixes" ; $1 }
+
+prefixDeclarationList : 
+    prefixDeclaration {  }
+    | prefixDeclaration prefixDeclarationList {  }
+
+prefixDeclaration : 
+    TOKENPREFIX PREFIXNAME LT FULLIRI GT {printfn $"Parsed prefix declaration {$2}"; prefixMap <- prefixMap.Add($2, $4) }
+
+ontology :
+    ONTOLOGY Iri frameList { printfn "Parsed non-empty ontology"; $3 }
+    | ONTOLOGY Iri {printfn "Parsed empty  Ontology" ; [] }
+
+frameList : 
+    classFrame frameList {$1 @ $2 }
+    | classFrame {$1}
 
 description:
     | description OR conjunction { AlcTableau.ALC.Disjunction($1, $3) }
@@ -66,20 +98,21 @@ restriction:
     | objectPropertyExpression ONLY primary { AlcTableau.ALC.Universal($1, $3) }
 
 primary:
-    | NOT primary { AlcTableau.ALC.Negation($2) }
+    | NOT primary { printfn "Parsed negation"; AlcTableau.ALC.Negation($2) }
     | restriction { $1 }
     | Iri { AlcTableau.ALC.ConceptName($1) }
     | LPAREN description RPAREN { $2 }
 
 classFrame: CLASS Iri classExpressionList { $3 (AlcTableau.ALC.ConceptName $2) }
+    | CLASS Iri { [] }
 
 classExpressionList:  
     classExpression { $1 }
-    | classExpression classExpressionList { fun superclass -> Seq.append ($1 superclass) ($2 superclass) }
+    | classExpression classExpressionList { fun superclass -> ($1 superclass) @ ($2 superclass) }
 
 classExpression:
-    SUBCLASSOF descriptionAnnotatedList { fun superclass ->  Seq.map (fun subclass -> AlcTableau.ALC.Inclusion(subclass, superclass)) $2 }
-    | EQUIVALENTTO descriptionAnnotatedList { fun superclass ->  Seq.map (fun subclass -> AlcTableau.ALC.Equivalence(subclass, superclass)) $2 }
+    SUBCLASSOF descriptionAnnotatedList { fun superclass ->  List.map (fun subclass -> AlcTableau.ALC.Inclusion(subclass, superclass)) $2 }
+    | EQUIVALENTTO descriptionAnnotatedList { fun superclass ->  List.map (fun subclass -> AlcTableau.ALC.Equivalence(subclass, superclass)) $2 }
 
 descriptionAnnotatedList:
     | description {[$1]}
@@ -90,7 +123,7 @@ objectPropertyExpression:
     | INVERSE Iri { failwith "Inverse not supported"  }
 
 Iri: 
-    | LT FULLIRI GT { $2 }
-    | ABBREVIATETEDIRI { $1 }
-    | PREFIXEDIRI { $1 } 
+    | LT FULLIRI GT { printfn "Parsed full Iri"; $2 }
+    | LOCAL { new IriReference( prefixMap[""] + $1 ) }
+    | PREFIXNAME LOCAL {printfn $"Parsed prefixed Iri {$1}";  new IriReference( prefixMap[$1] + $2  )} 
 

@@ -11,7 +11,7 @@ let testLexerAndParserFromString text expectedCount =
 
     let countFromParser = Parser.start Lexer.tokenstream lexbuf
 
-    printfn "countFromParser: result = %s, expected %s" (Manchester.Printer.toString countFromParser) expectedCount
+    printfn "countFromParser: result = %s, expected %s" (Manchester.Printer.ontologyToString countFromParser) expectedCount
 
 
 
@@ -21,16 +21,23 @@ let testLexerAndParserFromFile (fileName:string) expectedCount =
 
     let countFromParser = Parser.start Lexer.tokenstream lexbuf
 
-    printfn "countFromParser: result = %s, expected %s" (toString countFromParser) expectedCount
+    printfn "countFromParser: result = %s, expected %s" (ontologyToString countFromParser) expectedCount
 
-testLexerAndParserFromString "ex:hello" "ex:hello"
-testLexerAndParserFromString "ex:hello and ex:hello" "ex:hello and ex:hello"
+testLexerAndParserFromString """
+    Prefix: ex: <https://example.com/>
+    Ontology: <https://example.com/ontology> 
+    Class: ex:concept
+    """ ""
+// testLexerAndParserFromString "ex:hello and ex:hello" "ex:hello and ex:hello"
 
-testLexerAndParserFromString "ex:prop some ex:hello" "ex:prop some ex:hello"
+// testLexerAndParserFromString "ex:prop some ex:hello" "ex:prop some ex:hello"
 
 let testFile = Path.Combine(__SOURCE_DIRECTORY__, "test.txt")
-File.WriteAllText(testFile, "<https://example.com/concept>")
-testLexerAndParserFromFile testFile "<https://example.com/concept>"
+File.WriteAllText(testFile, """
+    Ontology: <https://example.com/ontology> 
+    Class: <https://example.com/concept>
+    """)
+testLexerAndParserFromFile testFile ""
 
 printfn "Press any key to continue..."
 System.Console.ReadLine() |> ignore

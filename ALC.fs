@@ -4,6 +4,11 @@ open IriTools
 
 module ALC =
     
+    type Iri = 
+    | FullIri of IriReference
+    | AbbreviatedIri of string
+    | PrefixedIri of PrefixName : string * LocalName : string
+
     type Role = IriReference
     
     [<CustomEquality>]

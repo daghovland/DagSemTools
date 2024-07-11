@@ -21,3 +21,12 @@ let rec toString (concept: Concept) =
     | Top -> "owl:Thing"
     | Bottom -> "owl:Nothing"
 
+and ontologyToString (tbox: TBoxAxiom list) : string =
+        List.map (fun ax -> axiomToString ax) tbox  
+        |>  List.fold (fun acc elem -> acc + elem) ""
+
+and axiomToString (axiom: TBoxAxiom) : string = 
+    match axiom with
+    | Inclusion (sup, sub) -> $"%s{toString sub} <= {toString sup}"
+    | Equivalence (left, right) -> $"%s{toString left} >= {toString right}"
+    
