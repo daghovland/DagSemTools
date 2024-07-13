@@ -41,6 +41,8 @@ type classExpressionType = AlcTableau.ALC.Concept -> TBox
 %token <string> FULLIRI
 %token <string> LOCAL
 %token <string> PREFIXNAME
+%token <string> QUOTEDSTRING
+%token <int> INTEGERLITERAL
 %token SCHEME 
 
 // Misc tokens
@@ -61,8 +63,6 @@ type classExpressionType = AlcTableau.ALC.Concept -> TBox
 
 %%
 
-// These are the rules of the grammar along with the F# code of the 
-// actions executed as rules are reduced.  
 start: ontologyDocument EOF { $1 }
 
 ontologyDocument : 
@@ -83,7 +83,16 @@ ontologyVersion:
 
 ontology :
     ontologyVersion frameList { printfn "Parsed non-empty ontology"; $2 }
+    | ontologyVersion ontologyImportsAndAnnotations frameList { printfn "Parsed non-empty ontology"; $3 }
+    | ontologyVersion ontologyImportsAndAnnotations { printfn "Parsed empty ontology with imports/annots"; [] }
     | ontologyVersion { printfn "Parsed empty ontology"; [] }
+    
+
+ontologyImportsAndAnnotations: 
+    importDeclarationList {}
+    | annotationsList {printfn "Parsed annotation list"}
+    | importDeclarationList annotationsAnnotatedList {}
+    
 
 importDeclarationList:
     importDeclaration importDeclarationList {}
@@ -91,6 +100,26 @@ importDeclarationList:
 
 importDeclaration: 
     | IMPORT Iri { }
+
+
+annotations: 
+    ANNOTATIONS annotationsAnnotatedList {printfn "Parsed annotations list" }
+
+annotationsList:
+    annotations {}
+    | annotations annotationsList {}
+
+annotationsAnnotatedList :
+    annotation {printfn "Parsed annotation "}
+    | annotations annotation {}
+    | annotationsAnnotatedList COMMA annotationsAnnotatedList {}
+
+annotation: Iri Iri {printfn "Annotating with Iri"}
+    | Iri literal {printfn "Annotating with literal"}
+
+literal:
+    QUOTEDSTRING {}
+    | INTEGERLITERAL {}
 
 frameList : 
     classFrame frameList {$1 @ $2 }
@@ -136,6 +165,6 @@ objectPropertyExpression:
 
 Iri: 
     | LT FULLIRI GT { printfn "Parsed full Iri"; new IriReference( $2 ) }
-    | LOCAL { new IriReference( prefixMap[""] + $1 ) }
+    | LOCAL { new IriReference( prefixMap[":"] + $1 ) }
     | PREFIXNAME LOCAL {printfn $"Parsed prefixed Iri {$1}";  new IriReference( prefixMap[$1] + $2  )} 
 

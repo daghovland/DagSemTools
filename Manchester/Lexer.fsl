@@ -17,9 +17,9 @@ let digit = ['0'-'9']
 
 let scheme = ("http" | "https")
 let host = ['a'-'z' '.']+
-let authority = host + (':' + ['0'-'9']+)?
+let authority = host  (':'  ['0'-'9']+)?
 
-let fullIri = scheme +  "://" + authority +  [^'>' ' ' '\t']* 
+let fullIri = scheme   "://"  authority   [^'>' ' ' '\t']* 
 let prefix = ([^ ' ' ':' '\t' ' ' '\n' '\r' '<' '>']*) ':'
 let local = [^ ' ' ':' '\t' ' ' '\n' '\r' '<' '>']+
 
@@ -35,7 +35,7 @@ rule tokenstream = parse
 | "only"      { printfn "Token ONLY";Parser.ONLY }
 | "that"     { Parser.THAT }
 | "Class:"    { Parser.CLASS }
-| "Annotations:" {Parser.ANNOTATIONS }
+| "Annotations:" {printfn "Token Annotations:"; Parser.ANNOTATIONS }
 | "Prefix:"   { printfn "Token Prefix"; Parser.TOKENPREFIX }
 | "Ontology:" { printfn "Token Ontology"; Parser.ONTOLOGY }
 | "Import:"   {Parser.IMPORT}
@@ -46,6 +46,8 @@ rule tokenstream = parse
 | "<"        { Parser.LT }
 | ">"        { Parser.GT }
 | ","       { Parser.COMMA }
+| ['0'-'9']+ { printfn "Token Integer literal"; Parser.INTEGERLITERAL ( int (lexeme lexbuf))}
+| '"' [^ '"']+ '"' { printfn "Token literal string"; Parser.QUOTEDSTRING ( string ( lexeme lexbuf))}
 | scheme        { Parser.SCHEME }
 | fullIri       { printfn "Token fullIri"; Parser.FULLIRI ( string (lexeme lexbuf)) }
 | prefix       { printfn "Token prefixname"; Parser.PREFIXNAME ( string ( lexeme lexbuf ))}

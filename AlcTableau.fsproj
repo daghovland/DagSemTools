@@ -7,6 +7,7 @@
 
     <ItemGroup>
         <Compile Include="ALC.fs" />
+        <Compile Include="NNF.fs" />
     </ItemGroup>
 
     <ItemGroup>

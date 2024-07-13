@@ -11,3 +11,8 @@ test/ManchesterOwl2.Unit.Tests/obj/
 Manchester/Lexer.fsi
 Manchester/Parser.fs
 Manchester/Parser.fsi
+NNF.fs
+Manchester/Lexer.fs
+TurtleParser/.antlr
+TurtleParser/bin/
+TurtleParser/obj/

@@ -172,6 +172,51 @@ let ``Versioned ontology IRI can be parsed`` () =
     Ontology: <http://example.com/owl/families> <http://example.com/owl/families-v1>
     """
     Assert.Equal<ALC.TBox>(parseValue, [])
+
+
+[<Fact>]
+let ``Import can be parsed`` () =
+    let parseValue = testLexerAndParserFromString """
+    Ontology: 
+    Import: <http://ex.com/owl2/families.owl>
+    """
+    Assert.Equal<ALC.TBox>(parseValue, [])
+
+[<Fact>]
+let ``Multiple annotations can be parsed`` () =
+    let parseValue = testLexerAndParserFromString """
+    Prefix: : <http://ex.com/owl/families#>
+    Ontology: 
+    Annotations: creator John, 
+               mainClass Person
+    """
+    Assert.Equal<ALC.TBox>(parseValue, [])
+
+[<Fact>]
+let ``Annotations on  annotations can be parsed`` () =
+    let parseValue = testLexerAndParserFromString """
+    Prefix: : <http://ex.com/owl/families#>
+    Ontology: 
+    Annotations: creator John, 
+               Annotations: 
+                 rdfs:comment "Creation Year"
+                 creationYear 2008, 
+               mainClass Person
+    """
+    Assert.Equal<ALC.TBox>(parseValue, [])
+
+
+[<Fact>]
+let ``Single annotation can be parsed`` () =
+    let parseValue = testLexerAndParserFromString """
+    Prefix: : <http://ex.com/owl/families#>
+    Ontology: 
+    Annotations: creator John
+    """
+    Assert.Equal<ALC.TBox>(parseValue, [])
+
+
+    
 [<Fact>]
 let ``Reference example can be parsed`` () =
     let parseValue = testLexerAndParserFromFile "TestData/manchester-ref.owl"

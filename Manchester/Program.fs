@@ -23,11 +23,10 @@ let testLexerAndParserFromFile (fileName:string) expectedCount =
 
     printfn "countFromParser: result = %s, expected %s" (ontologyToString countFromParser) expectedCount
 
-testLexerAndParserFromString """
-        Prefix: ex: <http://ex.com/owl/families#>
-    Prefix: g: <http://ex.com/owl2/families#>
-
-    Ontology: <http://example.com/owl/families> <http://example.com/owl/families-v1>
+testLexerAndParserFromString  """
+    Prefix: : <http://ex.com/owl/families#>
+    Ontology: 
+    Annotations: creator "John"
     """ ""
 // testLexerAndParserFromString "ex:hello and ex:hello" "ex:hello and ex:hello"
 
