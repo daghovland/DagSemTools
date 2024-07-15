@@ -16,3 +16,8 @@ Manchester/Lexer.fs
 TurtleParser/.antlr
 TurtleParser/bin/
 TurtleParser/obj/
+ManchesterAntlr/.antlr/
+ManchesterAntlr/bin/
+ManchesterAntlr/obj/
+test/ManchesterAntlr.Unit.Tests/bin/
+test/ManchesterAntlr.Unit.Tests/obj/
