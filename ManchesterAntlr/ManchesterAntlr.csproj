@@ -9,8 +9,15 @@
   <ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.10.1" />
 		<PackageReference Include="Antlr4BuildTasks" Version="10.7" />
+    <PackageReference Include="FSharp.Core" Version="8.0.301" />
 	</ItemGroup>
 	<ItemGroup>
 		<Antlr4 Include="Manchester.g4" />
+    <Antlr4 Include="Concept.g4" />
+    <Antlr4 Include="IriGrammar.g4" />
+    <Antlr4 Include="ManchesterLexer.g4" />
 	</ItemGroup>
+      <ItemGroup>
+        <ProjectReference Include="..\AlcTableau.fsproj" />
+    </ItemGroup>
 </Project>
