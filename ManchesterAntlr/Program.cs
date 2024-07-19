@@ -1,45 +1,54 @@
-﻿namespace AlcTableau.ManchesterAntlr;
+﻿namespace ManchesterAntlr.Unit.Tests;
 using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using AlcTableau.ManchesterAntlr;
+using IriTools;
 
-
-public class Program
+public static class Program
 {
 
 
-    static void Main(string[] args)
-    {
-            using TextReader text_reader = File.OpenText(args[0]);
+    public static IriReference testFile(string filename){
+        using TextReader text_reader = File.OpenText(filename);
 
+           return testReader(text_reader);
+
+    }
+
+    public static IriReference testReader(TextReader text_reader){
         
             // Create an input character stream from standard in
             var input = new AntlrInputStream(text_reader);
             // Create an ExprLexer that feeds from that stream
-            ManchesterLexer lexer = new ManchesterLexer(input);
+            var lexer = new IriGrammarLexer(input);
             // Create a stream of tokens fed by the lexer
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             // Create a parser that feeds off the token stream
-            ManchesterParser parser = new ManchesterParser(tokens);
-            // tell ANTLR to build a parse tree
-            parser.BuildParseTree = true; 
-            // Begin parsing at rule file
-            IParseTree tree = parser.ontologyDocument();
-            ManchesterVisitor visitor = new ManchesterVisitor();
+            var parser = new IriGrammarParser(tokens);
+            // Begin parsing at rule r
+            
+            IParseTree tree = parser.rdfiri();
+            var visitor = new IriGrammarVisitor(new Dictionary<string, IriReference>());
+            return visitor.Visit(tree);
             
 
-            Console.WriteLine(tree.ToStringTree(parser)); // print LISP-style tree
+    }
 
-            visitor.Visit(tree);
+    public static IriReference testString(string owl){
+            using TextReader text_reader = new StringReader(owl);
+                return testReader(text_reader);
+    }
 
-            // ParseTreeWalker walker = new ParseTreeWalker();
-            // var listener = new ManchesterListener();
-            // walker.Walk(listener, tree);
-            // foreach (var error in listener.errors)
-            // {
-            //         Console.WriteLine($"Error {error.ToString()}");
-            // }
-            
+
+    public static void Main(string[] args){
+        var iriString = args[0];
+        Console.WriteLine($"Input string: {iriString}");
+        var testIri = new IriReference(iriString);
+        var parsedIri  = testString($"<{testIri.ToString()}>");
+        Console.WriteLine($"parsed IRI: {parsedIri}");
+        
     }
     
+
 }

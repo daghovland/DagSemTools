@@ -1,5 +1,5 @@
 grammar Concept;
-import IriGrammar, ManchesterLexer;
+import IriGrammar, ManchesterCommonTokens;
 
 description: conjunction ('or' conjunction)*;
 

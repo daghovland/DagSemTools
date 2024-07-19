@@ -1,5 +1,5 @@
 grammar Manchester;
-import IriGrammar, Concept, ManchesterLexer;
+import IriGrammar, Concept, ManchesterCommonTokens;
 
 ontologyDocument : prefixDeclaration* ontology EOF;
 

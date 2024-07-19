@@ -2,35 +2,41 @@ grammar IriGrammar; // Kind of IRIs (https://www.rfc-editor.org/rfc/rfc3987#sect
 
 
 rdfiri: '<' IRI '>'   #fullIri
-      | PREFIXNAME ':' LOCALNAME #prefixedIri
-      | LOCALNAME #abbreviatedIri
+      | prefixName ':' localName #prefixedIri
+      | ':'? localName #emptyPrefixedIri
       ;
 
+prefixName: LOCALNAME;
+localName: LOCALNAME;
 
-PREFIXNAME: [a-z]+;
-LOCALNAME: IPATH;
+// Lexer
+WHITESPACE: [ \t\r\n] -> skip;
+
+// According to OWL, this is the PNAME_NS from SPARQL
+LOCALNAME: ~([:<> \t\r\n]) +;
+
 
 // This is the IRI from the new RDF-1.2 spec
 IRI  :   SCHEME ':' IHIERPART ( '?' IQUERY )? ( '#' IFRAGMENT )? ;
 // This is stricter than the spec, but realistic
 SCHEME  :   'http'|'https';
-LOWER : [a-z]+;
+
+LOWER : [a-z];
+UPPER: [A-Z];
+ALPHA : LOWER | UPPER;
 DIGIT: [0-9];
 
 // This is super-loose, but we dont really need to parse the iri structure anyway
 IHIERPART  : '//' IAUTHORITY IPATH ;
 IQUERY : IPATH;
 IFRAGMENT: IPATH;
-IPATH : (LOWER | '/' )+ ;
+IPATH : ~[:<>?# ]+;
     
 // Rdf-1.2 recommends to not allow ports or ip numbers in IRIs
 IAUTHORITY: IHOST;
-IHOST: IREGNAME;
-IREGNAME : ( LOWER | '.'|'-' | DIGIT ) + ;
-ALPHA: [A-Z]|[a-z];
-RESERVED: GENDELIMS | SUBDELIMS;
-GENDELIMS :   [:|?#[\]@];
-SUBDELIMS :   [!$&'()*+,;=];
+// DNS spec only allows these hosts
+IHOST: VALIDHOSTNAMES;
+VALIDHOSTNAMES : ( LOWER | '.'|'-' | DIGIT ) + ;
 
 
 
