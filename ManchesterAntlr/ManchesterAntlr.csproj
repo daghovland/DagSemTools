@@ -12,9 +12,9 @@
     <PackageReference Include="FSharp.Core" Version="8.0.301" />
 	</ItemGroup>
 	<ItemGroup>
+        <Antlr4 Include="IriGrammar.g4" />
+        <Antlr4 Include="Concept.g4" />
 		<Antlr4 Include="Manchester.g4" />
-    <Antlr4 Include="Concept.g4" />
-    <Antlr4 Include="IriGrammar.g4" />
 	</ItemGroup>
       <ItemGroup>
         <ProjectReference Include="..\AlcTableau.fsproj" />

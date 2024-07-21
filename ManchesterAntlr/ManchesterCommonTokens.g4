@@ -1,9 +1,5 @@
 lexer grammar ManchesterCommonTokens;
 
-SOME: 'some';
-ONLY: 'only';
-OR: 'or';
-AND: 'and';
 INVERSE: 'inverse';
 NOT: 'not';
 THAT: 'that';
@@ -21,7 +17,6 @@ RPAREN: ')';
 LT: '<';
 GT: '>';
 COMMA: ',';
-
 
 WHITESPACE : [ \t\r\n]+ -> skip ;
 NEWLINE : '\n'  | '\r' '\n';

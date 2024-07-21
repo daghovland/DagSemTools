@@ -1,11 +1,9 @@
 namespace AlcTableau.ManchesterAntlr;
-using AlcTableau;
-using System;
 using System.Collections.Generic;
 using IriTools;
-using static IriGrammarParser;
+using static ConceptParser;
 
-public class IriGrammarVisitor : IriGrammarBaseVisitor<IriReference>
+public class IriGrammarVisitor : ConceptBaseVisitor<IriReference>
 {
     private Dictionary<string, IriReference> _prefixes;
     public IriGrammarVisitor()
