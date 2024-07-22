@@ -1,5 +1,5 @@
 grammar Concept;
-import IriGrammar, ManchesterCommonTokens;
+import ManchesterCommonTokens, IriGrammar;
 
 start: description EOF;
 
@@ -19,6 +19,6 @@ primary:
     NOT primary                   #NegatedPrimary
     | restriction                   #RestrictionPrimary
     | rdfiri                        #IriPrimary
-    | LPAREN description RPAREN     #ParenthesizedPrimary
+    | '(' description ')'     #ParenthesizedPrimary
     ;
 

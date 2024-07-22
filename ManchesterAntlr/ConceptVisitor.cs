@@ -11,7 +11,10 @@ public class ConceptVisitor : ConceptBaseVisitor<ALC.Concept>
     {
         _iriGrammarVisitor = new IriGrammarVisitor();
     }
-
+    public ConceptVisitor(Dictionary<string, IriReference> prefixes)
+    {
+        _iriGrammarVisitor = new IriGrammarVisitor(prefixes);
+    }
     public override ALC.Concept VisitStart(ConceptParser.StartContext context) =>
         Visit(context.GetChild(0));
     
@@ -20,7 +23,9 @@ public class ConceptVisitor : ConceptBaseVisitor<ALC.Concept>
         var iri = _iriGrammarVisitor.Visit(context.rdfiri());
         return ALC.Concept.NewConceptName(iri);
     }
-    
+
+    public override ALC.Concept VisitParenthesizedPrimary(ConceptParser.ParenthesizedPrimaryContext context) =>
+        Visit(context.description());
     public override ALC.Concept VisitActualDisjunction(ConceptParser.ActualDisjunctionContext context) =>
         ALC.Concept.NewDisjunction(Visit(context.description()), Visit(context.conjunction()));
     
@@ -36,6 +41,11 @@ public class ConceptVisitor : ConceptBaseVisitor<ALC.Concept>
     public override ALC.Concept VisitSingleConjunction(ConceptParser.SingleConjunctionContext context) =>
         Visit(context.primary());
     
+    public override ALC.Concept VisitUniversalRestriction(ConceptParser.UniversalRestrictionContext context) =>
+        ALC.Concept.NewUniversal(
+            _iriGrammarVisitor.Visit(context.rdfiri()),
+            Visit(context.primary()));
+
     public override ALC.Concept VisitExistentialRestriction(ConceptParser.ExistentialRestrictionContext context) =>
         ALC.Concept.NewExistential(
             _iriGrammarVisitor.Visit(context.rdfiri()),

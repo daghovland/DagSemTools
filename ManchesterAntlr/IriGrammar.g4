@@ -13,7 +13,7 @@ localName: LOCALNAME;
 WHITESPACE: [ \t\r\n] -> skip;
 
 // According to OWL, this is the PNAME_NS from SPARQL
-LOCALNAME: ~([:<> \t\r\n]) +;
+LOCALNAME: ~([:<> \t\r\n()]) +;
 
 
 // This is the IRI from the new RDF-1.2 spec
@@ -30,7 +30,7 @@ DIGIT: [0-9];
 IHIERPART  : '//' IAUTHORITY IPATH ;
 IQUERY : IPATH;
 IFRAGMENT: IPATH;
-IPATH : ~[:<>?# ]+;
+IPATH : ~[:<>?# \t\r\n()]+;
     
 // Rdf-1.2 recommends to not allow ports or ip numbers in IRIs
 IAUTHORITY: IHOST;
