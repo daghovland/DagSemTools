@@ -17,9 +17,9 @@ public class TestConceptParser
     private ALC.Concept TestReader(TextReader textReader, Dictionary<string, IriReference> prefixes){
         
             var input = new AntlrInputStream(textReader);
-            var lexer = new ConceptLexer(input);
+            var lexer = new ManchesterLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new ConceptParser(tokens);
+            var parser = new ManchesterParser(tokens);
             IParseTree tree = parser.start();
             var visitor = new ConceptVisitor(prefixes);
             return visitor.Visit(tree);

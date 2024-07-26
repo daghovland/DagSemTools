@@ -60,3 +60,12 @@ module ALC =
     type ABox = ABoxAssertion list
     
     type KnowledgeBase = TBox * ABox
+    
+    type ontologyVersion =
+        | UnNamedOntology
+        | NamedOntology of OntologyIri: IriReference
+        | VersionedOntology of OntologyIri: IriReference * OntologyVersionIri: IriReference
+    type prefix =
+        | Prefix of PrefixName: string * PrefixIri: IriReference
+    type OntologyDocument =
+        | Ontology of prefix list * ontologyVersion * KnowledgeBase

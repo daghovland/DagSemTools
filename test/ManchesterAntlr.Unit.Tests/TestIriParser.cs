@@ -20,9 +20,9 @@ public class TestIriParser
     public IriReference testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes){
         
             var input = new AntlrInputStream(text_reader);
-            var lexer = new ConceptLexer(input);
+            var lexer = new ManchesterLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
-            var parser = new ConceptParser(tokens);
+            var parser = new ManchesterParser(tokens);
             IParseTree tree = parser.rdfiri();
             var visitor = new IriGrammarVisitor(prefixes);
             return visitor.Visit(tree);

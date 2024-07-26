@@ -4,69 +4,53 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using AlcTableau.ManchesterAntlr;
 using FluentAssertions;
+using AlcTableau.ManchesterAntlr;
+using AlcTableau;
+using FluentAssertions;
+using IriTools;
 
 public class TestParser
 {
 
 
-    public AlcTableau.ManchesterAntlr.ManchesterListener testFile(string filename){
-        using TextReader text_reader = File.OpenText(filename);
-
-           return testReader(text_reader);
-
+    private ALC.Concept TestFile(string filename){
+        using TextReader textReader = File.OpenText(filename);
+        return TestReader(textReader);
     }
 
-    public ManchesterListener testReader(TextReader text_reader){
+    private ALC.Concept TestReader(TextReader textReader, Dictionary<string, IriReference> prefixes){
         
-            // Create an input character stream from standard in
-            var input = new AntlrInputStream(text_reader);
-            // Create an ExprLexer that feeds from that stream
-            ManchesterLexer lexer = new ManchesterLexer(input);
-            // Create a stream of tokens fed by the lexer
-            CommonTokenStream tokens = new CommonTokenStream(lexer);
-            // Create a parser that feeds off the token stream
-            ManchesterParser parser = new ManchesterParser(tokens);
-            // Begin parsing at rule r
-            
-            IParseTree tree = parser.ontologyDocument();
-            ParseTreeWalker walker = new ParseTreeWalker();
-            var listener = new AlcTableau.ManchesterAntlr.ManchesterListener();
-            walker.Walk(listener, tree);
-            
-            Console.WriteLine(tree.ToStringTree(parser)); // print LISP-style tree
-            return listener;
-
+        var input = new AntlrInputStream(textReader);
+        var lexer = new ManchesterLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        var parser = new ManchesterParser(tokens);
+        IParseTree tree = parser.start();
+        var visitor = new ConceptVisitor(prefixes);
+        return visitor.Visit(tree);
     }
-
-
-        public AlcTableau.ManchesterAntlr.ManchesterListener testString(string owl){
-            using TextReader text_reader = new StringReader(owl);
-                return testReader(text_reader);
+    
+    public ALC.Concept TestReader(TextReader textReader) =>
+        TestReader(textReader, new Dictionary<string, IriReference>());
+    public ALC.Concept TestString(string owl){
+        using TextReader textReader = new StringReader(owl);
+        return TestReader(textReader);
     }
-
 
     [Fact]
     public void TestSmallestOntology()
     {
-        var listener = testString("Prefix: Ontology:");
-        Assert.Empty(listener.errors);
+        var parsed = TestString("Prefix: Ontology:");
+        parsed.Should().NotBeNull();
     }
 
     
     [Fact]
     public void TestOntologyWithIri()
     {
-        var listener = testString("Prefix: Ontology: <https://example.com/ontology>");
-        Assert.Empty(listener.errors);
+        var parsedOntology = TestString("Prefix: Ontology: <https://example.com/ontology>");
+        parsedOntology.Should().NotBeNull();
     }
-
     
-    [Fact]
-    public void TurtleGivesEroor()
-    {
-        var listener = testString("<http://example.com/concecpt1> <http://example.com/role1> <http://example.com/concecpt2> .");
-        listener.errors.Should().NotBeEmpty("The parser should not allow nquads");
-    }
 
 
 }

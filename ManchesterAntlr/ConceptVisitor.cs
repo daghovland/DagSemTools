@@ -4,7 +4,7 @@ using IriTools;
 namespace ManchesterAntlr;
 using AlcTableau;
 
-public class ConceptVisitor : ConceptBaseVisitor<ALC.Concept>
+public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
 {
     private readonly IriGrammarVisitor _iriGrammarVisitor;
     public ConceptVisitor()
@@ -15,38 +15,38 @@ public class ConceptVisitor : ConceptBaseVisitor<ALC.Concept>
     {
         _iriGrammarVisitor = new IriGrammarVisitor(prefixes);
     }
-    public override ALC.Concept VisitStart(ConceptParser.StartContext context) =>
+    public override ALC.Concept VisitStart(ManchesterParser.StartContext context) =>
         Visit(context.GetChild(0));
     
-    public override ALC.Concept VisitIriPrimary(ConceptParser.IriPrimaryContext context)
+    public override ALC.Concept VisitIriPrimary(ManchesterParser.IriPrimaryContext context)
     {
         var iri = _iriGrammarVisitor.Visit(context.rdfiri());
         return ALC.Concept.NewConceptName(iri);
     }
 
-    public override ALC.Concept VisitParenthesizedPrimary(ConceptParser.ParenthesizedPrimaryContext context) =>
+    public override ALC.Concept VisitParenthesizedPrimary(ManchesterParser.ParenthesizedPrimaryContext context) =>
         Visit(context.description());
-    public override ALC.Concept VisitActualDisjunction(ConceptParser.ActualDisjunctionContext context) =>
+    public override ALC.Concept VisitActualDisjunction(ManchesterParser.ActualDisjunctionContext context) =>
         ALC.Concept.NewDisjunction(Visit(context.description()), Visit(context.conjunction()));
     
-    public override ALC.Concept VisitSingleDisjunction(ConceptParser.SingleDisjunctionContext context) =>
+    public override ALC.Concept VisitSingleDisjunction(ManchesterParser.SingleDisjunctionContext context) =>
         Visit(context.conjunction());
 
-    public override ALC.Concept VisitActualConjunction(ConceptParser.ActualConjunctionContext context)
+    public override ALC.Concept VisitActualConjunction(ManchesterParser.ActualConjunctionContext context)
     {
         var conjunction = Visit(context.conjunction());
         var primary = Visit(context.primary());
         return ALC.Concept.NewConjunction(conjunction, primary);
     }
-    public override ALC.Concept VisitSingleConjunction(ConceptParser.SingleConjunctionContext context) =>
+    public override ALC.Concept VisitSingleConjunction(ManchesterParser.SingleConjunctionContext context) =>
         Visit(context.primary());
     
-    public override ALC.Concept VisitUniversalRestriction(ConceptParser.UniversalRestrictionContext context) =>
+    public override ALC.Concept VisitUniversalRestriction(ManchesterParser.UniversalRestrictionContext context) =>
         ALC.Concept.NewUniversal(
             _iriGrammarVisitor.Visit(context.rdfiri()),
             Visit(context.primary()));
 
-    public override ALC.Concept VisitExistentialRestriction(ConceptParser.ExistentialRestrictionContext context) =>
+    public override ALC.Concept VisitExistentialRestriction(ManchesterParser.ExistentialRestrictionContext context) =>
         ALC.Concept.NewExistential(
             _iriGrammarVisitor.Visit(context.rdfiri()),
             Visit(context.primary()));
