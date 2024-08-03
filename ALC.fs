@@ -1,5 +1,6 @@
 ﻿namespace AlcTableau
 
+open System
 open IriTools
 
 module ALC =
@@ -65,7 +66,29 @@ module ALC =
         | UnNamedOntology
         | NamedOntology of OntologyIri: IriReference
         | VersionedOntology of OntologyIri: IriReference * OntologyVersionIri: IriReference
-    type prefix =
-        | Prefix of PrefixName: string * PrefixIri: IriReference
+    type ontologyVersion with
+        member x.TryGetOntologyVersionIri() =
+            match x with
+            | NamedOntology iri -> null
+            | VersionedOntology (_, iri) -> iri
+            | _ -> null
+        member x.TryGetOntologyIri() =
+            match x with
+            | NamedOntology iri -> iri
+            | VersionedOntology (iri, _) -> iri
+            | _ -> null
+            
+    type prefixDeclaration =
+        | PrefixDefinition of PrefixName: string * PrefixIri: IriReference
+    type prefixDeclaration with
+        member x.TryGetPrefixName() =
+            match x with
+            | PrefixDefinition (name, iri) -> (name, iri)
+            | _ -> (null, null)
     type OntologyDocument =
-        | Ontology of prefix list * ontologyVersion * KnowledgeBase
+        | Ontology of prefixDeclaration list * ontologyVersion * KnowledgeBase
+    type OntologyDocument with
+        member x.TryGetOntology() =
+            match x with
+            | Ontology (prefixes, ontologyVersion, KB) -> (prefixes, ontologyVersion, KB)
+            

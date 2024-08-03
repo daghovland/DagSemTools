@@ -1,8 +1,6 @@
 grammar Concept;
 import ManchesterCommonTokens, IriGrammar;
 
-start: description EOF;
-
 description: description 'or' conjunction #ActualDisjunction
     | conjunction #SingleDisjunction;
 

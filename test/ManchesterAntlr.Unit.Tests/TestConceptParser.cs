@@ -20,7 +20,7 @@ public class TestConceptParser
             var lexer = new ManchesterLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             var parser = new ManchesterParser(tokens);
-            IParseTree tree = parser.start();
+            IParseTree tree = parser.description();
             var visitor = new ConceptVisitor(prefixes);
             return visitor.Visit(tree);
     }

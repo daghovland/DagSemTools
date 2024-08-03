@@ -6,21 +6,24 @@ using AlcTableau;
 
 public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
 {
-    private readonly IriGrammarVisitor _iriGrammarVisitor;
+    public IriGrammarVisitor IriGrammarVisitor { get; init; }
     public ConceptVisitor()
     {
-        _iriGrammarVisitor = new IriGrammarVisitor();
+        IriGrammarVisitor = new IriGrammarVisitor();
     }
+    public ConceptVisitor(IriGrammarVisitor iriGrammarVisitor)
+    {
+        IriGrammarVisitor = iriGrammarVisitor;
+    }
+    
+
     public ConceptVisitor(Dictionary<string, IriReference> prefixes)
     {
-        _iriGrammarVisitor = new IriGrammarVisitor(prefixes);
+        IriGrammarVisitor = new IriGrammarVisitor(prefixes);
     }
-    public override ALC.Concept VisitStart(ManchesterParser.StartContext context) =>
-        Visit(context.GetChild(0));
-    
     public override ALC.Concept VisitIriPrimary(ManchesterParser.IriPrimaryContext context)
     {
-        var iri = _iriGrammarVisitor.Visit(context.rdfiri());
+        var iri = IriGrammarVisitor.Visit(context.rdfiri());
         return ALC.Concept.NewConceptName(iri);
     }
 
@@ -43,12 +46,12 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
     
     public override ALC.Concept VisitUniversalRestriction(ManchesterParser.UniversalRestrictionContext context) =>
         ALC.Concept.NewUniversal(
-            _iriGrammarVisitor.Visit(context.rdfiri()),
+            IriGrammarVisitor.Visit(context.rdfiri()),
             Visit(context.primary()));
 
     public override ALC.Concept VisitExistentialRestriction(ManchesterParser.ExistentialRestrictionContext context) =>
         ALC.Concept.NewExistential(
-            _iriGrammarVisitor.Visit(context.rdfiri()),
+            IriGrammarVisitor.Visit(context.rdfiri()),
             Visit(context.primary()));
     
     

@@ -9,4 +9,5 @@ frame: classFrame;
 classFrame: CLASS rdfiri subClassOf* ;
 
 subClassOf: SUBCLASSOF description*;
+equivalentTo: EQUIVALENTTO description*;
 
