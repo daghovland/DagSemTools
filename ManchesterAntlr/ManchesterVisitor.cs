@@ -11,21 +11,24 @@ using static ManchesterParser;
 
 public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDocument>
 {
-    private ConceptVisitor _conceptVisitor;
-    private FrameVisitor _frameVisitor;
+    private ConceptVisitor? _conceptVisitor;
+    private FrameVisitor? _frameVisitor;
     
-    private Dictionary<string, IriReference> prefixes = new Dictionary<string, IriReference>();
+    private readonly Dictionary<string, IriReference> _prefixes = new Dictionary<string, IriReference>();
+    
     public override ALC.OntologyDocument VisitOntologyDocument(OntologyDocumentContext ctxt){
         foreach (var prefixDecl in ctxt.prefixDeclaration())
-            prefixes[prefixDecl.prefixName().GetText()] = new IriReference(prefixDecl.IRI().GetText());
-        _conceptVisitor = new ConceptVisitor(prefixes);
+            _prefixes[prefixDecl.prefixName().GetText()] = new IriReference(prefixDecl.IRI().GetText());
+        _conceptVisitor = new ConceptVisitor(_prefixes);
         _frameVisitor = new FrameVisitor(_conceptVisitor);
         return Visit(ctxt.ontology());
     }
     
     public override ALC.OntologyDocument VisitOntology(OntologyContext ctxt)
     {
-        AlcTableau.ALC.ontologyVersion version = (ctxt.rdfiri(0), ctxt.rdfiri(1)) switch
+        if(_frameVisitor == null || _conceptVisitor == null)
+            throw new Exception("Smoething strange happened. Please report. FrameVisitor and ConceptVisitor should have been initialized in VisitOntologyDocument before visiting ontology");
+        ALC.ontologyVersion version = (ctxt.rdfiri(0), ctxt.rdfiri(1)) switch
         {
             (null, null) => ALC.ontologyVersion.UnNamedOntology,
             (not null, null) => ALC.ontologyVersion.NewNamedOntology(_conceptVisitor.IriGrammarVisitor.Visit(ctxt.rdfiri(0))),
@@ -35,19 +38,21 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
             ),
             (null, not null) => throw new Exception("A versioned ontology can only be provided with an ontology IRI")
         };
-        var tboxAxioms = ctxt.frame()
+        var knowledgeBase = ctxt.frame()
             .Select(_frameVisitor.Visit)
-            .SelectMany(x => x);
+            .Aggregate<(List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>),(IEnumerable<ALC.TBoxAxiom>, IEnumerable<ALC.ABoxAssertion>)> 
+            ((new List<ALC.TBoxAxiom>(), new List<ALC.ABoxAssertion>()), 
+                (acc, x) => (acc.Item1.Concat(x.Item1), acc.Item2.Concat(x.Item2)));
         return ALC.OntologyDocument.NewOntology(
             CreatePrefixList(),
             version,
-            System.Tuple.Create(ListModule.OfSeq(tboxAxioms), ListModule.Empty<ALC.ABoxAssertion>())
+            System.Tuple.Create(ListModule.OfSeq(knowledgeBase.Item1), ListModule.OfSeq(knowledgeBase.Item2))
         );
     }
     private FSharpList<ALC.prefixDeclaration> CreatePrefixList()
     {
         var prefixList = new List<ALC.prefixDeclaration>();
-        foreach (var kvp in prefixes)
+        foreach (var kvp in _prefixes)
         {
             var prefix = ALC.prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
             prefixList.Add(prefix);

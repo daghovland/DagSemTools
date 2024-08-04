@@ -55,12 +55,12 @@ module ALC =
     type TBox = TBoxAxiom list
     
     type ABoxAssertion =
-        | Member of Individual: IriReference * Concept
-        | RoleMember of Left: IriReference * Right: IriReference * Role
+        | ConceptAssertion of Individual: IriReference * Concept
+        | RoleAssertion of Left: IriReference * Right: IriReference * AssertedRole:  Role
        
     type ABox = ABoxAssertion list
     
-    type KnowledgeBase = TBox * ABox
+    type knowledgeBase = TBox * ABox
     
     type ontologyVersion =
         | UnNamedOntology
@@ -86,7 +86,7 @@ module ALC =
             | PrefixDefinition (name, iri) -> (name, iri)
             | _ -> (null, null)
     type OntologyDocument =
-        | Ontology of prefixDeclaration list * ontologyVersion * KnowledgeBase
+        | Ontology of prefixDeclaration list * ontologyVersion * knowledgeBase
     type OntologyDocument with
         member x.TryGetOntology() =
             match x with

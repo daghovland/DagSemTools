@@ -14,7 +14,7 @@ restriction:
     ;
 
 primary:
-    NOT primary                   #NegatedPrimary
+    'not' primary                   #NegatedPrimary
     | restriction                   #RestrictionPrimary
     | rdfiri                        #IriPrimary
     | '(' description ')'     #ParenthesizedPrimary

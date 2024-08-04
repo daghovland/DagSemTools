@@ -20,6 +20,7 @@ public class TestConceptParser
             var lexer = new ManchesterLexer(input);
             CommonTokenStream tokens = new CommonTokenStream(lexer);
             var parser = new ManchesterParser(tokens);
+            parser.ErrorHandler = new BailErrorStrategy();
             IParseTree tree = parser.description();
             var visitor = new ConceptVisitor(prefixes);
             return visitor.Visit(tree);
@@ -73,6 +74,18 @@ public class TestConceptParser
                 ALC.Concept.NewConceptName(new IriReference("http://example.com/ex2"))
             ));
     }
+    
+    [Fact]
+    public void TestNegation()
+    {
+        var conceptString = "not <http://example.com/ex1>";
+        var parsedIri  = TestString(conceptString);
+        parsedIri.Should().BeEquivalentTo(
+            ALC.Concept.NewNegation(
+                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1"))
+            ));
+    }
+    
     [Fact]
     public void TestUniversal()
     {

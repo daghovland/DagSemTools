@@ -29,6 +29,9 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
 
     public override ALC.Concept VisitParenthesizedPrimary(ManchesterParser.ParenthesizedPrimaryContext context) =>
         Visit(context.description());
+    public override ALC.Concept VisitNegatedPrimary(ManchesterParser.NegatedPrimaryContext context) =>
+        ALC.Concept.NewNegation(Visit(context.primary()));
+
     public override ALC.Concept VisitActualDisjunction(ManchesterParser.ActualDisjunctionContext context) =>
         ALC.Concept.NewDisjunction(Visit(context.description()), Visit(context.conjunction()));
     
