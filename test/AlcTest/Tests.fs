@@ -5,7 +5,6 @@ open Xunit
 open AlcTableau
 open IriTools
 open System.IO
-open FSharp.Text.Lexing
 open Manchester.Printer
 
 [<Fact>]
@@ -14,7 +13,7 @@ let ``Alc Can Be Created`` () =
     let concept = ALC.ConceptName(IriTools.IriReference("http://example.org/concept"))
     let tbox = [ ALC.Inclusion(ALC.Top, ALC.Bottom) ]
     let abox = [ ALC.ConceptAssertion (IriReference "http://example.org/individual", concept),
-                  ALC.RoleAssertion (IriReference "http://example.org/individual", role, IriReference "http://example.org/individual2")]
+                  ALC.RoleMember (IriReference "http://example.org/individual", role, IriReference "http://example.org/individual2")]
     let kb = (tbox, abox)
     Assert.True(kb.ToString().Length > 0)
     
