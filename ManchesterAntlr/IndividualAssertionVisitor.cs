@@ -20,4 +20,13 @@ public class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func
                 concept => (
                     (individual) => ALC.ABoxAssertion.NewConceptAssertion(individual, concept)));
     
+    public override IEnumerable<Func<IriReference, ALC.ABoxAssertion>> VisitFacts(ManchesterParser.FactsContext context)
+    =>
+        context.factAnnotatedList().fact()
+            .Select<ManchesterParser.FactContext, Func<IriReference, ALC.ABoxAssertion>>(
+                    fact => (individual => ALC.ABoxAssertion.NewRoleAssertion(
+                individual, 
+                ConceptVisitor.IriGrammarVisitor.Visit(fact.rdfiri(1)), 
+                ConceptVisitor.IriGrammarVisitor.Visit(fact.rdfiri(0))
+                )));
 }

@@ -16,13 +16,23 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
     
     private readonly Dictionary<string, IriReference> _prefixes = new Dictionary<string, IriReference>();
     
-    public override ALC.OntologyDocument VisitOntologyDocument(OntologyDocumentContext ctxt){
+    public override ALC.OntologyDocument VisitOntologyDocument(OntologyDocumentContext ctxt)
+    {
         foreach (var prefixDecl in ctxt.prefixDeclaration())
-            _prefixes[prefixDecl.prefixName().GetText()] = new IriReference(prefixDecl.IRI().GetText());
+        {
+            if (prefixDecl is NonEmptyprefixDeclarationContext NonEmptyPrefix)
+                _prefixes.Add(NonEmptyPrefix.prefixName().GetText(), new IriReference(NonEmptyPrefix.IRI().GetText()));
+            else if (prefixDecl is EmptyPrefixContext emptyPrefix)
+                _prefixes.Add("", new IriReference(emptyPrefix.IRI().GetText()));
+            else
+                throw new Exception("Unknown prefix declaration type");
+        }
+
         _conceptVisitor = new ConceptVisitor(_prefixes);
         _frameVisitor = new FrameVisitor(_conceptVisitor);
         return Visit(ctxt.ontology());
     }
+    
     
     public override ALC.OntologyDocument VisitOntology(OntologyContext ctxt)
     {

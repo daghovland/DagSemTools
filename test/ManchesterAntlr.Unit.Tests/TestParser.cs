@@ -217,6 +217,19 @@ public class TestParser
     
     
     [Fact]
+    public void TestOntologyWithobjectProperty()
+    {
+        var (_, aboxAxioms) = TestOntology("""
+                                           Prefix: ex: <https://example.com/> 
+                                           Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
+                                           ObjectProperty: ex:Role
+                                           """
+        );
+        
+        
+    }
+    
+    [Fact]
     public void TestOntologyWithAboxAssertion()
     {
         var (_, aboxAxioms) = TestOntology("""
@@ -234,5 +247,79 @@ public class TestParser
         var assertion = (ALC.ABoxAssertion.ConceptAssertion)aboxAxioms[0];
         assertion.Individual.Should().Be(new IriReference("https://example.com/ind1"));
         assertion.Item2.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
+    }
+    
+    
+    [Fact]
+    public void TestOntologyWithRoleAssertion()
+    {
+        var (_, aboxAxioms) = TestOntology("""
+                                           Prefix: ex: <https://example.com/> 
+                                           Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
+                                           Class: ex:Class
+                                               EquivalentTo: ex:EqClass
+                                           Individual: ex:ind1 
+                                               Facts: ex:Role ex:ind2
+                                           """
+        );
+        
+        aboxAxioms.Should().HaveCount(1);
+        aboxAxioms[0].Should().BeOfType<ALC.ABoxAssertion.RoleAssertion>();
+        var assertion = (ALC.ABoxAssertion.RoleAssertion)aboxAxioms[0];
+        assertion.Left.Should().Be(new IriReference("https://example.com/ind1"));
+        assertion.Right.Should().Be(new IriReference("https://example.com/ind2"));
+        assertion.AssertedRole.Should().Be(new IriReference("https://example.com/Role"));
+    }
+    
+    
+    [Fact]
+    public void TestOntologyWithRoleandTypeAssertions()
+    {
+        var (_, aboxAxioms) = TestOntology("""
+                                           Prefix: ex: <https://example.com/> 
+                                           Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
+                                           Class: ex:Class
+                                               EquivalentTo: ex:EqClass
+                                           Individual: ex:ind1 
+                                               Facts: ex:Role ex:ind2
+                                            Individual: ex:Ind2
+                                                Types: ex:Class
+                                           """
+        );
+        
+        aboxAxioms.Should().HaveCount(2);
+        
+    }
+    
+    
+    [Fact]
+    public void TestEmptyPrefix()
+    {
+        var (_, _) = TestOntology("""
+                                           Prefix: : <https://example.com/empty/>
+                                           Prefix: ex: <https://example.com/> 
+                                           Ontology: <https://example.com/ontology> <https://example.com/ontology#1>   
+                                           Class: Teacher
+                                           """
+        );
+    }
+    
+    
+    [Fact]
+    public void TestAlcExample()
+    {
+        var (_, _) = TestOntology("""
+                                  Prefix: : <https://example.com/empty/>
+                                  Prefix: ex: <https://example.com/> 
+                                  Ontology: <https://example.com/ontology> <https://example.com/ontology#1>   
+                                  Class: Teacher 
+                                    SubClassOf: 
+                                        Person,
+                                        teaches some Course
+                                  Class: PGC SubClassOf: not Person
+                                  Class: Person
+                                    SubClassOf: teaches some Course
+                                  """
+        );
     }
 }

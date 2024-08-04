@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{BF9EFAC5-4
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManchesterAntlr.Unit.Tests", "test\ManchesterAntlr.Unit.Tests\ManchesterAntlr.Unit.Tests.csproj", "{7C1CB214-5330-4DFA-9657-120DE7D9D255}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Manchester", "Manchester\Manchester.fsproj", "{1B7A3332-0DF2-449F-8525-478795002236}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -39,6 +41,10 @@ Global
 		{7C1CB214-5330-4DFA-9657-120DE7D9D255}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{7C1CB214-5330-4DFA-9657-120DE7D9D255}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{7C1CB214-5330-4DFA-9657-120DE7D9D255}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1B7A3332-0DF2-449F-8525-478795002236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1B7A3332-0DF2-449F-8525-478795002236}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1B7A3332-0DF2-449F-8525-478795002236}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1B7A3332-0DF2-449F-8525-478795002236}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7C1CB214-5330-4DFA-9657-120DE7D9D255} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}

@@ -11,12 +11,25 @@ public class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<ALC
     public ConceptVisitor ConceptVisitor { get; init; }
     private ClassAssertionVisitor ClassAssertionVisitor { get; init; }
     private IndividualAssertionVisitor IndividualAssertionVisitor { get; init; }
+    private ObjectPropertyAssertionVisitor ObjectPropertyAssertionVisitor { get; init; }
 
     public FrameVisitor(ConceptVisitor conceptVisitor)
     {
         ConceptVisitor = conceptVisitor;
         ClassAssertionVisitor = new ClassAssertionVisitor(conceptVisitor);
         IndividualAssertionVisitor = new IndividualAssertionVisitor(conceptVisitor);
+        ObjectPropertyAssertionVisitor = new ObjectPropertyAssertionVisitor(conceptVisitor);
+    }
+    
+    
+    public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitObjectPropertyFrame(ManchesterParser.ObjectPropertyFrameContext context)
+    {
+        var objectPropertyIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
+        var frame = context.objectPropertyFrameList()
+            .SelectMany(ObjectPropertyAssertionVisitor.Visit)
+            .Select(classProperty => classProperty(objectPropertyIri))
+            .ToList();
+        return (frame, []);
     }
     
     public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitClassFrame(ManchesterParser.ClassFrameContext context)
