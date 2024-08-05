@@ -303,8 +303,8 @@ public class TestParser
                                            """
         );
     }
-    
-    
+
+
     [Fact]
     public void TestAlcExample()
     {
@@ -321,5 +321,28 @@ public class TestParser
                                     SubClassOf: teaches some Course
                                   """
         );
+    }
+
+    /// <summary>
+    /// From "An introduction to Description Logic" by Baader, Horrocks, Sattler
+    /// Page 70
+    /// </summary>
+    [Fact]
+        public void TestAlcTableauExample()
+        {
+            var (_, _) = TestOntology("""
+                                        Prefix: : <https://example.com/empty/>
+                                        Prefix: ex: <https://example.com/> 
+                                        Ontology: <https://example.com/ontology> <https://example.com/ontology#1>   
+                                        Class: Course EquivalentTo: UGC and PGC
+                                        Class: PGC SubClassOf: not UGC
+                                        Class: Professor EquivalentTo: Teacher and teaches some PGC 
+                                        Individual: Betty Types: Professor
+                                            Facts: teaches CS600
+                                        Individual: Hugo Types: Student
+                                            Facts: attends CS600
+                                        Individual: CS600 Types: Course
+                                      """
+            );
     }
 }
