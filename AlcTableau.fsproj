@@ -8,6 +8,7 @@
     <ItemGroup>
         <Compile Include="ALC.fs" />
         <Compile Include="NNF.fs" />
+        <Compile Include="Tableau.fs" />
     </ItemGroup>
 
     <ItemGroup>

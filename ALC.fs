@@ -84,7 +84,6 @@ module ALC =
         member x.TryGetPrefixName() =
             match x with
             | PrefixDefinition (name, iri) -> (name, iri)
-            | _ -> (null, null)
     type OntologyDocument =
         | Ontology of prefixDeclaration list * ontologyVersion * knowledgeBase
     type OntologyDocument with
