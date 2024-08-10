@@ -46,6 +46,9 @@ let init_expander (Abox : ABoxAssertion list)  =
         | RoleAssertion (left, right, role) -> (individual_concept_map, add_element_to_dict_list individual_role_map left [(right, role)]))
         (Map.empty, Map.empty)
 
+let individual_is_asserted_concept (concept_assertions : Map<IriReference, Concept list>) (concept : Concept) (individual : IriReference) =
+    concept_assertions.ContainsKey(individual) && concept_assertions[individual] |> List.contains concept
+
 let expandAssertion (role_assertions : Map<IriReference, (IriReference * Role) list>)
     (concept_assertions : Map<IriReference, Concept list>)
     (assertion : ALC.ABoxAssertion) =
@@ -61,7 +64,7 @@ let expandAssertion (role_assertions : Map<IriReference, (IriReference * Role) l
         
     | ConceptAssertion (individual, ALC.Existential(role, concept)) ->
         if not (role_assertions.ContainsKey(individual) &&
-           role_assertions[individual] |> List.exists (fun (right, r) -> r = role && concept_assertions[right] |> List.contains concept)) then
+           role_assertions[individual] |> List.exists (fun (right, r) -> r = role && individual_is_asserted_concept concept_assertions concept right )) then
             let new_individual = new IriReference($"https://alctableau.example.com/anonymous#{Guid.NewGuid()}")
             [[ALC.ConceptAssertion(new_individual, concept); ALC.RoleAssertion(individual, new_individual, role)]]
         else
@@ -69,7 +72,7 @@ let expandAssertion (role_assertions : Map<IriReference, (IriReference * Role) l
     | ConceptAssertion (individual, ALC.Universal(role, concept)) ->
         if role_assertions.ContainsKey(individual) then
             role_assertions[individual]
-            |> List.where (fun (right, r) -> r = role && not (concept_assertions[right] |> List.contains concept))
+            |> List.where (fun (right, r) -> r = role && not (individual_is_asserted_concept concept_assertions concept right))
             |> List.map (fun (right, r) -> [ALC.ConceptAssertion(right, concept)])
         else
             []

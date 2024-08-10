@@ -28,4 +28,14 @@ let  TestSimplestContradiction() =
     | Ontology (prefixes, version, kb) ->
         let reasoner_result = AlcTableau.Tableau.reasoner kb
         Assert.False(reasoner_result)
+   
+[<Fact>]
+let  TestAlcBoolExample() =
+    // Arrange
+    let doc = ManchesterAntlr.Parser.TestFile("TestData/alc_tableau_ex.owl")
+    // Act
+    match doc with
+    | Ontology (prefixes, version, kb) ->
+        let reasoner_result = AlcTableau.Tableau.reasoner kb
+        Assert.True(reasoner_result)
     

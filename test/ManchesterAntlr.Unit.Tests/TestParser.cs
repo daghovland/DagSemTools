@@ -184,6 +184,23 @@ public class TestParser
         inclusion.Sup.Should().Be(ALC.Concept.NewExistential(new IriReference("https://example.com/Role"), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
     }
 
+    [Fact]
+    public void TestOntologyWithSubClassAndUniversal()
+    {
+        var (tboxAxiomsList, _) = TestOntology("""
+                                               Prefix: ex: <https://example.com/> 
+                                               Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
+                                               Class: ex:Class
+                                               SubClassOf: ex:Role only ex:SuperClass
+                                               """
+        );
+        tboxAxiomsList.Should().HaveCount(1);
+        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
+        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
+        inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
+        inclusion.Sup.Should().Be(ALC.Concept.NewUniversal(new IriReference("https://example.com/Role"), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
+    }
+
     
     [Fact]
     public void TestOntologyWithEquivalentClass()
@@ -318,24 +335,41 @@ public class TestParser
     [Fact]
     public void TestAlcTableauExample()
     {
-        var (_, _) = TestOntology("""
-                                    Prefix: : <https://example.com/empty/>
-                                    Prefix: ex: <https://example.com/> 
-                                    Ontology: <https://example.com/ontology> <https://example.com/ontology#1>   
-                                    Class: Course EquivalentTo: UGC and PGC
-                                    Class: PGC SubClassOf: not UGC
-                                    Class: Professor EquivalentTo: Teacher and teaches some PGC 
-                                    Individual: Betty Types: Professor
-                                        Facts: teaches CS600
-                                    Individual: Hugo Types: Student
-                                        Facts: attends CS600
-                                    Individual: CS600 Types: Course
-                                  """
+        var parsedOntology = ManchesterAntlr.Parser.TestString("""
+                      Prefix: : <http://example.com/>
+                    Ontology: 
+                    Individual: a 
+                        Types: A and s some F, B and s only F
+                    """
         );
     }
+    
     [Fact]
     public void TestAlcTableauFromFile()
     {
         var (_, _) = TestOntologyFile("TestData/alctableauex.owl");
     }
+    
+    
+    [Fact]
+    public void TestOntologyWithManyRoleAssertions()
+    {
+        var parsedOntology = ManchesterAntlr.Parser.TestString("""
+                                           Prefix: : <https://example.com/> 
+                                           Ontology:  
+                                           Individual: a 
+                                               Facts: r b, s c
+                                           """
+        );
+        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
+        var aboxAxioms = abox.ToList();
+        aboxAxioms.Should().HaveCount(2);
+        foreach (var axiom in aboxAxioms)
+        {
+            axiom.Should().BeOfType<ALC.ABoxAssertion.RoleAssertion>();
+            var assertion = (ALC.ABoxAssertion.RoleAssertion)axiom;
+            assertion.Left.Should().Be(new IriReference("https://example.com/a"));
+        }
+    }
+
 }
