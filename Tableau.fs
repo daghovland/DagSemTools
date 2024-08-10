@@ -68,6 +68,7 @@ let expandAssertion (role_assertions : Map<IriReference, (IriReference * Role) l
             |> List.map (fun (right, r) -> [ALC.ConceptAssertion(right, concept)])
         else
             []
+    | _ -> []
 
 let rec expand (concepts : Map<IriReference, Concept list>) (roles : Map<IriReference, (IriReference * Role) list>) (nextAssertions : ABoxAssertion list list) =
     (match nextAssertions with

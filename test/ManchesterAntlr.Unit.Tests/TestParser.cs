@@ -333,7 +333,7 @@ public class TestParser
                                   """
         );
     }
-
+    [Fact]
     public void TestAlcTableauFromFile()
     {
         var (_, _) = TestOntologyFile("TestData/alctableauex.owl");

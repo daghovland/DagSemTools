@@ -21,5 +21,7 @@ ManchesterAntlr/bin/
 ManchesterAntlr/obj/
 test/ManchesterAntlr.Unit.Tests/bin/
 test/ManchesterAntlr.Unit.Tests/obj/
+test/Reasoner.Integration.Tests/bin/
+test/Reasoner.Integration.Tests/obj/
 
 .fake

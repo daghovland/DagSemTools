@@ -19,4 +19,13 @@ let  TestOntologyWithSubClassAndExistential() =
         let reasoner_result = AlcTableau.Tableau.reasoner kb
         Assert.True(reasoner_result)
     
+[<Fact>]
+let  TestSimplestContradiction() =
+    // Arrange
+    let doc = ManchesterAntlr.Parser.TestFile("TestData/simplest_contradiction.owl")
+    // Act
+    match doc with
+    | Ontology (prefixes, version, kb) ->
+        let reasoner_result = AlcTableau.Tableau.reasoner kb
+        Assert.False(reasoner_result)
     
