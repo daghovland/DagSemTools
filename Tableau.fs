@@ -94,10 +94,10 @@ let rec expand (concepts : Map<IriReference, Concept list>) (roles : Map<IriRefe
                 )
         )
     
-let reasoner (Kb : ALC.knowledgeBase) =
-    let (Tbox, Abox) = Kb
-    let (concepts, roles) = init_expander Abox
-    if Abox |> List.exists (has_new_collision concepts)  then
+let reasoner (kb : ALC.knowledgeBase) =
+    let (TBox, ABox) = NNF.nnf_kb kb
+    let (concepts, roles) = init_expander ABox
+    if ABox |> List.exists (has_new_collision concepts)  then
         false
     else
-        expand concepts roles ([[Abox]])
+        expand concepts roles ([[ABox]])
