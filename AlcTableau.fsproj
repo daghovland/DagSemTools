@@ -9,7 +9,6 @@
         <Compile Include="ALC.fs" />
         <Compile Include="NNF.fs" />
         <Compile Include="Tableau.fs" />
-        <None Include="nuget.config" />
     </ItemGroup>
 
     <ItemGroup>

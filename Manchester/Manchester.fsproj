@@ -9,7 +9,7 @@
     </ItemGroup>
     <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="8.0.102" />
-        <PackageReference Include="IriTools" Version="1.1.0" />
+        <PackageReference Include="IriTools" Version="2.2.0" />
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\AlcTableau.fsproj" />

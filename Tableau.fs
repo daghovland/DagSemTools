@@ -19,9 +19,15 @@ let add_element_to_dict_list<'T> (dict : Map<IriReference, 'T list>) (key:IriRef
 let has_new_collision (concept_assertions : Map<IriReference, Concept list>) (new_assertion)   =
     match new_assertion with
     | ConceptAssertion (individual, ALC.ConceptName(C)) ->
-        concept_assertions.ContainsKey(individual) && concept_assertions[individual] |> List.contains (ALC.Negation (ALC.ConceptName(C)))
+        concept_assertions.ContainsKey(individual)
+        && concept_assertions[individual]
+        |> List.contains (ALC.Negation (ALC.ConceptName(C)))
+           
     | ConceptAssertion (individual, ALC.Negation (ALC.ConceptName(C))) ->
-        concept_assertions.ContainsKey(individual) && concept_assertions[individual] |> List.contains (ALC.ConceptName(C))
+        concept_assertions.ContainsKey(individual)
+        && concept_assertions[individual]
+        |> List.contains (ALC.ConceptName(C))
+           
     | _ -> false
 
 let add_assertion (concept_assertions : Map<IriReference, Concept list>) (role_assertions: Map<IriReference, (IriReference * Role) list>) (new_assertion) =
@@ -32,7 +38,6 @@ let add_assertion (concept_assertions : Map<IriReference, Concept list>) (role_a
 let add_assertion_list (concept_assertions : Map<IriReference, Concept list>) (role_assertions: Map<IriReference, (IriReference * Role) list>) (new_assertions) =
     new_assertions
     |> List.fold (fun (concepts, roles) new_assertion -> add_assertion concepts roles new_assertion) (concept_assertions, role_assertions)
-
 
 let init_expander (Abox : ABoxAssertion list)  =
     Abox |> List.fold (fun (individual_concept_map, individual_role_map) assertion ->
@@ -70,24 +75,26 @@ let expandAssertion (role_assertions : Map<IriReference, (IriReference * Role) l
             []
     | _ -> []
 
-let rec expand (concepts : Map<IriReference, Concept list>) (roles : Map<IriReference, (IriReference * Role) list>) (nextAssertions : ABoxAssertion list list) =
-    (match nextAssertions with
+let rec expand (concepts : Map<IriReference, Concept list>) (roles : Map<IriReference, (IriReference * Role) list>) (nextAssertions : ABoxAssertion list list list) =
+    match nextAssertions with
     | [] -> true
+    | [] :: restAssertions -> expand concepts roles restAssertions
     | nextAssertion :: restAssertions ->
-        nextAssertion |> List.where (fun assertion ->
-            let (newConcepts, newRoles) = add_assertion concepts roles assertion
-            if has_new_collision newConcepts assertion then
-                false
-            else
-                let newAssertions = expandAssertion newRoles newConcepts assertion
-                expand newConcepts newRoles (newAssertions @ restAssertions))
-        |> List.isEmpty |> not)
-        
-    
+        nextAssertion |> List.exists (fun assertion_choice ->        
+                let (newConcepts, newRoles) = add_assertion_list concepts roles assertion_choice
+                (
+                        if (assertion_choice |> List.forall ( fun a -> not (has_new_collision newConcepts a))) then
+                            let newAssertions = assertion_choice |> List.map (expandAssertion newRoles newConcepts) |> List.where (fun x -> not x.IsEmpty)
+                            expand newConcepts newRoles (restAssertions @ newAssertions)
+                        else
+                            false
+                )
+        )
     
 let reasoner (Kb : ALC.knowledgeBase) =
-    let (concepts, roles) = init_expander (snd Kb)
-    if ((snd Kb) |> List.where (has_new_collision concepts)) = [] then
-        expand concepts roles ([snd Kb])
-    else
+    let (Tbox, Abox) = Kb
+    let (concepts, roles) = init_expander Abox
+    if Abox |> List.exists (has_new_collision concepts)  then
         false
+    else
+        expand concepts roles ([[Abox]])
