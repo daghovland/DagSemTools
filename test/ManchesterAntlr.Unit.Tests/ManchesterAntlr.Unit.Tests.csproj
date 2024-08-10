@@ -41,4 +41,11 @@
         <ProjectReference Include="..\..\ManchesterAntlr\ManchesterAntlr.csproj" />
     </ItemGroup>
 
+
+    <ItemGroup>
+      <None Update="TestData\alctableauex.owl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
 </Project>

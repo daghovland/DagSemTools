@@ -9,10 +9,11 @@
         <Compile Include="ALC.fs" />
         <Compile Include="NNF.fs" />
         <Compile Include="Tableau.fs" />
+        <None Include="nuget.config" />
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Include="IriTools" Version="1.1.0" />
+      <PackageReference Include="IriTools" Version="2.2.0" />
     </ItemGroup>
 
 </Project>

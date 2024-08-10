@@ -9,38 +9,19 @@ using AlcTableau.ManchesterAntlr;
 using FluentAssertions;
 using AlcTableau;
 using IriTools;
+using ManchesterAntlr;
 
 public class TestParser
 {
 
-
-    private ALC.OntologyDocument TestFile(string filename){
-        using TextReader textReader = File.OpenText(filename);
-        return TestReader(textReader);
-    }
-
-    private ALC.OntologyDocument TestReader(TextReader textReader, Dictionary<string, IriReference> prefixes){
-        
-        var input = new AntlrInputStream(textReader);
-        var lexer = new ManchesterLexer(input);
-        CommonTokenStream tokens = new CommonTokenStream(lexer);
-        var parser = new ManchesterParser(tokens);
-        parser.ErrorHandler = new BailErrorStrategy();
-        IParseTree tree = parser.ontologyDocument();
-        var visitor = new ManchesterVisitor();
-        return visitor.Visit(tree);
-    }
-    
-    public ALC.OntologyDocument TestReader(TextReader textReader) =>
-        TestReader(textReader, new Dictionary<string, IriReference>());
-    public ALC.OntologyDocument TestString(string owl){
-        using TextReader textReader = new StringReader(owl);
-        return TestReader(textReader);
-    }
-    
-    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
+    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
     {
-        var parsedOntology = TestString(ontology);
+        var parsedOntology = ManchesterAntlr.Parser.TestFile(filename);
+        return TestOntology(parsedOntology);
+    }
+
+    private (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(ALC.OntologyDocument parsedOntology)
+    {
         parsedOntology.Should().NotBeNull();
 
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
@@ -57,10 +38,17 @@ public class TestParser
         return (KB.Item1.ToList(), KB.Item2.ToList());
     }
 
+    
+    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
+    {
+        var parsedOntology = ManchesterAntlr.Parser.TestString(ontology);
+        return TestOntology(parsedOntology);
+    }
+    
     [Fact]
     public void TestSmallestOntology()
     {
-        var parsed = TestString("Ontology:");
+        var parsed = ManchesterAntlr.Parser.TestString("Ontology:");
         parsed.Should().NotBeNull();
     }
 
@@ -68,7 +56,7 @@ public class TestParser
     [Fact]
     public void TestOntologyWithIri()
     {
-        var parsedOntology = TestString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>");
+        var parsedOntology = ManchesterAntlr.Parser.TestString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>");
         parsedOntology.Should().NotBeNull();
 
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
@@ -328,21 +316,26 @@ public class TestParser
     /// Page 70
     /// </summary>
     [Fact]
-        public void TestAlcTableauExample()
-        {
-            var (_, _) = TestOntology("""
-                                        Prefix: : <https://example.com/empty/>
-                                        Prefix: ex: <https://example.com/> 
-                                        Ontology: <https://example.com/ontology> <https://example.com/ontology#1>   
-                                        Class: Course EquivalentTo: UGC and PGC
-                                        Class: PGC SubClassOf: not UGC
-                                        Class: Professor EquivalentTo: Teacher and teaches some PGC 
-                                        Individual: Betty Types: Professor
-                                            Facts: teaches CS600
-                                        Individual: Hugo Types: Student
-                                            Facts: attends CS600
-                                        Individual: CS600 Types: Course
-                                      """
-            );
+    public void TestAlcTableauExample()
+    {
+        var (_, _) = TestOntology("""
+                                    Prefix: : <https://example.com/empty/>
+                                    Prefix: ex: <https://example.com/> 
+                                    Ontology: <https://example.com/ontology> <https://example.com/ontology#1>   
+                                    Class: Course EquivalentTo: UGC and PGC
+                                    Class: PGC SubClassOf: not UGC
+                                    Class: Professor EquivalentTo: Teacher and teaches some PGC 
+                                    Individual: Betty Types: Professor
+                                        Facts: teaches CS600
+                                    Individual: Hugo Types: Student
+                                        Facts: attends CS600
+                                    Individual: CS600 Types: Course
+                                  """
+        );
+    }
+
+    public void TestAlcTableauFromFile()
+    {
+        var (_, _) = TestOntologyFile("TestData/alctableauex.owl");
     }
 }
