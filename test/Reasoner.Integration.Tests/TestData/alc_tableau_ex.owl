@@ -1,6 +1,10 @@
 Prefix: : <http://example.com/>
 Ontology: 
 Individual: a 
-    Types: A and s some F
-        , s only (not F and not B)
+    Types: A and s some F,
+         s only (not F or not B)
     Facts: s b, r c
+Individual: b
+    Types: B
+Individual: c
+    Types: C and s some D
