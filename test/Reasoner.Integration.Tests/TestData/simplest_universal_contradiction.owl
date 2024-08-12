@@ -1,0 +1,5 @@
+Prefix: : <http://example.com/>
+Ontology:
+Individual: a
+    Types: R only A and R only not A
+     Facts: R a

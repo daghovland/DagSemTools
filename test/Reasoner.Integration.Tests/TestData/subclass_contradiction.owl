@@ -1,0 +1,5 @@
+Prefix: : <http://example.com/>
+Ontology: 
+Class: A SubClassOf: B, not B
+Individual: a
+    Types: A

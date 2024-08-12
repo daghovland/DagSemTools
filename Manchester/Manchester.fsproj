@@ -8,7 +8,7 @@
         <Compile Include="Printer.fs" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="8.0.102" />
+        <PackageReference Update="FSharp.Core" Version="8.0.301" />
         <PackageReference Include="IriTools" Version="2.2.0" />
     </ItemGroup>
     <ItemGroup>

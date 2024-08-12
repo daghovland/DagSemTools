@@ -21,7 +21,80 @@ let ``Alc Can Be Created`` () =
 
 let exConcept = ALC.ConceptName(new IriReference "https://example.com/concept")
 let exConcept2 = ALC.ConceptName(new IriReference "https://example.com/concept2")
+let exConcept3 = ALC.ConceptName(new IriReference "https://example.com/concept3")
 let exRole = ALC.Role(new IriReference "https://example.com/role")
+
+[<Fact>]
+let ``ConceptsNames can be compared``() =
+    let result1 = (exConcept :> IComparable).CompareTo(exConcept2)
+    Assert.True(result1 < 0)
+    let result2 = (exConcept2 :> IComparable).CompareTo(exConcept)
+    Assert.True(result2 > 0)
+    let equal_result = exConcept.Equals(exConcept2)
+    Assert.False(equal_result)
+    let hashCode1 = exConcept.GetHashCode()
+    let hashCode2 = exConcept2.GetHashCode()
+    Assert.NotEqual(hashCode1, hashCode2)
+
+
+[<Fact>]
+let ``Conjunctions can be compared``() =
+    let conj1 = ALC.Conjunction(exConcept, exConcept2)
+    let conj2 = ALC.Conjunction(exConcept, exConcept3)
+    let result1 = (conj1 :> IComparable).CompareTo(conj2)
+    Assert.True(result1 < 0)
+    let result2 = (conj2 :> IComparable).CompareTo(conj1)
+    Assert.True(result2 > 0)
+    let equal_result = conj1.Equals(conj2)
+    Assert.False(equal_result)
+    let hashCode1 = conj1.GetHashCode()
+    let hashCode2 = conj2.GetHashCode()
+    Assert.NotEqual(hashCode1, hashCode2)
+
+
+[<Fact>]
+let ``Disjunctions can be compared``() =
+    let conj1 = ALC.Disjunction(exConcept, exConcept2)
+    let conj2 = ALC.Disjunction(exConcept, exConcept3)
+    let result1 = (conj1 :> IComparable).CompareTo(conj2)
+    Assert.True(result1 < 0)
+    let result2 = (conj2 :> IComparable).CompareTo(conj1)
+    Assert.True(result2 > 0)
+    let equal_result = conj1.Equals(conj2)
+    Assert.False(equal_result)
+    let hashCode1 = conj1.GetHashCode()
+    let hashCode2 = conj2.GetHashCode()
+    Assert.NotEqual(hashCode1, hashCode2)
+
+
+[<Fact>]
+let ``Universals can be compared``() =
+    let conj1 = ALC.Universal(exRole, exConcept)
+    let conj2 = ALC.Universal(exRole, exConcept2)
+    let result1 = (conj1 :> IComparable).CompareTo(conj2)
+    Assert.True(result1 < 0)
+    let result2 = (conj2 :> IComparable).CompareTo(conj1)
+    Assert.True(result2 > 0)
+    let equal_result = conj1.Equals(conj2)
+    Assert.False(equal_result)
+    let hashCode1 = conj1.GetHashCode()
+    let hashCode2 = conj2.GetHashCode()
+    Assert.NotEqual(hashCode1, hashCode2)
+
+[<Fact>]
+let ``Existentials can be compared``() =
+    let conj1 = ALC.Existential(exRole, exConcept)
+    let conj2 = ALC.Existential(exRole, exConcept2)
+    let result1 = (conj1 :> IComparable).CompareTo(conj2)
+    Assert.True(result1 < 0)
+    let result2 = (conj2 :> IComparable).CompareTo(conj1)
+    Assert.True(result2 > 0)
+    let equal_result = conj1.Equals(conj2)
+    Assert.False(equal_result)
+    let hashCode1 = conj1.GetHashCode()
+    let hashCode2 = conj2.GetHashCode()
+    Assert.NotEqual(hashCode1, hashCode2)
+
 
 [<Fact>]
 let ``Double negation can be pushed`` () =

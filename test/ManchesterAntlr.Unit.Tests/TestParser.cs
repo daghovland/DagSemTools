@@ -16,7 +16,7 @@ public class TestParser
 
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
     {
-        var parsedOntology = ManchesterAntlr.Parser.TestFile(filename);
+        var parsedOntology = ManchesterAntlr.Parser.ParseFile(filename);
         return TestOntology(parsedOntology);
     }
 
@@ -41,14 +41,14 @@ public class TestParser
     
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
     {
-        var parsedOntology = ManchesterAntlr.Parser.TestString(ontology);
+        var parsedOntology = ManchesterAntlr.Parser.ParseString(ontology);
         return TestOntology(parsedOntology);
     }
     
     [Fact]
     public void TestSmallestOntology()
     {
-        var parsed = ManchesterAntlr.Parser.TestString("Ontology:");
+        var parsed = ManchesterAntlr.Parser.ParseString("Ontology:");
         parsed.Should().NotBeNull();
     }
 
@@ -56,7 +56,7 @@ public class TestParser
     [Fact]
     public void TestOntologyWithIri()
     {
-        var parsedOntology = ManchesterAntlr.Parser.TestString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>");
+        var parsedOntology = ManchesterAntlr.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>");
         parsedOntology.Should().NotBeNull();
 
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
@@ -335,7 +335,7 @@ public class TestParser
     [Fact]
     public void TestAlcTableauExample()
     {
-        var parsedOntology = ManchesterAntlr.Parser.TestString("""
+        var parsedOntology = ManchesterAntlr.Parser.ParseString("""
                       Prefix: : <http://example.com/>
                     Ontology: 
                     Individual: a 
@@ -354,7 +354,7 @@ public class TestParser
     [Fact]
     public void TestOntologyWithManyRoleAssertions()
     {
-        var parsedOntology = ManchesterAntlr.Parser.TestString("""
+        var parsedOntology = ManchesterAntlr.Parser.ParseString("""
                                            Prefix: : <https://example.com/> 
                                            Ontology:  
                                            Individual: a 

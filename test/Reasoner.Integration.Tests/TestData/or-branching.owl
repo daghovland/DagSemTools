@@ -1,0 +1,8 @@
+Prefix: : <http://example.com/>
+Ontology:
+Individual: a
+    Types: (R only D1 or R only E1) 
+            and (R some (A and B) or R some (A and C)) 
+            and (R only (not A and X) and R only (not A and Y))
+            
+                        

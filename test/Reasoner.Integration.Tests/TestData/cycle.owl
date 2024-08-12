@@ -1,0 +1,6 @@
+Prefix: : <http://example.com/>
+Ontology: 
+Class: A
+    SubClassOf: R some A
+Individual: a
+    Types: A
