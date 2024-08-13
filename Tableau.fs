@@ -111,15 +111,15 @@ let expandAssertion state  (assertion : ALC.ABoxAssertion) =
     | ConceptAssertion (_individual, ALC.ConceptName(_iri))  -> []
     | ConceptAssertion (_individual, ALC.Negation(_concept))  -> []
     | RoleAssertion (left, right, role) ->
-        state.concept_assertions.GetValueOrDefault(left,[])
+        [state.concept_assertions.GetValueOrDefault(left,[])
             |> List.filter (fun concept ->
                 match concept with
                 | ALC.Universal (r, c) -> (r = role && not ( individual_is_asserted_concept state c right))
                 | _ -> false) 
             |> List.map (fun concept ->
                 match concept with
-                | ALC.Universal(r, c) -> [ALC.ConceptAssertion(right, c)]
-                | _ -> raise (new Exception("Only universals should have passed through the filter above")))
+                | ALC.Universal(r, c) -> ALC.ConceptAssertion(right, c)
+                | _ -> raise (new Exception("Only universals should have passed through the filter above")))]
 
 let rec expand (state : ReasonerState) (nextAssertions : ABoxAssertion list list list) =
     match nextAssertions with

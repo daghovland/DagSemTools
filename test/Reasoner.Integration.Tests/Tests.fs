@@ -81,3 +81,14 @@ let  TestCycleCOntradiction() =
         let reasoner_result = AlcTableau.Tableau.is_consistent kb
         Assert.False(reasoner_result)
     
+        
+[<Fact>]
+let  ExistUniv() =
+    // Arrange
+    let doc = ManchesterAntlr.Parser.ParseFile("TestData/exist_univ.owl")
+    // Act
+    match doc with
+    | Ontology (prefixes, version, kb) ->
+        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        Assert.False(reasoner_result)
+ 
