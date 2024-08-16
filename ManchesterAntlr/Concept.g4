@@ -1,20 +1,20 @@
 grammar Concept;
 import ManchesterCommonTokens, IriGrammar;
 
-description: description 'or' conjunction #ActualDisjunction
+description: description OR conjunction #ActualDisjunction
     | conjunction #SingleDisjunction;
 
-conjunction: conjunction 'and' primary #ActualConjunction
+conjunction: conjunction AND primary #ActualConjunction
     | primary #SingleConjunction
     ; 
 
 restriction:
-    INVERSE? rdfiri 'some' primary #ExistentialRestriction
-    | INVERSE? rdfiri 'only' primary #UniversalRestriction
+    INVERSE? rdfiri SOME primary #ExistentialRestriction
+    | INVERSE? rdfiri ONLY primary #UniversalRestriction
     ;
 
 primary:
-    'not' primary                   #NegatedPrimary
+    NOT primary                   #NegatedPrimary
     | restriction                   #RestrictionPrimary
     | rdfiri                        #IriPrimary
     | '(' description ')'     #ParenthesizedPrimary

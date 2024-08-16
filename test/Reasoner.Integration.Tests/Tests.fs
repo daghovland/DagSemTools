@@ -92,3 +92,14 @@ let  ExistUniv() =
         let reasoner_result = AlcTableau.Tableau.is_consistent kb
         Assert.False(reasoner_result)
  
+         
+[<Fact>]
+let  Dexpi() =
+    // Arrange
+    let doc = ManchesterAntlr.Parser.ParseFile("TestData/pandid.owl")
+    // Act
+    match doc with
+    | Ontology (prefixes, version, kb) ->
+        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        Assert.False(reasoner_result)
+ 
