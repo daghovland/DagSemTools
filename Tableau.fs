@@ -45,6 +45,7 @@ let add_assertion (state : ReasonerState) (new_assertion) =
     match new_assertion with
     | ConceptAssertion (individual, concept) -> add_concept_assertion state individual [concept]
     | RoleAssertion (left, right, role) -> add_role_assertion state left [(right, role)]
+    | _ -> state
     
 let add_assertion_list (state : ReasonerState) (new_assertions) =
     new_assertions
@@ -54,7 +55,8 @@ let init_abox_expander (abox : ABoxAssertion list) init_state  =
     abox |> List.fold (fun state assertion ->
         match assertion with
         | ConceptAssertion (individual, concept) -> add_concept_assertion state individual [concept]
-        | RoleAssertion (left, right, role) -> add_role_assertion state left [(right, role)])
+        | RoleAssertion (left, right, role) -> add_role_assertion state left [(right, role)]
+        | _ -> state )
         init_state
 
 let init_tbox_expander (tbox : TBoxAxiom list) init_state  =
@@ -110,6 +112,8 @@ let expandAssertion state  (assertion : ALC.ABoxAssertion) =
     | ConceptAssertion (_individual, ALC.Top)  -> []
     | ConceptAssertion (_individual, ALC.ConceptName(_iri))  -> []
     | ConceptAssertion (_individual, ALC.Negation(_concept))  -> []
+    | LiteralAnnotationAssertion (_individual, _property, _right)  -> []
+    | ObjectAnnotationAssertion (_individual, _property, _value)  -> []
     | RoleAssertion (left, right, role) ->
         [state.concept_assertions.GetValueOrDefault(left,[])
             |> List.filter (fun concept ->

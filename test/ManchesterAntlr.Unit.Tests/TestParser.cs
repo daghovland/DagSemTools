@@ -371,5 +371,15 @@ public class TestParser
             assertion.Left.Should().Be(new IriReference("https://example.com/a"));
         }
     }
+    
+    [Fact]
+    public void TestDefinitionExample()
+    {
+        var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/def_example.owl");
+        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
+        var tboxAxioms = tbox.ToList();
+        tboxAxioms.Should().HaveCount(2);
+        
+    }
 
 }

@@ -33,6 +33,9 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
         return Visit(ctxt.ontology());
     }
     
+    public static IEnumerable<T> concateOrKeep<T>(IEnumerable<T> a, IEnumerable<T>? b) => 
+        b == null ? a: a.Concat(b);
+    
     
     public override ALC.OntologyDocument VisitOntology(OntologyContext ctxt)
     {
@@ -52,7 +55,7 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
             .Select(_frameVisitor.Visit)
             .Aggregate<(List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>),(IEnumerable<ALC.TBoxAxiom>, IEnumerable<ALC.ABoxAssertion>)> 
             ((new List<ALC.TBoxAxiom>(), new List<ALC.ABoxAssertion>()), 
-                (acc, x) => (acc.Item1.Concat(x.Item1), acc.Item2.Concat(x.Item2)));
+                (acc, x) => (concateOrKeep(acc.Item1, x.Item1),concateOrKeep(acc.Item2, x.Item2)));
         return ALC.OntologyDocument.NewOntology(
             CreatePrefixList(),
             version,

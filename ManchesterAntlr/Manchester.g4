@@ -25,9 +25,9 @@ annotatedList:
     ;
 
 individualFrameList:
-    'Types:' descriptionAnnotatedList #Types
-    | 'Facts:' factAnnotatedList #Facts
-    | 'Annotations:' annotationAnnotatedList #Annotations
+    'Types:' descriptionAnnotatedList #IndividualTypes
+    | 'Facts:' factAnnotatedList #IndividualFacts
+    | 'Annotations:' annotationAnnotatedList #IndividualAnnotations
     ;
 
 annotationPropertyFrameList: 
@@ -54,8 +54,8 @@ factAnnotatedList: fact (COMMA fact)* ;
 
 annotationAnnotatedList: annotation (COMMA annotation)* ;
 annotation: 
-    rdfiri rdfiri #AnnotationIri
-    | rdfiri STRING #AnnotationLiteral
+    rdfiri rdfiri #ObjectAnnotation
+    | rdfiri STRING #LiteralAnnotation
     ;
 
 fact: rdfiri rdfiri;

@@ -46,7 +46,9 @@ public class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<ALC
     public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitIndividualFrame(ManchesterParser.IndividualFrameContext context)
     {
         var individualIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
-        var frame = context.individualFrameList()
+        var frameList = context.individualFrameList() ??
+                        throw new Exception($"Lacking individual fram list on individual {context.rdfiri().GetText()}");
+        var frame = frameList
             .SelectMany(IndividualAssertionVisitor.Visit)
             .Select(assertion => assertion(individualIri))
             .ToList();

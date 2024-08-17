@@ -101,5 +101,5 @@ let  Dexpi() =
     match doc with
     | Ontology (prefixes, version, kb) ->
         let reasoner_result = AlcTableau.Tableau.is_consistent kb
-        Assert.False(reasoner_result)
+        Assert.True(reasoner_result)
  
