@@ -1,39 +1,35 @@
 grammar Manchester;
-import ManchesterCommonTokens, IriGrammar, Concept;
+import ManchesterCommonTokens, IriGrammar, DataType, Concept;
 
 ontologyDocument : prefixDeclaration* ontology EOF;
 
-ontology: ONTOLOGYTOKEN rdfiri? rdfiri? importDeclaration* frame* ;
+ontology: ONTOLOGYTOKEN rdfiri? rdfiri? importDeclaration* annotations* frame* ;
 prefixDeclaration: 
-    PREFIXTOKEN prefixName ':' '<' IRI '>' #nonEmptyprefixDeclaration
-    | PREFIXTOKEN ':' '<' IRI '>' #emptyPrefix
+    PREFIXTOKEN prefixName=LOCALNAME COLON LT IRI GT #nonEmptyprefixDeclaration
+    | PREFIXTOKEN COLON LT IRI GT #emptyPrefix
     ;
-    
-importDeclaration: 'Import:' rdfiri ;
+        
+importDeclaration: IMPORT rdfiri ;
   
 frame: 
-    CLASS rdfiri annotatedList * #ClassFrame
+    CLASS rdfiri annotatedList* #ClassFrame
     | INDIVIDUAL rdfiri individualFrameList* #IndividualFrame
     | OBJECTPROPERTY rdfiri objectPropertyFrameList* #ObjectPropertyFrame
-    | DATATYPE rdfiri annotatedList* #DatatypeFrame
-    | ANNOTATIONPROPERTY rdfiri annotationPropertyFrameList* #AnnotationPropertyFrame
+    | DATATYPE rdfiri annotations? (EQUIVALENTTO annotations? dataRange)? annotations?  #DatatypeFrame
+    | DATAPROPERTY rdfiri dataPropertyFrameList* #DataPropertyFrame
+    | ANNOTATIONPROPERTY rdfiri annotations* #AnnotationPropertyFrame
     ;
 
 annotatedList: 
     SUBCLASSOF descriptionAnnotatedList  #SubClassOf
-    | EQUIVALENTTO descriptionAnnotatedList #EquivalentTo  
+    | EQUIVALENTTO descriptionAnnotatedList #EquivalentTo
+    | annotations #DatatypeAnnotations  
     ;
 
 individualFrameList:
     'Types:' descriptionAnnotatedList #IndividualTypes
     | 'Facts:' factAnnotatedList #IndividualFacts
-    | 'Annotations:' annotationAnnotatedList #IndividualAnnotations
-    ;
-
-annotationPropertyFrameList: 
-    SUBPROPERTYOF rdfiri #AnnotationSubPropertyOf
-    | DOMAIN descriptionAnnotatedList #AnnotationDomain
-    | RANGE descriptionAnnotatedList #AnnotationRange
+    | annotations #IndividualAnnotations
     ;
     
 objectPropertyFrameList:
@@ -42,20 +38,49 @@ objectPropertyFrameList:
     | INVERSEOF objectPropertyExpressionAnnotatedList #InverseOf
     | DOMAIN descriptionAnnotatedList #Domain
     | RANGE descriptionAnnotatedList #Range
+    | CHARACTERISTICS objectPropertyCharacteristicAnnotatedList #Characteristics
+    | DISJOINTWITH descriptionAnnotatedList #DisjointWith
+    | SUBPROPERTYCHAIN annotations? objectPropertyExpression ('o' objectPropertyExpression)+ #SubPropertyChain
+    | annotations #PropertyAnnotations
     ;
 
-objectPropertyExpressionAnnotatedList: objectPropertyExpression (COMMA objectPropertyExpression)* ;
+dataPropertyFrameList:
+    SUBPROPERTYOF objectPropertyExpressionAnnotatedList #SubDataPropertyOf
+    | EQUIVALENTTO objectPropertyExpressionAnnotatedList #DataPropertyEquivalentTo
+    | DOMAIN descriptionAnnotatedList #DataPropertyDomain
+    | RANGE dataRangeAnnotatedList #DataPropertyRange
+    | CHARACTERISTICS objectPropertyCharacteristicAnnotatedList #DataPropertyCharacteristics
+    | DISJOINTWITH descriptionAnnotatedList #DataPropertyDisjointWith
+    | annotations #DataPropertyAnnotations
+    ;
+
+
+objectPropertyCharacteristicAnnotatedList: objectPropertyCharacteristic annotations?  (COMMA annotations?  objectPropertyCharacteristic)* ;
+objectPropertyCharacteristic: 
+    FUNCTIONAL #Functional
+    | INVERSEFUNCTIONAL #InverseFunctional
+    | REFLEXIVE #Reflexive
+    | IRREFLEXIVE #Irreflexive
+    | ASYMMETRIC #Asymmetric
+    | TRANSITIVE #Transitive
+    | SYMMETRIC #Symmetric;
+
+objectPropertyExpressionAnnotatedList: objectPropertyExpression annotations?  (COMMA annotations?  objectPropertyExpression)* ;
 objectPropertyExpression: rdfiri 
 | INVERSE rdfiri;
 
-descriptionAnnotatedList: description (COMMA description)* ;
+dataRangeAnnotatedList: annotations?  dataRange (COMMA annotations?  dataRange)* ;
 
-factAnnotatedList: fact (COMMA fact)* ;
+descriptionAnnotatedList: annotations? description  (COMMA annotations?  description)* ;
 
-annotationAnnotatedList: annotation (COMMA annotation)* ;
+factAnnotatedList: annotations?  fact (COMMA annotations?  fact)* ;
+
+annotations: 'Annotations:' annotations? annotation (COMMA annotations? annotation)* ;
 annotation: 
     rdfiri rdfiri #ObjectAnnotation
-    | rdfiri STRING #LiteralAnnotation
+    | rdfiri literal #LiteralAnnotation
     ;
 
-fact: rdfiri rdfiri;
+fact: role=rdfiri object=rdfiri #ObjectFact
+    | property=rdfiri value=literal #LiteralFact
+    ;

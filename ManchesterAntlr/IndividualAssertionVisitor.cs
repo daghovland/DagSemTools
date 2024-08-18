@@ -8,11 +8,11 @@ using AlcTableau;
 public class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, ALC.ABoxAssertion>>>
 {
     public ConceptVisitor ConceptVisitor { get; init; }
-    public AnnotationVisitor AnnotationVisitor { get; init; }
+    public ABoxAssertionVisitor ABoxAssertionVisitor { get; init; }
     public IndividualAssertionVisitor(ConceptVisitor conceptVisitor)
     {
         ConceptVisitor = conceptVisitor;
-        AnnotationVisitor = new AnnotationVisitor(conceptVisitor);
+        ABoxAssertionVisitor = new ABoxAssertionVisitor(conceptVisitor);
     }
 
     public override IEnumerable<Func<IriReference, ALC.ABoxAssertion>> VisitIndividualTypes(ManchesterParser.IndividualTypesContext context)
@@ -26,16 +26,12 @@ public class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func
     =>
         context.factAnnotatedList().fact()
             .Select<ManchesterParser.FactContext, Func<IriReference, ALC.ABoxAssertion>>(
-                    fact => (individual => ALC.ABoxAssertion.NewRoleAssertion(
-                individual, 
-                ConceptVisitor.IriGrammarVisitor.Visit(fact.rdfiri(1)), 
-                ConceptVisitor.IriGrammarVisitor.Visit(fact.rdfiri(0))
-                )));
+                    ABoxAssertionVisitor.Visit);
     
     public override IEnumerable<Func<IriReference, ALC.ABoxAssertion>> VisitIndividualAnnotations(ManchesterParser.IndividualAnnotationsContext context)
         =>
-            context.annotationAnnotatedList().annotation()
+            context.annotations().annotation()
                 .Select<ManchesterParser.AnnotationContext, Func<IriReference, ALC.ABoxAssertion>>(
-                    AnnotationVisitor.Visit);
+                    ABoxAssertionVisitor.Visit);
                     
 }

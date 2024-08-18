@@ -31,14 +31,14 @@ public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
     }
 
     public override IriReference VisitPrefixedIri(PrefixedIriContext ctxt){
-        var prefixedPart = _prefixes[ctxt.prefixName().GetText()];
-        var iriString = $"{prefixedPart}{ctxt.localName().GetText()}";
+        var prefixedPart = _prefixes[ctxt.prefixName.Text];
+        var iriString = $"{prefixedPart}{ctxt.localName.Text}";
         return new IriReference(iriString);
     }
 
     public override IriReference VisitEmptyPrefixedIri(EmptyPrefixedIriContext ctxt){
         var prefixedPart = _prefixes[""];
-        var iriString = $"{prefixedPart}{ctxt.localName().GetText()}";
+        var iriString = $"{prefixedPart}{ctxt.LOCALNAME().GetText()}";
         return new IriReference(iriString);
     }
 }

@@ -95,8 +95,9 @@ module ALC =
     
     type ABoxAssertion =
         | ConceptAssertion of Individual: IriReference * Concept
-        | RoleAssertion of Left: IriReference * Right: IriReference * AssertedRole:  Role
-        | LiteralAnnotationAssertion of Individual: IriReference * Property: IriReference * Right: string
+        | RoleAssertion of Individual: IriReference * Right: IriReference * AssertedRole:  Role
+        | LiteralAssertion of Individual: IriReference * Property: IriReference * Value: string
+        | LiteralAnnotationAssertion of Individual: IriReference * Property: IriReference * Value: string
         | ObjectAnnotationAssertion of Individual:  IriReference * Property: IriReference * Value: IriReference
        
     type ABox = ABoxAssertion list

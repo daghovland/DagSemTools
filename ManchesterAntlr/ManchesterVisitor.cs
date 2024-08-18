@@ -21,7 +21,7 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
         foreach (var prefixDecl in ctxt.prefixDeclaration())
         {
             if (prefixDecl is NonEmptyprefixDeclarationContext NonEmptyPrefix)
-                _prefixes.Add(NonEmptyPrefix.prefixName().GetText(), new IriReference(NonEmptyPrefix.IRI().GetText()));
+                _prefixes.Add(NonEmptyPrefix.prefixName.Text, new IriReference(NonEmptyPrefix.IRI().GetText()));
             else if (prefixDecl is EmptyPrefixContext emptyPrefix)
                 _prefixes.Add("", new IriReference(emptyPrefix.IRI().GetText()));
             else

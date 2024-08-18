@@ -271,7 +271,7 @@ public class TestParser
         aboxAxioms.Should().HaveCount(1);
         aboxAxioms[0].Should().BeOfType<ALC.ABoxAssertion.RoleAssertion>();
         var assertion = (ALC.ABoxAssertion.RoleAssertion)aboxAxioms[0];
-        assertion.Left.Should().Be(new IriReference("https://example.com/ind1"));
+        assertion.Individual.Should().Be(new IriReference("https://example.com/ind1"));
         assertion.Right.Should().Be(new IriReference("https://example.com/ind2"));
         assertion.AssertedRole.Should().Be(new IriReference("https://example.com/Role"));
     }
@@ -368,7 +368,7 @@ public class TestParser
         {
             axiom.Should().BeOfType<ALC.ABoxAssertion.RoleAssertion>();
             var assertion = (ALC.ABoxAssertion.RoleAssertion)axiom;
-            assertion.Left.Should().Be(new IriReference("https://example.com/a"));
+            assertion.Individual.Should().Be(new IriReference("https://example.com/a"));
         }
     }
     
@@ -379,6 +379,18 @@ public class TestParser
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var tboxAxioms = tbox.ToList();
         tboxAxioms.Should().HaveCount(2);
+        
+    }
+
+    
+    
+    [Fact]
+    public void TestAnnotationsExample()
+    {
+        var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/annotations.owl");
+        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
+        var aboxAxioms = abox.ToList();
+        aboxAxioms.Should().HaveCount(0);
         
     }
 
