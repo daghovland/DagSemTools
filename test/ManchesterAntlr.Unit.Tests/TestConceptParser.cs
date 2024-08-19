@@ -215,6 +215,13 @@ public class TestConceptParser
         parsedConcept.Should().NotBeNull();
     }
 
+    [Fact]
+    public void TestDatapropertyRestriction()
+    {
+        var conceptString = "hasFirstName only string[minLength 1]";
+        var parsedConcept = TestString(conceptString);
+        parsedConcept.Should().NotBeNull();
+    }
 
     [Fact]
     public void TestComplexConcept()

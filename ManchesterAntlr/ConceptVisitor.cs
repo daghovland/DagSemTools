@@ -57,5 +57,5 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
         ALC.Concept.NewExistential(
             _roleVisitor.Visit(context.objectPropertyExpression()),
             Visit(context.primary()));
-    
+
 }

@@ -1,5 +1,5 @@
 grammar Concept;
-import ManchesterCommonTokens, IriGrammar;
+import ManchesterCommonTokens, IriGrammar, DataType;
 
 description: description OR conjunction #ConceptDisjunction
     | conjunction #ConceptSingleDisjunction;
@@ -16,7 +16,10 @@ conjunction_restriction: concept_restriction #ConjunctionRestriction
 concept_restriction:
     objectPropertyExpression SOME primary #ExistentialConceptRestriction
     | objectPropertyExpression ONLY primary #UniversalConceptRestriction
-    | objectPropertyExpression EXACTLY INTEGERLITERAL #CardinalityConceptRestriction
+    | objectPropertyExpression EXACTLY INTEGERLITERAL primary? #CardinalityConceptRestriction
+    | dataPropertyExpression SOME dataPrimary #ExistentialDataRestriction
+    | dataPropertyExpression ONLY dataPrimary #UniversalDataRestriction
+    | dataPropertyExpression EXACTLY INTEGERLITERAL dataPrimary? #CardinalityConceptRestriction
     ;
 
 primary:
@@ -29,3 +32,5 @@ primary:
 objectPropertyExpression: rdfiri #ObjectPropertyIri
     | INVERSE rdfiri #InverseObjectProperty
     ;
+    
+dataPropertyExpression: rdfiri;
