@@ -125,6 +125,7 @@ let expandAssertion state  (assertion : ALC.ABoxAssertion) =
                 | ALC.Universal(r, c) -> ALC.ConceptAssertion(right, c)
                 | _ -> raise (new Exception("Only universals should have passed through the filter above")))]
     | LiteralAssertion(_individual, _property, _right) -> []
+    | NegativeAssertion(_assertion) -> failwith "Negative abox assertions are not supported"
     
 let rec expand (state : ReasonerState) (nextAssertions : ABoxAssertion list list list) =
     match nextAssertions with

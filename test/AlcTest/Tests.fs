@@ -14,7 +14,7 @@ let ``Alc Can Be Created`` () =
     let concept = ALC.ConceptName(IriTools.IriReference("http://example.org/concept"))
     let tbox = [ ALC.Inclusion(ALC.Top, ALC.Bottom) ]
     let abox = [ ALC.ConceptAssertion (IriReference "http://example.org/individual", concept),
-                  ALC.ABoxAssertion.RoleAssertion (IriReference "http://example.org/individual", role, IriReference "http://example.org/individual2")]
+                  ALC.ABoxAssertion.RoleAssertion (IriReference "http://example.org/individual", role, Role.Iri( IriReference "http://example.org/individual2"))]
     let kb = (tbox, abox)
     Assert.True(kb.ToString().Length > 0)
     
@@ -22,7 +22,7 @@ let ``Alc Can Be Created`` () =
 let exConcept = ALC.ConceptName(new IriReference "https://example.com/concept")
 let exConcept2 = ALC.ConceptName(new IriReference "https://example.com/concept2")
 let exConcept3 = ALC.ConceptName(new IriReference "https://example.com/concept3")
-let exRole = ALC.Role(new IriReference "https://example.com/role")
+let exRole = ALC.Role.Iri (new IriReference "https://example.com/role")
 
 [<Fact>]
 let ``ConceptsNames can be compared``() =

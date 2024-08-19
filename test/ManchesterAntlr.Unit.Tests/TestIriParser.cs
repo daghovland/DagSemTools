@@ -37,6 +37,15 @@ public class TestIriParser
             using TextReader text_reader = new StringReader(owl);
                 return testReader(text_reader);
     }
+    public IriReference testStringWithEmptyProefix(string owl)
+    {
+        var prefixes = new Dictionary<string, IriReference>()
+        {
+            { "", new IriReference("https://example.com/vocab/ont#") }
+        };
+            using TextReader text_reader = new StringReader(owl);
+                return testReader(text_reader, prefixes);
+    }
 
 
     [Theory]
@@ -94,4 +103,18 @@ public class TestIriParser
         parsedIri2.Should().BeEquivalentTo(new IriReference($"{prefix}className"));
     }
 
+    [Fact]
+    public void TestLocalNamesThatAreAlsoExponents()
+    {
+        var parsedIri = testStringWithEmptyProefix("E1");
+        parsedIri.Should().BeEquivalentTo(new IriReference("https://example.com/vocab/ont#E1"));
+    }
+    
+    
+    [Fact]
+    public void TestLocalNamesThatAreAlsoIntegers()
+    {
+        var parsedIri = testStringWithEmptyProefix("1");
+        parsedIri.Should().BeEquivalentTo(new IriReference("https://example.com/vocab/ont#1"));
+    }
 }

@@ -2,8 +2,14 @@ grammar DataType;
 import ManchesterCommonTokens, IriGrammar;
 
 
-dataRange: dataConjunction (OR dataConjunction)* ;
-dataConjunction: dataPrimary (AND dataPrimary)* ;
+dataRange: dataConjunction #SingleDataDisjunction
+    | (dataConjunction OR dataRange) #DisjunctionDataRange
+    ;
+ 
+dataConjunction: dataPrimary#SingleDataConjunction
+    | dataPrimary AND dataConjunction #ActualDataRangeConjunction
+    ;
+    
 dataPrimary: dataAtomic #PositiveDataPrimary
     | NOT dataAtomic #NegativeDataPrimary
     ;
@@ -11,11 +17,13 @@ dataPrimary: dataAtomic #PositiveDataPrimary
 dataAtomic : datatype #DataTypeAtomic
     | '{' literal (COMMA literal)* '}' #LiteralSet
     | LPAREN dataRange RPAREN #DataRangeParenthesis
-    | datatype LSQUARE facet literal (COMMA facet literal)* RSQUARE #DatatypeRestriction
+    | datatype LSQUARE datatype_restriction (COMMA datatype_restriction)* RSQUARE #DatatypeRestriction
     ;
     
+datatype_restriction: facet literal;
+
 facet: LENGTH #facetLength
-    | MINLENGTH #faetMinLenght
+    | MINLENGTH #facetMinLength
     | MAXLENGTH #facetMaxLength
     | PATTERN #facetPattern
     | LANGRANGE #facetLangRange
@@ -40,12 +48,3 @@ datatype:  INTEGER #DatatypeInteger
     | STRING #DatatypeString
     | rdfiri #DatatypeIri
     ;
-
-LANGUAGETAG : '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)*;
-QUOTEDSTRING: '"' (~["\\] | '\\')* '"' ;
-FLOATINGPOINTLITERAL : ('+' | '-')? ( DIGITS ( '.' DIGITS) ? (EXPONENT)? ) | ( '.' DIGITS (EXPONENT)?) ( 'f' | 'F' );
-EXPONENT : ('e' | 'E') ('+' | '-')? DIGITS;
-DECIMALLITERAL : ('+' | '-')? DIGITS '.' DIGITS;
-INTEGERLITERAL : ('+' | '-')? DIGITS;
-DIGITS: [0-9]+;
-

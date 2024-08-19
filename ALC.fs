@@ -10,7 +10,9 @@ module ALC =
     | AbbreviatedIri of string
     | PrefixedIri of PrefixName : string * LocalName : string
 
-    type Role = IriReference
+    type Role =
+        | Iri of IriReference
+        | Inverse of IriReference
     
     [<CustomEquality>]
     [<CustomComparison>]
@@ -95,6 +97,7 @@ module ALC =
     
     type ABoxAssertion =
         | ConceptAssertion of Individual: IriReference * Concept
+        | NegativeAssertion of ABoxAssertion
         | RoleAssertion of Individual: IriReference * Right: IriReference * AssertedRole:  Role
         | LiteralAssertion of Individual: IriReference * Property: IriReference * Value: string
         | LiteralAnnotationAssertion of Individual: IriReference * Property: IriReference * Value: string

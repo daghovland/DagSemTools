@@ -1,3 +1,5 @@
+using Microsoft.FSharp.Collections;
+
 namespace ManchesterAntlr.Unit.Tests;
 using Antlr4;
 using Antlr4.Runtime;
@@ -93,7 +95,7 @@ public class TestConceptParser
         var parsedIri  = TestString(conceptString);
         parsedIri.Should().BeEquivalentTo(
             ALC.Concept.NewUniversal(
-                new IriReference("http://example.com/name"),
+                ALC.Role.NewIri(new IriReference("http://example.com/name")),
                 ALC.Concept.NewConceptName(new IriReference("http://foaf.com/name"))
             ));
     }
@@ -106,7 +108,7 @@ public class TestConceptParser
         var parsedIri  = TestString(conceptString);
         parsedIri.Should().BeEquivalentTo(
             ALC.Concept.NewExistential(
-                new IriReference("http://example.com/name"),
+                ALC.Role.NewIri(new IriReference("http://example.com/name")),
                 ALC.Concept.NewConceptName(new IriReference("http://foaf.com/name"))
             ));
     }
@@ -119,7 +121,7 @@ public class TestConceptParser
         var parsedIri  = TestString(conceptString);
         parsedIri.Should().BeEquivalentTo(
             ALC.Concept.NewExistential(
-                new IriReference("http://example.com/name"),
+                ALC.Role.NewIri(new IriReference("http://example.com/name")),
                 ALC.Concept.NewConceptName(new IriReference("http://foaf.com/name"))
             ));
     }
@@ -137,10 +139,10 @@ public class TestConceptParser
         var parenthesizedString = "(p some a) and (p only b)";
         var expected = ALC.Concept.NewConjunction(
             ALC.Concept.NewExistential(
-                new IriReference("https://example.com/p"),
+                ALC.Role.NewIri(new IriReference("https://example.com/p")),
                 ALC.Concept.NewConceptName(new IriReference("https://example.com/a"))),
             ALC.Concept.NewUniversal(
-                new IriReference("https://example.com/p"),
+                ALC.Role.NewIri(new IriReference("https://example.com/p")),
                 ALC.Concept.NewConceptName(new IriReference("https://example.com/b")))
         );
         
@@ -203,5 +205,42 @@ public class TestConceptParser
         parsedIri.Should().BeEquivalentTo(
             ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1"))
         );
+    }
+
+    [Fact]
+    public void TestConceptRestriction()
+    {
+        var conceptString = "hasFirstName exactly 1";
+        var parsedConcept = TestString(conceptString);
+        parsedConcept.Should().NotBeNull();
+    }
+
+
+    [Fact]
+    public void TestComplexConcept()
+    {
+        var conceptString = "owl:Thing that hasFirstName exactly 1 and hasFirstName only string[minLength 1]";
+        var parsedConcept = TestString(conceptString);
+        parsedConcept.Should().NotBeNull();
+        // var expected = ALC.Concept.NewConjunction(
+        //     ALC.Concept.NewConceptName(new IriReference("http://www.w3.org/2002/07/owl#Thing")),
+        //     ALC.Concept.NewConjunction(
+        //         ALC.Concept.NewCardinality(
+        //             new IriReference("http://example.com/hasFirstName"),
+        //             1,
+        //             ALC.Concept.NewConceptName(new IriReference("http://example.com/hasFirstName"))
+        //         ),
+        //         ALC.Concept.NewUniversal(
+        //             new IriReference("http://example.com/hasFirstName"),
+        //              DataRange.Datarange.NewRestriction(
+        //                 DataRange.Datarange.NewDatatype(new IriReference("http://www.w3.org/2001/XMLSchema#string")),
+        //                 new FSharpList<Tuple<DataRange.facet, string>>(
+        //                     new Tuple<DataRange.facet, string>(DataRange.facet.MinLength, "1"),
+        //                     FSharpList<Tuple<DataRange.facet, string>>.Empty
+        //                 )
+        //             )
+        //         )
+        //     )
+        // );
     }
 }

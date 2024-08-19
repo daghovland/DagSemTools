@@ -9,6 +9,7 @@
         <Compile Include="ALC.fs" />
         <Compile Include="NNF.fs" />
         <Compile Include="Tableau.fs" />
+        <Compile Include="DataRange.fs" />
     </ItemGroup>
 
     <ItemGroup>

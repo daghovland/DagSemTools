@@ -181,7 +181,7 @@ public class TestParser
         tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
         var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-        inclusion.Sup.Should().Be(ALC.Concept.NewExistential(new IriReference("https://example.com/Role"), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
+        inclusion.Sup.Should().Be(ALC.Concept.NewExistential(ALC.Role.NewIri(new IriReference("https://example.com/Role")), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
     }
 
     [Fact]
@@ -198,7 +198,7 @@ public class TestParser
         tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
         var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-        inclusion.Sup.Should().Be(ALC.Concept.NewUniversal(new IriReference("https://example.com/Role"), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
+        inclusion.Sup.Should().Be(ALC.Concept.NewUniversal(ALC.Role.NewIri(new IriReference("https://example.com/Role")), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
     }
 
     
@@ -273,7 +273,7 @@ public class TestParser
         var assertion = (ALC.ABoxAssertion.RoleAssertion)aboxAxioms[0];
         assertion.Individual.Should().Be(new IriReference("https://example.com/ind1"));
         assertion.Right.Should().Be(new IriReference("https://example.com/ind2"));
-        assertion.AssertedRole.Should().Be(new IriReference("https://example.com/Role"));
+        assertion.AssertedRole.Should().Be(ALC.Role.NewIri(new IriReference("https://example.com/Role")));
     }
     
     
@@ -383,6 +383,22 @@ public class TestParser
     }
 
     
+    
+    [Fact]
+    public void TestDataTypeFacet()
+    {
+        var parsedOntology = ManchesterAntlr.Parser.ParseString("""
+                                                                Prefix: : <https://example.com/>
+                                                                Ontology: 
+                                                                Datatype: NegInt
+                                                                  Annotations: rdfs:comment "Negative Integer"
+                                                                  EquivalentTo: integer[< 0]   
+                                                                """);
+        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
+        var aboxAxioms = abox.ToList();
+        aboxAxioms.Should().HaveCount(0);
+        
+    }
     
     [Fact]
     public void TestAnnotationsExample()

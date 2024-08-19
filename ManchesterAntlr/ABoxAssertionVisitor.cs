@@ -24,18 +24,26 @@ public class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<IriReference, ALC
         var value = context.literal().GetText();
         return (individual) => ALC.ABoxAssertion.NewLiteralAnnotationAssertion(individual, propertyIri, value);
     }
+
+    public override Func<IriReference, ALC.ABoxAssertion> VisitPositiveFact(
+        ManchesterParser.PositiveFactContext context) =>
+        Visit(context.propertyFact());
+    public override Func<IriReference, ALC.ABoxAssertion> VisitNegativeFact(
+        ManchesterParser.NegativeFactContext context) =>
+        individual => ALC.ABoxAssertion.NewNegativeAssertion(Visit(context.propertyFact())(individual) );
     
-    public override Func<IriReference, ALC.ABoxAssertion> VisitObjectFact(ManchesterParser.ObjectFactContext context)
+    public override Func<IriReference, ALC.ABoxAssertion> VisitObjectPropertyFact(ManchesterParser.ObjectPropertyFactContext context)
     {
-        var propertyIri = ConceptVisitor.IriGrammarVisitor.Visit(context.role);
+        var propertyIri = AlcTableau.ALC.Role.NewIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role));
         var value = ConceptVisitor.IriGrammarVisitor.Visit(context.@object);
         return (individual) => ALC.ABoxAssertion.NewRoleAssertion(individual, value, propertyIri);
     }
     
-    public override Func<IriReference, ALC.ABoxAssertion> VisitLiteralFact(ManchesterParser.LiteralFactContext context)
+    public override Func<IriReference, ALC.ABoxAssertion> VisitDataPropertyFact(ManchesterParser.DataPropertyFactContext context)
     {
         var propertyIri = ConceptVisitor.IriGrammarVisitor.Visit(context.property);
         var value = context.value.GetText();
         return (individual) => ALC.ABoxAssertion.NewLiteralAssertion(individual, propertyIri, value);
     }
+    
 }

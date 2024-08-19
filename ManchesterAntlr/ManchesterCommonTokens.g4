@@ -43,6 +43,11 @@ AND: 'and';
 OR: 'or';
 SOME: 'some';
 ONLY: 'only';
+EXACTLY: 'exactly';
+MIN: 'min';
+MAX: 'max';
+SELF: 'Self';
+
 
 LT: '<';
 GT: '>';
@@ -55,7 +60,14 @@ LSQUARE: '[';
 RSQUARE: ']';
 COLON: ':';
 
-NEWLINE: [\r\n]+ -> skip;
-WHITESPACE : [ \t]+  -> skip ;
+WS: [\r\n \t]+ -> channel(1);
 
+LANGUAGETAG : '@' [a-zA-Z]+ ('-' [a-zA-Z0-9]+)*;
+QUOTEDSTRING: '"' (~["\\] | '\\')* '"' ;
+EXPONENT : ('e' | 'E') ('+' | '-')? DIGITS;
+DECIMALLITERAL : ('+' | '-')? DIGITS '.' DIGITS;
+INTEGERLITERAL : ('+' | '-')? DIGITS;
+// Integers also match floating point, so this rule has to be after INTEGERLITERAL
+FLOATINGPOINTLITERAL :  ('+' | '-')? ( DIGITS ( '.' DIGITS) ? (EXPONENT)? ) | ( '.' DIGITS (EXPONENT)?) ( 'f' | 'F' );
+DIGITS: [0-9]+;
 

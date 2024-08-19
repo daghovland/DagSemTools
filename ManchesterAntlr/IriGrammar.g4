@@ -3,14 +3,23 @@ import ManchesterCommonTokens;
 
 rdfiri: LT IRI GT   #fullIri
       | prefixName=LOCALNAME COLON localName=LOCALNAME  #prefixedIri
-      | COLON? LOCALNAME #emptyPrefixedIri
+      | COLON? simpleName = (LOCALNAME 
+      | DECIMALLITERAL 
+      | EXPONENT 
+      | INTEGERLITERAL 
+      | FLOATINGPOINTLITERAL  
+      ) #emptyPrefixedIri // Numbers are valid localnames in Manchester syntax
       ;
+
+localname: LOCALNAME;
+integerliteral: INTEGERLITERAL;
 
 // Lexer
 WHITESPACE: [ \t\r\n] -> skip;
 
 // According to OWL, this is the PNAME_NS from SPARQL
-LOCALNAME: ~([/():<>[\] \t\r\n,]) +;
+// Leading integers are removed, since they are matched by the INTEGERLITERAL rule
+LOCALNAME:  ~([/():<>[\] \t\r\n,0123456789]) ~([/():<>[\] \t\r\n,]) *;
 
 
 // This is the IRI from the new RDF-1.2 spec
