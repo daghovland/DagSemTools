@@ -24,29 +24,29 @@ public class DataRangeVisitor : ManchesterBaseVisitor<AlcTableau.DataRange.Datar
     }
     public override DataRange.Datarange VisitSingleDataDisjunction(ManchesterParser.SingleDataDisjunctionContext context)
     => Visit(context.dataConjunction());
-    
+
     public override DataRange.Datarange VisitSingleDataConjunction(ManchesterParser.SingleDataConjunctionContext context)
         => Visit(context.dataPrimary());
-    
+
     public override DataRange.Datarange VisitPositiveDataPrimary(ManchesterParser.PositiveDataPrimaryContext context)
         => Visit(context.dataAtomic());
-    
-    
+
+
     public override DataRange.Datarange VisitDataTypeAtomic(ManchesterParser.DataTypeAtomicContext context)
         => Visit(context.datatype());
-    
+
     public override DataRange.Datarange VisitDatatypeInteger(ManchesterParser.DatatypeIntegerContext context)
         => DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#integer");
-    
+
     public override DataRange.Datarange VisitDatatypeString(ManchesterParser.DatatypeStringContext context)
         => DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#string");
-    
+
     public override DataRange.Datarange VisitDatatypeDecimal(ManchesterParser.DatatypeDecimalContext context)
         => DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#decimal");
-    
+
     public override DataRange.Datarange VisitDatatypeFloat(ManchesterParser.DatatypeFloatContext context)
         => DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#float");
-    
+
     public override DataRange.Datarange VisitDatatypeIri(ManchesterParser.DatatypeIriContext context)
         => DataRange.Datarange.NewDatatype(IriGrammarVisitor.Visit(context.rdfiri()));
 

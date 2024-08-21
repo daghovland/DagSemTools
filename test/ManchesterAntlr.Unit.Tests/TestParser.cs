@@ -25,26 +25,26 @@ public class TestParser
         parsedOntology.Should().NotBeNull();
 
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
-        
+
         prefixes.ToList().Should().Contain(ALC.prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
-        
+
         var ontologyIri = versionedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
         ontologyIri.Should().Be(new IriReference("https://example.com/ontology"));
-        
+
         var ontologyVersionIri = versionedOntology.TryGetOntologyVersionIri();
         ontologyVersionIri.Should().NotBeNull();
         ontologyVersionIri.Should().Be(new IriReference("https://example.com/ontology#1"));
         return (KB.Item1.ToList(), KB.Item2.ToList());
     }
 
-    
+
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
     {
         var parsedOntology = ManchesterAntlr.Parser.ParseString(ontology);
         return TestOntology(parsedOntology);
     }
-    
+
     [Fact]
     public void TestSmallestOntology()
     {
@@ -52,7 +52,7 @@ public class TestParser
         parsed.Should().NotBeNull();
     }
 
-    
+
     [Fact]
     public void TestOntologyWithIri()
     {
@@ -63,11 +63,11 @@ public class TestParser
 
         var prefixDeclarations = prefixes.ToList();
         prefixDeclarations.Should().Contain(ALC.prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
-        
+
         var ontologyIri = versionedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
         ontologyIri.Should().Be(new IriReference("https://example.com/ontology"));
-        
+
         var namedOntology = (ALC.ontologyVersion.NamedOntology)versionedOntology;
         namedOntology.OntologyIri.Should().Be(new IriReference("https://example.com/ontology"));
     }
@@ -75,9 +75,9 @@ public class TestParser
     public void TestOntologyWithVersonIri()
     {
         TestOntology("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology> <https://example.com/ontology#1>");
-        
+
     }
-    
+
     [Fact]
     public void TestOntologyWithClass()
     {
@@ -87,8 +87,8 @@ public class TestParser
                                         Class: ex:Class
                                         """);
     }
-    
-    
+
+
     [Fact]
     public void TestWrongOntology()
     {
@@ -99,7 +99,7 @@ public class TestParser
                          """);
         ontologyTester.Should().Throw<ParseCanceledException>();
     }
-     
+
     [Fact]
     public void TestWrongOntology2()
     {
@@ -110,7 +110,7 @@ public class TestParser
                                                 """);
         ontologyTester.Should().Throw<KeyNotFoundException>();
     }
-    
+
     [Fact]
     public void TestOntologyWithSubClass()
     {
@@ -127,8 +127,8 @@ public class TestParser
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Sup.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass")));
     }
-    
-    
+
+
     [Fact]
     public void TestOntologyWithSubClasses()
     {
@@ -166,7 +166,7 @@ public class TestParser
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Sup.Should().Be(ALC.Concept.NewNegation(ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
     }
-    
+
     [Fact]
     public void TestOntologyWithSubClassAndExistential()
     {
@@ -201,7 +201,7 @@ public class TestParser
         inclusion.Sup.Should().Be(ALC.Concept.NewUniversal(ALC.Role.NewIri(new IriReference("https://example.com/Role")), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
     }
 
-    
+
     [Fact]
     public void TestOntologyWithEquivalentClass()
     {
@@ -212,15 +212,15 @@ public class TestParser
                                         EquivalentTo: ex:EqClass
                                         """
         );
-        
+
         tboxAxiomsList.Should().HaveCount(1);
         tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Equivalence>();
         var inclusion = (ALC.TBoxAxiom.Equivalence)tboxAxiomsList[0];
         inclusion.Left.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Right.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/EqClass")));
     }
-    
-    
+
+
     [Fact]
     public void TestOntologyWithobjectProperty()
     {
@@ -230,10 +230,10 @@ public class TestParser
                                            ObjectProperty: ex:Role
                                            """
         );
-        
-        
+
+
     }
-    
+
     [Fact]
     public void TestOntologyWithAboxAssertion()
     {
@@ -246,15 +246,15 @@ public class TestParser
                                                             Types: ex:Class , ex:Class2
                                                         """
         );
-        
+
         aboxAxioms.Should().HaveCount(2);
         aboxAxioms[0].Should().BeOfType<ALC.ABoxAssertion.ConceptAssertion>();
         var assertion = (ALC.ABoxAssertion.ConceptAssertion)aboxAxioms[0];
         assertion.Individual.Should().Be(new IriReference("https://example.com/ind1"));
         assertion.Item2.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
     }
-    
-    
+
+
     [Fact]
     public void TestOntologyWithRoleAssertion()
     {
@@ -267,7 +267,7 @@ public class TestParser
                                                Facts: ex:Role ex:ind2
                                            """
         );
-        
+
         aboxAxioms.Should().HaveCount(1);
         aboxAxioms[0].Should().BeOfType<ALC.ABoxAssertion.RoleAssertion>();
         var assertion = (ALC.ABoxAssertion.RoleAssertion)aboxAxioms[0];
@@ -275,8 +275,8 @@ public class TestParser
         assertion.Right.Should().Be(new IriReference("https://example.com/ind2"));
         assertion.AssertedRole.Should().Be(ALC.Role.NewIri(new IriReference("https://example.com/Role")));
     }
-    
-    
+
+
     [Fact]
     public void TestOntologyWithRoleandTypeAssertions()
     {
@@ -291,12 +291,12 @@ public class TestParser
                                                 Types: ex:Class
                                            """
         );
-        
+
         aboxAxioms.Should().HaveCount(2);
-        
+
     }
-    
-    
+
+
     [Fact]
     public void TestEmptyPrefix()
     {
@@ -343,14 +343,14 @@ public class TestParser
                     """
         );
     }
-    
+
     [Fact]
     public void TestAlcTableauFromFile()
     {
         var (_, _) = TestOntologyFile("TestData/alctableauex.owl");
     }
-    
-    
+
+
     [Fact]
     public void TestOntologyWithManyRoleAssertions()
     {
@@ -371,7 +371,7 @@ public class TestParser
             assertion.Individual.Should().Be(new IriReference("https://example.com/a"));
         }
     }
-    
+
     [Fact]
     public void TestDefinitionExample()
     {
@@ -379,11 +379,11 @@ public class TestParser
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var tboxAxioms = tbox.ToList();
         tboxAxioms.Should().HaveCount(2);
-        
+
     }
 
-    
-    
+
+
     [Fact]
     public void TestDataTypeFacet()
     {
@@ -397,9 +397,9 @@ public class TestParser
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);
-        
+
     }
-    
+
     [Fact]
     public void TestAnnotationsExample()
     {
@@ -407,7 +407,7 @@ public class TestParser
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);
-        
+
     }
 
 }

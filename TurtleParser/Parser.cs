@@ -1,4 +1,4 @@
-﻿﻿using Antlr4.Runtime;
+﻿using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 
 // Thansk to Ken Domino to have created Antlr4BuildTasks
@@ -22,9 +22,9 @@ namespace Install
             // Create a parser that feeds off the token stream
             TURTLEParser parser = new TURTLEParser(tokens);
             // Begin parsing at rule r
-            
+
             IParseTree tree = parser.turtleDoc();
-            
+
 
             Console.WriteLine(tree.ToStringTree(parser)); // print LISP-style tree
 

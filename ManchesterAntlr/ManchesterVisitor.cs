@@ -13,9 +13,9 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
 {
     private ConceptVisitor? _conceptVisitor;
     private FrameVisitor? _frameVisitor;
-    
+
     private readonly Dictionary<string, IriReference> _prefixes = new Dictionary<string, IriReference>();
-    
+
     public override ALC.OntologyDocument VisitOntologyDocument(OntologyDocumentContext ctxt)
     {
         foreach (var prefixDecl in ctxt.prefixDeclaration())
@@ -32,14 +32,14 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
         _frameVisitor = new FrameVisitor(_conceptVisitor);
         return Visit(ctxt.ontology());
     }
-    
-    public static IEnumerable<T> concateOrKeep<T>(IEnumerable<T> a, IEnumerable<T>? b) => 
-        b == null ? a: a.Concat(b);
-    
-    
+
+    public static IEnumerable<T> concateOrKeep<T>(IEnumerable<T> a, IEnumerable<T>? b) =>
+        b == null ? a : a.Concat(b);
+
+
     public override ALC.OntologyDocument VisitOntology(OntologyContext ctxt)
     {
-        if(_frameVisitor == null || _conceptVisitor == null)
+        if (_frameVisitor == null || _conceptVisitor == null)
             throw new Exception("Smoething strange happened. Please report. FrameVisitor and ConceptVisitor should have been initialized in VisitOntologyDocument before visiting ontology");
         ALC.ontologyVersion version = (ctxt.rdfiri(0), ctxt.rdfiri(1)) switch
         {
@@ -53,9 +53,9 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
         };
         var knowledgeBase = ctxt.frame()
             .Select(_frameVisitor.Visit)
-            .Aggregate<(List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>),(IEnumerable<ALC.TBoxAxiom>, IEnumerable<ALC.ABoxAssertion>)> 
-            ((new List<ALC.TBoxAxiom>(), new List<ALC.ABoxAssertion>()), 
-                (acc, x) => (concateOrKeep(acc.Item1, x.Item1),concateOrKeep(acc.Item2, x.Item2)));
+            .Aggregate<(List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>), (IEnumerable<ALC.TBoxAxiom>, IEnumerable<ALC.ABoxAssertion>)>
+            ((new List<ALC.TBoxAxiom>(), new List<ALC.ABoxAssertion>()),
+                (acc, x) => (concateOrKeep(acc.Item1, x.Item1), concateOrKeep(acc.Item2, x.Item2)));
         return ALC.OntologyDocument.NewOntology(
             CreatePrefixList(),
             version,

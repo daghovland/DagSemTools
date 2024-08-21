@@ -16,12 +16,12 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
         IriGrammarVisitor = iriGrammarVisitor;
         _roleVisitor = new RoleVisitor(IriGrammarVisitor);
     }
-    
+
 
     public ConceptVisitor(Dictionary<string, IriReference> prefixes)
     : this(new IriGrammarVisitor(prefixes))
-    {}
-    
+    { }
+
     public override ALC.Concept VisitIriPrimaryConcept(ManchesterParser.IriPrimaryConceptContext context)
     {
         var iri = IriGrammarVisitor.Visit(context.rdfiri());
@@ -35,7 +35,7 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
 
     public override ALC.Concept VisitConceptDisjunction(ManchesterParser.ConceptDisjunctionContext context) =>
         ALC.Concept.NewDisjunction(Visit(context.description()), Visit(context.conjunction()));
-    
+
     public override ALC.Concept VisitConceptSingleDisjunction(ManchesterParser.ConceptSingleDisjunctionContext context) =>
         Visit(context.conjunction());
 
@@ -47,7 +47,7 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
     }
     public override ALC.Concept VisitConceptSingleConjunction(ManchesterParser.ConceptSingleConjunctionContext context) =>
         Visit(context.primary());
-    
+
     public override ALC.Concept VisitUniversalConceptRestriction(ManchesterParser.UniversalConceptRestrictionContext context) =>
         ALC.Concept.NewUniversal(
             _roleVisitor.Visit(context.objectPropertyExpression()),

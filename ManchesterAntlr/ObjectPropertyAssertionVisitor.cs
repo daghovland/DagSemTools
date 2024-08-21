@@ -12,5 +12,5 @@ public class ObjectPropertyAssertionVisitor : ManchesterBaseVisitor<IEnumerable<
     {
         ConceptVisitor = conceptVisitor;
     }
-    
+
 }

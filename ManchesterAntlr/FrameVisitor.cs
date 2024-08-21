@@ -20,8 +20,8 @@ public class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<ALC
         IndividualAssertionVisitor = new IndividualAssertionVisitor(conceptVisitor);
         ObjectPropertyAssertionVisitor = new ObjectPropertyAssertionVisitor(conceptVisitor);
     }
-    
-    
+
+
     public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitObjectPropertyFrame(ManchesterParser.ObjectPropertyFrameContext context)
     {
         var objectPropertyIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
@@ -31,7 +31,7 @@ public class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<ALC
             .ToList();
         return (frame, []);
     }
-    
+
     public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitClassFrame(ManchesterParser.ClassFrameContext context)
     {
         var classIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
@@ -42,7 +42,7 @@ public class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<ALC
             .ToList();
         return (frame, []);
     }
-    
+
     public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitIndividualFrame(ManchesterParser.IndividualFrameContext context)
     {
         var individualIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
@@ -54,5 +54,5 @@ public class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<ALC
             .ToList();
         return ([], frame);
     }
-        
+
 }
