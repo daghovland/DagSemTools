@@ -10,6 +10,7 @@
         <Compile Include="NNF.fs" />
         <Compile Include="Tableau.fs" />
         <Compile Include="DataRange.fs" />
+        <Compile Include="Querying.fs" />
     </ItemGroup>
 
     <ItemGroup>
