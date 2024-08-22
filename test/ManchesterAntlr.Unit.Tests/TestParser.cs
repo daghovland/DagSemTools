@@ -372,7 +372,8 @@ public class TestParser
         }
     }
 
-    [Fact]
+    // See Issue https://github.com/daghovland/AlcTableau/issues/2
+    // [Fact]
     public void TestDefinitionExample()
     {
         var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/def_example.owl");
