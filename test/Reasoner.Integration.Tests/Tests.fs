@@ -70,8 +70,7 @@ let  TestLongOrBranching() =
         Assert.False(reasoner_result)
     
     
-// This test does not halt. Needs a cycle test, or different rules
-//[<Fact>]
+[<Fact(Skip= "Not implemented yet, See Issue https://github.com/daghovland/AlcTableau/issues/2")>]
 let  TestCycleCOntradiction() =
     // Arrange
     let doc = ManchesterAntlr.Parser.ParseFile("TestData/cycle.owl")

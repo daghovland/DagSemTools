@@ -211,9 +211,7 @@ public class TestConceptParser
     }
 
 
-    // See issue https://github.com/daghovland/AlcTableau/issues/2
-    // [Fact]
-    [Fact]
+    [Fact(Skip = "Not implemented yet, See Issue https://github.com/daghovland/AlcTableau/issues/2")]
     public void TestConceptRestriction()
     {
         var conceptString = "hasFirstName exactly 1";
@@ -221,9 +219,7 @@ public class TestConceptParser
         parsedConcept.Should().NotBeNull();
     }
 
-    // See issue https://github.com/daghovland/AlcTableau/issues/2
-    // [Fact]
-    [Fact]
+    [Fact(Skip = "Not implemented yet, See Issue https://github.com/daghovland/AlcTableau/issues/2")]
     public void TestDatapropertyRestriction()
     {
         var conceptString = "hasFirstName only string[minLength 1]";
@@ -231,9 +227,7 @@ public class TestConceptParser
         parsedConcept.Should().NotBeNull();
     }
 
-    // See issue https://github.com/daghovland/AlcTableau/issues/2
-    // [Fact]
-    [Fact]
+    [Fact(Skip = "Not implemented yet, See Issue https://github.com/daghovland/AlcTableau/issues/2")]
     public void TestComplexConcept()
     {
         var conceptString = "owl:Thing that hasFirstName exactly 1 and hasFirstName only string[minLength 1]";
