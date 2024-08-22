@@ -1,0 +1,32 @@
+name: Test code
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: '8.x'
+
+    - name: Restore dependencies
+      run: dotnet restore ./AlcTableau.sln
+
+    - name: Format code
+      run: dotnet format ./AlcTableau.sln --verbosity diagnostic --verify-no-changes --no-restore
+
+    - name: Run tests
+      run: dotnet test ./AlcTableau.sln --no-restore
