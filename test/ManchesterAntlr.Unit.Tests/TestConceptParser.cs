@@ -210,9 +210,10 @@ public class TestConceptParser
         );
     }
 
-    
+
     // See issue https://github.com/daghovland/AlcTableau/issues/2
     // [Fact]
+    [Fact]
     public void TestConceptRestriction()
     {
         var conceptString = "hasFirstName exactly 1";
@@ -222,6 +223,7 @@ public class TestConceptParser
 
     // See issue https://github.com/daghovland/AlcTableau/issues/2
     // [Fact]
+    [Fact]
     public void TestDatapropertyRestriction()
     {
         var conceptString = "hasFirstName only string[minLength 1]";
@@ -231,6 +233,7 @@ public class TestConceptParser
 
     // See issue https://github.com/daghovland/AlcTableau/issues/2
     // [Fact]
+    [Fact]
     public void TestComplexConcept()
     {
         var conceptString = "owl:Thing that hasFirstName exactly 1 and hasFirstName only string[minLength 1]";

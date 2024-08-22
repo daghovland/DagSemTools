@@ -23,10 +23,10 @@ jobs:
         dotnet-version: '8.x'
 
     - name: Restore dependencies
-      run: dotnet restore
+      run: dotnet restore ./AlcTableau.sln
 
     - name: Format code
-      run: dotnet format
+      run: dotnet format ./AlcTableau.sln --verbosity diagnostic --verify-no-changes --no-restore
 
     - name: Run tests
-      run: dotnet test
+      run: dotnet test ./AlcTableau.sln --no-restore
