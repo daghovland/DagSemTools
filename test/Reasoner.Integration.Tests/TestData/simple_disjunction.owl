@@ -1,0 +1,4 @@
+Prefix: : <http://example.com/>
+Ontology: 
+Individual: a 
+    Types: A or not A

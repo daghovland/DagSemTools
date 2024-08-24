@@ -39,6 +39,16 @@ let  TestAlcBoolExample() =
         let reasoner_result = AlcTableau.Tableau.is_consistent kb
         Assert.True(reasoner_result)
     
+    
+[<Fact>]
+let  TestDisjunction() =
+    // Arrange
+    let doc = ManchesterAntlr.Parser.ParseFile("TestData/simple_disjunction.owl")
+    // Act
+    match doc with
+    | Ontology (prefixes, version, kb) ->
+        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        Assert.True(reasoner_result)
 [<Fact>]
 let  TestSubclassContradiction() =
     // Arrange

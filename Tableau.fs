@@ -1,4 +1,4 @@
-module AlcTableau.Querying
+module AlcTableau.Tableau
 
 
 open System
@@ -14,8 +14,17 @@ type ReasonerState = {
     subclass_assertions : Map<Concept, Concept list>
 }
 
+type ReasoningResult = 
+    | Consistent of ReasonerState
+    | InConsistent of ReasonerState
+
+let is_consistent_result (result : ReasoningResult) =
+    match result with
+    | Consistent _ -> true
+    | InConsistent _ -> false
+
 type NewAssertions =
-    | Disjunction of ABoxAssertion list
+    | Disjunction of NewAssertions list
     | Known of ABoxAssertion list
     | Nothing
 
@@ -25,18 +34,34 @@ let new_assertion_is_non_empty (new_assertion : NewAssertions) =
     | Known assertions -> assertions.Length > 0
     | Nothing -> false
 
-type ReasoningResult =
-    | Consistent of ABoxAssertion list
-    | InConsistent 
+
+let addToList l v =
+       if l |> List.contains v
+       then l else l @ [v]
+let mergeLists l1 l2 = l2 |> List.fold addToList l1
+let mergeMaps (map1: Map<IriReference, 'T list>) (map2: Map<IriReference, 'T list>) =
+    map2 |> Map.fold (fun acc key value ->
+        let combinedValue = 
+            match Map.tryFind key acc with
+            | Some existingValue -> value |> List.fold addToList existingValue 
+            | None -> value
+        acc.Add(key, combinedValue)
+    ) map1
+
+let mergeThreeMaps (map1: Map<IriReference, 'T list>) (map2: Map<IriReference, 'T list>) (map3: Map<IriReference, 'T list>) =
+    map1 |> mergeMaps map2 |> mergeMaps map3
+    
+let mergeMapList map (maps : Map<IriReference, 'T list> list) =
+    maps |> List.fold (fun acc map -> mergeMaps acc map) map
+    
 
 let add_concept_assertion(state: ReasonerState) (key:IriReference) (value : Concept list) =
     let orig_values = state.known_concept_assertions.GetValueOrDefault(key, [])
-    { state with known_concept_assertions =  state.known_concept_assertions.Add(key, orig_values @ value) }
+    { state with known_concept_assertions =  state.known_concept_assertions.Add(key, mergeLists orig_values value) }
         
 let add_role_assertion(state: ReasonerState) (key:IriReference) (value : (IriReference * Role) list) =
     let orig_values = state.known_role_assertions.GetValueOrDefault(key, [])
-    { state with known_role_assertions =  state.known_role_assertions.Add(key, orig_values @ value) }
-
+    { state with known_role_assertions =  state.known_role_assertions.Add(key, mergeLists orig_values value) }
 
 let add_subclass_assertion(state: ReasonerState) (key:Concept) (value : Concept) =
     let orig_values = state.subclass_assertions.GetValueOrDefault(key, [])
@@ -109,7 +134,10 @@ let expandAssertion state  (assertion : ALC.ABoxAssertion) =
          (if (individual_is_asserted_concept state C individual || individual_is_asserted_concept state D individual) then
             NewAssertions.Nothing
         else
-            NewAssertions.Disjunction [ALC.ConceptAssertion(individual, C);ALC.ConceptAssertion(individual, D)]
+            NewAssertions.Disjunction [
+                                       NewAssertions.Known [ALC.ConceptAssertion(individual, C)]
+                                       NewAssertions.Known [ALC.ConceptAssertion(individual, D)]
+                                       ]
         )
     | ConceptAssertion (individual, ALC.Existential(role, concept)) ->
         if not (state.known_role_assertions.GetValueOrDefault(individual,[])
@@ -143,9 +171,10 @@ let expandAssertion state  (assertion : ALC.ABoxAssertion) =
     | LiteralAssertion(_individual, _property, _right) -> NewAssertions.Nothing
     | NegativeAssertion(_assertion) -> failwith "Negative abox assertions are not supported"
     
+
 let rec expand (state : ReasonerState) (nextAssertions : NewAssertions list) =
     match nextAssertions with
-    | [] -> true
+    | [] -> Consistent state
     | NewAssertions.Nothing :: restAssertions -> expand state restAssertions
     | NewAssertions.Known assertion_choice :: restAssertions ->
             let new_state = add_assertion_list state assertion_choice
@@ -155,10 +184,24 @@ let rec expand (state : ReasonerState) (nextAssertions : NewAssertions list) =
                     let newAssertions = assertion_choice |> List.map (expandAssertion new_state) |> List.where new_assertion_is_non_empty
                     expand new_state (restAssertions @ inferredAssertions @ newAssertions )
                 else
-                    false
+                    InConsistent state
             )
-    | NewAssertions.Disjunction assertion_disjunction :: restAssertions ->
-        raise (NotImplementedException "Disjunctions are not supported yet")        
+    | (NewAssertions.Disjunction assertion_disjunction) :: restAssertions ->
+        let positive_states = (assertion_disjunction
+            |> List.map (fun assertion -> expand state (assertion :: restAssertions))
+            |> List.where (is_consistent_result)
+            |> List.map (fun x -> match x with| Consistent s -> s | _ -> failwith "This should not happen"))
+        match positive_states with
+            | [] -> InConsistent state
+            | [new_state] -> Consistent new_state
+            | stateList ->
+                let possible_assertions = mergeMapList
+                                              state.probable_concept_assertions
+                                              (stateList |> List.map (fun state -> mergeMaps state.known_concept_assertions state.probable_concept_assertions))
+                let possible_roles = mergeMapList
+                                         state.probable_role_assertions
+                                         (stateList |> List.map (fun state -> mergeMaps state.known_role_assertions state.probable_role_assertions))
+                Consistent { state with probable_concept_assertions = possible_assertions ; probable_role_assertions = possible_roles }
     
 let is_consistent (kb : ALC.knowledgeBase) =
     let normalized_kb = NNF.nnf_kb kb
@@ -167,4 +210,4 @@ let is_consistent (kb : ALC.knowledgeBase) =
     if abox |> List.exists (has_new_collision reasoner_state)  then
         false
     else
-        expand reasoner_state ([NewAssertions.Known abox])
+        expand reasoner_state ([NewAssertions.Known abox]) |> is_consistent_result
