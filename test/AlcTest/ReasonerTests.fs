@@ -218,9 +218,20 @@ let ``query over disjunctive is ok`` () =
     )
 
 
+
+[<Fact>]
+let ``subclass check works`` () =
+     let concept1 = ALC.ConceptName(IriTools.IriReference("http://example.org/concept1"))
+     let concept2 = ALC.ConceptName(IriTools.IriReference("http://example.org/concept2"))
+     let subclass_assertion = ALC.Inclusion(concept1, concept2)
+     let reasoned_subclass = ReasonerService.is_subclass_of [subclass_assertion] concept1 concept2
+     Assert.True(reasoned_subclass)
+     let reasoned_subclass2 = ReasonerService.is_subclass_of [subclass_assertion] concept2 concept1
+     Assert.False(reasoned_subclass2)
+
+
 [<Fact>]
 let ``checking over  disjunctive is ok`` () =
-    (
      let concept1 = ALC.ConceptName(IriTools.IriReference("http://example.org/concept1"))
      let negation = ALC.Negation(concept1)
      let individual = IriReference "http://example.org/individual"
@@ -232,8 +243,6 @@ let ``checking over  disjunctive is ok`` () =
         | Tableau.Consistent state -> 
             let hasType = ReasonerService.check_individual_type state individual concept1
             Assert.False(hasType)
-    )
-
 
 [<Fact>]
 let ``simplest query is ok`` () =

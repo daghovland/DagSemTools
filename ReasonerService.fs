@@ -31,8 +31,15 @@ let get_individual_types (reasoner_state : Tableau.ReasonerState) (individual : 
        |> List.where (fun c -> check_individual_type reasoner_state individual c)
     easy_answers @ inferred_answers
 
-let is_satisfiable_class (tbox, _abox) concept =
+let is_satisfiable_class tbox concept =
     let individual = IriReference($"http://www.example.com/individual/{Guid.NewGuid()}")
     let assertion = ALC.ConceptAssertion (individual, concept)
     init (tbox, [assertion])
     |> Tableau.is_consistent_result
+    
+let is_subclass_of tbox sub super =
+    let concept = ALC.Conjunction (sub, ALC.Negation super)
+    is_satisfiable_class tbox concept |> not
+    
+let is_equivalent_class tbox c1 c2 =
+    is_subclass_of tbox c1 c2 && is_subclass_of tbox c2 c1
