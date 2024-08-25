@@ -27,7 +27,12 @@ module NNF =
     let nnf_assertion assertion =
         match assertion with
             | ConceptAssertion (individual, concept) -> ConceptAssertion(individual, nnf_concept concept)
+            | NegativeAssertion (RoleAssertion (individual, object, role)) -> NegativeRoleAssertion (individual, object, role)
+            | NegativeAssertion (ConceptAssertion (individual, concept)) -> ConceptAssertion(individual, nnf_concept (ALC.Negation concept))
+            | NegativeAssertion _ -> failwith "Arbitrary negative assertions are not yet supported"
             | r -> r
+            
+            
             
     let nnf_kb (tbox, abox) =
         (tbox, List.map nnf_assertion abox)
