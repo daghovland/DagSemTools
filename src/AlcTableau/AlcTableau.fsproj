@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="MapUtils.fs" />
+        <Compile Include="ALC.fs" />
+        <Compile Include="NNF.fs" />
+        <Compile Include="Tableau.fs" />
+        <Compile Include="DataRange.fs" />
+        <Compile Include="ReasonerService.fs" />
+        <Compile Include="QueryingService.fs" />
+        <Compile Include="ConjunctiveQuery.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="IriTools" Version="2.2.0" />
+      <PackageReference Update="FSharp.Core" Version="8.0.301" />
+    </ItemGroup>
+
+</Project>
