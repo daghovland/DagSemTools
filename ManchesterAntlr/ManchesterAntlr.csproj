@@ -17,6 +17,6 @@
 		<Antlr4 Include="Manchester.g4" />
 	</ItemGroup>
       <ItemGroup>
-        <ProjectReference Include="..\AlcTableau.fsproj" />
+        <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
     </ItemGroup>
 </Project>

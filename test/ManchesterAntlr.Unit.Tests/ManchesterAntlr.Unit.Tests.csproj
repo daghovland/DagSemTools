@@ -34,7 +34,7 @@
 
 
     <ItemGroup>
-        <ProjectReference Include="..\..\AlcTableau.fsproj" />
+        <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\..\ManchesterAntlr\ManchesterAntlr.csproj" />
     </ItemGroup>
 
