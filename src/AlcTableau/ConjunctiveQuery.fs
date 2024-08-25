@@ -12,9 +12,10 @@
 
 *)
 
-
-
 module AlcTableau.ConjunctiveQuery
+
+open AlcTableau.ALC
+open IriTools
 
 type ConceptSignature =
     | Variable of string
@@ -25,7 +26,7 @@ type RoleSignature =
     | Variable of string
     
 type IndividualSignature =
-    | Individual of ALC.Iri
+    | Individual of IriReference
     | Variable of string
 open System
 type QueryAtom =

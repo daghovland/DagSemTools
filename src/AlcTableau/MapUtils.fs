@@ -12,6 +12,7 @@
 
 module AlcTableau.MapUtils
 
+open System
 open IriTools
 open System.Collections.Generic
 
@@ -44,5 +45,13 @@ let invert_assertions_map (map : Map<'K, 'V list>) =
     map |> Map.toSeq
     |> Seq.fold (fun concept_map (iri, concepts) -> concepts |> List.fold
                                                                 (fun acc concept -> addToMapList acc concept [iri])
+                                                                concept_map
+                ) Map.empty
+
+/// Takes as input a map from tuples T, U to list of V and returns a map from V, U to list of T
+let invert_index_map (map : Map<Tuple<'T, 'U>, 'V list>) =
+    map |> Map.toSeq
+    |> Seq.fold (fun concept_map ((left, role), rights) -> rights |> List.fold
+                                                                (fun acc right -> addToMapList acc (right, role) [left])
                                                                 concept_map
                 ) Map.empty

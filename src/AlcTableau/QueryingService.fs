@@ -22,16 +22,22 @@ type QueryingCache = {
     reasoner_state : Tableau.ReasonerState
     known_concept_individuals : Map<ALC.Concept, IriReference list>
     known_object_predicate_index : Map<(IriReference * ALC.Role), IriReference list>
+    known_subject_predicate_index : Map<(IriReference * ALC.Role), IriReference list>
     probable_concept_individuals : Map<ALC.Concept, IriReference list>
     probable_object_predicate_index : Map<(IriReference * ALC.Role), IriReference list>
+    probable_subject_predicate_index : Map<(IriReference * ALC.Role), IriReference list>
 }
 
-let cache_concept_answers reasoner_state =
+let cache_concept_answers (reasoner_state : Tableau.ReasonerState) =
+    let knownObjectPredicateIndex = MapUtils.invert_assertions_map reasoner_state.known_role_assertions
+    let probableObjectPredicateIndex = MapUtils.invert_assertions_map reasoner_state.probable_role_assertions
     { reasoner_state = reasoner_state
       known_concept_individuals = MapUtils.invert_assertions_map reasoner_state.known_concept_assertions
-      known_object_predicate_index = MapUtils.invert_assertions_map reasoner_state.known_role_assertions
+      known_object_predicate_index = knownObjectPredicateIndex
       probable_concept_individuals = MapUtils.invert_assertions_map reasoner_state.probable_concept_assertions
-      probable_object_predicate_index =  MapUtils.invert_assertions_map reasoner_state.probable_role_assertions
+      probable_object_predicate_index =  probableObjectPredicateIndex
+      probable_subject_predicate_index = MapUtils.invert_index_map knownObjectPredicateIndex
+      known_subject_predicate_index = MapUtils.invert_index_map probableObjectPredicateIndex 
     }
 
 let init (kb : ALC.knowledgeBase) =
