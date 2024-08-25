@@ -5,13 +5,21 @@ open System
 open System.Collections.Generic
 open AlcTableau.ALC
 open IriTools
+open MapUtils
+
+/// The reasoner can be slightly faster if we only check for consistency
+type ReasonerFunctionality =
+       | OnlyConsistencty
+       | PrepareQueryingCache
 
 type ReasonerState = {
     known_concept_assertions : Map<IriReference, Concept list>
     probable_concept_assertions : Map<IriReference, Concept list>
     known_role_assertions : Map<IriReference, (IriReference * Role) list>
     probable_role_assertions : Map<IriReference, (IriReference * Role) list>
+    negative_role_assertion : Map<IriReference, (IriReference * Role) list>
     subclass_assertions : Map<Concept, Concept list>
+    functionality : ReasonerFunctionality
 }
 
 type ReasoningResult = 
@@ -35,37 +43,14 @@ let new_assertion_is_non_empty (new_assertion : NewAssertions) =
     | Nothing -> false
 
 
-let addToList l v =
-       if l |> List.contains v
-       then l else l @ [v]
-let mergeLists l1 l2 = l2 |> List.fold addToList l1
-let mergeMaps (map1: Map<IriReference, 'T list>) (map2: Map<IriReference, 'T list>) =
-    map2 |> Map.fold (fun acc key value ->
-        let combinedValue = 
-            match Map.tryFind key acc with
-            | Some existingValue -> value |> List.fold addToList existingValue 
-            | None -> value
-        acc.Add(key, combinedValue)
-    ) map1
-
-let mergeThreeMaps (map1: Map<IriReference, 'T list>) (map2: Map<IriReference, 'T list>) (map3: Map<IriReference, 'T list>) =
-    map1 |> mergeMaps map2 |> mergeMaps map3
-    
-let mergeMapList map (maps : Map<IriReference, 'T list> list) =
-    maps |> List.fold (fun acc map -> mergeMaps acc map) map
-    
-
 let add_concept_assertion(state: ReasonerState) (key:IriReference) (value : Concept list) =
-    let orig_values = state.known_concept_assertions.GetValueOrDefault(key, [])
-    { state with known_concept_assertions =  state.known_concept_assertions.Add(key, mergeLists orig_values value) }
+    { state with known_concept_assertions = addToMapList state.known_concept_assertions key value }
         
 let add_role_assertion(state: ReasonerState) (key:IriReference) (value : (IriReference * Role) list) =
-    let orig_values = state.known_role_assertions.GetValueOrDefault(key, [])
-    { state with known_role_assertions =  state.known_role_assertions.Add(key, mergeLists orig_values value) }
+    { state with known_role_assertions =  addToMapList state.known_role_assertions key value }
 
 let add_subclass_assertion(state: ReasonerState) (key:Concept) (value : Concept) =
-    let orig_values = state.subclass_assertions.GetValueOrDefault(key, [])
-    { state with subclass_assertions = state.subclass_assertions.Add(key, orig_values @ [value]) }
+    { state with subclass_assertions = addToMapList state.subclass_assertions key [value] }
 
 
 let individual_is_asserted_concept state (concept : Concept) (individual : IriReference) =
@@ -105,8 +90,22 @@ let init_tbox_expander (tbox : TBoxAxiom list) init_state  =
         | _ -> state )
         init_state
 
+let create_negative_role_assertion_map (abox : ABoxAssertion list) =
+    abox |> List.choose (fun assertion -> 
+        match assertion with
+        | NegativeRoleAssertion (left, right, role) -> Some (left, (right, role))
+        | _ -> None)
+        |> List.fold (fun map (left, (right, role)) -> addToMapList map left [(right, role)]) Map.empty
+
 let init_expander ((tbox, abox) : ALC.knowledgeBase) =
-    { known_concept_assertions = Map.empty; probable_concept_assertions = Map.empty; known_role_assertions = Map.empty; probable_role_assertions = Map.empty; subclass_assertions = Map.empty }
+    { known_concept_assertions = Map.empty
+      probable_concept_assertions = Map.empty
+      known_role_assertions = Map.empty
+      negative_role_assertion = create_negative_role_assertion_map abox
+      probable_role_assertions = Map.empty
+      subclass_assertions = Map.empty
+      functionality = PrepareQueryingCache
+    }
     |> init_abox_expander abox
     |> init_tbox_expander tbox
 
@@ -122,43 +121,36 @@ let expandAxiom state new_assertion =
         |> NewAssertions.Known
     | _ -> NewAssertions.Nothing
         
-
-let expandAssertion state  (assertion : ALC.ABoxAssertion) =
-    match assertion with
-    | ConceptAssertion (individual, ALC.Conjunction(C,D)) ->
-        (if individual_is_asserted_concept state C individual && individual_is_asserted_concept state D individual then
-            NewAssertions.Nothing
-        else
-            NewAssertions.Known [ALC.ConceptAssertion(individual, C) ; ALC.ConceptAssertion(individual, D)])
-    | ConceptAssertion (individual, ALC.Disjunction(C,D)) ->
-         (if (individual_is_asserted_concept state C individual || individual_is_asserted_concept state D individual) then
-            NewAssertions.Nothing
-        else
-            NewAssertions.Disjunction [
+let expandConjunction state C D individual =
+            (if individual_is_asserted_concept state C individual && individual_is_asserted_concept state D individual then
+                NewAssertions.Nothing
+            else
+                NewAssertions.Known [ALC.ConceptAssertion(individual, C) ; ALC.ConceptAssertion(individual, D)])
+            
+let expandDisjunction state C D individual =
+            if (individual_is_asserted_concept state C individual || individual_is_asserted_concept state D individual) then
+               NewAssertions.Nothing
+            else
+                NewAssertions.Disjunction [
                                        NewAssertions.Known [ALC.ConceptAssertion(individual, C)]
                                        NewAssertions.Known [ALC.ConceptAssertion(individual, D)]
                                        ]
-        )
-    | ConceptAssertion (individual, ALC.Existential(role, concept)) ->
-        if not (state.known_role_assertions.GetValueOrDefault(individual,[])
+let expandExistential state role concept individual =
+    if not (state.known_role_assertions.GetValueOrDefault(individual,[])
                 |> List.exists (fun (right, r) -> r = role && individual_is_asserted_concept state concept right )) then
             let new_individual = new IriReference($"https://alctableau.example.com/anonymous#{Guid.NewGuid()}")
             NewAssertions.Known [ALC.ConceptAssertion(new_individual, concept); ALC.RoleAssertion(individual, new_individual, role)]
         else
             NewAssertions.Nothing
-    | ConceptAssertion (individual, ALC.Universal(role, concept)) ->
-        state.known_role_assertions.GetValueOrDefault(individual,[])
+            
+let expandUniversal state role concept individual =
+    state.known_role_assertions.GetValueOrDefault(individual,[])
             |> List.where (fun (right, r) -> r = role && not (individual_is_asserted_concept state concept right))
             |> List.map (fun (right, r) -> ALC.ConceptAssertion(right, concept))
             |> NewAssertions.Known
-    | ConceptAssertion (_individual, ALC.Bottom)  -> NewAssertions.Nothing
-    | ConceptAssertion (_individual, ALC.Top)  -> NewAssertions.Nothing
-    | ConceptAssertion (_individual, ALC.ConceptName(_iri))  -> NewAssertions.Nothing
-    | ConceptAssertion (_individual, ALC.Negation(_concept))  -> NewAssertions.Nothing
-    | LiteralAnnotationAssertion (_individual, _property, _right)  -> NewAssertions.Nothing
-    | ObjectAnnotationAssertion (_individual, _property, _value)  -> NewAssertions.Nothing
-    | RoleAssertion (left, right, role) ->
-        state.known_concept_assertions.GetValueOrDefault(left,[])
+            
+let expandRoleAssertion state left right role =
+    state.known_concept_assertions.GetValueOrDefault(left,[])
             |> List.filter (fun concept ->
                 match concept with
                 | ALC.Universal (r, c) -> (r = role && not ( individual_is_asserted_concept state c right))
@@ -168,7 +160,21 @@ let expandAssertion state  (assertion : ALC.ABoxAssertion) =
                 | ALC.Universal(r, c) -> ALC.ConceptAssertion(right, c)
                 | _ -> raise (new Exception("Only universals should have passed through the filter above")))
             |> NewAssertions.Known
+let expandAssertion state  (assertion : ALC.ABoxAssertion) =
+    match assertion with
+    | ConceptAssertion (individual, ALC.Conjunction(C,D)) -> expandConjunction state C D individual
+    | ConceptAssertion (individual, ALC.Disjunction(C,D)) -> expandDisjunction state C D individual
+    | ConceptAssertion (individual, ALC.Existential(role, concept)) -> expandExistential state role concept individual 
+    | ConceptAssertion (individual, ALC.Universal(role, concept)) -> expandUniversal state role concept individual
+    | ConceptAssertion (_individual, ALC.Bottom)  -> NewAssertions.Nothing
+    | ConceptAssertion (_individual, ALC.Top)  -> NewAssertions.Nothing
+    | ConceptAssertion (_individual, ALC.ConceptName(_iri))  -> NewAssertions.Nothing
+    | ConceptAssertion (_individual, ALC.Negation(_concept))  -> NewAssertions.Nothing
+    | LiteralAnnotationAssertion (_individual, _property, _right)  -> NewAssertions.Nothing
+    | ObjectAnnotationAssertion (_individual, _property, _value)  -> NewAssertions.Nothing
+    | RoleAssertion (left, right, role) -> expandRoleAssertion state left right role
     | LiteralAssertion(_individual, _property, _right) -> NewAssertions.Nothing
+    | NegativeRoleAssertion(_individual, _right, _role) -> failwith "Negative roles are not supported"
     | NegativeAssertion(_assertion) -> failwith "Negative abox assertions are not supported"
     
 
@@ -187,11 +193,14 @@ let rec expand (state : ReasonerState) (nextAssertions : NewAssertions list) =
                     InConsistent state
             )
     | (NewAssertions.Disjunction assertion_disjunction) :: restAssertions ->
-        let positive_states = (assertion_disjunction
+        match state.functionality with
+        | OnlyConsistencty -> handleDisjunctionConsistency state assertion_disjunction restAssertions
+        | PrepareQueryingCache -> expandDisjunctionAssertion state assertion_disjunction restAssertions
+and expandDisjunctionAssertion (state : ReasonerState) (assertion_disjunction : NewAssertions list) restAssertions =
+    let positive_states = (assertion_disjunction
             |> List.map (fun assertion -> expand state (assertion :: restAssertions))
-            |> List.where (is_consistent_result)
-            |> List.map (fun x -> match x with| Consistent s -> s | _ -> failwith "This should not happen"))
-        match positive_states with
+            |> List.choose (fun x -> match x with | Consistent s -> Some s | InConsistent _ -> None))
+    match positive_states with
             | [] -> InConsistent state
             | [new_state] -> Consistent new_state
             | stateList ->
@@ -202,12 +211,13 @@ let rec expand (state : ReasonerState) (nextAssertions : NewAssertions list) =
                                          state.probable_role_assertions
                                          (stateList |> List.map (fun state -> mergeMaps state.known_role_assertions state.probable_role_assertions))
                 Consistent { state with probable_concept_assertions = possible_assertions ; probable_role_assertions = possible_roles }
+                
+and handleDisjunctionConsistency (state : ReasonerState) (assertion_disjunction : NewAssertions list) restAssertions =
+    match (
+        assertion_disjunction
+                                |> List.map (fun assertion -> expand state (assertion :: restAssertions))
+                                |> List.tryHead
+        ) with 
+        | Some s -> s
+        | None -> InConsistent state        
     
-let is_consistent (kb : ALC.knowledgeBase) =
-    let normalized_kb = NNF.nnf_kb kb
-    let reasoner_state = init_expander normalized_kb
-    let (tbox, abox) = normalized_kb
-    if abox |> List.exists (has_new_collision reasoner_state)  then
-        false
-    else
-        expand reasoner_state ([NewAssertions.Known abox]) |> is_consistent_result

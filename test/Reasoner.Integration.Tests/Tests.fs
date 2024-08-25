@@ -16,7 +16,8 @@ let  TestOntologyWithSubClassAndExistential() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.True(reasoner_result)
     
 [<Fact>]
@@ -26,7 +27,8 @@ let  TestSimplestContradiction() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.False(reasoner_result)
    
 [<Fact>]
@@ -36,7 +38,8 @@ let  TestAlcBoolExample() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.True(reasoner_result)
     
     
@@ -47,7 +50,8 @@ let  TestDisjunction() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.True(reasoner_result)
 [<Fact>]
 let  TestSubclassContradiction() =
@@ -56,7 +60,8 @@ let  TestSubclassContradiction() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.False(reasoner_result)
     
 [<Fact>]
@@ -66,7 +71,8 @@ let  TestUniversalContradiction() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.False(reasoner_result)
     
 [<Fact>]
@@ -76,7 +82,8 @@ let  TestLongOrBranching() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.False(reasoner_result)
     
     
@@ -87,7 +94,8 @@ let  TestCycleCOntradiction() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.False(reasoner_result)
     
         
@@ -98,7 +106,8 @@ let  ExistUniv() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.False(reasoner_result)
  
          
@@ -109,6 +118,7 @@ let  Dexpi() =
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
-        let reasoner_result = AlcTableau.Tableau.is_consistent kb
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
         Assert.True(reasoner_result)
  

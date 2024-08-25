@@ -6,11 +6,13 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="MapUtils.fs" />
         <Compile Include="ALC.fs" />
         <Compile Include="NNF.fs" />
         <Compile Include="Tableau.fs" />
         <Compile Include="DataRange.fs" />
         <Compile Include="ReasonerService.fs" />
+        <Compile Include="QueryingService.fs" />
     </ItemGroup>
 
     <ItemGroup>
