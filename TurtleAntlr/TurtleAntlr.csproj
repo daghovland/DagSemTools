@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <OutputType>Library</OutputType>
+    <RootNamespace>TurtleParser</RootNamespace>
+  </PropertyGroup>
+	<ItemGroup>
+		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.10.1" />
+		<PackageReference Include="Antlr4BuildTasks" Version="10.7" />
+        <PackageReference Include="FSharp.Core" Version="8.0.301" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Remove="grammars\IriGrammar.g4" />
+        <Antlr4 Include="grammars\IriGrammar.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
+        <None Remove="grammars\Turtle.g4" />
+        <Antlr4 Include="grammars\Turtle.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
+        <None Remove="grammars\DataType.g4" />
+        <Antlr4 Include="grammars\DataType.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
+        <Antlr4 Include="grammars\CommonTokens.g4">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
+    </ItemGroup>
+    <ItemGroup>
+        <ProjectReference Include="..\ManchesterAntlr\ManchesterAntlr.csproj" />
+        <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
+    </ItemGroup>
+    <ItemGroup>
+      <Folder Include="grammars\" />
+    </ItemGroup>
+</Project>

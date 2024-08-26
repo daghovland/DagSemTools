@@ -7,7 +7,7 @@
 */
 
 grammar Manchester;
-import ManchesterCommonTokens, IriGrammar, DataType, Concept;
+import ManchesterCommonTokens, CommonTokens, IriGrammar, DataType, Concept;
 
 ontologyDocument : prefixDeclaration* ontology EOF;
 

@@ -7,15 +7,16 @@
 */
 
 grammar IriGrammar; // Kind of IRIs (https://www.rfc-editor.org/rfc/rfc3987#section-5), but only the subset valid as defined in RDF-1.2 https://www.w3.org/TR/rdf12-concepts/#iri-abnf
-import ManchesterCommonTokens;
+import CommonTokens, CommonTokens;
 
 rdfiri: LT IRI GT   #fullIri
       | prefixName=LOCALNAME COLON localName=LOCALNAME  #prefixedIri
-      | COLON? simpleName = (LOCALNAME 
-      | DECIMALLITERAL 
-      | EXPONENT 
-      | INTEGERLITERAL 
-      | FLOATINGPOINTLITERAL  
+      | COLON? simpleName = (
+            LOCALNAME 
+          | DECIMALLITERAL 
+          | EXPONENT 
+          | INTEGERLITERAL 
+          | FLOATINGPOINTLITERAL  
       ) #emptyPrefixedIri // Numbers are valid localnames in Manchester syntax
       ;
 

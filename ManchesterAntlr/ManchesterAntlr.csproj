@@ -12,11 +12,27 @@
     <PackageReference Include="FSharp.Core" Version="8.0.301" />
 	</ItemGroup>
 	<ItemGroup>
-        <Antlr4 Include="IriGrammar.g4" />
-        <Antlr4 Include="Concept.g4" />
-		<Antlr4 Include="Manchester.g4" />
+        <Antlr4 Include="grammars/IriGrammar.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
+      <Antlr4 Include="grammars/DataType.g4">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Antlr4>
+        <Antlr4 Include="grammars/Concept.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
+		<Antlr4 Include="grammars/Manchester.g4">
+		  <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+		</Antlr4>
+      <Antlr4 Include="grammars/ManchesterCommonTokens.g4">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </Antlr4>
+        <Antlr4 Include="grammars/CommonTokens.g4">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
 	</ItemGroup>
       <ItemGroup>
         <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
     </ItemGroup>
+      
 </Project>

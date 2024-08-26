@@ -1,9 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AlcTest", "test\AlcTest\AlcTest.fsproj", "{81E44777-BDE2-4741-A0AA-15C4162BF549}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleParser", "TurtleParser\TurtleParser.csproj", "{00034BC7-6B84-4C89-AAB9-3368ED3AF8AC}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleAntlr", "TurtleAntlr\TurtleAntlr.csproj", "{00034BC7-6B84-4C89-AAB9-3368ED3AF8AC}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManchesterAntlr", "ManchesterAntlr\ManchesterAntlr.csproj", "{24D84463-1C39-43C6-B309-EEDA7E9D2883}"
 EndProject
@@ -20,6 +20,8 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{150881EB-B2AE-4E27-80B8-68FC9688D9BE}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AlcTableau", "src\AlcTableau\AlcTableau.fsproj", "{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleParser.Unit.Tests", "test\TurtleParser.Unit.Tests\TurtleParser.Unit.Tests.csproj", "{115AD1FD-FA5A-4F06-ADD3-9D44D5049262}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -59,10 +61,15 @@ Global
 		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}.Release|Any CPU.Build.0 = Release|Any CPU
+		{115AD1FD-FA5A-4F06-ADD3-9D44D5049262}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{115AD1FD-FA5A-4F06-ADD3-9D44D5049262}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{115AD1FD-FA5A-4F06-ADD3-9D44D5049262}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{115AD1FD-FA5A-4F06-ADD3-9D44D5049262}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7C1CB214-5330-4DFA-9657-120DE7D9D255} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
 		{71138595-AFD2-4A10-8E1E-60418043BBA9} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
 		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56} = {150881EB-B2AE-4E27-80B8-68FC9688D9BE}
+		{115AD1FD-FA5A-4F06-ADD3-9D44D5049262} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
 	EndGlobalSection
 EndGlobal

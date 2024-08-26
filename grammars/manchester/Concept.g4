@@ -7,7 +7,7 @@
 */
 
 grammar Concept;
-import ManchesterCommonTokens, IriGrammar, DataType;
+import ManchesterCommonTokens, CommonTokens, IriGrammar, DataType;
 
 description: description OR conjunction #ConceptDisjunction
     | conjunction #ConceptSingleDisjunction;
@@ -42,3 +42,36 @@ objectPropertyExpression: rdfiri #ObjectPropertyIri
     ;
     
 dataPropertyExpression: rdfiri;
+
+
+
+dataRange: dataConjunction #SingleDataDisjunction
+    | (dataConjunction OR dataRange) #DisjunctionDataRange
+    ;
+ 
+dataConjunction: dataPrimary#SingleDataConjunction
+    | dataPrimary AND dataConjunction #ActualDataRangeConjunction
+    ;
+    
+dataPrimary: dataAtomic #PositiveDataPrimary
+    | NOT dataAtomic #NegativeDataPrimary
+    ;
+    
+dataAtomic : datatype #DataTypeAtomic
+    | '{' literal (COMMA literal)* '}' #LiteralSet
+    | LPAREN dataRange RPAREN #DataRangeParenthesis
+    | datatype LSQUARE datatype_restriction (COMMA datatype_restriction)* RSQUARE #DatatypeRestriction
+    ;
+    
+datatype_restriction: facet literal;
+
+facet: LENGTH #facetLength
+    | MINLENGTH #facetMinLength
+    | MAXLENGTH #facetMaxLength
+    | PATTERN #facetPattern
+    | LANGRANGE #facetLangRange
+    | LT #facetLessThan
+    | GT #facetGreaterThan
+    | LTE #facetLessThanEqual
+    | GTE #facetGreaterThanEqual
+    ; 

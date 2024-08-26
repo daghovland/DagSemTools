@@ -1,0 +1,1 @@
+../../grammars/manchester/ManchesterCommonTokens.g4
