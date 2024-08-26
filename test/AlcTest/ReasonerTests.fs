@@ -2,6 +2,7 @@ module AlcTest.ReasonerTests
 
 open System
 open AlcTableau.ALC
+open Microsoft.FSharp.Quotations
 open Xunit
 open AlcTableau
 open IriTools
@@ -213,7 +214,7 @@ let ``query over disjunctive is ok`` () =
 
 
 [<Fact>]
-let ``queries over disjunctive is ok`` () =
+let ``check queries over disjunctive is ok`` () =
     (
      let concept1 = ALC.ConceptName(IriTools.IriReference("http://example.org/concept1"))
      let negation = ALC.Negation(concept1)
@@ -224,9 +225,40 @@ let ``queries over disjunctive is ok`` () =
      match QueryingService.init kb with
         | None -> Assert.False(true)
         | Some state -> 
-            let types = AlcTableau.ConjunctiveQueryAnswer.answer state [ConceptQuery(Concept concept1, Individual individual)]
-            Assert.Equal(1, types.Length)
+            let answers = AlcTableau.ConjunctiveQueryAnswer.answer state [ConceptQuery(Concept concept1, Individual individual)] { IndividualMap = Map.empty; RoleMap = Map.empty; ConceptMap = Map.empty }
+            Assert.Equal(0, answers |> List.length)
     )
+
+
+[<Fact>]
+let ``realisation query over single negation is ok`` () =
+    (
+     let concept1 = ALC.ConceptName(IriTools.IriReference("http://example.org/concept1"))
+     let individual = IriReference "http://example.org/individual"
+     let negation = ALC.Negation(concept1)
+     let individualAssertion = ALC.ConceptAssertion(individual, negation)
+     let kb = ([], [individualAssertion])
+     match QueryingService.init kb with
+        | None -> Assert.False(true)
+        | Some state -> 
+            let answers = AlcTableau.ConjunctiveQueryAnswer.answer state [ConceptQuery(Concept concept1, Variable "v")] { IndividualMap = Map.empty; RoleMap = Map.empty; ConceptMap = Map.empty }
+            Assert.Equal(0, answers |> List.length)
+    )
+
+[<Fact>]
+let ``realisation query over single assertion is ok`` () =
+    (
+     let concept1 = ALC.ConceptName(IriTools.IriReference("http://example.org/concept1"))
+     let individual = IriReference "http://example.org/individual"
+     let individualAssertion = ALC.ConceptAssertion(individual, concept1)
+     let kb = ([], [individualAssertion])
+     match QueryingService.init kb with
+        | None -> Assert.False(true)
+        | Some state -> 
+            let answers = AlcTableau.ConjunctiveQueryAnswer.answer state [ConceptQuery(Concept concept1, Variable "v")] { IndividualMap = Map.empty; RoleMap = Map.empty; ConceptMap = Map.empty }
+            Assert.Equal(1, answers.Length)
+    )
+
 
 
 [<Fact>]

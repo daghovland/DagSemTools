@@ -89,6 +89,14 @@ let rec answer (state : QueryingService.QueryingCache)  (query : ConjunctiveQuer
                                                                             let updated_state = (add_assertion state (ABoxAssertion.ConceptAssertion (individual, concept)))
                                                                             let updated_map = { answer_map with IndividualMap = answer_map.IndividualMap.Add(v, individual) }
                                                                             answer updated_state rest_query updated_map )
+                                    | ConceptQuery (ConceptSignature.Concept concept, IndividualSignature.Individual i) ->
+                                        if ReasonerService.check_assertion state.reasoner_state (ALC.ConceptAssertion(i, concept))
+                                        then answer state rest_query answer_map
+                                        else []
+                                     | RoleQuery (RoleSignature.Role role, IndividualSignature.Individual left, IndividualSignature.Individual right) ->
+                                        if ReasonerService.check_assertion state.reasoner_state (ALC.RoleAssertion(left, right, role))
+                                        then answer state rest_query answer_map
+                                        else []
                                     | _ -> failwith "Not implemented"
 
 let answer_query (state : QueryingService.QueryingCache) (query : ConjunctiveQuery) =

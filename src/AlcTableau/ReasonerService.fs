@@ -77,5 +77,6 @@ let get_individual_types (reasoner_state : Tableau.ReasonerState) (individual : 
     
  /// Checks that assertion is true in all interpretations of the knowledgebase
 let check_assertion (reasoner_state : Tableau.ReasonerState) (assertion : ALC.ABoxAssertion) =
-    let assertion = Tableau.Known [ALC.NegativeAssertion assertion]
+    let normalized = NNF.nnf_assertion ( ALC.NegativeAssertion assertion )
+    let assertion = Tableau.Known [ normalized ]
     Tableau.expand {reasoner_state with functionality=Tableau.ReasonerFunctionality.OnlyConsistencty} [assertion] |> Tableau.is_consistent_result |> not
