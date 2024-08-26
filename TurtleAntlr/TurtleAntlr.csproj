@@ -13,21 +13,11 @@
         <PackageReference Include="FSharp.Core" Version="8.0.301" />
     </ItemGroup>
     <ItemGroup>
-        <None Remove="grammars\IriGrammar.g4" />
-        <Antlr4 Include="grammars\IriGrammar.g4">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Antlr4>
         <None Remove="grammars\Turtle.g4" />
         <Antlr4 Include="grammars\Turtle.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
-        <None Remove="grammars\DataType.g4" />
-        <Antlr4 Include="grammars\DataType.g4">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Antlr4>
-        <Antlr4 Include="grammars\CommonTokens.g4">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Antlr4>
+        
     </ItemGroup>
     <ItemGroup>
         <ProjectReference Include="..\ManchesterAntlr\ManchesterAntlr.csproj" />

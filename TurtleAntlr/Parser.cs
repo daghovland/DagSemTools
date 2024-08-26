@@ -30,7 +30,7 @@ public static class Parser
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         var parser = new TurtleParser(tokens);
         parser.ErrorHandler = new BailErrorStrategy();
-        IParseTree tree = parser.turtleDocument();
+        IParseTree tree = parser.turtleDoc();
         ParseTreeWalker walker = new ParseTreeWalker();
         var listener = new TurtleListener();
         walker.Walk(listener, tree);
