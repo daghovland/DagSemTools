@@ -13,6 +13,8 @@
         <Compile Include="DataRange.fs" />
         <Compile Include="ReasonerService.fs" />
         <Compile Include="QueryingService.fs" />
+        <Compile Include="ConjunctiveQuery.fs" />
+        <Compile Include="ConjunctiveQueryAnswer.fs" />
     </ItemGroup>
 
     <ItemGroup>

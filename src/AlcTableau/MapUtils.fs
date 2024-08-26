@@ -1,5 +1,18 @@
+(*
+    Copyright (C) 2024 Dag Hovland
+    
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    
+    Contact: hovlanddag@gmail.com
+*)
+
 module AlcTableau.MapUtils
 
+open System
 open IriTools
 open System.Collections.Generic
 
@@ -32,5 +45,13 @@ let invert_assertions_map (map : Map<'K, 'V list>) =
     map |> Map.toSeq
     |> Seq.fold (fun concept_map (iri, concepts) -> concepts |> List.fold
                                                                 (fun acc concept -> addToMapList acc concept [iri])
+                                                                concept_map
+                ) Map.empty
+
+/// Takes as input a map from tuples T, U to list of V and returns a map from V, U to list of T
+let invert_index_map (map : Map<Tuple<'T, 'U>, 'V list>) =
+    map |> Map.toSeq
+    |> Seq.fold (fun concept_map ((left, role), rights) -> rights |> List.fold
+                                                                (fun acc right -> addToMapList acc (right, role) [left])
                                                                 concept_map
                 ) Map.empty

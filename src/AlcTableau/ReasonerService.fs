@@ -1,3 +1,15 @@
+(*
+    Copyright (C) 2024 Dag Hovland
+    
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    
+    Contact: hovlanddag@gmail.com
+*)
+
 module AlcTableau.ReasonerService
 
 open System
@@ -65,5 +77,6 @@ let get_individual_types (reasoner_state : Tableau.ReasonerState) (individual : 
     
  /// Checks that assertion is true in all interpretations of the knowledgebase
 let check_assertion (reasoner_state : Tableau.ReasonerState) (assertion : ALC.ABoxAssertion) =
-    let assertion = Tableau.Known [ALC.NegativeAssertion assertion]
+    let normalized = NNF.nnf_assertion ( ALC.NegativeAssertion assertion )
+    let assertion = Tableau.Known [ normalized ]
     Tableau.expand {reasoner_state with functionality=Tableau.ReasonerFunctionality.OnlyConsistencty} [assertion] |> Tableau.is_consistent_result |> not

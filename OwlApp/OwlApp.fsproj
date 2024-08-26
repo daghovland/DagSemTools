@@ -1,18 +1,19 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <TargetFramework>net8.0</TargetFramework>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
+
     <ItemGroup>
-        <Compile Include="Printer.fs" />
-    </ItemGroup>
-    <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="8.0.301" />
-        <PackageReference Include="IriTools" Version="2.2.0" />
-    </ItemGroup>
-    <ItemGroup>
-        <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
+        <Compile Include="Program.fs"/>
     </ItemGroup>
     
+    <ItemGroup>
+        <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\ManchesterAntlr\ManchesterAntlr.csproj" />
+        <ProjectReference Include="..\Manchester\Manchester.fsproj" />
+        <PackageReference Update="FSharp.Core" Version="8.0.301" />
+    </ItemGroup>
+
 </Project>

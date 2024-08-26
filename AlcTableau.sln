@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-#
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AlcTableau", "AlcTableau.fsproj", "{E209D08B-34DF-40CB-A109-368E6F494F60}"
-EndProject
+# 
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AlcTest", "test\AlcTest\AlcTest.fsproj", "{81E44777-BDE2-4741-A0AA-15C4162BF549}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleParser", "TurtleParser\TurtleParser.csproj", "{00034BC7-6B84-4C89-AAB9-3368ED3AF8AC}"
@@ -17,16 +15,18 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Manchester", "Manchester\Ma
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Reasoner.Integration.Tests", "test\Reasoner.Integration.Tests\Reasoner.Integration.Tests.fsproj", "{71138595-AFD2-4A10-8E1E-60418043BBA9}"
 EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OwlApp", "OwlApp\OwlApp.fsproj", "{B35630D4-B6CD-4A62-9E10-FF11EAC60057}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{150881EB-B2AE-4E27-80B8-68FC9688D9BE}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AlcTableau", "src\AlcTableau\AlcTableau.fsproj", "{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E209D08B-34DF-40CB-A109-368E6F494F60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E209D08B-34DF-40CB-A109-368E6F494F60}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E209D08B-34DF-40CB-A109-368E6F494F60}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E209D08B-34DF-40CB-A109-368E6F494F60}.Release|Any CPU.Build.0 = Release|Any CPU
 		{81E44777-BDE2-4741-A0AA-15C4162BF549}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{81E44777-BDE2-4741-A0AA-15C4162BF549}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{81E44777-BDE2-4741-A0AA-15C4162BF549}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -51,9 +51,18 @@ Global
 		{71138595-AFD2-4A10-8E1E-60418043BBA9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{71138595-AFD2-4A10-8E1E-60418043BBA9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{71138595-AFD2-4A10-8E1E-60418043BBA9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B35630D4-B6CD-4A62-9E10-FF11EAC60057}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B35630D4-B6CD-4A62-9E10-FF11EAC60057}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B35630D4-B6CD-4A62-9E10-FF11EAC60057}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B35630D4-B6CD-4A62-9E10-FF11EAC60057}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7C1CB214-5330-4DFA-9657-120DE7D9D255} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
 		{71138595-AFD2-4A10-8E1E-60418043BBA9} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
+		{22694FCA-F5DB-4C7A-98A4-90D2450B9E56} = {150881EB-B2AE-4E27-80B8-68FC9688D9BE}
 	EndGlobalSection
 EndGlobal
