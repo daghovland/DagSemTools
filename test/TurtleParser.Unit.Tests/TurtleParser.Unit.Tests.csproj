@@ -28,7 +28,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Update="example1.ttl">
+      <Content Include="example1.ttl">
         <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </Content>
     </ItemGroup>
