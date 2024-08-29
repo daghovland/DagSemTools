@@ -1,4 +1,5 @@
 using AlcTableau;
+using IriTools;
 
 namespace TurtleParser.Unit.Tests;
 
@@ -20,8 +21,11 @@ public class TestParser
     [Fact]
     public void TestSingleTriple()
     {
-        var ont = TestOntology("<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .");
+        var ont = TestOntology("<http://example.org/subject> a <http://example.org/object> .");
         Assert.NotNull(ont);
+        var (prefixes, version, (tbox, abox))= ont.TryGetOntology();
+        Assert.NotNull(abox);
+        Assert.Contains(ALC.ABoxAssertion.NewConceptAssertion(new IriReference("http://example.org/subject"), ALC.Concept.NewConceptName("http://example.org/object")), abox);
     }
 
     [Fact]
@@ -35,8 +39,8 @@ public class TestParser
             """);
         Assert.NotNull(ont);
     }
-    
-    
+
+
     [Fact]
     public void TestSpecExamplePredicateList()
     {
@@ -47,7 +51,7 @@ public class TestParser
             """);
         Assert.NotNull(ont);
     }
-    
+
     [Fact]
     public void TestAllIriWritings()
     {
@@ -80,8 +84,8 @@ public class TestParser
             """);
         Assert.NotNull(ont);
     }
-    
-        
+
+
     [Fact]
     public void TestNumberLiterals()
     {
@@ -95,7 +99,7 @@ public class TestParser
             """);
         Assert.NotNull(ont);
     }
-    
+
     [Fact]
     public void Test1()
     {

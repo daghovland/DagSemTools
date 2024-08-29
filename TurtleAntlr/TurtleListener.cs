@@ -8,12 +8,12 @@ namespace TurtleAntlr
 {
     public class TurtleListener : TurtleBaseListener
     {
-        
+
         private IriGrammarVisitor _iriGrammarVisitor = new IriGrammarVisitor();
-        
-        
-        
-        public ALC.OntologyDocument GetOntology ()
+
+
+
+        public ALC.OntologyDocument GetOntology()
         {
             return ALC.OntologyDocument.NewOntology(
                 _iriGrammarVisitor.CreatePrefixList(),
