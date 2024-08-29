@@ -1,9 +1,8 @@
-lexer grammar TurtleLexer;
+lexer grammar TurtleTokens;
 
 IRIREF: '<' (~[<>"{}|^`\\] | UCHAR)* '>';
 
 PNAME_NS: PN_PREFIX? COLON;
-
 
 PNAME_LN: PNAME_NS PN_LOCAL;
 
@@ -83,3 +82,7 @@ COLON : ':' ;
 SEMICOLON : ';' ;
 
 COMMA : ',' ;
+
+RSQPAREN : ']' ;
+
+LSQPAREN : '[' ;

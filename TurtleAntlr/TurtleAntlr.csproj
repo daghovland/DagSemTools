@@ -17,7 +17,7 @@
         <Antlr4 Include="grammars\Turtle.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
-        <None Update="grammars\TurtleLexer.g4">
+        <None Update="grammars\TurtleTokens.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         

@@ -1,5 +1,5 @@
 grammar Turtle;
-import TurtleLexer;
+import TurtleTokens;
 
 turtleDoc : statement*;
 
@@ -49,9 +49,6 @@ literal: rdfLiteral | numericLiteral | booleanLiteral;
 
 blankNodePropertyList: LSQPAREN predicateObjectList RSQPAREN;
 
-RSQPAREN : ']' ;
-
-LSQPAREN : '[' ;
 
 collection: LPAREN object* RPAREN;
 
@@ -68,9 +65,11 @@ rdfLiteral: string (LANG_DIR | '^^' iri)?;
 string: STRING_LITERAL_QUOTE | STRING_LITERAL_SINGLE_QUOTE
     | STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE;
 
-iri: IRIREF | prefixedName;
-
-prefixedName: PNAME_LN | PNAME_NS;
+iri: 
+    IRIREF #fullIri
+    | PNAME_LN #relativeIri
+    | PNAME_NS #prefixedIri
+    ;
 
 blankNode: BLANK_NODE_LABEL | ANON;
 
