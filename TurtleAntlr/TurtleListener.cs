@@ -12,6 +12,11 @@ namespace TurtleAntlr
         private IriGrammarVisitor _iriGrammarVisitor = new IriGrammarVisitor();
 
 
+        public override void ExitStatement(TurtleParser.StatementContext context)
+        {
+            
+        }
+
 
         public ALC.OntologyDocument GetOntology()
         {

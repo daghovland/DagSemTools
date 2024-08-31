@@ -1,0 +1,22 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="RDFStore.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="IriTools">
+        <HintPath>..\..\..\..\..\.nuget\packages\iritools\2.2.0\lib\net8.0\IriTools.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="IriTools" Version="2.2.0" />
+    </ItemGroup>
+
+</Project>
