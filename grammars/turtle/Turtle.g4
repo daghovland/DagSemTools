@@ -24,9 +24,9 @@ sparqlBase: BASE_STRING IRIREF ;
 BASE_STRING : 'BASE' ;
 
 triples: 
-    |subject predicateObjectList 
-    | blankNodePropertyList predicateObjectList?
-    | reifiedTriple predicateObjectList? 
+    subject predicateObjectList #NamedSubjectTriples 
+    | blankNodePropertyList predicateObjectList? #BlankNodeTriples
+    | reifiedTriple predicateObjectList?  #ReifiedTriples
     ;
     
 predicateObjectList: verb objectList (SEMICOLON (verb objectList)?)*;

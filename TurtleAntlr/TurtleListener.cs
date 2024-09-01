@@ -2,6 +2,8 @@ using AlcTableau;
 using AlcTableau.TurtleAntlr;
 using IriTools;
 using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Core;
+using Rdf;
 
 
 namespace TurtleAntlr
@@ -10,21 +12,21 @@ namespace TurtleAntlr
     {
 
         private IriGrammarVisitor _iriGrammarVisitor = new IriGrammarVisitor();
+        private FSharpOption<IriReference> _graphName = FSharpOption<IriReference>.None;
+        private FSharpList<AbstractRdf.Triple> _triples = new FSharpList<AbstractRdf.Triple>();
 
-
-        public override void ExitStatement(TurtleParser.StatementContext context)
+        public override void ExitNamedSubjectTriples(TurtleParser.NaStatementContext context)
         {
-            
+            context.            
         }
 
 
-        public ALC.OntologyDocument GetOntology()
+        public Rdf.AbstractRdf.Graph GetGraph()
         {
-            return ALC.OntologyDocument.NewOntology(
-                _iriGrammarVisitor.CreatePrefixList(),
-                ALC.ontologyVersion.UnNamedOntology,
-                System.Tuple.Create(ListModule.Empty<ALC.TBoxAxiom>(), ListModule.Empty<ALC.ABoxAssertion>())
-            );
+            return new AbstractRdf.Graph(
+                _graphName,
+                _triples
+                );
         }
     }
 }

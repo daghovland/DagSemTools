@@ -25,6 +25,7 @@
     <ItemGroup>
         <ProjectReference Include="..\ManchesterAntlr\ManchesterAntlr.csproj" />
         <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\src\Rdf\Rdf.fsproj" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="grammars\" />

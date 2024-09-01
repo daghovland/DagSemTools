@@ -7,6 +7,7 @@
 
     <ItemGroup>
         <Compile Include="RDFStore.fs" />
+        <Compile Include="StoreManager.fs" />
     </ItemGroup>
 
     <ItemGroup>

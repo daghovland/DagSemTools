@@ -10,19 +10,20 @@ using AlcTableau;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using IriTools;
+using Rdf;
 
 namespace TurtleAntlr;
 
 public static class Parser
 {
 
-    public static ALC.OntologyDocument ParseFile(string filename)
+    public static Rdf.AbstractRdf.Graph ParseFile(string filename)
     {
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader);
     }
 
-    public static ALC.OntologyDocument ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
+    public static AbstractRdf.Graph ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
     {
 
         var input = new AntlrInputStream(textReader);
@@ -34,13 +35,13 @@ public static class Parser
         ParseTreeWalker walker = new ParseTreeWalker();
         var listener = new TurtleListener();
         walker.Walk(listener, tree);
-        return listener.GetOntology();
+        return listener.GetGraph();
     }
 
-    public static ALC.OntologyDocument ParseReader(TextReader textReader) =>
+    public static AbstractRdf.Graph ParseReader(TextReader textReader) =>
         ParseReader(textReader, new Dictionary<string, IriReference>());
 
-    public static ALC.OntologyDocument ParseString(string owl)
+    public static AbstractRdf.Graph ParseString(string owl)
     {
         using TextReader textReader = new StringReader(owl);
         return ParseReader(textReader);

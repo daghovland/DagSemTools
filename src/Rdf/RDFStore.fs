@@ -12,27 +12,33 @@
 namespace Rdf
 
 open System
+open System.Resources
 open IriTools
 
 module RDFStore =
     type ResourceId = int
+    [<Struct>]
     type Resource =
-        | Iri of IriReference
-        | Literal of string
+        Iri of iri:  IriReference
+        | Literal of  literal: string
+    
+    [<Struct>]
     type TripleLookup =
-        | ArrayIndex of int
+        | ArrayIndex of index: int
         | End
-    type Triple = {
-        subject: ResourceId
-        predicate: ResourceId
-        object: ResourceId
-    }
-    type TripleListEntry = {
-        triple: Triple
-        next_subject_predicate_list: TripleLookup
-        next_predicate_list: TripleLookup
-        next_object_predicate_list: TripleLookup
-    }
+    type Triple =
+        struct
+            val subject: ResourceId
+            val predicate: ResourceId
+            val object: ResourceId
+        end
+    type TripleListEntry =
+        struct
+            val triple: Triple
+            val next_subject_predicate_list: TripleLookup
+            val next_predicate_list: TripleLookup
+            val next_object_predicate_list: TripleLookup
+        end
     
     type TripleTable = {
         ResourceMap : Map<Resource, ResourceId>
@@ -43,7 +49,8 @@ module RDFStore =
         predicate_index: array<TripleLookup>
         object_index: array<TripleLookup>
         subject_predicate_index: Map<Tuple<ResourceId, ResourceId>, TripleLookup>
-        object_predicate_index: Map<Tuple<ResourceId, ResourceId>, TripleLookup>        
+        object_predicate_index: Map<Tuple<ResourceId, ResourceId>, TripleLookup>
+        
     }
       
     
