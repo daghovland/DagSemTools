@@ -12,7 +12,7 @@ using Antlr4.Runtime.Tree;
 using IriTools;
 using Rdf;
 
-namespace TurtleAntlr;
+namespace AlcTableau.TurtleAntlr;
 
 public static class Parser
 {
@@ -35,7 +35,7 @@ public static class Parser
         ParseTreeWalker walker = new ParseTreeWalker();
         var listener = new TurtleListener();
         walker.Walk(listener, tree);
-        return listener.GetGraph();
+        return listener.TripleTable;
     }
 
     public static TripleTable ParseReader(TextReader textReader) =>

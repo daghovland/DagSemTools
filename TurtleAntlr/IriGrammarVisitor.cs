@@ -76,4 +76,7 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
         var iriString = $"{baseIriReference}{ctxt.PNAME_LN()}";
         return GetIriId(new IriReference(iriString));
     }
+
+    public override UInt32 VisitRdfobject(RdfobjectContext context) =>
+        Visit(context.GetChild(0));
 }

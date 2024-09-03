@@ -5,17 +5,10 @@ namespace TurtleParser.Unit.Tests;
 
 public class TestParser
 {
-    public ALC.OntologyDocument TestOntology(string ontology)
+    public Rdf.TripleTable TestOntology(string ontology)
     {
-        try
-        {
-            return TurtleAntlr.Parser.ParseString(ontology);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            return null;
-        }
+            return AlcTableau.TurtleAntlr.Parser.ParseString(ontology);
+        
     }
 
     [Fact]
@@ -23,9 +16,8 @@ public class TestParser
     {
         var ont = TestOntology("<http://example.org/subject> a <http://example.org/object> .");
         Assert.NotNull(ont);
-        var (prefixes, version, (tbox, abox))= ont.TryGetOntology();
-        Assert.NotNull(abox);
-        Assert.Contains(ALC.ABoxAssertion.NewConceptAssertion(new IriReference("http://example.org/subject"), ALC.Concept.NewConceptName("http://example.org/object")), abox);
+        Assert.Equal(1u, ont.TripleCount);
+        Assert.NotNull(ont.TripleList);
     }
 
     [Fact]
