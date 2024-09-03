@@ -7,24 +7,30 @@
 */
 
 using Microsoft.FSharp.Collections;
+using Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 using System.Collections.Generic;
 using IriTools;
 using static TurtleParser;
 
-public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
+public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
 {
+    public RDFStore.TripleTable tripleTable { get; set; }
     private Dictionary<string, IriReference> _prefixes;
     private IriReference? baseIriReference;
-    public IriGrammarVisitor()
+    public IriGrammarVisitor(RDFStore.TripleTable tripleTable)
     {
-        _prefixes = new Dictionary<string, IriReference>();
+        
+        tripleTable = tripleTable;
+        _prefixes = new Dictionary<string, IriReference>(); 
     }
 
 
-    public IriGrammarVisitor(Dictionary<string, IriReference> prefixes)
+    public IriGrammarVisitor(RDFStore.TripleTable _tripleTable, Dictionary<string, IriReference> prefixes)
     {
+        
+        tripleTable = _tripleTable;
         _prefixes = prefixes;
     }
 
@@ -38,13 +44,20 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
         }
         return ListModule.OfSeq(prefixList);
     }
-
-    public override IriReference VisitFullIri(FullIriContext ctxt)
+    
+    private UInt32 GetIriId(IriReference iri)
     {
-        return new IriReference(ctxt.IRIREF().GetText()[1..^1]);
+        var resource = RDFStore.Resource.NewIri(iri);
+        tripleTable = StoreManager.AddResource(tripleTable, resource);
+        return tripleTable.ResourceMap[resource];
+    }
+    public override UInt32 VisitFullIri(FullIriContext ctxt)
+    {
+        var iri = new IriReference(ctxt.IRIREF().GetText()[1..^1]);
+        return GetIriId(iri);
     }
 
-    public override IriReference VisitPrefixedIri(PrefixedIriContext ctxt)
+    public override UInt32 VisitPrefixedIri(PrefixedIriContext ctxt)
     {
         var prefixedIriString = ctxt.PNAME_NS().GetText();
         var components = prefixedIriString.Split(':', 2);
@@ -52,14 +65,15 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
         var namespaceName = _prefixes[prefix];
         var localName = components[1];
         var iriString = $"{namespaceName}{localName}";
-        return new IriReference(iriString);
+        var iri = new IriReference(iriString);
+        return GetIriId(iri);
     }
 
-    public override IriReference VisitRelativeIri(RelativeIriContext ctxt)
+    public override UInt32 VisitRelativeIri(RelativeIriContext ctxt)
     {
         var prefixedPart = baseIriReference ??
                            throw new Exception("relative IRIs can only be used when the base iri is set. ");
         var iriString = $"{baseIriReference}{ctxt.PNAME_LN()}";
-        return new IriReference(iriString);
+        return GetIriId(new IriReference(iriString));
     }
 }

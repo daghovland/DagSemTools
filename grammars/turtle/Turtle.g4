@@ -29,10 +29,9 @@ triples:
     | reifiedTriple predicateObjectList?  #ReifiedTriples
     ;
     
-predicateObjectList: verb objectList (SEMICOLON (verb objectList)?)*;
+predicateObjectList: verbObjectList (SEMICOLON (verbObjectList)?)*;
 
-
-objectList: object (COMMA object)*;
+verbObjectList: verb rdfobject (COMMA rdfobject)*;
 
 
 verb: predicate | RDF_TYPE_ABBR;
@@ -43,14 +42,14 @@ subject: iri | blankNode | collection;
 
 predicate: iri;
 
-object: iri | blankNode | collection | blankNodePropertyList | literal | tripleTerm | reifiedTriple ;
+rdfobject: iri | blankNode | collection | blankNodePropertyList | literal | tripleTerm | reifiedTriple ;
 
 literal: rdfLiteral | numericLiteral | booleanLiteral;
 
 blankNodePropertyList: LSQPAREN predicateObjectList RSQPAREN;
 
 
-collection: LPAREN object* RPAREN;
+collection: LPAREN rdfobject* RPAREN;
 
 RPAREN : ')' ;
 
@@ -75,7 +74,7 @@ blankNode: BLANK_NODE_LABEL | ANON;
 
 reifier: '~' (iri | blankNode);
 
-reifiedTriple: '<<' (subject | reifiedTriple) predicate object reifier* '>>';
+reifiedTriple: '<<' (subject | reifiedTriple) predicate rdfobject reifier* '>>';
 
 tripleTerm: '<<(' ttSubject predicate ttObject ')>>';
 

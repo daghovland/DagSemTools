@@ -16,7 +16,9 @@ open System.Resources
 open IriTools
 
 module RDFStore =
-    type ResourceId = int
+    type ResourceId = uint32
+    [<StructuralComparison>]
+    [<StructuralEquality>]
     [<Struct>]
     type Resource =
         Iri of iri:  IriReference
@@ -39,19 +41,7 @@ module RDFStore =
             val next_predicate_list: TripleLookup
             val next_object_predicate_list: TripleLookup
         end
-    
-    type TripleTable = {
-        ResourceMap : Map<Resource, ResourceId>
-        ResourceList : array<Resource>
-        TripleList : array<TripleListEntry>
-        ThreeKeysIndex: Map<Triple, TripleLookup>
-        subject_index: array<TripleLookup>
-        predicate_index: array<TripleLookup>
-        object_index: array<TripleLookup>
-        subject_predicate_index: Map<Tuple<ResourceId, ResourceId>, TripleLookup>
-        object_predicate_index: Map<Tuple<ResourceId, ResourceId>, TripleLookup>
-        
-    }
+
       
     
     
