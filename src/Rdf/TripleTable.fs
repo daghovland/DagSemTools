@@ -59,11 +59,12 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             this.ResourceCount <- nextResourceIndex
             nextResourceIndex - 1u
        
-    member this.AddTriple triple =
+    member this.AddTriple (triple : RDFStore.Triple) =
             let nextTripleCount = this.TripleCount + 1u
             if nextTripleCount > uint32(this.TripleList.Length) then
                     this.doubleResourceListSize()
-            this.TripleList.[int(this.TripleCount)] <- triple
+            // TODO Update indexes
+            this.TripleList.[int(this.TripleCount)] <- TripleListEntry()
             this.ResourceCount <- nextTripleCount
             ()
             

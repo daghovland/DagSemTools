@@ -17,13 +17,13 @@ namespace TurtleAntlr;
 public static class Parser
 {
 
-    public static RDFStore.TripleTable ParseFile(string filename)
+    public static TripleTable ParseFile(string filename)
     {
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader);
     }
 
-    public static RDFStore.TripleTable ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
+    public static TripleTable ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
     {
 
         var input = new AntlrInputStream(textReader);
@@ -38,10 +38,10 @@ public static class Parser
         return listener.GetGraph();
     }
 
-    public static RDFStore.TripleTable ParseReader(TextReader textReader) =>
+    public static TripleTable ParseReader(TextReader textReader) =>
         ParseReader(textReader, new Dictionary<string, IriReference>());
 
-    public static RDFStore.TripleTable ParseString(string owl)
+    public static TripleTable ParseString(string owl)
     {
         using TextReader textReader = new StringReader(owl);
         return ParseReader(textReader);
