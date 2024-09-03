@@ -29,7 +29,7 @@ namespace TurtleAntlr
             var subject = _iriGrammarVisitor.Visit(context.subject());
             var triples = VisitPredicateObjectList(context.predicateObjectList())
                 .SelectMany(predicateObject => predicateObject.objects
-                    .Select(obj => new RDFStore.Triple(){subject = subject, predicate = predicateObject.verb, @object = obj}));
+                    .Select(obj => new RDFStore.Triple(subject, predicateObject.verb, obj)));
             triples.ToList().ForEach(triple => _tripleTable.AddTriple(triple));
         }
         

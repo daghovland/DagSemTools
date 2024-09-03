@@ -28,19 +28,19 @@ module RDFStore =
     type TripleLookup =
         | ArrayIndex of index: int
         | End
-    type Triple =
-        struct
-            val subject: ResourceId
-            val predicate: ResourceId
-            val object: ResourceId
-        end
-    type TripleListEntry =
-        struct
-            val triple: Triple
-            val next_subject_predicate_list: TripleLookup
-            val next_predicate_list: TripleLookup
-            val next_object_predicate_list: TripleLookup
-        end
+    [<Struct>]
+    type Triple = {
+            subject: ResourceId
+            predicate: ResourceId
+            object: ResourceId
+        }
+    [<Struct>]
+    type TripleListEntry = {
+            triple: Triple
+            next_subject_predicate_list: TripleLookup
+            next_predicate_list: TripleLookup
+            next_object_predicate_list: TripleLookup
+        }
 
       
     
