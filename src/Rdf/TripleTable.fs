@@ -67,7 +67,7 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
                     this.doubleResourceListSize()
             // TODO Update indexes
             this.TripleList.[int(this.TripleCount)] <- { triple = triple; next_subject_predicate_list = TripleLookup.End; next_predicate_list = TripleLookup.End; next_object_predicate_list = TripleLookup.End }
-            this.ResourceCount <- nextTripleCount
+            this.TripleCount <- nextTripleCount
             ()
             
                 

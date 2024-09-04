@@ -30,8 +30,8 @@ public class TestParser
             <http://example.org/#green-goblin> .
             """);
         Assert.NotNull(ont);
-        Assert.Equal(1u, ont.TripleCount);
         Assert.Equal(3u, ont.ResourceCount);
+        Assert.Equal(1u, ont.TripleCount);
     }
 
 
