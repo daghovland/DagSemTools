@@ -7,8 +7,8 @@ public class TestParser
 {
     public Rdf.TripleTable TestOntology(string ontology)
     {
-            return AlcTableau.TurtleAntlr.Parser.ParseString(ontology);
-        
+        return AlcTableau.TurtleAntlr.Parser.ParseString(ontology);
+
     }
 
     [Fact]

@@ -21,15 +21,15 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
     private IriReference? baseIriReference;
     public IriGrammarVisitor(TripleTable tripleTable)
     {
-        
+
         tripleTable = tripleTable;
-        _prefixes = new Dictionary<string, IriReference>(); 
+        _prefixes = new Dictionary<string, IriReference>();
     }
 
 
     public IriGrammarVisitor(TripleTable _tripleTable, Dictionary<string, IriReference> prefixes)
     {
-        
+
         tripleTable = _tripleTable;
         _prefixes = prefixes;
     }
@@ -44,16 +44,17 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
         }
         return ListModule.OfSeq(prefixList);
     }
-    
+
     private UInt32 GetIriId(IriReference iri)
     {
         var resource = RDFStore.Resource.NewIri(iri);
         return tripleTable.AddResource(resource);
-        
+
     }
     public override UInt32 VisitFullIri(FullIriContext ctxt)
     {
-        var iri = new IriReference(ctxt.IRIREF().GetText()[1..^1]);
+        var uriString = ctxt.IRIREF().GetText()[1..^1];
+        var iri = new IriReference(uriString);
         return GetIriId(iri);
     }
 
