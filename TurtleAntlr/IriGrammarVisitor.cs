@@ -16,21 +16,20 @@ using static TurtleParser;
 
 public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
 {
-    public TripleTable tripleTable { get; set; }
+    public TripleTable TripleTable { get; init; }
     private Dictionary<string, IriReference> _prefixes;
     private IriReference? baseIriReference;
     public IriGrammarVisitor(TripleTable tripleTable)
     {
 
-        tripleTable = tripleTable;
+        TripleTable = tripleTable;
         _prefixes = new Dictionary<string, IriReference>();
     }
 
 
-    public IriGrammarVisitor(TripleTable _tripleTable, Dictionary<string, IriReference> prefixes)
+    public IriGrammarVisitor(TripleTable tripleTable, Dictionary<string, IriReference> prefixes)
     {
-
-        tripleTable = _tripleTable;
+        TripleTable = tripleTable;
         _prefixes = prefixes;
     }
 
@@ -48,7 +47,7 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
     private UInt32 GetIriId(IriReference iri)
     {
         var resource = RDFStore.Resource.NewIri(iri);
-        return tripleTable.AddResource(resource);
+        return TripleTable.AddResource(resource);
 
     }
     public override UInt32 VisitFullIri(FullIriContext ctxt)

@@ -31,8 +31,10 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
     member val SubjectPredicateIndex = subjectPredicateIndex with get, set
     member val ObjectPredicateIndex = objectPredicateIndex with get, set
 
-    new() = 
-        TripleTable(new Dictionary<Resource, ResourceId>(), Array.empty, 0u, Array.empty, 0u, new Dictionary<Triple, TripleLookup>(), Array.empty, Array.empty, Array.empty, new Dictionary<Tuple<ResourceId, ResourceId>, TripleLookup>(), new Dictionary<Tuple<ResourceId, ResourceId>, TripleLookup>())
+    new(init_rdf_size : uint) =
+        let init_resources = max 10 (int init_rdf_size / 10)
+        let init_triples = max 10 (int init_rdf_size / 60)
+        TripleTable(new Dictionary<Resource, ResourceId>(), Array.zeroCreate init_resources, 0u, Array.zeroCreate init_triples, 0u, new Dictionary<Triple, TripleLookup>(), Array.zeroCreate init_resources, Array.zeroCreate init_resources, Array.zeroCreate init_resources, new Dictionary<Tuple<ResourceId, ResourceId>, TripleLookup>(), new Dictionary<Tuple<ResourceId, ResourceId>, TripleLookup>())
         
     member this.doubleArraySize (originalArray: 'T array) : 'T array =
         let newSize = originalArray.Length * 2

@@ -17,13 +17,14 @@ namespace AlcTableau.TurtleAntlr;
 public static class Parser
 {
 
+
     public static TripleTable ParseFile(string filename)
     {
         using TextReader textReader = File.OpenText(filename);
-        return ParseReader(textReader);
+        return ParseReader(textReader, (uint)(new FileInfo(filename).Length));
     }
 
-    public static TripleTable ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
+    public static TripleTable ParseReader(TextReader textReader, UInt32 init_size, Dictionary<string, IriReference> prefixes)
     {
 
         var input = new AntlrInputStream(textReader);
@@ -33,18 +34,18 @@ public static class Parser
         parser.ErrorHandler = new BailErrorStrategy();
         IParseTree tree = parser.turtleDoc();
         ParseTreeWalker walker = new ParseTreeWalker();
-        var listener = new TurtleListener();
+        var listener = new TurtleListener(init_size);
         walker.Walk(listener, tree);
         return listener.TripleTable;
     }
 
-    public static TripleTable ParseReader(TextReader textReader) =>
-        ParseReader(textReader, new Dictionary<string, IriReference>());
+    public static TripleTable ParseReader(TextReader textReader, UInt32 init_size) =>
+        ParseReader(textReader, init_size, new Dictionary<string, IriReference>());
 
     public static TripleTable ParseString(string owl)
     {
         using TextReader textReader = new StringReader(owl);
-        return ParseReader(textReader);
+        return ParseReader(textReader, (uint) owl.Length);
     }
 
 

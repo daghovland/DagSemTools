@@ -11,9 +11,9 @@ public class TurtleListener : TurtleBaseListener
     private FSharpOption<IriReference> _graphName;
     public TripleTable TripleTable { get; init; }
 
-    public TurtleListener()
+    public TurtleListener(uint init_size)
     {
-        TripleTable = new TripleTable();
+        TripleTable = new TripleTable(init_size);
         _graphName = FSharpOption<IriReference>.None;
         _iriGrammarVisitor = new IriGrammarVisitor(TripleTable);
     }
