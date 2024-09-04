@@ -5,17 +5,17 @@ turtleDoc : statement*;
 
 statement: directive | triples PERIOD;
 
-directive: prefixID | base | sparqlPrefix | sparqlBase;
+directive: prefix | base  | sparqlBase;
 
-prefixID: ATPREFIX PNAME_NS IRIREF PERIOD;
+prefix: ATPREFIX PNAME_NS IRIREF PERIOD #prefixId
+    | ATPREFIX PNAME_LN IRIREF PERIOD #sparqlPrefix
+    ;
 
 ATPREFIX : '@prefix' ;
 
 base: ATBASE IRIREF PERIOD;
 
 ATBASE : '@base' ;
-
-sparqlPrefix: PREFIX_STRING PNAME_NS IRIREF ;
 
 PREFIX_STRING : 'PREFIX' ;
 

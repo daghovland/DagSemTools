@@ -26,6 +26,7 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
         _prefixes = new Dictionary<string, IriReference>();
     }
 
+    
 
     public IriGrammarVisitor(TripleTable tripleTable, Dictionary<string, IriReference> prefixes)
     {
@@ -79,4 +80,10 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
 
     public override UInt32 VisitRdfobject(RdfobjectContext context) =>
         Visit(context.GetChild(0));
+
+    public void AddPrefix(string prefix, IriReference iri) =>
+        _prefixes.Add(prefix, iri);
+
+    public void SetBase(IriReference iri) =>
+        baseIriReference = iri;
 }

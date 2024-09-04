@@ -18,7 +18,28 @@ public class TurtleListener : TurtleBaseListener
         _iriGrammarVisitor = new IriGrammarVisitor(TripleTable);
     }
 
-
+    public override void ExitBase(TurtleParser.BaseContext context)
+    {
+        var iriString = context.IRIREF().GetText()[1..-1];
+        var iri = new IriReference(iriString);
+        _iriGrammarVisitor.SetBase(iri);
+    }
+    
+    public override void ExitPrefixId(TurtleParser.PrefixIdContext context)
+    {
+        var prefix = context.PNAME_NS().GetText();
+        var iriString =  context.IRIREF().GetText()[1..-1];
+        var iri = new IriReference(iriString);
+        _iriGrammarVisitor.AddPrefix(prefix, iri);
+    }
+    public override void ExitSparqlPrefix(TurtleParser.SparqlPrefixContext context)
+    {
+        var prefix = context.PNAME_LN().GetText();
+        var iriString =  context.IRIREF().GetText()[1..-1];
+        var iri = new IriReference(iriString);
+        _iriGrammarVisitor.AddPrefix(prefix, iri);
+    }
+    
     public override void ExitNamedSubjectTriples(TurtleParser.NamedSubjectTriplesContext context)
     {
         var subject = _iriGrammarVisitor.Visit(context.subject());

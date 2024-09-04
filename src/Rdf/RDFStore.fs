@@ -23,10 +23,10 @@ module RDFStore =
     type Resource =
         Iri of iri:  IriReference
         | Literal of  literal: string
-    
+    type TripleListIndex = int
     [<Struct>]
-    type TripleLookup =
-        | ArrayIndex of index: int
+    type TripleListLink =
+        | ArrayIndex of index: TripleListIndex
         | End
     [<Struct>]
     type Triple = {
@@ -37,9 +37,9 @@ module RDFStore =
     [<Struct>]
     type TripleListEntry = {
             triple: Triple
-            next_subject_predicate_list: TripleLookup
-            next_predicate_list: TripleLookup
-            next_object_predicate_list: TripleLookup
+            next_subject_predicate_list: TripleListLink
+            next_predicate_list: TripleListLink
+            next_object_predicate_list: TripleListLink
         }
 
       
