@@ -18,9 +18,17 @@ public class TurtleListener : TurtleBaseListener
         _iriGrammarVisitor = new IriGrammarVisitor(TripleTable);
     }
 
+    public static string GetStringExcludingFirstAndLast(string input)
+    {
+        if (input.Length > 2)
+        {
+            return input.Substring(1, input.Length - 2);
+        }
+        return string.Empty;
+    }
     public override void ExitBase(TurtleParser.BaseContext context)
     {
-        var iriString = context.IRIREF().GetText()[1..-1];
+        var iriString = GetStringExcludingFirstAndLast(context.IRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.SetBase(iri);
     }
@@ -28,7 +36,7 @@ public class TurtleListener : TurtleBaseListener
     public override void ExitPrefixId(TurtleParser.PrefixIdContext context)
     {
         var prefix = context.PNAME_NS().GetText();
-        var iriString =  context.IRIREF().GetText()[1..-1];
+        var iriString = GetStringExcludingFirstAndLast(context.IRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
