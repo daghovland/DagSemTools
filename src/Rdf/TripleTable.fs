@@ -34,7 +34,7 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
     new(init_rdf_size : uint) =
         let init_resources = max 10 (int init_rdf_size / 10)
         let init_triples = max 10 (int init_rdf_size / 60)
-        TripleTable(new Dictionary<Resource, ResourceId>(), Array.zeroCreate init_resources, 0u, Array.zeroCreate init_triples, 0u, new Dictionary<Triple, uint>(), Array.zeroCreate init_resources, Array.zeroCreate init_resources, Array.zeroCreate init_resources, new Dictionary<Tuple<ResourceId, ResourceId>, uint>(), new Dictionary<Tuple<ResourceId, ResourceId>, uint>())
+        TripleTable(new Dictionary<Resource, ResourceId>(), Array.zeroCreate init_resources, 0u, Array.zeroCreate init_triples, 0u, new Dictionary<Triple, TripleListIndex>(), Array.zeroCreate init_resources, Array.zeroCreate init_resources, Array.zeroCreate init_resources, new Dictionary<Tuple<ResourceId, ResourceId>, TripleListIndex>(), new Dictionary<Tuple<ResourceId, ResourceId>, TripleListIndex>())
         
     member this.doubleArraySize (originalArray: 'T array) : 'T array =
         let newSize = originalArray.Length * 2
@@ -69,6 +69,10 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
     member this.GetTripleListEntry (index: TripleListIndex) : TripleListEntry =
         this.TripleList.[int index]
         
+    member this.AddPredicateIndex (predicate: ResourceId, tripleIndex: TripleListIndex) =
+        let nextIndex = this.PredicateIndex.[int(predicate)]
+        this.PredicateIndex.[int(predicate)] <- TripleListLink.ArrayIndex(int(tripleIndex))
+        nextIndex
     member this.AddSubjectIndex (subject: ResourceId, tripleIndex: TripleListIndex) =
         let nextIndex = this.SubjectIndex.[int(subject)]
         this.SubjectIndex.[int(subject)] <- TripleListLink.ArrayIndex(int(tripleIndex))
@@ -108,10 +112,11 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             // TODO Update indexes
             let sp_list = this.AddSubjectPredicateIndex(triple.subject, triple.predicate, int this.TripleCount)
             let op_list = this.AddObjectPredicateIndex(triple.object, triple.predicate, int this.TripleCount)
+            let p_list = this.AddPredicateIndex(triple.predicate, int this.TripleCount) 
             this.TripleList.[int(this.TripleCount)] <- {
                 triple = triple
                 next_subject_predicate_list = sp_list
-                next_predicate_list = TripleLookup.End
+                next_predicate_list = p_list
                 next_object_predicate_list = op_list
             }
             this.ThreeKeysIndex.Add(triple, int(this.TripleCount)) |> ignore
