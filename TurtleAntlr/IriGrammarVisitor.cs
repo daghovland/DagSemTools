@@ -6,6 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
+using System.Globalization;
 using Microsoft.FSharp.Collections;
 using Rdf;
 
@@ -59,6 +60,26 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
         return GetIriId(iri);
     }
 
+    public override uint VisitIntegerLiteral(IntegerLiteralContext context)
+    {
+        int literal = int.Parse(context.INTEGER().GetText());
+        var resource = RDFStore.Resource.NewIntegerLiteral(literal);
+        return TripleTable.AddResource(resource);
+    }
+
+    public override uint VisitDecimalLiteral(DecimalLiteralContext context)
+    {
+        decimal literal = decimal.Parse(context.DECIMAL().GetText(), CultureInfo.InvariantCulture);
+        var resource = RDFStore.Resource.NewDecimalLiteral(literal);
+        return TripleTable.AddResource(resource);
+    }
+    
+    public override uint VisitDoubleLiteral(DoubleLiteralContext context)
+    {
+        double literal = double.Parse(context.DOUBLE().GetText(), CultureInfo.InvariantCulture);
+        var resource = RDFStore.Resource.NewDoubleLiteral(literal);
+        return TripleTable.AddResource(resource);
+    }
     public override UInt32 VisitPrefixedIri(PrefixedIriContext ctxt)
     {
         var prefixedIriString = ctxt.PNAME_LN().GetText();
@@ -73,11 +94,17 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
 
     public override UInt32 VisitRelativeIri(RelativeIriContext ctxt)
     {
-        string iriString = ctxt.RELATIVEIRIREF().GetText()[1..^1];
+        string rdfiristring = ctxt.RELATIVEIRIREF().GetText();
+        return GetIriId(ResolveRelativeIri(rdfiristring));
+    }
+
+    public IriReference ResolveRelativeIri(string rdfiristring)
+    {
+        string iriString = rdfiristring[1..^1];
         return baseIriReference switch
         {
             null => throw new Exception($"Relative IRI {iriString} can only be used when the base iri is set. "),
-            _ => GetIriId(new IriReference(baseIriReference + iriString))
+            _ => new IriReference(baseIriReference + iriString)
         };
     }
 

@@ -80,6 +80,18 @@ public class TestParser
         Assert.NotNull(ont);
     }
 
+    [Fact]
+    public void RelativePrefixWorksFine()
+    {
+        var ont = TestOntology("""
+                               BASE <http://one.example/>
+                               @prefix p: <path/> .                    # prefix p: now stands for http://one.example/path/
+                               p:subject4 p:predicate4 p:object4 .     # prefixed name, e.g., http://one.example/path/subject4
+                               """);
+        ont.TripleCount.Should().Be(1);
+        ont.TripleList[0].triple.subject.Should().BeGreaterOrEqualTo(0);
+        ont.TripleList[0].triple.predicate.Should().BeGreaterOrEqualTo(0);        
+    }
 
     [Fact]
     public void TestNumberLiterals()
@@ -126,7 +138,7 @@ public class TestParser
     public void TestMultipleLiteralObjects()
     {
         var ont = TestOntology("""
-                prefix : <http://example.org/> . 
+                @prefix : <http://example.org/> . 
                 :subject :predicate 1, 2, 3 .
             """);   
         Assert.NotNull(ont);

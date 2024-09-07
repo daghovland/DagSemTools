@@ -22,7 +22,11 @@ module RDFStore =
     [<Struct>]
     type Resource =
         Iri of iri:  IriReference
-        | Literal of  literal: string
+        | LiteralString of literal: string
+        | IntegerLiteral of literalInt: int
+        | DecimalLiteral of literalDec: decimal
+        | DoubleLiteral of literalDouble: double
+        | BooleanLiteral of literalBool: bool
     type TripleListIndex = int
     [<Struct>]
     type TripleListLink =

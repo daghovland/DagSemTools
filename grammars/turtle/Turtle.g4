@@ -8,20 +8,23 @@ statement: directive | triples PERIOD;
 directive: prefix | base  | sparqlBase;
 
 prefix: PREFIX_STRING PNAME_NS ABSOLUTEIRIREF  #sparqlPrefix
+    | PREFIX_STRING PNAME_NS RELATIVEIRIREF  #sparqlRelativePrefix
     | ATPREFIX PNAME_NS ABSOLUTEIRIREF PERIOD #prefixId
+    | ATPREFIX PNAME_NS RELATIVEIRIREF PERIOD #relativePrefixId
     ;
+
 
 ATPREFIX : '@prefix' ;
 
-base: ATBASE ABSOLUTEIRIREF PERIOD;
+base: ATBASE ABSOLUTEIRIREF PERIOD
+    | BASE_STRING ABSOLUTEIRIREF
+    ;
 
+BASE_STRING : 'BASE' ;
+    
 ATBASE : '@base' ;
 
 PREFIX_STRING : 'PREFIX' ;
-
-sparqlBase: BASE_STRING ABSOLUTEIRIREF ;
-
-BASE_STRING : 'BASE' ;
 
 triples: 
     subject predicateObjectList #NamedSubjectTriples 
@@ -42,7 +45,14 @@ subject: iri | blankNode | collection;
 
 predicate: iri;
 
-rdfobject: iri | blankNode | collection | blankNodePropertyList | literal | tripleTerm | reifiedTriple ;
+rdfobject: iri 
+    | blankNode 
+    | collection 
+    | blankNodePropertyList 
+    | literal 
+    | tripleTerm 
+    | reifiedTriple 
+    ;
 
 literal: rdfLiteral | numericLiteral | booleanLiteral;
 
@@ -55,7 +65,10 @@ RPAREN : ')' ;
 
 LPAREN : '(' ;
 
-numericLiteral: INTEGER | DECIMAL | DOUBLE;
+numericLiteral: INTEGER #integerLiteral 
+    | DECIMAL #decimalLiteral
+    | DOUBLE #doubleLiteral
+    ;
 
 booleanLiteral: 'true' | 'false';
 
@@ -84,4 +97,5 @@ ttSubject: iri | blankNode;
 ttObject: iri | blankNode | literal | tripleTerm ;
 
 annotation: (reifier | ('{|' predicateObjectList '|}'))*;
+
 

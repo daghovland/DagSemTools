@@ -60,12 +60,29 @@ public class TurtleListener : TurtleBaseListener
     }
     public override void ExitSparqlPrefix(TurtleParser.SparqlPrefixContext context)
     {
-        var prefix = GetStringExcludingLastColon(context.PNAME_LN().GetText());
-        var iriString =  context.ABSOLUTEIRIREF().GetText()[1..-1];
+        var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
+        var iriString = GetStringExcludingFirstAndLast(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
+
     
+        
+    public override void ExitRelativePrefixId(TurtleParser.RelativePrefixIdContext context)
+    {
+        var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
+        var iriString = context.RELATIVEIRIREF().GetText();
+        var iri = _iriGrammarVisitor.ResolveRelativeIri(iriString);
+        _iriGrammarVisitor.AddPrefix(prefix, iri);
+    }
+    public override void ExitSparqlRelativePrefix(TurtleParser.SparqlRelativePrefixContext context)
+    {
+        var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
+        var iriString = context.RELATIVEIRIREF().GetText();
+        var iri = _iriGrammarVisitor.ResolveRelativeIri(iriString);
+        _iriGrammarVisitor.AddPrefix(prefix, iri);
+    }
+
     public override void ExitNamedSubjectTriples(TurtleParser.NamedSubjectTriplesContext context)
     {
         var curSubject = _iriGrammarVisitor.Visit(context.subject());
