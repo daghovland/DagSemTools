@@ -1,25 +1,25 @@
 grammar Turtle;
 import TurtleTokens;
 
-turtleDoc : statement*;
+turtleDoc : statement* EOF;
 
 statement: directive | triples PERIOD;
 
 directive: prefix | base  | sparqlBase;
 
-prefix: ATPREFIX PNAME_NS IRIREF PERIOD #prefixId
-    | ATPREFIX PNAME_LN IRIREF PERIOD #sparqlPrefix
+prefix: PREFIX_STRING PNAME_NS ABSOLUTEIRIREF  #sparqlPrefix
+    | ATPREFIX PNAME_NS ABSOLUTEIRIREF PERIOD #prefixId
     ;
 
 ATPREFIX : '@prefix' ;
 
-base: ATBASE IRIREF PERIOD;
+base: ATBASE ABSOLUTEIRIREF PERIOD;
 
 ATBASE : '@base' ;
 
 PREFIX_STRING : 'PREFIX' ;
 
-sparqlBase: BASE_STRING IRIREF ;
+sparqlBase: BASE_STRING ABSOLUTEIRIREF ;
 
 BASE_STRING : 'BASE' ;
 
@@ -65,9 +65,10 @@ string: STRING_LITERAL_QUOTE | STRING_LITERAL_SINGLE_QUOTE
     | STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE;
 
 iri: 
-    IRIREF #fullIri
-    | PNAME_LN #relativeIri
-    | PNAME_NS #prefixedIri
+    ABSOLUTEIRIREF #fullIri
+    | RELATIVEIRIREF #relativeIri
+    | PNAME_LN #prefixedIri
+    | PNAME_NS #iriPrefix
     ;
 
 blankNode: BLANK_NODE_LABEL | ANON;

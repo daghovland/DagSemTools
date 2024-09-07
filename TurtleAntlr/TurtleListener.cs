@@ -18,6 +18,11 @@ public class TurtleListener : TurtleBaseListener
         _iriGrammarVisitor = new IriGrammarVisitor(TripleTable);
     }
 
+    /// <summary>
+    /// Used to transform <iri> into iri in the handlers below
+    /// </summary>
+    /// <param name="input"></param>
+    /// <returns></returns>
     public static string GetStringExcludingFirstAndLast(string input)
     {
         if (input.Length > 2)
@@ -26,34 +31,47 @@ public class TurtleListener : TurtleBaseListener
         }
         return string.Empty;
     }
+
+    /// <summary>
+    /// Used to transform prefix: into prefix in the methods below
+    /// </summary>
+    /// <param name="context"></param>
+    public static string GetStringExcludingLastColon(string prefixNs)
+    {
+        if(prefixNs.Length >= 1 && prefixNs[^1] == ':')
+        {
+            return prefixNs.Substring(0, prefixNs.Length - 1);
+        }
+        throw new Exception($"Invalid prefix {prefixNs}. Prefix should end with ':'");
+    }
     public override void ExitBase(TurtleParser.BaseContext context)
     {
-        var iriString = GetStringExcludingFirstAndLast(context.IRIREF().GetText());
+        var iriString = GetStringExcludingFirstAndLast(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.SetBase(iri);
     }
     
     public override void ExitPrefixId(TurtleParser.PrefixIdContext context)
     {
-        var prefix = context.PNAME_NS().GetText();
-        var iriString = GetStringExcludingFirstAndLast(context.IRIREF().GetText());
+        var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
+        var iriString = GetStringExcludingFirstAndLast(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
     public override void ExitSparqlPrefix(TurtleParser.SparqlPrefixContext context)
     {
-        var prefix = context.PNAME_LN().GetText();
-        var iriString =  context.IRIREF().GetText()[1..-1];
+        var prefix = GetStringExcludingLastColon(context.PNAME_LN().GetText());
+        var iriString =  context.ABSOLUTEIRIREF().GetText()[1..-1];
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
     
     public override void ExitNamedSubjectTriples(TurtleParser.NamedSubjectTriplesContext context)
     {
-        var subject = _iriGrammarVisitor.Visit(context.subject());
+        var curSubject = _iriGrammarVisitor.Visit(context.subject());
         var triples = VisitPredicateObjectList(context.predicateObjectList())
             .SelectMany(predicateObject => predicateObject.objects
-                .Select(obj => new RDFStore.Triple(subject, predicateObject.verb, obj)));
+                .Select(obj => new RDFStore.Triple(curSubject, predicateObject.verb, obj)));
         triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
     }
 

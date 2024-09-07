@@ -1,6 +1,10 @@
 lexer grammar TurtleTokens;
 
-IRIREF: '<' (~[<>"{}|^`\\] | UCHAR)* '>';
+ABSOLUTEIRIREF: '<' URI_SCHEMES '://'  (~[<>"{}|^`\\] | UCHAR)* '>';
+
+URI_SCHEMES: 'http'|'https';
+
+RELATIVEIRIREF: '<' (~[<>"{}|^`\\] | UCHAR)* '>';
 
 PNAME_NS: PN_PREFIX? COLON;
 

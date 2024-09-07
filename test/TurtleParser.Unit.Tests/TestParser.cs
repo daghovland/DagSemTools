@@ -1,4 +1,5 @@
 using AlcTableau;
+using FluentAssertions;
 using IriTools;
 
 namespace TurtleParser.Unit.Tests;
@@ -94,6 +95,44 @@ public class TestParser
         Assert.NotNull(ont);
     }
 
+    [Fact]
+    public void TestReleativeIris()
+    {
+        var ont = TestOntology(
+            """
+            @base <http://example.org/> .
+            <#green-goblin> <#enemyOf> <#spiderman> .
+            """);
+        Assert.NotNull(ont);
+    }
+
+    [Fact]
+    public void TestPrefixes()
+    {
+        var ont = TestOntology(
+            """
+            @prefix : <http://example.org/> .
+            :spiderman :enemyOf :green-goblin .
+            """);
+        Assert.NotNull(ont);
+        ont.TripleCount.Should().Be(1);
+        var triple = ont.TripleList[0].triple;
+        triple.subject.Should().BeGreaterOrEqualTo(0);
+        triple.predicate.Should().BeGreaterOrEqualTo(0);
+        triple.@object.Should().BeGreaterOrEqualTo(0);
+    }
+
+    [Fact]
+    public void TestMultipleLiteralObjects()
+    {
+        var ont = TestOntology("""
+                prefix : <http://example.org/> . 
+                :subject :predicate 1, 2, 3 .
+            """);   
+        Assert.NotNull(ont);
+        ont.TripleCount.Should().Be(3);
+    }
+    
     [Fact]
     public void Test1()
     {

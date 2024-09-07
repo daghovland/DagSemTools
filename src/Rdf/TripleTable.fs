@@ -105,11 +105,11 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
         else
             this.ObjectPredicateIndex.Add(key, tripleIndex) |> ignore
             this.AddObjectIndex(object, tripleIndex)
+
     member this.AddTriple (triple : RDFStore.Triple) =
             let nextTripleCount = this.TripleCount + 1u
             if nextTripleCount > uint32(this.TripleList.Length) then
                     this.doubleResourceListSize()
-            // TODO Update indexes
             let sp_list = this.AddSubjectPredicateIndex(triple.subject, triple.predicate, int this.TripleCount)
             let op_list = this.AddObjectPredicateIndex(triple.object, triple.predicate, int this.TripleCount)
             let p_list = this.AddPredicateIndex(triple.predicate, int this.TripleCount) 

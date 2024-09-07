@@ -51,16 +51,17 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
         return TripleTable.AddResource(resource);
 
     }
+    
     public override UInt32 VisitFullIri(FullIriContext ctxt)
     {
-        var uriString = ctxt.IRIREF().GetText()[1..^1];
+        var uriString = ctxt.ABSOLUTEIRIREF().GetText()[1..^1];
         var iri = new IriReference(uriString);
         return GetIriId(iri);
     }
 
     public override UInt32 VisitPrefixedIri(PrefixedIriContext ctxt)
     {
-        var prefixedIriString = ctxt.PNAME_NS().GetText();
+        var prefixedIriString = ctxt.PNAME_LN().GetText();
         var components = prefixedIriString.Split(':', 2);
         var prefix = components[0];
         var namespaceName = _prefixes[prefix];
@@ -72,10 +73,12 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
 
     public override UInt32 VisitRelativeIri(RelativeIriContext ctxt)
     {
-        var prefixedPart = baseIriReference ??
-                           throw new Exception("relative IRIs can only be used when the base iri is set. ");
-        var iriString = $"{baseIriReference}{ctxt.PNAME_LN()}";
-        return GetIriId(new IriReference(iriString));
+        string iriString = ctxt.RELATIVEIRIREF().GetText()[1..^1];
+        return baseIriReference switch
+        {
+            null => throw new Exception($"Relative IRI {iriString} can only be used when the base iri is set. "),
+            _ => GetIriId(new IriReference(baseIriReference + iriString))
+        };
     }
 
     public override UInt32 VisitRdfobject(RdfobjectContext context) =>
