@@ -59,3 +59,4 @@ ManchesterAntlr/gen/
 /test/Rdf.Unit.Tests/obj/
 
 .fake
+/.vscode/
