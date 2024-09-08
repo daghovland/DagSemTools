@@ -135,12 +135,24 @@ public class TestParser
     }
 
     [Fact]
-    public void TestMultipleLiteralObjects()
+    public void TestMultipleIntegerObjects()
     {
         var ont = TestOntology("""
                 @prefix : <http://example.org/> . 
                 :subject :predicate 1, 2, 3 .
             """);   
+        Assert.NotNull(ont);
+        ont.TripleCount.Should().Be(3);
+    }
+    
+    
+    [Fact]
+    public void TestMultipleStringObjects()
+    {
+        var ont = TestOntology("""
+                                   @prefix : <http://example.org/> . 
+                                   :subject :predicate "string1", "string2", "3" .
+                               """);   
         Assert.NotNull(ont);
         ont.TripleCount.Should().Be(3);
     }

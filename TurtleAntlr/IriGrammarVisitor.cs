@@ -17,6 +17,8 @@ using static TurtleParser;
 
 public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
 {
+    private StringVisitor _stringVisitor = new();
+    
     public TripleTable TripleTable { get; init; }
     private Dictionary<string, IriReference> _prefixes;
     private IriReference? baseIriReference;
@@ -79,6 +81,19 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
         double literal = double.Parse(context.DOUBLE().GetText(), CultureInfo.InvariantCulture);
         var resource = RDFStore.Resource.NewDoubleLiteral(literal);
         return TripleTable.AddResource(resource);
+    }
+
+    public override uint VisitRdfLiteral(RdfLiteralContext context)
+    {
+        var literalString = _stringVisitor.Visit(context.@string());
+        uint typeIriId = context.iri() switch
+        {
+            null => TripleTable.AddResource(RDFStore.Resource.NewIri(new IriReference(Namespaces.XsdString))),
+            var typeIriNode => Visit(typeIriNode)
+        };
+        
+        
+        return literal;
     }
     public override UInt32 VisitPrefixedIri(PrefixedIriContext ctxt)
     {

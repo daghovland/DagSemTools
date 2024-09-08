@@ -27,6 +27,9 @@ module RDFStore =
         | DecimalLiteral of literalDec: decimal
         | DoubleLiteral of literalDouble: double
         | BooleanLiteral of literalBool: bool
+        | DateTimeLiteral of literalDateTime: DateTime
+        | LangLiteral of lang: string * langliteral: string
+        | TypedLiteral of typeIri: IriReference * typedLiteral: string
     type TripleListIndex = int
     [<Struct>]
     type TripleListLink =

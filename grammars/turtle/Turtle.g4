@@ -72,10 +72,16 @@ numericLiteral: INTEGER #integerLiteral
 
 booleanLiteral: 'true' | 'false';
 
-rdfLiteral: string (LANG_DIR | '^^' iri)?;
+rdfLiteral: string #plainStringLiteral
+    | string LANG_DIR #langLiteral
+    | string '^^' iri? #typedLiteral
+    ;
+    
 
-string: STRING_LITERAL_QUOTE | STRING_LITERAL_SINGLE_QUOTE
-    | STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE;
+string: string_single_quote | string_triple_quote;
+ 
+string_single_quote:  STRING_LITERAL_QUOTE  | STRING_LITERAL_SINGLE_QUOTE;
+string_triple_quote: STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE;
 
 iri: 
     ABSOLUTEIRIREF #fullIri
