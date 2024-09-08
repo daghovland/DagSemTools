@@ -5,7 +5,7 @@ turtleDoc : statement* EOF;
 
 statement: directive | triples PERIOD;
 
-directive: prefix | base  | sparqlBase;
+directive: prefix | base ;
 
 prefix: PREFIX_STRING PNAME_NS ABSOLUTEIRIREF  #sparqlPrefix
     | PREFIX_STRING PNAME_NS RELATIVEIRIREF  #sparqlRelativePrefix
@@ -16,8 +16,8 @@ prefix: PREFIX_STRING PNAME_NS ABSOLUTEIRIREF  #sparqlPrefix
 
 ATPREFIX : '@prefix' ;
 
-base: ATBASE ABSOLUTEIRIREF PERIOD
-    | BASE_STRING ABSOLUTEIRIREF
+base: ATBASE ABSOLUTEIRIREF PERIOD 
+    | BASE_STRING ABSOLUTEIRIREF 
     ;
 
 BASE_STRING : 'BASE' ;
