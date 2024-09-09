@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        
+        <PackageReadMeFile>README.md</PackageReadMeFile>
+        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <PackageId>AlcTableau.Api</PackageId>
+        <Version>0.1.0</Version>
+        <Authors>Dag Hovland</Authors>
+        <Description>For Rdf, reasoning and querying</Description>
+        <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSource>true</IncludeSource>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\Rdf\Rdf.fsproj" />
+      <ProjectReference Include="..\TurtleAntlr\TurtleAntlr.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="README.md">
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </None>
+    </ItemGroup>
+
+</Project>

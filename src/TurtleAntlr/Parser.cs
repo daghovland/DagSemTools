@@ -24,6 +24,12 @@ public static class Parser
         return ParseReader(textReader, (uint)(new FileInfo(filename).Length));
     }
 
+    public static TripleTable ParseFile(FileInfo fInfo)
+    {
+        using TextReader textReader = File.OpenText(fInfo.FullName);
+        return ParseReader(textReader, (uint)(fInfo.Length));
+    }
+    
     public static TripleTable ParseReader(TextReader textReader, UInt32 init_size, Dictionary<string, IriReference> prefixes)
     {
 
