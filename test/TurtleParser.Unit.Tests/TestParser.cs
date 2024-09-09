@@ -47,6 +47,37 @@ public class TestParser
         Assert.NotNull(ont);
     }
 
+    
+    [Fact]
+    public void TestDuplicateTriples()
+    {
+        var ont = TestOntology(
+            """
+            @base <http://one.example/> .
+            <subject2> <predicate2> <object2> .     # relative IRI references, e.g., http://one.example/subject2
+            <subject2> <predicate2> <object2> .     # relative IRI references, e.g., http://one.example/subject2
+            
+            """);
+        Assert.NotNull(ont);
+        ont.TripleCount.Should().Be(1);
+        var subjectId = ont.TripleList[0].triple.subject;
+        var subjectIri = ont.ResourceList[subjectId].iri;
+        subjectIri.Should().Be("http://one.example/subject2");
+    }
+    
+    
+    [Fact]
+    public void TestPrefixCanBeUpdated()
+    {
+        var ont = TestOntology(
+            """
+            @prefix p: <http://two.example/> .
+            PREFIX p: <http://two.example/>
+            """);
+        Assert.NotNull(ont);
+        
+    }
+    
     [Fact]
     public void TestAllIriWritings()
     {

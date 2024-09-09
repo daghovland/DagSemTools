@@ -107,21 +107,24 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             this.AddObjectIndex(object, tripleIndex)
 
     member this.AddTriple (triple : RDFStore.Triple) =
-            let nextTripleCount = this.TripleCount + 1u
-            if nextTripleCount > uint32(this.TripleList.Length) then
-                    this.doubleResourceListSize()
-            let sp_list = this.AddSubjectPredicateIndex(triple.subject, triple.predicate, int this.TripleCount)
-            let op_list = this.AddObjectPredicateIndex(triple.object, triple.predicate, int this.TripleCount)
-            let p_list = this.AddPredicateIndex(triple.predicate, int this.TripleCount) 
-            this.TripleList.[int(this.TripleCount)] <- {
-                triple = triple
-                next_subject_predicate_list = sp_list
-                next_predicate_list = p_list
-                next_object_predicate_list = op_list
-            }
-            this.ThreeKeysIndex.Add(triple, int(this.TripleCount)) |> ignore
-            
-            this.TripleCount <- nextTripleCount
-            ()
+            if this.ThreeKeysIndex.ContainsKey triple then
+                ()
+            else
+                let nextTripleCount = this.TripleCount + 1u
+                if nextTripleCount > uint32(this.TripleList.Length) then
+                        this.doubleResourceListSize()
+                let sp_list = this.AddSubjectPredicateIndex(triple.subject, triple.predicate, int this.TripleCount)
+                let op_list = this.AddObjectPredicateIndex(triple.object, triple.predicate, int this.TripleCount)
+                let p_list = this.AddPredicateIndex(triple.predicate, int this.TripleCount) 
+                this.TripleList.[int(this.TripleCount)] <- {
+                    triple = triple
+                    next_subject_predicate_list = sp_list
+                    next_predicate_list = p_list
+                    next_object_predicate_list = op_list
+                }
+                this.ThreeKeysIndex.Add(triple, int(this.TripleCount)) |> ignore
+                
+                this.TripleCount <- nextTripleCount
+                ()
             
                 

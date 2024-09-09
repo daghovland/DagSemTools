@@ -7,10 +7,8 @@ statement: directive | triples PERIOD;
 
 directive: prefix | base ;
 
-prefix: PREFIX_STRING PNAME_NS ABSOLUTEIRIREF  #sparqlPrefix
-    | PREFIX_STRING PNAME_NS RELATIVEIRIREF  #sparqlRelativePrefix
-    | ATPREFIX PNAME_NS ABSOLUTEIRIREF PERIOD #prefixId
-    | ATPREFIX PNAME_NS RELATIVEIRIREF PERIOD #relativePrefixId
+prefix: PREFIX_STRING PNAME_NS iri  #sparqlPrefix
+    | ATPREFIX PNAME_NS iri PERIOD #prefixId
     ;
 
 
@@ -24,7 +22,7 @@ BASE_STRING : 'BASE' ;
     
 ATBASE : '@base' ;
 
-PREFIX_STRING : 'PREFIX' ;
+PREFIX_STRING: [Pp] [Rr] [Ee] [Ff] [Ii] [Xx];
 
 triples: 
     subject predicateObjectList #NamedSubjectTriples 
@@ -70,7 +68,9 @@ numericLiteral: INTEGER #integerLiteral
     | DOUBLE #doubleLiteral
     ;
 
-booleanLiteral: 'true' | 'false';
+booleanLiteral: 'true' #trueBooleanLiteral
+    | 'false' #falseBooleanLiteral
+    ;
 
 rdfLiteral: string #plainStringLiteral
     | string LANG_DIR #langLiteral
@@ -83,7 +83,9 @@ string: string_single_quote | string_triple_quote;
 string_single_quote:  STRING_LITERAL_QUOTE  | STRING_LITERAL_SINGLE_QUOTE;
 string_triple_quote: STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE;
 
-iri: 
+iri: turtleIri;
+
+turtleIri:
     ABSOLUTEIRIREF #fullIri
     | RELATIVEIRIREF #relativeIri
     | PNAME_LN #prefixedIri

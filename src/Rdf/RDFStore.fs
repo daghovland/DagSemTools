@@ -23,11 +23,15 @@ module RDFStore =
     type Resource =
         Iri of iri:  IriReference
         | LiteralString of literal: string
-        | IntegerLiteral of literalInt: int
-        | DecimalLiteral of literalDec: decimal
-        | DoubleLiteral of literalDouble: double
         | BooleanLiteral of literalBool: bool
+        | DecimalLiteral of literalDec: decimal
+        | FloatLiteral of literalFloat: float
+        | DoubleLiteral of literalDouble: double
+        | DurationLiteral of literalDuration: TimeSpan
+        | IntegerLiteral of literalInt: int
         | DateTimeLiteral of literalDateTime: DateTime
+        | TimeLiteral of literalTime: TimeOnly
+        | DateLiteral of literalDate: DateOnly
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
     type TripleListIndex = int

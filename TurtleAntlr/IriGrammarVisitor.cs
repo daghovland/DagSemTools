@@ -15,25 +15,16 @@ using System.Collections.Generic;
 using IriTools;
 using static TurtleParser;
 
-public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
+public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
 {
-    private StringVisitor _stringVisitor = new();
-    
-    public TripleTable TripleTable { get; init; }
     private Dictionary<string, IriReference> _prefixes;
     private IriReference? baseIriReference;
-    public IriGrammarVisitor(TripleTable tripleTable)
+    public IriGrammarVisitor()
     {
-
-        TripleTable = tripleTable;
         _prefixes = new Dictionary<string, IriReference>();
     }
-
-    
-
-    public IriGrammarVisitor(TripleTable tripleTable, Dictionary<string, IriReference> prefixes)
+    public IriGrammarVisitor(Dictionary<string, IriReference> prefixes)
     {
-        TripleTable = tripleTable;
         _prefixes = prefixes;
     }
 
@@ -48,54 +39,12 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
         return ListModule.OfSeq(prefixList);
     }
 
-    private UInt32 GetIriId(IriReference iri)
-    {
-        var resource = RDFStore.Resource.NewIri(iri);
-        return TripleTable.AddResource(resource);
-
-    }
-    
-    public override UInt32 VisitFullIri(FullIriContext ctxt)
+    public override IriReference VisitFullIri(FullIriContext ctxt)
     {
         var uriString = ctxt.ABSOLUTEIRIREF().GetText()[1..^1];
-        var iri = new IriReference(uriString);
-        return GetIriId(iri);
+        return new IriReference(uriString);
     }
-
-    public override uint VisitIntegerLiteral(IntegerLiteralContext context)
-    {
-        int literal = int.Parse(context.INTEGER().GetText());
-        var resource = RDFStore.Resource.NewIntegerLiteral(literal);
-        return TripleTable.AddResource(resource);
-    }
-
-    public override uint VisitDecimalLiteral(DecimalLiteralContext context)
-    {
-        decimal literal = decimal.Parse(context.DECIMAL().GetText(), CultureInfo.InvariantCulture);
-        var resource = RDFStore.Resource.NewDecimalLiteral(literal);
-        return TripleTable.AddResource(resource);
-    }
-    
-    public override uint VisitDoubleLiteral(DoubleLiteralContext context)
-    {
-        double literal = double.Parse(context.DOUBLE().GetText(), CultureInfo.InvariantCulture);
-        var resource = RDFStore.Resource.NewDoubleLiteral(literal);
-        return TripleTable.AddResource(resource);
-    }
-
-    public override uint VisitRdfLiteral(RdfLiteralContext context)
-    {
-        var literalString = _stringVisitor.Visit(context.@string());
-        uint typeIriId = context.iri() switch
-        {
-            null => TripleTable.AddResource(RDFStore.Resource.NewIri(new IriReference(Namespaces.XsdString))),
-            var typeIriNode => Visit(typeIriNode)
-        };
-        
-        
-        return literal;
-    }
-    public override UInt32 VisitPrefixedIri(PrefixedIriContext ctxt)
+    public override IriReference VisitPrefixedIri(PrefixedIriContext ctxt)
     {
         var prefixedIriString = ctxt.PNAME_LN().GetText();
         var components = prefixedIriString.Split(':', 2);
@@ -103,14 +52,13 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
         var namespaceName = _prefixes[prefix];
         var localName = components[1];
         var iriString = $"{namespaceName}{localName}";
-        var iri = new IriReference(iriString);
-        return GetIriId(iri);
+        return new IriReference(iriString);
     }
 
-    public override UInt32 VisitRelativeIri(RelativeIriContext ctxt)
+    public override IriReference VisitRelativeIri(RelativeIriContext ctxt)
     {
         string rdfiristring = ctxt.RELATIVEIRIREF().GetText();
-        return GetIriId(ResolveRelativeIri(rdfiristring));
+        return ResolveRelativeIri(rdfiristring);
     }
 
     public IriReference ResolveRelativeIri(string rdfiristring)
@@ -122,12 +70,9 @@ public class IriGrammarVisitor : TurtleBaseVisitor<UInt32>
             _ => new IriReference(baseIriReference + iriString)
         };
     }
-
-    public override UInt32 VisitRdfobject(RdfobjectContext context) =>
-        Visit(context.GetChild(0));
-
+    
     public void AddPrefix(string prefix, IriReference iri) =>
-        _prefixes.Add(prefix, iri);
+        _prefixes[prefix] = iri;
 
     public void SetBase(IriReference iri) =>
         baseIriReference = iri;
