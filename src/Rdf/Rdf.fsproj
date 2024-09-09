@@ -1,0 +1,24 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <Compile Include="RDFStore.fs" />
+        <Compile Include="TripleTable.fs" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="IriTools">
+        <HintPath>..\..\..\..\..\.nuget\packages\iritools\2.2.0\lib\net8.0\IriTools.dll</HintPath>
+      </Reference>
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="IriTools" Version="2.2.0" />
+      <PackageReference Update="FSharp.Core" Version="8.0.400" />
+    </ItemGroup>
+
+</Project>

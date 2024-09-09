@@ -7,9 +7,9 @@
     <Nullable>enable</Nullable>
   </PropertyGroup>
   <ItemGroup>
-		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.10.1" />
+		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
 		<PackageReference Include="Antlr4BuildTasks" Version="10.7" />
-    <PackageReference Include="FSharp.Core" Version="8.0.301" />
+    <PackageReference Include="FSharp.Core" Version="8.0.400" />
 	</ItemGroup>
 	<ItemGroup>
         <Antlr4 Include="grammars/IriGrammar.g4">

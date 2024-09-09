@@ -10,10 +10,7 @@
 
     <ItemGroup>
         <Compile Include="Tests.fs"/>
-        <Compile Include="ReasonerTests.fs" />
         <Compile Include="Program.fs"/>
-        <Content Include=".gitignore" />
-        <Folder Include="TestData\" />
     </ItemGroup>
 
     <ItemGroup>
@@ -27,8 +24,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
-      <ProjectReference Include="..\..\Manchester\Manchester.fsproj" />
+      <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
     </ItemGroup>
 
 </Project>

@@ -6,7 +6,9 @@
     Contact: hovlanddag@gmail.com
 */
 
+using System.Globalization;
 using Microsoft.FSharp.Collections;
+using Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 using System.Collections.Generic;
@@ -21,8 +23,6 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
     {
         _prefixes = new Dictionary<string, IriReference>();
     }
-
-
     public IriGrammarVisitor(Dictionary<string, IriReference> prefixes)
     {
         _prefixes = prefixes;
@@ -41,12 +41,12 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
 
     public override IriReference VisitFullIri(FullIriContext ctxt)
     {
-        return new IriReference(ctxt.IRIREF().GetText()[1..^1]);
+        var uriString = ctxt.ABSOLUTEIRIREF().GetText()[1..^1];
+        return new IriReference(uriString);
     }
-
     public override IriReference VisitPrefixedIri(PrefixedIriContext ctxt)
     {
-        var prefixedIriString = ctxt.PNAME_NS().GetText();
+        var prefixedIriString = ctxt.PNAME_LN().GetText();
         var components = prefixedIriString.Split(':', 2);
         var prefix = components[0];
         var namespaceName = _prefixes[prefix];
@@ -57,9 +57,23 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
 
     public override IriReference VisitRelativeIri(RelativeIriContext ctxt)
     {
-        var prefixedPart = baseIriReference ??
-                           throw new Exception("relative IRIs can only be used when the base iri is set. ");
-        var iriString = $"{baseIriReference}{ctxt.PNAME_LN()}";
-        return new IriReference(iriString);
+        string rdfiristring = ctxt.RELATIVEIRIREF().GetText();
+        return ResolveRelativeIri(rdfiristring);
     }
+
+    public IriReference ResolveRelativeIri(string rdfiristring)
+    {
+        string iriString = rdfiristring[1..^1];
+        return baseIriReference switch
+        {
+            null => throw new Exception($"Relative IRI {iriString} can only be used when the base iri is set. "),
+            _ => new IriReference(baseIriReference + iriString)
+        };
+    }
+
+    public void AddPrefix(string prefix, IriReference iri) =>
+        _prefixes[prefix] = iri;
+
+    public void SetBase(IriReference iri) =>
+        baseIriReference = iri;
 }

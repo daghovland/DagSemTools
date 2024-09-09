@@ -10,19 +10,21 @@ using AlcTableau;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using IriTools;
+using Rdf;
 
-namespace TurtleAntlr;
+namespace AlcTableau.TurtleAntlr;
 
 public static class Parser
 {
 
-    public static ALC.OntologyDocument ParseFile(string filename)
+
+    public static TripleTable ParseFile(string filename)
     {
         using TextReader textReader = File.OpenText(filename);
-        return ParseReader(textReader);
+        return ParseReader(textReader, (uint)(new FileInfo(filename).Length));
     }
 
-    public static ALC.OntologyDocument ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
+    public static TripleTable ParseReader(TextReader textReader, UInt32 init_size, Dictionary<string, IriReference> prefixes)
     {
 
         var input = new AntlrInputStream(textReader);
@@ -32,18 +34,18 @@ public static class Parser
         parser.ErrorHandler = new BailErrorStrategy();
         IParseTree tree = parser.turtleDoc();
         ParseTreeWalker walker = new ParseTreeWalker();
-        var listener = new TurtleListener();
+        var listener = new TurtleListener(init_size);
         walker.Walk(listener, tree);
-        return listener.GetOntology();
+        return listener.TripleTable;
     }
 
-    public static ALC.OntologyDocument ParseReader(TextReader textReader) =>
-        ParseReader(textReader, new Dictionary<string, IriReference>());
+    public static TripleTable ParseReader(TextReader textReader, UInt32 init_size) =>
+        ParseReader(textReader, init_size, new Dictionary<string, IriReference>());
 
-    public static ALC.OntologyDocument ParseString(string owl)
+    public static TripleTable ParseString(string owl)
     {
         using TextReader textReader = new StringReader(owl);
-        return ParseReader(textReader);
+        return ParseReader(textReader, (uint)owl.Length);
     }
 
 

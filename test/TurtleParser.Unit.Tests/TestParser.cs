@@ -1,27 +1,24 @@
 using AlcTableau;
+using FluentAssertions;
+using IriTools;
 
 namespace TurtleParser.Unit.Tests;
 
 public class TestParser
 {
-    public ALC.OntologyDocument TestOntology(string ontology)
+    public Rdf.TripleTable TestOntology(string ontology)
     {
-        try
-        {
-            return TurtleAntlr.Parser.ParseString(ontology);
-        }
-        catch (Exception e)
-        {
-            Console.WriteLine(e.Message);
-            return null;
-        }
+        return AlcTableau.TurtleAntlr.Parser.ParseString(ontology);
+
     }
 
     [Fact]
     public void TestSingleTriple()
     {
-        var ont = TestOntology("<http://example.org/subject> <http://example.org/predicate> <http://example.org/object> .");
+        var ont = TestOntology("<http://example.org/subject> a <http://example.org/object> .");
         Assert.NotNull(ont);
+        Assert.Equal(1u, ont.TripleCount);
+        Assert.NotNull(ont.TripleList);
     }
 
     [Fact]
@@ -34,9 +31,11 @@ public class TestParser
             <http://example.org/#green-goblin> .
             """);
         Assert.NotNull(ont);
+        Assert.Equal(3u, ont.ResourceCount);
+        Assert.Equal(1u, ont.TripleCount);
     }
-    
-    
+
+
     [Fact]
     public void TestSpecExamplePredicateList()
     {
@@ -47,7 +46,38 @@ public class TestParser
             """);
         Assert.NotNull(ont);
     }
-    
+
+
+    [Fact]
+    public void TestDuplicateTriples()
+    {
+        var ont = TestOntology(
+            """
+            @base <http://one.example/> .
+            <subject2> <predicate2> <object2> .     # relative IRI references, e.g., http://one.example/subject2
+            <subject2> <predicate2> <object2> .     # relative IRI references, e.g., http://one.example/subject2
+            
+            """);
+        Assert.NotNull(ont);
+        ont.TripleCount.Should().Be(1);
+        var subjectId = ont.TripleList[0].triple.subject;
+        var subjectIri = ont.ResourceList[subjectId].iri;
+        subjectIri.Should().Be("http://one.example/subject2");
+    }
+
+
+    [Fact]
+    public void TestPrefixCanBeUpdated()
+    {
+        var ont = TestOntology(
+            """
+            @prefix p: <http://two.example/> .
+            PREFIX p: <http://two.example/>
+            """);
+        Assert.NotNull(ont);
+
+    }
+
     [Fact]
     public void TestAllIriWritings()
     {
@@ -80,8 +110,20 @@ public class TestParser
             """);
         Assert.NotNull(ont);
     }
-    
-        
+
+    [Fact]
+    public void RelativePrefixWorksFine()
+    {
+        var ont = TestOntology("""
+                               BASE <http://one.example/>
+                               @prefix p: <path/> .                    # prefix p: now stands for http://one.example/path/
+                               p:subject4 p:predicate4 p:object4 .     # prefixed name, e.g., http://one.example/path/subject4
+                               """);
+        ont.TripleCount.Should().Be(1);
+        ont.TripleList[0].triple.subject.Should().BeGreaterOrEqualTo(0);
+        ont.TripleList[0].triple.predicate.Should().BeGreaterOrEqualTo(0);
+    }
+
     [Fact]
     public void TestNumberLiterals()
     {
@@ -95,7 +137,57 @@ public class TestParser
             """);
         Assert.NotNull(ont);
     }
-    
+
+    [Fact]
+    public void TestReleativeIris()
+    {
+        var ont = TestOntology(
+            """
+            @base <http://example.org/> .
+            <#green-goblin> <#enemyOf> <#spiderman> .
+            """);
+        Assert.NotNull(ont);
+    }
+
+    [Fact]
+    public void TestPrefixes()
+    {
+        var ont = TestOntology(
+            """
+            @prefix : <http://example.org/> .
+            :spiderman :enemyOf :green-goblin .
+            """);
+        Assert.NotNull(ont);
+        ont.TripleCount.Should().Be(1);
+        var triple = ont.TripleList[0].triple;
+        triple.subject.Should().BeGreaterOrEqualTo(0);
+        triple.predicate.Should().BeGreaterOrEqualTo(0);
+        triple.@object.Should().BeGreaterOrEqualTo(0);
+    }
+
+    [Fact]
+    public void TestMultipleIntegerObjects()
+    {
+        var ont = TestOntology("""
+                @prefix : <http://example.org/> . 
+                :subject :predicate 1, 2, 3 .
+            """);
+        Assert.NotNull(ont);
+        ont.TripleCount.Should().Be(3);
+    }
+
+
+    [Fact]
+    public void TestMultipleStringObjects()
+    {
+        var ont = TestOntology("""
+                                   @prefix : <http://example.org/> . 
+                                   :subject :predicate "string1", "string2", "3" .
+                               """);
+        Assert.NotNull(ont);
+        ont.TripleCount.Should().Be(3);
+    }
+
     [Fact]
     public void Test1()
     {

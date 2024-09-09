@@ -8,9 +8,9 @@
     <RootNamespace>TurtleParser</RootNamespace>
   </PropertyGroup>
 	<ItemGroup>
-		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.10.1" />
-		<PackageReference Include="Antlr4BuildTasks" Version="10.7" />
-        <PackageReference Include="FSharp.Core" Version="8.0.301" />
+		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+		<PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
+        <PackageReference Include="FSharp.Core" Version="8.0.400" />
     </ItemGroup>
     <ItemGroup>
         <None Remove="grammars\Turtle.g4" />
@@ -25,6 +25,7 @@
     <ItemGroup>
         <ProjectReference Include="..\ManchesterAntlr\ManchesterAntlr.csproj" />
         <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\src\Rdf\Rdf.fsproj" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="grammars\" />

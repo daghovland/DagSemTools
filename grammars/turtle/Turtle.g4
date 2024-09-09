@@ -1,38 +1,38 @@
 grammar Turtle;
 import TurtleTokens;
 
-turtleDoc : statement*;
+turtleDoc : statement* EOF;
 
 statement: directive | triples PERIOD;
 
-directive: prefixID | base | sparqlPrefix | sparqlBase;
+directive: prefix | base ;
 
-prefixID: ATPREFIX PNAME_NS IRIREF PERIOD;
+prefix: PREFIX_STRING PNAME_NS iri  #sparqlPrefix
+    | ATPREFIX PNAME_NS iri PERIOD #prefixId
+    ;
+
 
 ATPREFIX : '@prefix' ;
 
-base: ATBASE IRIREF PERIOD;
-
-ATBASE : '@base' ;
-
-sparqlPrefix: PREFIX_STRING PNAME_NS IRIREF ;
-
-PREFIX_STRING : 'PREFIX' ;
-
-sparqlBase: BASE_STRING IRIREF ;
+base: ATBASE ABSOLUTEIRIREF PERIOD 
+    | BASE_STRING ABSOLUTEIRIREF 
+    ;
 
 BASE_STRING : 'BASE' ;
+    
+ATBASE : '@base' ;
+
+PREFIX_STRING: [Pp] [Rr] [Ee] [Ff] [Ii] [Xx];
 
 triples: 
-    |subject predicateObjectList 
-    | blankNodePropertyList predicateObjectList?
-    | reifiedTriple predicateObjectList? 
+    subject predicateObjectList #NamedSubjectTriples 
+    | blankNodePropertyList predicateObjectList? #BlankNodeTriples
+    | reifiedTriple predicateObjectList?  #ReifiedTriples
     ;
     
-predicateObjectList: verb objectList (SEMICOLON (verb objectList)?)*;
+predicateObjectList: verbObjectList (SEMICOLON (verbObjectList)?)*;
 
-
-objectList: object (COMMA object)*;
+verbObjectList: verb rdfobject (COMMA rdfobject)*;
 
 
 verb: predicate | RDF_TYPE_ABBR;
@@ -43,39 +43,60 @@ subject: iri | blankNode | collection;
 
 predicate: iri;
 
-object: iri | blankNode | collection | blankNodePropertyList | literal | tripleTerm | reifiedTriple ;
+rdfobject: iri 
+    | blankNode 
+    | collection 
+    | blankNodePropertyList 
+    | literal 
+    | tripleTerm 
+    | reifiedTriple 
+    ;
 
 literal: rdfLiteral | numericLiteral | booleanLiteral;
 
 blankNodePropertyList: LSQPAREN predicateObjectList RSQPAREN;
 
 
-collection: LPAREN object* RPAREN;
+collection: LPAREN rdfobject* RPAREN;
 
 RPAREN : ')' ;
 
 LPAREN : '(' ;
 
-numericLiteral: INTEGER | DECIMAL | DOUBLE;
+numericLiteral: INTEGER #integerLiteral 
+    | DECIMAL #decimalLiteral
+    | DOUBLE #doubleLiteral
+    ;
 
-booleanLiteral: 'true' | 'false';
+booleanLiteral: 'true' #trueBooleanLiteral
+    | 'false' #falseBooleanLiteral
+    ;
 
-rdfLiteral: string (LANG_DIR | '^^' iri)?;
+rdfLiteral: string #plainStringLiteral
+    | string LANG_DIR #langLiteral
+    | string '^^' iri? #typedLiteral
+    ;
+    
 
-string: STRING_LITERAL_QUOTE | STRING_LITERAL_SINGLE_QUOTE
-    | STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE;
+string: string_single_quote | string_triple_quote;
+ 
+string_single_quote:  STRING_LITERAL_QUOTE  | STRING_LITERAL_SINGLE_QUOTE;
+string_triple_quote: STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE;
 
-iri: 
-    IRIREF #fullIri
-    | PNAME_LN #relativeIri
-    | PNAME_NS #prefixedIri
+iri: turtleIri;
+
+turtleIri:
+    ABSOLUTEIRIREF #fullIri
+    | RELATIVEIRIREF #relativeIri
+    | PNAME_LN #prefixedIri
+    | PNAME_NS #iriPrefix
     ;
 
 blankNode: BLANK_NODE_LABEL | ANON;
 
 reifier: '~' (iri | blankNode);
 
-reifiedTriple: '<<' (subject | reifiedTriple) predicate object reifier* '>>';
+reifiedTriple: '<<' (subject | reifiedTriple) predicate rdfobject reifier* '>>';
 
 tripleTerm: '<<(' ttSubject predicate ttObject ')>>';
 
@@ -84,4 +105,5 @@ ttSubject: iri | blankNode;
 ttObject: iri | blankNode | literal | tripleTerm ;
 
 annotation: (reifier | ('{|' predicateObjectList '|}'))*;
+
 
