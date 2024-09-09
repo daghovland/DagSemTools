@@ -1,1 +1,0 @@
-../../grammars/common/TurtleLexer.g4
