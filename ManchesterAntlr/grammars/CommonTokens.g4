@@ -1,1 +1,0 @@
-../../grammars/common/CommonTokens.g4

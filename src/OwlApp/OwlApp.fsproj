@@ -10,7 +10,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\ManchesterAntlr\ManchesterAntlr.csproj" />
         <ProjectReference Include="..\Manchester\Manchester.fsproj" />
         <PackageReference Update="FSharp.Core" Version="8.0.400" />

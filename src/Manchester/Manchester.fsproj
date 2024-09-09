@@ -12,7 +12,7 @@
         <PackageReference Include="IriTools" Version="2.2.0" />
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
     </ItemGroup>
     
 </Project>

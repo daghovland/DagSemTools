@@ -56,8 +56,8 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
-      <ProjectReference Include="..\..\ManchesterAntlr\ManchesterAntlr.csproj" />
-      <ProjectReference Include="..\..\Manchester\Manchester.fsproj" />
+      <ProjectReference Include="..\..\src\ManchesterAntlr\ManchesterAntlr.csproj" />
+      <ProjectReference Include="..\..\src\Manchester\Manchester.fsproj" />
     </ItemGroup>
 
 </Project>

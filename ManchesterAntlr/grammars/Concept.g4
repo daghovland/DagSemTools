@@ -1,1 +1,0 @@
-../../grammars/manchester/Concept.g4

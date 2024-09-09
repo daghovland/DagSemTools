@@ -28,7 +28,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
-      <ProjectReference Include="..\..\Manchester\Manchester.fsproj" />
+      <ProjectReference Include="..\..\src\Manchester\Manchester.fsproj" />
     </ItemGroup>
 
 </Project>

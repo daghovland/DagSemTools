@@ -1,1 +1,0 @@
-../../grammars/manchester/Manchester.g4

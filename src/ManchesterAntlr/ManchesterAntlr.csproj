@@ -32,7 +32,7 @@
         </Antlr4>
 	</ItemGroup>
       <ItemGroup>
-        <ProjectReference Include="..\src\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
     </ItemGroup>
       
 </Project>
