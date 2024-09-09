@@ -10,20 +10,20 @@ public static class Namespaces
     internal const string Xsd = "http://www.w3.org/2001/XMLSchema#";
 
     internal const string RdfType = $"{Rdf}type";
-    
+
     internal const string XsdString = $"{Xsd}string";
-    internal const string XsdBoolean =  $"{Xsd}boolean";
-    internal const string XsdDecimal =  $"{Xsd}decimal";
-    internal const string XsdFloat =  $"{Xsd}float";
-    internal const string XsdDouble =  $"{Xsd}double";
-    internal const string XsdDuration =  $"{Xsd}duration";
-    internal const string XsdDateTime =  $"{Xsd}dateTime";
-    internal const string XsdTime =  $"{Xsd}time";
-    internal const string XsdDate =  $"{Xsd}date";
+    internal const string XsdBoolean = $"{Xsd}boolean";
+    internal const string XsdDecimal = $"{Xsd}decimal";
+    internal const string XsdFloat = $"{Xsd}float";
+    internal const string XsdDouble = $"{Xsd}double";
+    internal const string XsdDuration = $"{Xsd}duration";
+    internal const string XsdDateTime = $"{Xsd}dateTime";
+    internal const string XsdTime = $"{Xsd}time";
+    internal const string XsdDate = $"{Xsd}date";
     internal const string XsdInt = $"{Xsd}int";
     internal const string XsdInteger = $"{Xsd}integer";
     internal const string XsdHexBinary = $"{Xsd}hexBinary";
     internal const string XsdBase64Binary = $"{Xsd}base64Binary";
     internal const string XsdAnyUri = $"{Xsd}anyURI";
-    
+
 }

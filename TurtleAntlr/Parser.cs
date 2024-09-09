@@ -45,7 +45,7 @@ public static class Parser
     public static TripleTable ParseString(string owl)
     {
         using TextReader textReader = new StringReader(owl);
-        return ParseReader(textReader, (uint) owl.Length);
+        return ParseReader(textReader, (uint)owl.Length);
     }
 
 

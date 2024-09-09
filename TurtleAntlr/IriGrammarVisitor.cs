@@ -70,7 +70,7 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
             _ => new IriReference(baseIriReference + iriString)
         };
     }
-    
+
     public void AddPrefix(string prefix, IriReference iri) =>
         _prefixes[prefix] = iri;
 

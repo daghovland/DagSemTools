@@ -40,7 +40,7 @@ public class TurtleListener : TurtleBaseListener
     /// <param name="context"></param>
     public static string GetStringExcludingLastColon(string prefixNs)
     {
-        if(prefixNs.Length >= 1 && prefixNs[^1] == ':')
+        if (prefixNs.Length >= 1 && prefixNs[^1] == ':')
         {
             return prefixNs.Substring(0, prefixNs.Length - 1);
         }
@@ -52,7 +52,7 @@ public class TurtleListener : TurtleBaseListener
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.SetBase(iri);
     }
-    
+
     public override void ExitPrefixId(TurtleParser.PrefixIdContext context)
     {
         var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());

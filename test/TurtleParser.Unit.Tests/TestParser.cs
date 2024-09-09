@@ -47,7 +47,7 @@ public class TestParser
         Assert.NotNull(ont);
     }
 
-    
+
     [Fact]
     public void TestDuplicateTriples()
     {
@@ -64,8 +64,8 @@ public class TestParser
         var subjectIri = ont.ResourceList[subjectId].iri;
         subjectIri.Should().Be("http://one.example/subject2");
     }
-    
-    
+
+
     [Fact]
     public void TestPrefixCanBeUpdated()
     {
@@ -75,9 +75,9 @@ public class TestParser
             PREFIX p: <http://two.example/>
             """);
         Assert.NotNull(ont);
-        
+
     }
-    
+
     [Fact]
     public void TestAllIriWritings()
     {
@@ -121,7 +121,7 @@ public class TestParser
                                """);
         ont.TripleCount.Should().Be(1);
         ont.TripleList[0].triple.subject.Should().BeGreaterOrEqualTo(0);
-        ont.TripleList[0].triple.predicate.Should().BeGreaterOrEqualTo(0);        
+        ont.TripleList[0].triple.predicate.Should().BeGreaterOrEqualTo(0);
     }
 
     [Fact]
@@ -171,23 +171,23 @@ public class TestParser
         var ont = TestOntology("""
                 @prefix : <http://example.org/> . 
                 :subject :predicate 1, 2, 3 .
-            """);   
+            """);
         Assert.NotNull(ont);
         ont.TripleCount.Should().Be(3);
     }
-    
-    
+
+
     [Fact]
     public void TestMultipleStringObjects()
     {
         var ont = TestOntology("""
                                    @prefix : <http://example.org/> . 
                                    :subject :predicate "string1", "string2", "3" .
-                               """);   
+                               """);
         Assert.NotNull(ont);
         ont.TripleCount.Should().Be(3);
     }
-    
+
     [Fact]
     public void Test1()
     {

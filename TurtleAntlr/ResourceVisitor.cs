@@ -27,13 +27,13 @@ public class ResourceVisitor : TurtleBaseVisitor<uint>
         TripleTable = tripleTable;
         _iriGrammarVisitor = iriGrammarVisitor;
     }
-    
+
     private UInt32 GetIriId(IriReference iri)
     {
         var resource = RDFStore.Resource.NewIri(iri);
         return TripleTable.AddResource(resource);
     }
-    
+
     public override uint VisitIri(IriContext ctxt)
     {
         var iri = _iriGrammarVisitor.Visit(ctxt);
@@ -53,7 +53,7 @@ public class ResourceVisitor : TurtleBaseVisitor<uint>
         var resource = RDFStore.Resource.NewDecimalLiteral(literal);
         return TripleTable.AddResource(resource);
     }
-    
+
     public override uint VisitDoubleLiteral(DoubleLiteralContext context)
     {
         double literal = double.Parse(context.DOUBLE().GetText(), CultureInfo.InvariantCulture);
@@ -64,14 +64,14 @@ public class ResourceVisitor : TurtleBaseVisitor<uint>
 
     public override uint VisitTrueBooleanLiteral(TrueBooleanLiteralContext context)
         => TripleTable.AddResource(RDFStore.Resource.NewBooleanLiteral(true));
-    
+
     public override uint VisitFalseBooleanLiteral(FalseBooleanLiteralContext context)
         => TripleTable.AddResource(RDFStore.Resource.NewBooleanLiteral(false));
-    
+
     public override uint VisitPlainStringLiteral(PlainStringLiteralContext context)
     {
         var literalString = _stringVisitor.Visit(context.@string());
-        var literal = RDFStore.Resource.NewLiteralString(literalString);       
+        var literal = RDFStore.Resource.NewLiteralString(literalString);
         return TripleTable.AddResource(literal);
     }
 
