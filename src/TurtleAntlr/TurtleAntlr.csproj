@@ -45,4 +45,12 @@
     <ItemGroup>
       <Folder Include="grammars\" />
     </ItemGroup>
+
+        <ItemGroup>
+        <None Update="README.md">
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </None>
+    </ItemGroup>
+
 </Project>
