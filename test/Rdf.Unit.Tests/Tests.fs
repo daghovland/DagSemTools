@@ -2,9 +2,10 @@ module Tests
 
 open System
 open IriTools
-open Rdf
+open AlcTableau
+open AlcTableau.Rdf
 open Xunit
-open Rdf.RDFStore
+open AlcTableau.Rdf.RDFStore
 
 [<Fact>]
 let ``Can add resource to tripletable`` () =

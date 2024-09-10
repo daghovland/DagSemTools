@@ -1,4 +1,4 @@
-namespace Api
+namespace AlcTableau.Api
 {
     /// <summary>
     /// Represents an RDF resource. https://www.w3.org/TR/rdf12-concepts/#resources-and-statements

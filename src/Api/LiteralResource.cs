@@ -1,4 +1,4 @@
-namespace Api;
+namespace AlcTableau.Api;
 
 /// <inheritdoc />
 public class LiteralResource : Resource

@@ -1,5 +1,7 @@
 namespace NugetTest;
 
+using AlcTableau.Api;
+
 public class UnitTest1
 {
     [Fact]

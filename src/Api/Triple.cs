@@ -1,7 +1,7 @@
 using IriTools;
-using Rdf;
+using AlcTableau.Rdf;
 
-namespace Api;
+namespace AlcTableau.Api;
 
 /// <summary>
 /// Represents a triple in RDF. https://www.w3.org/TR/rdf12-concepts/#dfn-rdf-triple

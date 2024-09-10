@@ -1,9 +1,8 @@
-namespace Rdf
+namespace AlcTableau.Rdf
 open RDFStore
 
 open System
 open System.Collections.Generic
-open Rdf.RDFStore
 
 
 

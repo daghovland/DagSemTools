@@ -9,7 +9,7 @@
     
     Contact: hovlanddag@gmail.com
 *)
-namespace Rdf
+namespace AlcTableau.Rdf
 
 open System
 open System.Resources

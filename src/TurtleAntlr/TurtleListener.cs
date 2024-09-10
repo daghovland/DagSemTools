@@ -1,7 +1,7 @@
 using AlcTableau.TurtleAntlr;
 using IriTools;
 using Microsoft.FSharp.Core;
-using Rdf;
+using AlcTableau.Rdf;
 namespace AlcTableau.TurtleAntlr;
 
 public class TurtleListener : TurtleBaseListener

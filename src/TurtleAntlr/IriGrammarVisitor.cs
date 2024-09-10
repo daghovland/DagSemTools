@@ -8,7 +8,7 @@
 
 using System.Globalization;
 using Microsoft.FSharp.Collections;
-using Rdf;
+using AlcTableau.Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 using System.Collections.Generic;

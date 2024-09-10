@@ -1,7 +1,7 @@
 using IriTools;
-using Rdf;
+using AlcTableau.Rdf;
 
-namespace Api;
+namespace AlcTableau.Api;
 
 /// <summary>
 /// Represents an RDF Graph https://www.w3.org/TR/rdf12-concepts/

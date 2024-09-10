@@ -1,6 +1,6 @@
 using AlcTableau.TurtleAntlr;
 
-namespace Api;
+namespace AlcTableau.Api;
 
 /// <summary>
 /// Parses a Turtle file into an RDF graph. https://www.w3.org/TR/rdf12-turtle/

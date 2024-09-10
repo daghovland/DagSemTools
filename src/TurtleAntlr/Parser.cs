@@ -10,7 +10,7 @@ using AlcTableau;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using IriTools;
-using Rdf;
+using AlcTableau.Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 
