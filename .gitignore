@@ -74,4 +74,6 @@ src/Api/bin
 src/Rdf/obj
 src/OwlApp/bin
 src/OwlApp/obj
+test/NugetTest/bin
+test/NugetTest/obj
 
