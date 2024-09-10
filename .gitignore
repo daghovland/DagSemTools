@@ -60,3 +60,18 @@ ManchesterAntlr/gen/
 
 .fake
 /.vscode/
+src/Api/bin
+src/Api/obj
+
+src/Manchester/bin
+src/Manchester/obj
+src/ManchesterAntlr/bin
+src/ManchesterAntlr/obj
+src/TurtleAntlr/bin
+src/TurtleAntlr/obj
+src/Rdf/bin
+src/Api/bin
+src/Rdf/obj
+src/OwlApp/bin
+src/OwlApp/obj
+
