@@ -24,7 +24,10 @@ jobs:
 
     - name: Restore dependencies
       run: dotnet restore ./AlcTableau.sln
-
+      
+    - name: Build Release
+      run: dotnet build --configuration Release ./AlcTableau.sln
+      
     - name: Format code
       run: dotnet format ./AlcTableau.sln --verbosity diagnostic --verify-no-changes --no-restore
 
