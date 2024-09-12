@@ -12,13 +12,13 @@ public class Graph : IGraph
     {
         Triples = triples;
     }
-internal TripleTable Triples { get; init; }
+    internal TripleTable Triples { get; init; }
 
-/// <inheritdoc />
-public bool isEmpty() => Triples.TripleCount == 0;
+    /// <inheritdoc />
+    public bool isEmpty() => Triples.TripleCount == 0;
 
-/// <inheritdoc />
-public IEnumerator<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj)
+    /// <inheritdoc />
+    public IEnumerator<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj)
     {
         throw new NotImplementedException();
     }

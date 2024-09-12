@@ -29,7 +29,7 @@ public static class Parser
         using TextReader textReader = File.OpenText(fInfo.FullName);
         return ParseReader(textReader, (uint)(fInfo.Length));
     }
-    
+
     public static TripleTable ParseReader(TextReader textReader, UInt32 init_size, Dictionary<string, IriReference> prefixes)
     {
 

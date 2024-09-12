@@ -7,7 +7,7 @@ namespace TurtleParser.Unit.Tests;
 
 public class TestParser
 {
-    
+
     public TripleTable TestOntology(string ontology)
     {
         return AlcTableau.TurtleAntlr.Parser.ParseString(ontology);

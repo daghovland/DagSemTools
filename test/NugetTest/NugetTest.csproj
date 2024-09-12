@@ -20,9 +20,15 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="AlcTableau.Rdf" />
-    <PackageReference Include="AlcTableau.TurtleAntlr" />
-    <PackageReference Include="AlcTableau.Api" />
+    <PackageReference Include="AlcTableau.Rdf" Version="0.1.0" />
+    <PackageReference Include="AlcTableau.Turtle" Version="0.1.0"/>
+    <PackageReference Include="AlcTableau.Api" Version="0.1.0"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="TestData\example1.ttl">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
   </ItemGroup>
 
 </Project>

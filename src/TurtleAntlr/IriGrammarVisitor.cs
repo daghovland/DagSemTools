@@ -28,12 +28,12 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
         _prefixes = prefixes;
     }
 
-    public FSharpList<ALC.prefixDeclaration> CreatePrefixList()
+    public FSharpList<RDFStore.prefixDeclaration> CreatePrefixList()
     {
-        var prefixList = new List<ALC.prefixDeclaration>();
+        var prefixList = new List<RDFStore.prefixDeclaration>();
         foreach (var kvp in _prefixes)
         {
-            var prefix = ALC.prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
+            var prefix = RDFStore.prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
             prefixList.Add(prefix);
         }
         return ListModule.OfSeq(prefixList);

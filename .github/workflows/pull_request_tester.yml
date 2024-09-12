@@ -30,3 +30,6 @@ jobs:
 
     - name: Run tests
       run: dotnet test ./AlcTableau.sln --no-restore
+      
+    - name: Run nuget package tests
+      run: dotnet test test/NugetTest/NugetTest.sln
