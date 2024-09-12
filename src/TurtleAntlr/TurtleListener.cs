@@ -1,7 +1,7 @@
 using AlcTableau.TurtleAntlr;
 using IriTools;
 using Microsoft.FSharp.Core;
-using Rdf;
+using AlcTableau.Rdf;
 namespace AlcTableau.TurtleAntlr;
 
 public class TurtleListener : TurtleBaseListener
@@ -21,7 +21,7 @@ public class TurtleListener : TurtleBaseListener
     }
 
     /// <summary>
-    /// Used to transform <iri> into iri in the handlers below
+    /// Used to transform input into iri in the handlers below
     /// </summary>
     /// <param name="input"></param>
     /// <returns></returns>

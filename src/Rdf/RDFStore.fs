@@ -9,7 +9,7 @@
     
     Contact: hovlanddag@gmail.com
 *)
-namespace Rdf
+namespace AlcTableau.Rdf
 
 open System
 open System.Resources
@@ -53,6 +53,12 @@ module RDFStore =
             next_object_predicate_list: TripleListLink
         }
 
+    type prefixDeclaration =
+        | PrefixDefinition of PrefixName: string * PrefixIri: IriReference
+    type prefixDeclaration with
+        member x.TryGetPrefixName() =
+            match x with
+            | PrefixDefinition (name, iri) -> (name, iri)
       
     
     

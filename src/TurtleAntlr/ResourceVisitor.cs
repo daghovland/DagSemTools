@@ -9,7 +9,7 @@
 
 using System.Globalization;
 using System.Security.Cryptography;
-using Rdf;
+using AlcTableau.Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 

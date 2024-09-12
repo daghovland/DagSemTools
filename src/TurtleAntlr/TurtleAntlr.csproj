@@ -5,7 +5,22 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
-    <RootNamespace>TurtleParser</RootNamespace>
+    <PackageReadMeFile>README.md</PackageReadMeFile>
+        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <PackageId>AlcTableau.Turtle</PackageId>
+        <Version>0.1.0</Version>
+        <Authors>Dag Hovland</Authors>
+        <Description>For parsing Rdf-1.2 Turtle</Description>
+        <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSource>true</IncludeSource>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
   </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
@@ -13,7 +28,6 @@
         <PackageReference Include="FSharp.Core" Version="8.0.400" />
     </ItemGroup>
     <ItemGroup>
-        <None Remove="grammars\Turtle.g4" />
         <Antlr4 Include="grammars\Turtle.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
@@ -23,11 +37,18 @@
         
     </ItemGroup>
     <ItemGroup>
-        <ProjectReference Include="..\ManchesterAntlr\ManchesterAntlr.csproj" />
-        <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
     </ItemGroup>
     <ItemGroup>
       <Folder Include="grammars\" />
     </ItemGroup>
+
+            <ItemGroup>
+              <Content Include="README.md">
+                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+                <Pack>true</Pack>
+                <PackagePath>README.md</PackagePath>
+              </Content>
+        </ItemGroup>
+
 </Project>

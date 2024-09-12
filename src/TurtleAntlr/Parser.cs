@@ -10,7 +10,7 @@ using AlcTableau;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using IriTools;
-using Rdf;
+using AlcTableau.Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 
@@ -22,6 +22,12 @@ public static class Parser
     {
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader, (uint)(new FileInfo(filename).Length));
+    }
+
+    public static TripleTable ParseFile(FileInfo fInfo)
+    {
+        using TextReader textReader = File.OpenText(fInfo.FullName);
+        return ParseReader(textReader, (uint)(fInfo.Length));
     }
 
     public static TripleTable ParseReader(TextReader textReader, UInt32 init_size, Dictionary<string, IriReference> prefixes)

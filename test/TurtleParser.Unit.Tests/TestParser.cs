@@ -1,4 +1,5 @@
 using AlcTableau;
+using AlcTableau.Rdf;
 using FluentAssertions;
 using IriTools;
 
@@ -6,7 +7,8 @@ namespace TurtleParser.Unit.Tests;
 
 public class TestParser
 {
-    public Rdf.TripleTable TestOntology(string ontology)
+
+    public TripleTable TestOntology(string ontology)
     {
         return AlcTableau.TurtleAntlr.Parser.ParseString(ontology);
 

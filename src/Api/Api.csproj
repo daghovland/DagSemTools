@@ -1,19 +1,21 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <OutputType>Library</OutputType>
         <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <OutputType>Library</OutputType>
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageId>AlcTableau.Rdf</PackageId>
+        <PackageId>AlcTableau.Api</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For Rdf, reasoning and querying</Description>
         <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
-
+        
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSource>true</IncludeSource>
@@ -22,17 +24,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Content Include="README.md">
-            <Pack>true</Pack>
-            <PackagePath>README.md</PackagePath>
-        </Content>
-        <Compile Include="RDFStore.fs" />
-        <Compile Include="TripleTable.fs" />
-    </ItemGroup>
-
-    <ItemGroup>
-        <PackageReference Include="IriTools" Version="2.2.0" />
-        <PackageReference Update="FSharp.Core" Version="8.0.400" />
+      <ProjectReference Include="..\Rdf\Rdf.fsproj" />
+      <ProjectReference Include="..\TurtleAntlr\TurtleAntlr.csproj" />
     </ItemGroup>
 
     <ItemGroup>
