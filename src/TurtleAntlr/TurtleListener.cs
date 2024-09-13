@@ -1,3 +1,4 @@
+using AlcTableau.Parser;
 using AlcTableau.TurtleAntlr;
 using IriTools;
 using Microsoft.FSharp.Core;
@@ -10,14 +11,16 @@ internal class TurtleListener : TurtleBaseListener
     private IriGrammarVisitor _iriGrammarVisitor;
     private ResourceVisitor _resourceVisitor;
     private FSharpOption<IriReference> _graphName;
+    private readonly IVistorErrorListener _errorListener;
     public TripleTable TripleTable { get; init; }
 
-    public TurtleListener(uint init_size)
+    public TurtleListener(uint initSize, IVistorErrorListener errorListener)
     {
-        TripleTable = new TripleTable(init_size);
+        TripleTable = new TripleTable(initSize);
         _graphName = FSharpOption<IriReference>.None;
         _iriGrammarVisitor = new IriGrammarVisitor();
         _resourceVisitor = new ResourceVisitor(TripleTable, _iriGrammarVisitor);
+        _errorListener = errorListener;
     }
 
     /// <summary>
