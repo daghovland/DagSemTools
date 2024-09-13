@@ -70,7 +70,7 @@ public class TestParser
                                                         Class: fam:Person
                                                         """, customErrorOutput);
         customErrorOutput.LastError.Should().Be("line 1:0 mismatched input 'Prefix' expecting {'Ontology:', 'Prefix:'}");
-        
+
     }
 
     [Fact]
@@ -82,9 +82,9 @@ public class TestParser
                                                         Class: fam:Person
                                                         """, customErrorOutput);
         customErrorOutput.LastError.Should().Be("line 2:7 Prefix fam not defined.");
-        
+
     }
-    
+
     [Fact]
     public void TestOntologyWithIri()
     {

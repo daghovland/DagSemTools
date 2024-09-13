@@ -22,7 +22,7 @@ public static class Parser
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader, errorOutput);
     }
-    
+
     public static ALC.OntologyDocument ParseReader(TextReader textReader, TextWriter errorOutput)
     {
         var input = new AntlrInputStream(textReader);

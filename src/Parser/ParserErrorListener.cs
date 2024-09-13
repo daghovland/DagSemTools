@@ -11,12 +11,12 @@ public class ParserErrorListener : IAntlrErrorListener<IToken>, IVistorErrorList
         : this(Console.Error)
     {
     }
-    
+
     public ParserErrorListener(TextWriter output)
     {
         this.output = output;
     }
-    
+
     /// <inheritdoc />
     public void SyntaxError(
         TextWriter _,
@@ -29,7 +29,7 @@ public class ParserErrorListener : IAntlrErrorListener<IToken>, IVistorErrorList
     {
         output.WriteLine($"line {line}:{charPositionInLine} {msg}");
     }
-    
+
     /// <inheritdoc />
     public void VisitorError(IToken offendingSymbol, int line, int charPositionInLine, string msg)
     {

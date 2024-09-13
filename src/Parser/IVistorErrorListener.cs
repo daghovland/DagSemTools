@@ -22,7 +22,7 @@ public interface IVistorErrorListener
         int line,
         int charPositionInLine,
         string msg);
-    
+
     /// <summary>
     /// Returns true if VisitorError was never called
     /// </summary>

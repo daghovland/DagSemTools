@@ -11,7 +11,7 @@ public static class Program
 {
 
 
-    public static IriReference testFile(string filename, TextWriter errorListener)  
+    public static IriReference testFile(string filename, TextWriter errorListener)
     {
         using TextReader text_reader = File.OpenText(filename);
 

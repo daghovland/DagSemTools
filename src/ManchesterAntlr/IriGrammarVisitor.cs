@@ -48,9 +48,9 @@ public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
 
     public override IriReference VisitPrefixedIri(PrefixedIriContext ctxt)
     {
-        if(!_prefixes.TryGetValue(ctxt.prefixName.Text, out var prefixedPart))
+        if (!_prefixes.TryGetValue(ctxt.prefixName.Text, out var prefixedPart))
         {
-            ErrorListener.VisitorError(ctxt.Start, ctxt.Start.Line, 
+            ErrorListener.VisitorError(ctxt.Start, ctxt.Start.Line,
                 ctxt.Start.Column, $"Prefix {ctxt.prefixName.Text} not defined.");
             return new IriReference("https://example.com/error!");
         }
@@ -60,7 +60,7 @@ public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
 
     public override IriReference VisitEmptyPrefixedIri(EmptyPrefixedIriContext ctxt)
     {
-        if(!_prefixes.TryGetValue("", out var prefixedPart))
+        if (!_prefixes.TryGetValue("", out var prefixedPart))
         {
             ErrorListener.VisitorError(ctxt.Start, ctxt.Start.Line, ctxt.Start.Column, "No default prefix defined.");
             return new IriReference("https://example.com/error!");

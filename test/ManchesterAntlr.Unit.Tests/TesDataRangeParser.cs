@@ -15,7 +15,7 @@ using IriTools;
 
 public class TestDataRangeParser
 {
-    
+
     public DataRange.Datarange testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
 
@@ -47,7 +47,7 @@ public class TestDataRangeParser
         this.output = output;
         this.testOutputTextWriter = new TestOutputTextWriter(output);
     }
-    
+
     [Fact]
     public void TestDatatypeInt()
     {

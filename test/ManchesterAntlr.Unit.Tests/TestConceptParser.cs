@@ -57,8 +57,8 @@ public class TestConceptParser
         _outputHelper = output;
         _testOutputTextWriter = new TestOutputTextWriter(output);
     }
-        
-    
+
+
 
     [Fact]
     public void TestConjunction()

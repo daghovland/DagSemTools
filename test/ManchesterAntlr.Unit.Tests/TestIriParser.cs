@@ -64,7 +64,7 @@ public class TestIriParser
         this.output = output;
         this.testOutputTextWriter = new TestOutputTextWriter(output);
     }
-    
+
 
     [Theory]
     [InlineData("http://example.com/ex")]
