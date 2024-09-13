@@ -7,6 +7,7 @@
 */
 
 using AlcTableau.ManchesterAntlr;
+using Antlr4.Runtime;
 using IriTools;
 
 namespace ManchesterAntlr;
@@ -16,18 +17,20 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
 {
     public IriGrammarVisitor IriGrammarVisitor { get; init; }
     private RoleVisitor _roleVisitor;
-    public ConceptVisitor()
-    : this(new IriGrammarVisitor())
-    { }
+    private IAntlrErrorListener<IToken> _errorListener;
+    public ConceptVisitor(IAntlrErrorListener<IToken> errorListener)
+    : this(new IriGrammarVisitor(errorListener))
+    { _errorListener = errorListener; }
     public ConceptVisitor(IriGrammarVisitor iriGrammarVisitor)
     {
         IriGrammarVisitor = iriGrammarVisitor;
-        _roleVisitor = new RoleVisitor(IriGrammarVisitor);
+        _errorListener = iriGrammarVisitor.ErrorListener;
+        _roleVisitor = new RoleVisitor(IriGrammarVisitor, _errorListener);
     }
 
 
-    public ConceptVisitor(Dictionary<string, IriReference> prefixes)
-    : this(new IriGrammarVisitor(prefixes))
+    public ConceptVisitor(Dictionary<string, IriReference> prefixes, IAntlrErrorListener<IToken> errorListener)
+    : this(new IriGrammarVisitor(prefixes, errorListener))
     { }
 
     public override ALC.Concept VisitIriPrimaryConcept(ManchesterParser.IriPrimaryConceptContext context)

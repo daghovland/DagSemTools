@@ -5,7 +5,7 @@ turtleDoc : statement* EOF;
 
 statement: directive | triples PERIOD;
 
-directive: prefix | base ;
+directive: prefix | baseDeclaration ;
 
 prefix: PREFIX_STRING PNAME_NS iri  #sparqlPrefix
     | ATPREFIX PNAME_NS iri PERIOD #prefixId
@@ -14,7 +14,7 @@ prefix: PREFIX_STRING PNAME_NS iri  #sparqlPrefix
 
 ATPREFIX : '@prefix' ;
 
-base: ATBASE ABSOLUTEIRIREF PERIOD 
+baseDeclaration: ATBASE ABSOLUTEIRIREF PERIOD 
     | BASE_STRING ABSOLUTEIRIREF 
     ;
 
@@ -72,13 +72,13 @@ booleanLiteral: 'true' #trueBooleanLiteral
     | 'false' #falseBooleanLiteral
     ;
 
-rdfLiteral: string #plainStringLiteral
-    | string LANG_DIR #langLiteral
-    | string '^^' iri? #typedLiteral
+rdfLiteral: stringLiteral #plainStringLiteral
+    | stringLiteral LANG_DIR #langLiteral
+    | stringLiteral '^^' iri? #typedLiteral
     ;
     
 
-string: string_single_quote | string_triple_quote;
+stringLiteral: string_single_quote | string_triple_quote;
  
 string_single_quote:  STRING_LITERAL_QUOTE  | STRING_LITERAL_SINGLE_QUOTE;
 string_triple_quote: STRING_LITERAL_LONG_SINGLE_QUOTE | STRING_LITERAL_LONG_QUOTE;

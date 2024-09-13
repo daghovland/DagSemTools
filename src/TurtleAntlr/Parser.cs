@@ -14,22 +14,42 @@ using AlcTableau.Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 
+/// <summary>
+/// Parser for the Turtle language.
+/// </summary>
 public static class Parser
 {
 
 
+    /// <summary>
+    /// Parses the content of the file containing RDF-1.2 Turtle. 
+    /// </summary>
+    /// <param name="filename"></param>
+    /// <returns></returns>
     public static TripleTable ParseFile(string filename)
     {
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader, (uint)(new FileInfo(filename).Length));
     }
 
+    /// <summary>
+    /// Parses the content of the file containing RDF-1.2 Turtle.
+    /// </summary>
+    /// <param name="fInfo"></param>
+    /// <returns></returns>
     public static TripleTable ParseFile(FileInfo fInfo)
     {
         using TextReader textReader = File.OpenText(fInfo.FullName);
         return ParseReader(textReader, (uint)(fInfo.Length));
     }
 
+    /// <summary>
+    /// Parses the content of the TextReader containing RDF-1.2 Turtle.
+    /// </summary>
+    /// <param name="textReader"></param>
+    /// <param name="init_size"></param>
+    /// <param name="prefixes"></param>
+    /// <returns></returns>
     public static TripleTable ParseReader(TextReader textReader, UInt32 init_size, Dictionary<string, IriReference> prefixes)
     {
 
@@ -37,7 +57,6 @@ public static class Parser
         var lexer = new TurtleLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         var parser = new TurtleParser(tokens);
-        parser.ErrorHandler = new BailErrorStrategy();
         IParseTree tree = parser.turtleDoc();
         ParseTreeWalker walker = new ParseTreeWalker();
         var listener = new TurtleListener(init_size);
@@ -45,9 +64,20 @@ public static class Parser
         return listener.TripleTable;
     }
 
+    /// <summary>
+    /// Parses the content of the TextReader containing RDF-1.2 Turtle.
+    /// </summary>
+    /// <param name="textReader"></param>
+    /// <param name="init_size"></param>
+    /// <returns></returns>
     public static TripleTable ParseReader(TextReader textReader, UInt32 init_size) =>
         ParseReader(textReader, init_size, new Dictionary<string, IriReference>());
 
+    /// <summary>
+    /// Parses the content of the string containing RDF-1.2 Turtle.
+    /// </summary>
+    /// <param name="owl"></param>
+    /// <returns></returns>
     public static TripleTable ParseString(string owl)
     {
         using TextReader textReader = new StringReader(owl);

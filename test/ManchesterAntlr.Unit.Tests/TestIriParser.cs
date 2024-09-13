@@ -10,35 +10,43 @@ public class TestIriParser
 {
 
 
-    public IriReference testFile(string filename)
+    public IriReference testFile(string filename, IAntlrErrorListener<IToken>? errorListener)
     {
-        using TextReader text_reader = File.OpenText(filename);
+        using TextReader textReader = File.OpenText(filename);
 
-        return testReader(text_reader);
+        return TestReader(textReader, errorListener);
 
     }
 
-    public IriReference testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes)
+    public IriReference TestReader(TextReader textReader, Dictionary<string, IriReference> prefixes, IAntlrErrorListener<IToken>? errorListener = null)
     {
 
-        var input = new AntlrInputStream(text_reader);
+        var input = new AntlrInputStream(textReader);
         var lexer = new ManchesterLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         var parser = new ManchesterParser(tokens);
         IParseTree tree = parser.rdfiri();
-        var visitor = new IriGrammarVisitor(prefixes);
+        IAntlrErrorListener<IToken> customErrorListener = new ConsoleErrorListener<IToken>();
+        if (errorListener != null)
+        {
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(errorListener);
+            customErrorListener = errorListener;
+        }
+
+        var visitor = new IriGrammarVisitor(prefixes, customErrorListener);
         return visitor.Visit(tree);
 
 
     }
 
-    public IriReference testReader(TextReader text_reader) =>
-        testReader(text_reader, new Dictionary<string, IriReference>());
+    public IriReference TestReader(TextReader textReader, IAntlrErrorListener<IToken>? errorListener = null) =>
+        TestReader(textReader, new Dictionary<string, IriReference>(), errorListener);
 
-    public IriReference testString(string owl)
+    public IriReference testString(string owl, IAntlrErrorListener<IToken>? errorListener = null)
     {
-        using TextReader text_reader = new StringReader(owl);
-        return testReader(text_reader);
+        using TextReader textReader = new StringReader(owl);
+        return TestReader(textReader, errorListener);
     }
     public IriReference testStringWithEmptyProefix(string owl)
     {
@@ -47,7 +55,7 @@ public class TestIriParser
             { "", new IriReference("https://example.com/vocab/ont#") }
         };
         using TextReader text_reader = new StringReader(owl);
-        return testReader(text_reader, prefixes);
+        return TestReader(text_reader, prefixes);
     }
 
 
@@ -86,7 +94,7 @@ public class TestIriParser
             { "ex", prefix }
         };
         using TextReader textReader = new StringReader("ex:className");
-        var parsedIri = testReader(textReader, prefixes);
+        var parsedIri = TestReader(textReader, prefixes);
         parsedIri.Should().BeEquivalentTo(new IriReference($"{prefix}className"));
     }
 
@@ -99,10 +107,10 @@ public class TestIriParser
             { "", prefix }
         };
         using TextReader textReader = new StringReader(":className");
-        var parsedIri = testReader(textReader, prefixes);
+        var parsedIri = TestReader(textReader, prefixes);
         parsedIri.Should().BeEquivalentTo(new IriReference($"{prefix}className"));
         using TextReader textReader2 = new StringReader("className");
-        var parsedIri2 = testReader(textReader2, prefixes);
+        var parsedIri2 = TestReader(textReader2, prefixes);
         parsedIri2.Should().BeEquivalentTo(new IriReference($"{prefix}className"));
     }
 

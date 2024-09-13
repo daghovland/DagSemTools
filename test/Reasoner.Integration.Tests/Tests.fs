@@ -121,4 +121,15 @@ let  Dexpi() =
         let state = ReasonerService.init kb
         let reasoner_result = ReasonerService.is_consistent state
         Assert.True(reasoner_result)
- 
+
+         
+[<Fact>]
+let  Boundaries() =
+    // Arrange
+    let doc = ManchesterAntlr.Parser.ParseFile("TestData/boundaries.owl")
+    // Act
+    match doc with
+    | Ontology (prefixes, version, kb) ->
+        let state = ReasonerService.init kb
+        let reasoner_result = ReasonerService.is_consistent state
+        Assert.True(reasoner_result) 

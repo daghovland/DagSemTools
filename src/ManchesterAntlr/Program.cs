@@ -9,15 +9,15 @@ public static class Program
 {
 
 
-    public static IriReference testFile(string filename)
+    public static IriReference testFile(string filename, IAntlrErrorListener<IToken>? errorListener = null)
     {
         using TextReader text_reader = File.OpenText(filename);
 
-        return testReader(text_reader);
+        return testReader(text_reader, errorListener);
 
     }
 
-    public static IriReference testReader(TextReader text_reader)
+    public static IriReference testReader(TextReader text_reader, IAntlrErrorListener<IToken>? errorListener = null)
     {
 
         // Create an input character stream from standard in
@@ -29,18 +29,24 @@ public static class Program
         // Create a parser that feeds off the token stream
         var parser = new IriGrammarParser(tokens);
         // Begin parsing at rule r
-
+        IAntlrErrorListener<IToken> customErrorListener = new ConsoleErrorListener<IToken>();
+        if (errorListener != null)
+        {
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(errorListener);
+            customErrorListener = errorListener;
+        }
         IParseTree tree = parser.rdfiri();
-        var visitor = new IriGrammarVisitor(new Dictionary<string, IriReference>());
+        var visitor = new IriGrammarVisitor(new Dictionary<string, IriReference>(), customErrorListener);
         return visitor.Visit(tree);
 
 
     }
 
-    public static IriReference testString(string owl)
+    public static IriReference testString(string owl, IAntlrErrorListener<IToken>? errorListener = null)
     {
         using TextReader text_reader = new StringReader(owl);
-        return testReader(text_reader);
+        return testReader(text_reader, errorListener);
     }
 
 

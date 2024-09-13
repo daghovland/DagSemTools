@@ -17,7 +17,7 @@ public class TestConceptParser
         return TestReader(textReader);
     }
 
-    private ALC.Concept TestReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
+    private ALC.Concept TestReader(TextReader textReader, Dictionary<string, IriReference> prefixes, IAntlrErrorListener<IToken>? errorListener = null)
     {
 
         var input = new AntlrInputStream(textReader);
@@ -26,12 +26,19 @@ public class TestConceptParser
         var parser = new ManchesterParser(tokens);
         parser.ErrorHandler = new BailErrorStrategy();
         IParseTree tree = parser.description();
-        var visitor = new ConceptVisitor(prefixes);
+        IAntlrErrorListener<IToken> customErrorListener = new ConsoleErrorListener<IToken>();
+        if (errorListener != null)
+        {
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(errorListener);
+            customErrorListener = errorListener;
+        }
+        var visitor = new ConceptVisitor(prefixes, customErrorListener);
         return visitor.Visit(tree);
     }
 
-    public ALC.Concept TestReader(TextReader textReader) =>
-        TestReader(textReader, new Dictionary<string, IriReference>());
+    public ALC.Concept TestReader(TextReader textReader, IAntlrErrorListener<IToken>? errorListener = null) =>
+        TestReader(textReader, new Dictionary<string, IriReference>(), errorListener);
     public ALC.Concept TestString(string owl)
     {
         using TextReader textReader = new StringReader(owl);

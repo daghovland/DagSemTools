@@ -8,6 +8,7 @@
 
 using AlcTableau;
 using AlcTableau.ManchesterAntlr;
+using Antlr4.Runtime;
 using IriTools;
 
 namespace ManchesterAntlr;
@@ -15,9 +16,11 @@ namespace ManchesterAntlr;
 public class RoleVisitor : ManchesterBaseVisitor<ALC.Role>
 {
     private IriGrammarVisitor _iriGrammarVisitor;
-    public RoleVisitor(IriGrammarVisitor iriGrammarVisitor)
+    private IAntlrErrorListener<IToken> _errorListener;
+    public RoleVisitor(IriGrammarVisitor iriGrammarVisitor, IAntlrErrorListener<IToken> errorListener)
     {
         _iriGrammarVisitor = iriGrammarVisitor;
+        _errorListener = errorListener;
     }
 
     public override ALC.Role VisitObjectPropertyExpression(ManchesterParser.ObjectPropertyExpressionContext context) =>

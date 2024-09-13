@@ -22,7 +22,7 @@ public class TestDataRangeParser
 
     }
 
-    public DataRange.Datarange testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes)
+    public DataRange.Datarange testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes, IAntlrErrorListener<IToken>? errorListener = null)
     {
 
         var input = new AntlrInputStream(text_reader);
@@ -30,7 +30,15 @@ public class TestDataRangeParser
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         var parser = new ManchesterParser(tokens);
         IParseTree tree = parser.dataRange();
-        var visitor = new DataRangeVisitor(prefixes);
+        IAntlrErrorListener<IToken> customErrorListener = new ConsoleErrorListener<IToken>();
+        if (errorListener != null)
+        {
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(errorListener);
+            customErrorListener = errorListener;
+        }
+
+        var visitor = new DataRangeVisitor(prefixes, customErrorListener);
         return visitor.Visit(tree);
 
 

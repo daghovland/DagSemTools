@@ -4,7 +4,7 @@ using Microsoft.FSharp.Core;
 using AlcTableau.Rdf;
 namespace AlcTableau.TurtleAntlr;
 
-public class TurtleListener : TurtleBaseListener
+internal class TurtleListener : TurtleBaseListener
 {
 
     private IriGrammarVisitor _iriGrammarVisitor;
@@ -37,7 +37,7 @@ public class TurtleListener : TurtleBaseListener
     /// <summary>
     /// Used to transform prefix: into prefix in the methods below
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="prefixNs"></param>
     public static string GetStringExcludingLastColon(string prefixNs)
     {
         if (prefixNs.Length >= 1 && prefixNs[^1] == ':')
@@ -46,7 +46,7 @@ public class TurtleListener : TurtleBaseListener
         }
         throw new Exception($"Invalid prefix {prefixNs}. Prefix should end with ':'");
     }
-    public override void ExitBase(TurtleParser.BaseContext context)
+    public override void ExitBaseDeclaration(TurtleParser.BaseDeclarationContext context)
     {
         var iriString = GetStringExcludingFirstAndLast(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);

@@ -16,33 +16,38 @@ namespace ManchesterAntlr;
 
 public static class Parser
 {
-
-    public static ALC.OntologyDocument ParseFile(string filename)
+    public static ALC.OntologyDocument ParseFile(string filename, IAntlrErrorListener<IToken>? errorListener = null)
     {
         using TextReader textReader = File.OpenText(filename);
-        return ParseReader(textReader);
+        return ParseReader(textReader, errorListener);
     }
-
-    public static ALC.OntologyDocument ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
+    
+    public static ALC.OntologyDocument ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes, IAntlrErrorListener<IToken>? errorListener = null)
     {
-
         var input = new AntlrInputStream(textReader);
         var lexer = new ManchesterLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         var parser = new ManchesterParser(tokens);
-        parser.ErrorHandler = new BailErrorStrategy();
+        IAntlrErrorListener<IToken> customErrorListener = new ConsoleErrorListener<IToken>();
+        if (errorListener != null)
+        {
+            parser.RemoveErrorListeners();
+            parser.AddErrorListener(errorListener);
+            customErrorListener = errorListener;
+        }
+
         IParseTree tree = parser.ontologyDocument();
-        var visitor = new ManchesterVisitor();
+        var visitor = new ManchesterVisitor(customErrorListener);
         return visitor.Visit(tree);
     }
 
-    public static ALC.OntologyDocument ParseReader(TextReader textReader) =>
-        ParseReader(textReader, new Dictionary<string, IriReference>());
+    public static ALC.OntologyDocument ParseReader(TextReader textReader, IAntlrErrorListener<IToken>? errorListener = null) =>
+        ParseReader(textReader, new Dictionary<string, IriReference>(), errorListener);
 
-    public static ALC.OntologyDocument ParseString(string owl)
+    public static ALC.OntologyDocument ParseString(string owl, IAntlrErrorListener<IToken>? errorListener = null)
     {
         using TextReader textReader = new StringReader(owl);
-        return ParseReader(textReader);
+        return ParseReader(textReader, errorListener);
     }
 
 

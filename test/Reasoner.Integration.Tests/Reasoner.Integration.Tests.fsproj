@@ -41,6 +41,9 @@
         <Content Include="TestData\simple_disjunction.owl">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+        <Content Include="TestData\boundaries.owl">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>

@@ -1,6 +1,6 @@
 namespace AlcTableau.TurtleAntlr;
 
-public class StringVisitor : TurtleBaseVisitor<string>
+internal class StringVisitor : TurtleBaseVisitor<string>
 {
     public override string VisitString_single_quote(TurtleParser.String_single_quoteContext context)
     {

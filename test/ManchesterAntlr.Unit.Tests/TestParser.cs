@@ -1,5 +1,6 @@
 using Antlr4.Runtime.Misc;
 using Microsoft.FSharp.Collections;
+using Xunit.Abstractions;
 
 namespace ManchesterAntlr.Unit.Tests;
 using Antlr4;
@@ -13,7 +14,13 @@ using ManchesterAntlr;
 
 public class TestParser
 {
-
+    private readonly ITestOutputHelper _output;
+    private TestErrorListener _errorListener;
+    public TestParser(ITestOutputHelper output)
+    {
+        _output = output;
+        _errorListener = new TestErrorListener(output);
+    }
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
     {
         var parsedOntology = ManchesterAntlr.Parser.ParseFile(filename);
@@ -52,6 +59,18 @@ public class TestParser
         parsed.Should().NotBeNull();
     }
 
+    [Fact]
+    public void TestErrorHandling()
+    {
+        var errorListener = new TestErrorListener(_output);
+        var parsed = ManchesterAntlr.Parser.ParseString("""
+                                                        Prefix: fam: <https://ex.com/owl2/families#>
+                                                        Ontology: <https://ex.com/owl2/families>
+                                                        Class fam:Person
+                                                        """, _errorListener);
+        _errorListener.ErrorString.Should().Be("line 1:0 mismatched input 'Prefix' expecting {'Ontology:', 'Prefix:'}");
+        
+    }
 
     [Fact]
     public void TestOntologyWithIri()

@@ -6,6 +6,8 @@
     Contact: hovlanddag@gmail.com
 */
 
+using Antlr4.Runtime;
+
 namespace AlcTableau.ManchesterAntlr;
 using System.Collections.Generic;
 using IriTools;
@@ -13,10 +15,12 @@ using static ManchesterParser;
 
 public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
 {
-    private Dictionary<string, IriReference> _prefixes;
-    public IriGrammarVisitor()
+    private readonly Dictionary<string, IriReference> _prefixes;
+    public readonly IAntlrErrorListener<IToken> ErrorListener;
+    public IriGrammarVisitor(IAntlrErrorListener<IToken> errorListener)
     {
         _prefixes = new Dictionary<string, IriReference>();
+        ErrorListener = errorListener;
         AddDefaultPrefixes();
     }
 
@@ -29,10 +33,11 @@ public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
         _prefixes.TryAdd("owl", new IriReference("https://www.w3.org/2002/07/owl#"));
     }
 
-    public IriGrammarVisitor(Dictionary<string, IriReference> prefixes)
+    public IriGrammarVisitor(Dictionary<string, IriReference> prefixes, IAntlrErrorListener<IToken> errorListener)
     {
         _prefixes = prefixes;
         AddDefaultPrefixes();
+        ErrorListener = errorListener;
     }
 
     public override IriReference VisitFullIri(FullIriContext ctxt)
@@ -49,7 +54,11 @@ public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
 
     public override IriReference VisitEmptyPrefixedIri(EmptyPrefixedIriContext ctxt)
     {
-        var prefixedPart = _prefixes[""];
+        if(!_prefixes.TryGetValue("", out var prefixedPart))
+        {
+            ErrorListener.SyntaxError(null, null, ctxt.Start, ctxt.Start.Line, ctxt.Start.Column, "No default prefix defined.", null);
+            return null;
+        }
         var iriString = $"{prefixedPart}{ctxt.simpleName.Text}";
         return new IriReference(iriString);
     }
