@@ -3,16 +3,19 @@ module Tests
 open System
 open AlcTableau
 open Tableau
+open TurtleParser.Unit.Tests
 open Xunit
 open ALC
 open IriTools
 open System.IO
+open Xunit.Abstractions
     
     
+ 
 [<Fact>]
-let  TestOntologyWithSubClassAndExistential() =
+let  TestOntologyWithSubClassAndExistential(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/subclasses.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("TestData/subclasses.owl", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -21,9 +24,9 @@ let  TestOntologyWithSubClassAndExistential() =
         Assert.True(reasoner_result)
     
 [<Fact>]
-let  TestSimplestContradiction() =
+let  TestSimplestContradiction(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/simplest_contradiction.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -32,9 +35,9 @@ let  TestSimplestContradiction() =
         Assert.False(reasoner_result)
    
 [<Fact>]
-let  TestAlcBoolExample() =
+let  TestAlcBoolExample(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/alc_tableau_ex.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -44,9 +47,9 @@ let  TestAlcBoolExample() =
     
     
 [<Fact>]
-let  TestDisjunction() =
+let  TestDisjunction(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/simple_disjunction.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -54,9 +57,9 @@ let  TestDisjunction() =
         let reasoner_result = ReasonerService.is_consistent state
         Assert.True(reasoner_result)
 [<Fact>]
-let  TestSubclassContradiction() =
+let  TestSubclassContradiction(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/subclass_contradiction.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -65,9 +68,9 @@ let  TestSubclassContradiction() =
         Assert.False(reasoner_result)
     
 [<Fact>]
-let  TestUniversalContradiction() =
+let  TestUniversalContradiction(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/simplest_universal_contradiction.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -76,9 +79,9 @@ let  TestUniversalContradiction() =
         Assert.False(reasoner_result)
     
 [<Fact>]
-let  TestLongOrBranching() =
+let  TestLongOrBranching(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/or-branching.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -88,9 +91,9 @@ let  TestLongOrBranching() =
     
     
 [<Fact(Skip= "Not implemented yet, See Issue https://github.com/daghovland/AlcTableau/issues/2")>]
-let  TestCycleCOntradiction() =
+let  TestCycleCOntradiction(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/cycle.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -100,9 +103,9 @@ let  TestCycleCOntradiction() =
     
         
 [<Fact>]
-let  ExistUniv() =
+let  ExistUniv(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/exist_univ.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -112,9 +115,9 @@ let  ExistUniv() =
  
          
 [<Fact>]
-let  Dexpi() =
+let  Dexpi(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/pandid.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->
@@ -124,9 +127,9 @@ let  Dexpi() =
 
          
 [<Fact>]
-let  Boundaries() =
+let  Boundaries(output : ITestOutputHelper) =
     // Arrange
-    let doc = ManchesterAntlr.Parser.ParseFile("TestData/boundaries.owl")
+    let doc = ManchesterAntlr.Parser.ParseFile("1", new TestOutputTextWriter(output))
     // Act
     match doc with
     | Ontology (prefixes, version, kb) ->

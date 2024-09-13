@@ -4,13 +4,10 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <RootNamespace>ClassLibrary1</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-      <Reference Include="Antlr4.Runtime.Standard">
-        <HintPath>..\..\..\..\..\.nuget\packages\antlr4.runtime.standard\4.13.1\lib\netstandard2.0\Antlr4.Runtime.Standard.dll</HintPath>
-      </Reference>
+      <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
     </ItemGroup>
-
+    
 </Project>

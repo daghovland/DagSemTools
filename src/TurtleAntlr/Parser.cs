@@ -66,6 +66,10 @@ public static class Parser
         ParseTreeWalker walker = new ParseTreeWalker();
         var listener = new TurtleListener(initSize, customErrorListener);
         walker.Walk(listener, tree);
+        if (customErrorListener.HasError)
+        {
+            throw new Exception("Syntax errors in Turtle file");
+        }
         return listener.TripleTable;
     }
 

@@ -17,11 +17,14 @@ public interface IVistorErrorListener
     /// <param name="charPositionInLine"></param>
     /// <param name="msg"></param>
     /// <param name="e"></param>
-    public void SyntaxError(
-        TextWriter output,
+    public void VisitorError(
         IToken offendingSymbol,
         int line,
         int charPositionInLine,
-        string msg,
-        RecognitionException e);
+        string msg);
+    
+    /// <summary>
+    /// Returns true if VisitorError was never called
+    /// </summary>
+    public bool HasError { get; }
 }

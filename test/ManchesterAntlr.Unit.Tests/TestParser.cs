@@ -1,5 +1,6 @@
 using Antlr4.Runtime.Misc;
 using Microsoft.FSharp.Collections;
+using TurtleParser.Unit.Tests;
 using Xunit.Abstractions;
 
 namespace ManchesterAntlr.Unit.Tests;
@@ -15,15 +16,15 @@ using ManchesterAntlr;
 public class TestParser
 {
     private readonly ITestOutputHelper _output;
-    private TestErrorListener _errorListener;
+    private TestOutputTextWriter _errorOutput;
     public TestParser(ITestOutputHelper output)
     {
         _output = output;
-        _errorListener = new TestErrorListener(output);
+        _errorOutput = new TestOutputTextWriter(output);
     }
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseFile(filename);
+        var parsedOntology = ManchesterAntlr.Parser.ParseFile(filename, _errorOutput);
         return TestOntology(parsedOntology);
     }
 
@@ -48,34 +49,46 @@ public class TestParser
 
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseString(ontology);
+        var parsedOntology = ManchesterAntlr.Parser.ParseString(ontology, _errorOutput);
         return TestOntology(parsedOntology);
     }
 
     [Fact]
     public void TestSmallestOntology()
     {
-        var parsed = ManchesterAntlr.Parser.ParseString("Ontology:");
+        var parsed = ManchesterAntlr.Parser.ParseString("Ontology:", _errorOutput);
         parsed.Should().NotBeNull();
     }
 
     [Fact]
     public void TestErrorHandling()
     {
-        var errorListener = new TestErrorListener(_output);
+        var customErrorOutput = new TestOutputTextWriter(_output);
         var parsed = ManchesterAntlr.Parser.ParseString("""
-                                                        Prefix: fam: <https://ex.com/owl2/families#>
+                                                        Prefix fam: <https://ex.com/owl2/families#>
                                                         Ontology: <https://ex.com/owl2/families>
-                                                        Class fam:Person
-                                                        """, _errorListener);
-        _errorListener.ErrorString.Should().Be("line 1:0 mismatched input 'Prefix' expecting {'Ontology:', 'Prefix:'}");
+                                                        Class: fam:Person
+                                                        """, customErrorOutput);
+        customErrorOutput.LastError.Should().Be("line 1:0 mismatched input 'Prefix' expecting {'Ontology:', 'Prefix:'}");
         
     }
 
     [Fact]
+    public void TestLackingPrefixErrorHandling()
+    {
+        var customErrorOutput = new TestOutputTextWriter(_output);
+        var parsed = ManchesterAntlr.Parser.ParseString("""
+                                                        Ontology: <https://ex.com/owl2/families>
+                                                        Class: fam:Person
+                                                        """, customErrorOutput);
+        customErrorOutput.LastError.Should().Be("line 2:7 Prefix fam not defined.");
+        
+    }
+    
+    [Fact]
     public void TestOntologyWithIri()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>");
+        var parsedOntology = ManchesterAntlr.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>", _errorOutput);
         parsedOntology.Should().NotBeNull();
 
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
@@ -359,7 +372,7 @@ public class TestParser
                     Ontology: 
                     Individual: a 
                         Types: A and s some F, B and s only F
-                    """
+                    """, _errorOutput
         );
     }
 
@@ -378,7 +391,7 @@ public class TestParser
                                            Ontology:  
                                            Individual: a 
                                                Facts: r b, s c
-                                           """
+                                           """, _errorOutput
         );
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
@@ -394,7 +407,7 @@ public class TestParser
     [Fact(Skip = "Not implemented yet, See Issue https://github.com/daghovland/AlcTableau/issues/2")]
     public void TestDefinitionExample()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/def_example.owl");
+        var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/def_example.owl", _errorOutput);
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var tboxAxioms = tbox.ToList();
         tboxAxioms.Should().HaveCount(2);
@@ -412,7 +425,7 @@ public class TestParser
                                                                 Datatype: NegInt
                                                                   Annotations: rdfs:comment "Negative Integer"
                                                                   EquivalentTo: integer[< 0]   
-                                                                """);
+                                                                """, _errorOutput);
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);
@@ -422,7 +435,7 @@ public class TestParser
     [Fact]
     public void TestAnnotationsExample()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/annotations.owl");
+        var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/annotations.owl", _errorOutput);
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);

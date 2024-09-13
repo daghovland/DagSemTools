@@ -1,5 +1,8 @@
 using AlcTableau;
+using AlcTableau.Parser;
 using Microsoft.FSharp.Collections;
+using TurtleParser.Unit.Tests;
+using Xunit.Abstractions;
 
 
 namespace ManchesterAntlr.Unit.Tests;
@@ -12,51 +15,43 @@ using IriTools;
 
 public class TestDataRangeParser
 {
-
-
-    public DataRange.Datarange testFile(string filename)
-    {
-        using TextReader text_reader = File.OpenText(filename);
-
-        return testReader(text_reader);
-
-    }
-
-    public DataRange.Datarange testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes, IAntlrErrorListener<IToken>? errorListener = null)
+    
+    public DataRange.Datarange testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
 
         var input = new AntlrInputStream(text_reader);
         var lexer = new ManchesterLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         var parser = new ManchesterParser(tokens);
+        var customErrorListener = new ParserErrorListener(errorOutput);
+        parser.RemoveErrorListeners();
+        parser.AddErrorListener(customErrorListener);
         IParseTree tree = parser.dataRange();
-        IAntlrErrorListener<IToken> customErrorListener = new ConsoleErrorListener<IToken>();
-        if (errorListener != null)
-        {
-            parser.RemoveErrorListeners();
-            parser.AddErrorListener(errorListener);
-            customErrorListener = errorListener;
-        }
-
         var visitor = new DataRangeVisitor(prefixes, customErrorListener);
         return visitor.Visit(tree);
-
-
     }
 
-    public DataRange.Datarange testReader(TextReader text_reader) =>
-        testReader(text_reader, new Dictionary<string, IriReference>());
+    public DataRange.Datarange testReader(TextReader text_reader, TextWriter errorOutput) =>
+        testReader(text_reader, new Dictionary<string, IriReference>(), errorOutput);
 
-    public DataRange.Datarange testString(string owl)
+    public DataRange.Datarange testString(string owl, TextWriter errorOutput)
     {
         using TextReader text_reader = new StringReader(owl);
-        return testReader(text_reader);
+        return testReader(text_reader, errorOutput);
     }
 
+    private ITestOutputHelper output;
+    private TestOutputTextWriter testOutputTextWriter;
+    public TestDataRangeParser(ITestOutputHelper output)
+    {
+        this.output = output;
+        this.testOutputTextWriter = new TestOutputTextWriter(output);
+    }
+    
     [Fact]
     public void TestDatatypeInt()
     {
-        var parsedDataRange = testString("integer");
+        var parsedDataRange = testString("integer", testOutputTextWriter);
         var expectedDataRange = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#integer");
         parsedDataRange.Should().BeEquivalentTo(expectedDataRange);
     }
@@ -64,7 +59,7 @@ public class TestDataRangeParser
     [Fact]
     public void TestRestrictedInt()
     {
-        var parsedDataRange = testString("integer[< 0]");
+        var parsedDataRange = testString("integer[< 0]", testOutputTextWriter);
         var xsd_int = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#integer");
         var expected_facet = new Tuple<DataRange.facet, string>(DataRange.facet.LessThan, "0");
         var expexted =
@@ -76,7 +71,7 @@ public class TestDataRangeParser
     [Fact]
     public void TestRestrictedString()
     {
-        var parsedDataRange = testString("string[length 5]");
+        var parsedDataRange = testString("string[length 5]", testOutputTextWriter);
         var xsd_int = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#string");
         var expected_facet = new Tuple<DataRange.facet, string>(DataRange.facet.Length, "5");
         var expexted =

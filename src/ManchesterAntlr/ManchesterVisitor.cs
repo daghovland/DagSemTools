@@ -7,6 +7,7 @@
 */
 
 using System.Runtime.Loader;
+using AlcTableau.Parser;
 using Antlr4.Runtime;
 using ManchesterAntlr;
 using Microsoft.FSharp.Collections;
@@ -22,9 +23,9 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
 {
     private ConceptVisitor? _conceptVisitor;
     private FrameVisitor? _frameVisitor;
-    private IAntlrErrorListener<IToken> _errorListener;
+    private IVistorErrorListener _errorListener;
     
-    public ManchesterVisitor(IAntlrErrorListener<IToken> errorListener)
+    public ManchesterVisitor(IVistorErrorListener errorListener)
     {
         _errorListener = errorListener;
     }

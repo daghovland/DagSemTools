@@ -5,10 +5,12 @@ namespace TurtleParser.Unit.Tests;
 
 public class TestOutputTextWriter(ITestOutputHelper output) : TextWriter
 {
+    public string LastError { get; private set; } = "";
     public override Encoding Encoding => Encoding.UTF8;
 
     public override void WriteLine(string? value)
     {
+        LastError = value ?? "";
         output.WriteLine(value);
     }
 

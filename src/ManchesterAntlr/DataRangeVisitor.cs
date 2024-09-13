@@ -6,6 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
+using AlcTableau.Parser;
 using Antlr4.Runtime;
 using IriTools;
 using ManchesterAntlr;
@@ -16,20 +17,20 @@ namespace AlcTableau.ManchesterAntlr;
 public class DataRangeVisitor : ManchesterBaseVisitor<AlcTableau.DataRange.Datarange>
 {
     DatatypeRestrictionVisitor _datatypeRestrictionVisitor = new DatatypeRestrictionVisitor();
-    IAntlrErrorListener<IToken> _errorListener;
+    IVistorErrorListener _errorListener;
     public IriGrammarVisitor IriGrammarVisitor { get; init; }
-    public DataRangeVisitor(IAntlrErrorListener<IToken> errorListener)
+    public DataRangeVisitor(IVistorErrorListener errorListener)
     {
         IriGrammarVisitor = new IriGrammarVisitor(errorListener);
         _errorListener = errorListener;
     }
-    public DataRangeVisitor(IriGrammarVisitor iriGrammarVisitor, IAntlrErrorListener<IToken> errorListener)
+    public DataRangeVisitor(IriGrammarVisitor iriGrammarVisitor, IVistorErrorListener errorListener)
     {
         IriGrammarVisitor = iriGrammarVisitor;
         _errorListener = errorListener;
     }
 
-    public DataRangeVisitor(Dictionary<string, IriReference> prefixes, IAntlrErrorListener<IToken> errorListener)
+    public DataRangeVisitor(Dictionary<string, IriReference> prefixes, IVistorErrorListener errorListener)
     {
         _errorListener = errorListener;
         IriGrammarVisitor = new IriGrammarVisitor(prefixes, _errorListener);
