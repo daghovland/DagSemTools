@@ -34,7 +34,7 @@ module RDFStore =
         | DateLiteral of literalDate: DateOnly
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
-    type TripleListIndex = int
+    type TripleListIndex = uint
     [<Struct>]
     type TripleListLink =
         | ArrayIndex of index: TripleListIndex

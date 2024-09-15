@@ -34,3 +34,40 @@ let ``Can add triple to tripletable`` () =
     Assert.Equal(1u, tripleTable.TripleCount)
     let mappedTriple = tripleTable.TripleList.[0]
     Assert.Equal(Triple, mappedTriple.triple)
+    
+    
+    
+[<Fact>]
+let ``Can query with subject to tripletable`` () =
+    let tripleTable = Rdf.TripleTable(60u)
+    let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+    let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    tripleTable.AddTriple(Triple)
+    let query = tripleTable.GetTriplesWithSubject(subjectIndex)
+    Assert.Single(query)
+    
+    
+[<Fact>]
+let ``Can query with object to tripletable`` () =
+    let tripleTable = Rdf.TripleTable(60u)
+    let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+    let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    tripleTable.AddTriple(Triple)
+    let query = tripleTable.GetTriplesWithObject(objdIndex)
+    Assert.Single(query)
+    
+    
+[<Fact>]
+let ``Can query with predicate to tripletable`` () =
+    let tripleTable = Rdf.TripleTable(60u)
+    let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+    let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    tripleTable.AddTriple(Triple)
+    let query = tripleTable.GetTriplesWithPredicate(predIndex)
+    Assert.Single(query)
