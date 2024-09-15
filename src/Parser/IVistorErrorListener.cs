@@ -11,12 +11,10 @@ public interface IVistorErrorListener
     /// <summary>
     /// The method that is called by the visitor when a syntax error is encountered
     /// </summary>
-    /// <param name="output"></param>
     /// <param name="offendingSymbol"></param>
     /// <param name="line"></param>
     /// <param name="charPositionInLine"></param>
     /// <param name="msg"></param>
-    /// <param name="e"></param>
     public void VisitorError(
         IToken offendingSymbol,
         int line,

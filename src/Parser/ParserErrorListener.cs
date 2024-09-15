@@ -2,19 +2,29 @@
 
 namespace AlcTableau.Parser;
 
+/// <inheritdoc />
 public class ParserErrorListener : IAntlrErrorListener<IToken>, IVistorErrorListener
 {
-    private TextWriter output;
+    private readonly TextWriter _output;
+
+    /// <inheritdoc />
     public bool HasError { get; private set; } = false;
 
+    /// <summary>
+    /// 
+    /// </summary>
     public ParserErrorListener()
         : this(Console.Error)
     {
     }
 
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="output"></param>
     public ParserErrorListener(TextWriter output)
     {
-        this.output = output;
+        this._output = output;
     }
 
     /// <inheritdoc />
@@ -27,13 +37,13 @@ public class ParserErrorListener : IAntlrErrorListener<IToken>, IVistorErrorList
         string msg,
         RecognitionException e)
     {
-        output.WriteLine($"line {line}:{charPositionInLine} {msg}");
+        _output.WriteLine($"line {line}:{charPositionInLine} {msg}");
     }
 
     /// <inheritdoc />
     public void VisitorError(IToken offendingSymbol, int line, int charPositionInLine, string msg)
     {
-        output.WriteLine($"line {line}:{charPositionInLine} {msg}");
+        _output.WriteLine($"line {line}:{charPositionInLine} {msg}");
         HasError = true;
     }
 
