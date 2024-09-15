@@ -6,7 +6,7 @@ using AlcTableau.Api;
 
 public class TestApi(ITestOutputHelper output)
 {
-  TestOutputTextWriter outputWriter = new TestOutputTextWriter(output);
+    TestOutputTextWriter outputWriter = new TestOutputTextWriter(output);
 
     [Fact]
     public void Test1()
