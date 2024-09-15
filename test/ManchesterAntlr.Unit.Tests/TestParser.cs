@@ -124,7 +124,7 @@ public class TestParser
     [Fact]
     public void TestWrongOntology()
     {
-        var ontologyString ="""
+        var ontologyString = """
                          Prefax: ex: <https://example.com/> 
                          Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                          Class: ex:Class
@@ -132,7 +132,7 @@ public class TestParser
         var customErrorOutput = new TestOutputTextWriter(_output);
         var parsedOntology = ManchesterAntlr.Parser.ParseString(ontologyString, customErrorOutput);
         customErrorOutput.LastError.Should().Be("line 1:0 mismatched input 'Prefax' expecting {'Ontology:', 'Prefix:'}");
-        
+
     }
 
     [Fact]
