@@ -124,23 +124,27 @@ public class TestParser
     [Fact]
     public void TestWrongOntology()
     {
-        var ontologyTester = () => TestOntology("""
+        var ontologyString ="""
                          Prefax: ex: <https://example.com/> 
                          Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                          Class: ex:Class
-                         """);
-        ontologyTester.Should().Throw<ParseCanceledException>();
+                         """;
+        var customErrorOutput = new TestOutputTextWriter(_output);
+        var parsedOntology = ManchesterAntlr.Parser.ParseString(ontologyString, customErrorOutput);
+        customErrorOutput.LastError.Should().Be("line 1:0 mismatched input 'Prefax' expecting {'Ontology:', 'Prefix:'}");
+        
     }
 
     [Fact]
     public void TestWrongOntology2()
     {
-        var ontologyTester = () => TestOntology("""
+        var customErrorOutput = new TestOutputTextWriter(_output);
+        var parsedOntology = ManchesterAntlr.Parser.ParseString("""
                                                 Prefix: ex: <https://example.com/> 
                                                 Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                                 Class: ax:Class
-                                                """);
-        ontologyTester.Should().Throw<KeyNotFoundException>();
+                                                """, customErrorOutput);
+        customErrorOutput.LastError.Should().Be("line 3:7 Prefix ax not defined.");
     }
 
     [Fact]
