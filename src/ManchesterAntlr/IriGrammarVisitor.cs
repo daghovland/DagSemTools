@@ -6,6 +6,9 @@
     Contact: hovlanddag@gmail.com
 */
 
+using AlcTableau.Parser;
+using Antlr4.Runtime;
+
 namespace AlcTableau.ManchesterAntlr;
 using System.Collections.Generic;
 using IriTools;
@@ -13,10 +16,12 @@ using static ManchesterParser;
 
 public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
 {
-    private Dictionary<string, IriReference> _prefixes;
-    public IriGrammarVisitor()
+    private readonly Dictionary<string, IriReference> _prefixes;
+    public readonly IVistorErrorListener ErrorListener;
+    public IriGrammarVisitor(IVistorErrorListener errorListener)
     {
         _prefixes = new Dictionary<string, IriReference>();
+        ErrorListener = errorListener;
         AddDefaultPrefixes();
     }
 
@@ -29,10 +34,11 @@ public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
         _prefixes.TryAdd("owl", new IriReference("https://www.w3.org/2002/07/owl#"));
     }
 
-    public IriGrammarVisitor(Dictionary<string, IriReference> prefixes)
+    public IriGrammarVisitor(Dictionary<string, IriReference> prefixes, IVistorErrorListener errorListener)
     {
         _prefixes = prefixes;
         AddDefaultPrefixes();
+        ErrorListener = errorListener;
     }
 
     public override IriReference VisitFullIri(FullIriContext ctxt)
@@ -42,14 +48,23 @@ public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
 
     public override IriReference VisitPrefixedIri(PrefixedIriContext ctxt)
     {
-        var prefixedPart = _prefixes[ctxt.prefixName.Text];
+        if (!_prefixes.TryGetValue(ctxt.prefixName.Text, out var prefixedPart))
+        {
+            ErrorListener.VisitorError(ctxt.Start, ctxt.Start.Line,
+                ctxt.Start.Column, $"Prefix {ctxt.prefixName.Text} not defined.");
+            return new IriReference("https://example.com/error!");
+        }
         var iriString = $"{prefixedPart}{ctxt.localName.Text}";
         return new IriReference(iriString);
     }
 
     public override IriReference VisitEmptyPrefixedIri(EmptyPrefixedIriContext ctxt)
     {
-        var prefixedPart = _prefixes[""];
+        if (!_prefixes.TryGetValue("", out var prefixedPart))
+        {
+            ErrorListener.VisitorError(ctxt.Start, ctxt.Start.Line, ctxt.Start.Column, "No default prefix defined.");
+            return new IriReference("https://example.com/error!");
+        }
         var iriString = $"{prefixedPart}{ctxt.simpleName.Text}";
         return new IriReference(iriString);
     }

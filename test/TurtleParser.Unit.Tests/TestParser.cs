@@ -2,15 +2,23 @@ using AlcTableau;
 using AlcTableau.Rdf;
 using FluentAssertions;
 using IriTools;
+using Xunit.Abstractions;
 
 namespace TurtleParser.Unit.Tests;
 
-public class TestParser
+public class TestParser : IDisposable, IAsyncDisposable
 {
 
+    private ITestOutputHelper _output;
+    private TextWriter _outputWriter;
+    public TestParser(ITestOutputHelper output)
+    {
+        _output = output;
+        _outputWriter = new TestOutputTextWriter(_output);
+    }
     public TripleTable TestOntology(string ontology)
     {
-        return AlcTableau.TurtleAntlr.Parser.ParseString(ontology);
+        return AlcTableau.TurtleAntlr.Parser.ParseString(ontology, _outputWriter);
 
     }
 
@@ -196,5 +204,15 @@ public class TestParser
         var ontology = File.ReadAllText("example1.ttl");
         var ont = TestOntology(ontology);
         Assert.NotNull(ont);
+    }
+
+    public void Dispose()
+    {
+        _outputWriter.Dispose();
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        await _outputWriter.DisposeAsync();
     }
 }

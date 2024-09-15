@@ -7,6 +7,8 @@
 */
 
 using System.Runtime.Loader;
+using AlcTableau.Parser;
+using Antlr4.Runtime;
 using ManchesterAntlr;
 using Microsoft.FSharp.Collections;
 
@@ -21,6 +23,12 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
 {
     private ConceptVisitor? _conceptVisitor;
     private FrameVisitor? _frameVisitor;
+    private IVistorErrorListener _errorListener;
+
+    public ManchesterVisitor(IVistorErrorListener errorListener)
+    {
+        _errorListener = errorListener;
+    }
 
     private readonly Dictionary<string, IriReference> _prefixes = new Dictionary<string, IriReference>();
 
@@ -36,9 +44,17 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
                 throw new Exception("Unknown prefix declaration type");
         }
 
-        _conceptVisitor = new ConceptVisitor(_prefixes);
+        _conceptVisitor = new ConceptVisitor(_prefixes, _errorListener);
         _frameVisitor = new FrameVisitor(_conceptVisitor);
-        return Visit(ctxt.ontology());
+        return ctxt.ontology() switch
+        {
+            null => ALC.OntologyDocument.NewOntology(
+                CreatePrefixList(),
+                ALC.ontologyVersion.UnNamedOntology,
+                System.Tuple.Create(ListModule.Empty<ALC.TBoxAxiom>(), ListModule.Empty<ALC.ABoxAssertion>())
+            ),
+            _ => Visit(ctxt.ontology())
+        };
     }
 
     public static IEnumerable<T> concateOrKeep<T>(IEnumerable<T> a, IEnumerable<T>? b) =>

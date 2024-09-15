@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using IriTools;
 using static TurtleParser;
 
-public class ResourceVisitor : TurtleBaseVisitor<uint>
+internal class ResourceVisitor : TurtleBaseVisitor<uint>
 {
     private StringVisitor _stringVisitor = new();
     private IriGrammarVisitor _iriGrammarVisitor;
@@ -70,21 +70,21 @@ public class ResourceVisitor : TurtleBaseVisitor<uint>
 
     public override uint VisitPlainStringLiteral(PlainStringLiteralContext context)
     {
-        var literalString = _stringVisitor.Visit(context.@string());
+        var literalString = _stringVisitor.Visit(context.stringLiteral());
         var literal = RDFStore.Resource.NewLiteralString(literalString);
         return TripleTable.AddResource(literal);
     }
 
     public override uint VisitLangLiteral(LangLiteralContext context)
     {
-        var literalString = _stringVisitor.Visit(context.@string());
+        var literalString = _stringVisitor.Visit(context.stringLiteral());
         var langDir = context.LANG_DIR().GetText();
         var literal = RDFStore.Resource.NewLangLiteral(literalString, langDir);
         return TripleTable.AddResource(literal);
     }
     public override uint VisitTypedLiteral(TypedLiteralContext context)
     {
-        var literalString = _stringVisitor.Visit(context.@string());
+        var literalString = _stringVisitor.Visit(context.stringLiteral());
         IriReference typeIri = _iriGrammarVisitor.Visit(context.iri());
         RDFStore.Resource typedLiteral = typeIri.ToString() switch
         {

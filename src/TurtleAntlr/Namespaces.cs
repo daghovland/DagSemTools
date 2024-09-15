@@ -2,6 +2,9 @@ using IriTools;
 
 namespace AlcTableau.TurtleAntlr;
 
+/// <summary>
+/// Namespaces and IRIs used in the Turtle language.
+/// </summary>
 public static class Namespaces
 {
     internal const string Rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";

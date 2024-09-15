@@ -1,23 +1,26 @@
+using AlcTableau.Parser;
 using AlcTableau.TurtleAntlr;
 using IriTools;
 using Microsoft.FSharp.Core;
 using AlcTableau.Rdf;
 namespace AlcTableau.TurtleAntlr;
 
-public class TurtleListener : TurtleBaseListener
+internal class TurtleListener : TurtleBaseListener
 {
 
     private IriGrammarVisitor _iriGrammarVisitor;
     private ResourceVisitor _resourceVisitor;
     private FSharpOption<IriReference> _graphName;
+    private readonly IVistorErrorListener _errorListener;
     public TripleTable TripleTable { get; init; }
 
-    public TurtleListener(uint init_size)
+    public TurtleListener(uint initSize, IVistorErrorListener errorListener)
     {
-        TripleTable = new TripleTable(init_size);
+        TripleTable = new TripleTable(initSize);
         _graphName = FSharpOption<IriReference>.None;
         _iriGrammarVisitor = new IriGrammarVisitor();
         _resourceVisitor = new ResourceVisitor(TripleTable, _iriGrammarVisitor);
+        _errorListener = errorListener;
     }
 
     /// <summary>
@@ -37,7 +40,7 @@ public class TurtleListener : TurtleBaseListener
     /// <summary>
     /// Used to transform prefix: into prefix in the methods below
     /// </summary>
-    /// <param name="context"></param>
+    /// <param name="prefixNs"></param>
     public static string GetStringExcludingLastColon(string prefixNs)
     {
         if (prefixNs.Length >= 1 && prefixNs[^1] == ':')
@@ -46,7 +49,7 @@ public class TurtleListener : TurtleBaseListener
         }
         throw new Exception($"Invalid prefix {prefixNs}. Prefix should end with ':'");
     }
-    public override void ExitBase(TurtleParser.BaseContext context)
+    public override void ExitBaseDeclaration(TurtleParser.BaseDeclarationContext context)
     {
         var iriString = GetStringExcludingFirstAndLast(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);

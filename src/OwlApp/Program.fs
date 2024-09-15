@@ -22,7 +22,7 @@ open System.IO
 let filename = Environment.GetCommandLineArgs().[1]
 let ontologyText = System.IO.File.ReadAllText(filename)
 
-let parsedOntology = ManchesterAntlr.Parser.ParseFile(filename)
+let parsedOntology = ManchesterAntlr.Parser.ParseFile(filename, Console.Error)
 
 match parsedOntology with
     | Ontology (prefixes, version, kb) ->

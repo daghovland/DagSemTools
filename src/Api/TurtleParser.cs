@@ -11,11 +11,12 @@ public static class TurtleParser
     /// <summary>
     /// Parses a Turtle file into an RDF graph.
     /// </summary>
-    /// <param name="rdf_file"></param>
+    /// <param name="rdfFile">A file with Turtle RDf content</param>
+    /// <param name="errorOutput">The stream where parser errors are output. Try Console.Error</param>
     /// <returns></returns>
-    public static IGraph Parse(FileInfo rdf_file)
+    public static IGraph Parse(FileInfo rdfFile, TextWriter errorOutput)
     {
-        var tt = Parser.ParseFile(rdf_file);
+        var tt = AlcTableau.TurtleAntlr.Parser.ParseFile(rdfFile, errorOutput);
         return new Graph(tt);
     }
 }

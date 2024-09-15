@@ -33,6 +33,7 @@
 	</ItemGroup>
       <ItemGroup>
         <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\Parser\Parser.csproj" />
     </ItemGroup>
       
 </Project>

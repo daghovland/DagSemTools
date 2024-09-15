@@ -8,6 +8,7 @@
 
 using AlcTableau;
 using AlcTableau.ManchesterAntlr;
+using AlcTableau.Parser;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using IriTools;
@@ -16,33 +17,30 @@ namespace ManchesterAntlr;
 
 public static class Parser
 {
-
-    public static ALC.OntologyDocument ParseFile(string filename)
+    public static ALC.OntologyDocument ParseFile(string filename, TextWriter errorOutput)
     {
         using TextReader textReader = File.OpenText(filename);
-        return ParseReader(textReader);
+        return ParseReader(textReader, errorOutput);
     }
 
-    public static ALC.OntologyDocument ParseReader(TextReader textReader, Dictionary<string, IriReference> prefixes)
+    public static ALC.OntologyDocument ParseReader(TextReader textReader, TextWriter errorOutput)
     {
-
         var input = new AntlrInputStream(textReader);
         var lexer = new ManchesterLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         var parser = new ManchesterParser(tokens);
-        parser.ErrorHandler = new BailErrorStrategy();
+        var customErrorListener = new ParserErrorListener(errorOutput);
+        parser.RemoveErrorListeners();
+        parser.AddErrorListener(customErrorListener);
         IParseTree tree = parser.ontologyDocument();
-        var visitor = new ManchesterVisitor();
+        var visitor = new ManchesterVisitor(customErrorListener);
         return visitor.Visit(tree);
     }
 
-    public static ALC.OntologyDocument ParseReader(TextReader textReader) =>
-        ParseReader(textReader, new Dictionary<string, IriReference>());
-
-    public static ALC.OntologyDocument ParseString(string owl)
+    public static ALC.OntologyDocument ParseString(string owl, TextWriter errorOutput)
     {
         using TextReader textReader = new StringReader(owl);
-        return ParseReader(textReader);
+        return ParseReader(textReader, errorOutput);
     }
 
 

@@ -22,6 +22,7 @@
     <ItemGroup>
       <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
       <ProjectReference Include="..\..\src\TurtleAntlr\TurtleAntlr.csproj" />
+      <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>
 
     <ItemGroup>
