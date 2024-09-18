@@ -34,25 +34,15 @@ module RDFStore =
         | DateLiteral of literalDate: DateOnly
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
-    type TripleListIndex = int
-    [<Struct>]
-    type TripleListLink =
-        | ArrayIndex of index: TripleListIndex
-        | End
+    type TripleListIndex = uint
+        
     [<Struct>]
     type Triple = {
             subject: ResourceId
             predicate: ResourceId
             object: ResourceId
         }
-    [<Struct>]
-    type TripleListEntry = {
-            triple: Triple
-            next_subject_predicate_list: TripleListLink
-            next_predicate_list: TripleListLink
-            next_object_predicate_list: TripleListLink
-        }
-
+    
     type prefixDeclaration =
         | PrefixDefinition of PrefixName: string * PrefixIri: IriReference
     type prefixDeclaration with
