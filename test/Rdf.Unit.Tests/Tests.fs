@@ -33,7 +33,7 @@ let ``Can add triple to tripletable`` () =
     Assert.Equal(3u, tripleTable.ResourceCount)
     Assert.Equal(1u, tripleTable.TripleCount)
     let mappedTriple = tripleTable.TripleList.[0]
-    Assert.Equal(Triple, mappedTriple.triple)
+    Assert.Equal(Triple, mappedTriple)
     
     
     

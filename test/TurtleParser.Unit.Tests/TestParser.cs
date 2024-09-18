@@ -70,7 +70,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """);
         Assert.NotNull(ont);
         ont.TripleCount.Should().Be(1);
-        var subjectId = ont.TripleList[0].triple.subject;
+        var subjectId = ont.TripleList[0].subject;
         var subjectIri = ont.ResourceList[subjectId].iri;
         subjectIri.Should().Be("http://one.example/subject2");
     }
@@ -130,8 +130,8 @@ public class TestParser : IDisposable, IAsyncDisposable
                                p:subject4 p:predicate4 p:object4 .     # prefixed name, e.g., http://one.example/path/subject4
                                """);
         ont.TripleCount.Should().Be(1);
-        ont.TripleList[0].triple.subject.Should().BeGreaterOrEqualTo(0);
-        ont.TripleList[0].triple.predicate.Should().BeGreaterOrEqualTo(0);
+        ont.TripleList[0].subject.Should().BeGreaterOrEqualTo(0);
+        ont.TripleList[0].predicate.Should().BeGreaterOrEqualTo(0);
     }
 
     [Fact]
@@ -169,7 +169,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """);
         Assert.NotNull(ont);
         ont.TripleCount.Should().Be(1);
-        var triple = ont.TripleList[0].triple;
+        var triple = ont.TripleList[0];
         triple.subject.Should().BeGreaterOrEqualTo(0);
         triple.predicate.Should().BeGreaterOrEqualTo(0);
         triple.@object.Should().BeGreaterOrEqualTo(0);
