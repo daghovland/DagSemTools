@@ -107,9 +107,9 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
                 let nextTripleCount = this.TripleCount + 1u
                 if nextTripleCount > uint32(this.TripleList.Length) then
                         this.doubleResourceListSize()
-                let sp_list = this.AddSubjectPredicateIndex(triple.subject, triple.predicate, this.TripleCount)
-                let op_list = this.AddObjectPredicateIndex(triple.object, triple.predicate, this.TripleCount)
-                let p_list = this.AddPredicateIndex(triple.predicate, this.TripleCount) 
+                this.AddSubjectPredicateIndex(triple.subject, triple.predicate, this.TripleCount)
+                this.AddObjectPredicateIndex(triple.object, triple.predicate, this.TripleCount)
+                this.AddPredicateIndex(triple.predicate, this.TripleCount) 
                 this.TripleList.[int(this.TripleCount)] <- triple
                 this.ThreeKeysIndex.Add(triple, this.TripleCount) |> ignore
                 this.TripleCount <- nextTripleCount
