@@ -8,6 +8,7 @@
 namespace AlcTableau
 
 open AlcTableau.Rdf
+open AlcTableau.Rdf.RDFStore
 
 module Datalog =
 
@@ -58,16 +59,46 @@ module Datalog =
     [<StructuralEquality>]
     type Rule = 
         {Head: TriplePattern; Body: TriplePattern list}
-
-   
+    type Substitution = 
+        Map<string, RDFStore.ResourceId>
+    type PartialRule = 
+        {Rule: Rule; MatchPosition : int}
+    type PartialRuleMatch = 
+        {Match: PartialRule; Substitution: Substitution}
     
+    
+    let GetSubstitution (subs : Substitution) (resource : RDFStore.ResourceId, variable : ResourceOrVariable) : Substitution option =
+        match variable, resource with
+        | Variable v, _  ->
+            match subs.TryGetValue v with
+            | true, r when r = resource -> Some Map.empty
+            | true, _ -> None
+            | false, _ -> Some (Map.ofList [(v, resource)])
+        | ResourceOrVariable.Resource r, s when r = s -> Some Map.empty
+        | _ -> None
+    
+    let GetSubstitutionOption (subs : Substitution option) (resource : RDFStore.ResourceId, variable : ResourceOrVariable) : Substitution option =
+        Option.bind (fun s -> GetSubstitution s (resource, variable)) subs    
+    let GetSubstitutions (fact : Triple) (rule : PartialRule)  : Substitution option =
+        let factPattern = rule.Rule.Body.[rule.MatchPosition]
+        let resourceList = [(fact.subject, factPattern.Subject); (fact.predicate, factPattern.Predicate); (fact.object, factPattern.Object)]
+        resourceList |> List.fold GetSubstitutionOption (Some Map.empty)
+        
     type DatalogProgram(Rules: Rule list) =
         let mutable Rules = Rules
-        let RuleMap = new System.Collections.Generic.Dictionary<TripleWildcard, TriplePattern list>()    
+        let RuleMap = new System.Collections.Generic.Dictionary<TripleWildcard, PartialRule list>()    
         member this.AddRule(rule: Rule)  =
             Rules <- rule :: Rules
             // TODO add to dictionary
             
-        
+        member this.GetRulesForFact(fact: RDFStore.Triple) : PartialRuleMatch list = 
+            ConstantTriplePattern fact
+                |> WildcardTriplePattern
+                |> List.collect (fun wildcardFact ->
+                    match RuleMap.TryGetValue(wildcardFact) with
+                    | true, rules -> rules
+                                     |> List.map (fun r -> (r, GetSubstitutions fact r))
+                                     |> List.choose (fun (r, s) -> Option.map (fun s -> {Match = r; Substitution = s}) s)
+                    | false, _ -> [])
 
         

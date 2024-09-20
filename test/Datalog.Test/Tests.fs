@@ -20,6 +20,36 @@ module Tests =
     
     
     [<Fact>]
+    let ``Datalog program fetches rule`` () =
+        let tripleTable = Rdf.TripleTable(60u)
+        
+        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+        let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
+        let triplepattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Predicate =  Variable "p"
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+        let triplepattern2 = {
+                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Predicate =  Variable "p"
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             }
+        let tripleFact : Triple = {
+                             subject = subjectIndex
+                             predicate =  predIndex
+                             object = objdIndex2
+                             }
+        
+        let rule = {Head =  triplepattern; Body = [triplepattern2]}
+        let prog = DatalogProgram [rule]
+        let rules = prog.GetRulesForFact tripleFact
+        Assert.Single(rules)
+        
+        
+        
+    [<Fact>]
     let ``Wildcard triple patterns with one variable are correctly generated`` () =
         let tripleTable = Rdf.TripleTable(60u)
         
@@ -31,6 +61,8 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
         let wildcards = WildcardTriplePattern triplepattern
         Assert.Equal(4, wildcards.Length)
+        
+        
         
     [<Fact>]
     let ``Wildcard triple patterns with three variables are correctly generated`` () =
