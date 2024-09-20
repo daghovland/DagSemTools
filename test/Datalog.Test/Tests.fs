@@ -47,6 +47,13 @@ module Tests =
         let rules = prog.GetRulesForFact tripleFact
         Assert.Single(rules)
         
+    [<Fact>]
+    let ``merging maps to lists works fine``() =
+        let m1 : Map<string, int list> = Map([("a", [1]); ("b", [2])])
+        let m2 : Map<string, int list> = Map([("a", [1]); ("b", [3])])
+        let merged : Map<string, int list> = mergeMaps [m1; m2]
+        let expected : Map<string, int list> = Map([("a", [1; 1]); ("b", [3; 2])])
+        Assert.Equal<Map<string, int list>>(expected, merged)
         
         
     [<Fact>]

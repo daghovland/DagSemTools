@@ -62,7 +62,7 @@ module Datalog =
     type Substitution = 
         Map<string, RDFStore.ResourceId>
     type PartialRule = 
-        {Rule: Rule; MatchPosition : int}
+        {Rule: Rule; Match : TriplePattern}
     type PartialRuleMatch = 
         {Match: PartialRule; Substitution: Substitution}
     
@@ -80,16 +80,38 @@ module Datalog =
     let GetSubstitutionOption (subs : Substitution option) (resource : RDFStore.ResourceId, variable : ResourceOrVariable) : Substitution option =
         Option.bind (fun s -> GetSubstitution s (resource, variable)) subs    
     let GetSubstitutions (fact : Triple) (rule : PartialRule)  : Substitution option =
-        let factPattern = rule.Rule.Body.[rule.MatchPosition]
+        let factPattern = rule.Match
         let resourceList = [(fact.subject, factPattern.Subject); (fact.predicate, factPattern.Predicate); (fact.object, factPattern.Object)]
         resourceList |> List.fold GetSubstitutionOption (Some Map.empty)
         
+    let GetPartialMatch (triple : TriplePattern)  =
+        WildcardTriplePattern triple
+        
+    let GetPartialMatches (rule : Rule) : Map<TripleWildcard, PartialRule list> =
+       Map.ofList (rule.Body
+       |> List.collect (fun pat ->
+           WildcardTriplePattern pat
+            |> List.map  (fun t -> (t, [{Rule = rule; Match = pat}]))
+            )
+       )
+    
+    let mergeMaps (maps: Map<'Key, 'Value list> list) : Map<'Key, 'Value list> =
+        maps |> List.fold
+                    (Map.fold (fun acc key value ->
+                    match acc.TryGetValue key with
+                        | true, existing -> Map.add key (value @ existing) acc
+                        | false, _ ->  Map.add key value acc)) Map.empty
+
     type DatalogProgram(Rules: Rule list) =
         let mutable Rules = Rules
-        let RuleMap = new System.Collections.Generic.Dictionary<TripleWildcard, PartialRule list>()    
+        let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
+                            Rules
+                                |> List.map GetPartialMatches
+                                |> mergeMaps
+                                   
         member this.AddRule(rule: Rule)  =
             Rules <- rule :: Rules
-            // TODO add to dictionary
+            RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
             
         member this.GetRulesForFact(fact: RDFStore.Triple) : PartialRuleMatch list = 
             ConstantTriplePattern fact
