@@ -102,6 +102,38 @@ module Datalog =
                         | true, existing -> Map.add key (value @ existing) acc
                         | false, _ ->  Map.add key value acc)) Map.empty
 
+    let GetMappedResource (sub : Substitution) (resource : ResourceOrVariable ) : ResourceOrVariable  =
+              match resource with
+              | ResourceOrVariable.Resource _ -> resource
+              | Variable v -> match sub.TryGetValue v with
+                              | true, r -> ResourceOrVariable.Resource r
+                              | false, _ -> Variable v
+
+    let evaluatePattern (rdf : TripleTable) (triplePattern : TriplePattern) (sub : Substitution) : Substitution list =
+        let mappedTriple : TriplePattern = {
+                            TriplePattern.Subject = GetMappedResource sub triplePattern.Subject
+                            TriplePattern.Predicate = GetMappedResource sub triplePattern.Predicate
+                            TriplePattern.Object = GetMappedResource sub triplePattern.Object
+                            }
+        match mappedTriple.Subject, mappedTriple.Predicate, mappedTriple.Object with
+            | ResourceOrVariable.Resource s, Variable p, Variable o -> 
+                    rdf.GetTriplesWithSubject(s)
+                    |> 
+            | Variable s, ResourceOrVariable.Resource p, Variable o -> 
+                    rdf.GetTriplesWithObject(p)
+            | Variable s, Variable p, ResourceOrVariable.Resource o -> 
+                    rdf.GetTriplesWithSubject(o)
+            | ResourceOrVariable.Resource s, ResourceOrVariable.Resource p, Variable o -> 
+                    rdf.GetTriplesWithSubjectPredicate(s, p)
+            | Variable s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
+                    rdf.GetTriplesWithObjectPredicate(o, p)
+            | ResourceOrVariable.Resource s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
+                    rdf.ThreeKeysIndex.TryGetValue {subject = s; predicate = p; object = o} 
+                    
+                            
+    let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) =
+        ()
+    
     type DatalogProgram(Rules: Rule list) =
         let mutable Rules = Rules
         let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =

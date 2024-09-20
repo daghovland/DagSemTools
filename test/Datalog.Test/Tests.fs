@@ -137,7 +137,6 @@ module Tests =
         let mappedTriple = tripleTable.TripleList.[0]
         Assert.Equal(Triple, mappedTriple)
         
-        
         let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
         let Triple2 = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
         
