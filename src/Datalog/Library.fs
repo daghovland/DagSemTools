@@ -116,11 +116,15 @@ module Datalog =
         member this.GetRulesForFact(fact: RDFStore.Triple) : PartialRuleMatch list = 
             ConstantTriplePattern fact
                 |> WildcardTriplePattern
-                |> List.collect (fun wildcardFact ->
+                |> List.map (fun wildcardFact ->
                     match RuleMap.TryGetValue(wildcardFact) with
                     | true, rules -> rules
-                                     |> List.map (fun r -> (r, GetSubstitutions fact r))
-                                     |> List.choose (fun (r, s) -> Option.map (fun s -> {Match = r; Substitution = s}) s)
                     | false, _ -> [])
+                |> List.distinct
+                |> List.collect (fun rules -> rules
+                                            |> List.map (fun r -> (r, GetSubstitutions fact r))
+                                            |> List.choose (fun (r, s) -> Option.map (fun s -> {Match = r; Substitution = s}) s)
+                                            )
+
 
         

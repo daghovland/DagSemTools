@@ -47,6 +47,34 @@ module Tests =
         let rules = prog.GetRulesForFact tripleFact
         Assert.Single(rules)
         
+    let ``Datalog program does not fetch when no matching rule`` () =
+        let tripleTable = Rdf.TripleTable(60u)
+        
+        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+        let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
+        let objdIndex3 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object3"))
+        let triplepattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Predicate =  Variable "p"
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+        let triplepattern2 = {
+                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Predicate =  Variable "p"
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             }
+        let tripleFact : Triple = {
+                             subject = subjectIndex
+                             predicate =  predIndex
+                             object = objdIndex3
+                             }
+        
+        let rule = {Head =  triplepattern; Body = [triplepattern2]}
+        let prog = DatalogProgram [rule]
+        let rules = prog.GetRulesForFact tripleFact
+        Assert.Empty(rules)
+        
     [<Fact>]
     let ``merging maps to lists works fine``() =
         let m1 : Map<string, int list> = Map([("a", [1]); ("b", [2])])
