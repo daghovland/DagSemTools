@@ -133,3 +133,14 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             
         member this.GetTriplesWithObjectPredicate (object: ResourceId, predicate: ResourceId) =
             this.ObjectPredicateIndex.[object].[predicate] |> Seq.map (fun e -> this.GetTripleListEntry e)
+            
+        member this.GetTriplesWithSubjectObject (subject: ResourceId, object: ResourceId) : Triple seq =
+            let subjectIndex = this.SubjectPredicateIndex.[subject]
+            let objectIndex = this.ObjectPredicateIndex.[object]
+            let (filter, idx) = match subjectIndex.Count > objectIndex.Count with
+                                | true -> ((fun t -> t.subject = subject), objectIndex)
+                                | false -> ((fun t -> t.object = object), subjectIndex)
+            idx |> Seq.collect (_.Value)
+                |> Seq.map this.GetTripleListEntry
+                |> Seq.where filter
+        

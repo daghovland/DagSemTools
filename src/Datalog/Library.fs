@@ -67,7 +67,7 @@ module Datalog =
         {Match: PartialRule; Substitution: Substitution}
     
     
-    let GetSubstitution (subs : Substitution) (resource : RDFStore.ResourceId, variable : ResourceOrVariable) : Substitution option =
+    let GetSubstitution (resource : RDFStore.ResourceId, variable : ResourceOrVariable) (subs : Substitution)  : Substitution option =
         match variable, resource with
         | Variable v, _  ->
             match subs.TryGetValue v with
@@ -78,9 +78,8 @@ module Datalog =
         | _ -> None
     
     let GetSubstitutionOption (subs : Substitution option) (resource : RDFStore.ResourceId, variable : ResourceOrVariable) : Substitution option =
-        Option.bind (fun s -> GetSubstitution s (resource, variable)) subs    
-    let GetSubstitutions (fact : Triple) (rule : PartialRule)  : Substitution option =
-        let factPattern = rule.Match
+        Option.bind (GetSubstitution (resource, variable)) subs    
+    let GetSubstitutions (fact : Triple) (factPattern : TriplePattern)  : Substitution option =
         let resourceList = [(fact.subject, factPattern.Subject); (fact.predicate, factPattern.Predicate); (fact.object, factPattern.Object)]
         resourceList |> List.fold GetSubstitutionOption (Some Map.empty)
         
@@ -109,16 +108,16 @@ module Datalog =
                               | true, r -> ResourceOrVariable.Resource r
                               | false, _ -> Variable v
 
-    let evaluatePattern (rdf : TripleTable) (triplePattern : TriplePattern) (sub : Substitution) : Substitution list =
+    let evaluatePattern (rdf : TripleTable) (triplePattern : TriplePattern) (sub : Substitution) : Substitution seq =
         let mappedTriple : TriplePattern = {
                             TriplePattern.Subject = GetMappedResource sub triplePattern.Subject
                             TriplePattern.Predicate = GetMappedResource sub triplePattern.Predicate
                             TriplePattern.Object = GetMappedResource sub triplePattern.Object
                             }
-        match mappedTriple.Subject, mappedTriple.Predicate, mappedTriple.Object with
+        let matchedTriples = (
+            match mappedTriple.Subject, mappedTriple.Predicate, mappedTriple.Object with
             | ResourceOrVariable.Resource s, Variable p, Variable o -> 
                     rdf.GetTriplesWithSubject(s)
-                    |> 
             | Variable s, ResourceOrVariable.Resource p, Variable o -> 
                     rdf.GetTriplesWithObject(p)
             | Variable s, Variable p, ResourceOrVariable.Resource o -> 
@@ -128,8 +127,14 @@ module Datalog =
             | Variable s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
                     rdf.GetTriplesWithObjectPredicate(o, p)
             | ResourceOrVariable.Resource s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
-                    rdf.ThreeKeysIndex.TryGetValue {subject = s; predicate = p; object = o} 
-                    
+                    match rdf.ThreeKeysIndex.TryGetValue {subject = s; predicate = p; object = o} with
+                    | false,_ -> []
+                    | true, v -> [rdf.GetTripleListEntry v]                    
+            | ResourceOrVariable.Resource s, Variable p, ResourceOrVariable.Resource o ->
+                rdf.GetTriplesWithSubjectObject (s, o)
+            | Variable s, Variable p, Variable o -> rdf.TripleList
+            ) 
+        matchedTriples |> Seq.choose (fun t -> GetSubstitutions t mappedTriple)
                             
     let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) =
         ()
