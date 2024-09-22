@@ -61,6 +61,16 @@ module Datalog =
         {Head: TriplePattern; Body: TriplePattern list}
     type Substitution = 
         Map<string, RDFStore.ResourceId>
+        
+    let ApplySubstitutionResource (sub : Substitution) (res : ResourceOrVariable) : ResourceId =
+        match res with
+        | ResourceOrVariable.Resource r -> r
+        | Variable v -> sub[v]
+    let ApplySubstitutionTriple sub (triple : TriplePattern) : Triple =
+        {Rdf.RDFStore.subject = ApplySubstitutionResource sub triple.Subject
+         RDFStore.predicate = ApplySubstitutionResource sub triple.Predicate
+         RDFStore.object = ApplySubstitutionResource sub triple.Object 
+         }
     type PartialRule = 
         {Rule: Rule; Match : TriplePattern}
     type PartialRuleMatch = 
@@ -82,6 +92,15 @@ module Datalog =
     let GetSubstitutions (fact : Triple) (factPattern : TriplePattern)  : Substitution option =
         let resourceList = [(fact.subject, factPattern.Subject); (fact.predicate, factPattern.Predicate); (fact.object, factPattern.Object)]
         resourceList |> List.fold GetSubstitutionOption (Some Map.empty)
+        
+    (*
+        For a given triple/fact and a rule, return 
+        all matches (PartialRuleMatch) such that the fact is an instance of the match in the rule.
+    *)
+    let GetMatchesForRule fact rule =
+        rule.Rule.Body
+        |> List.map (fun r -> r, GetSubstitutions fact r) 
+        |> List.choose (fun (r, s) -> Option.map (fun s -> {Match = rule; Substitution = s}) s)
         
     let GetPartialMatch (triple : TriplePattern)  =
         WildcardTriplePattern triple
@@ -108,7 +127,7 @@ module Datalog =
                               | true, r -> ResourceOrVariable.Resource r
                               | false, _ -> Variable v
 
-    let evaluatePattern (rdf : TripleTable) (triplePattern : TriplePattern) (sub : Substitution) : Substitution seq =
+    let evaluatePattern (rdf : TripleTable) (triplePattern : TriplePattern) (sub : Substitution)  =
         let mappedTriple : TriplePattern = {
                             TriplePattern.Subject = GetMappedResource sub triplePattern.Subject
                             TriplePattern.Predicate = GetMappedResource sub triplePattern.Predicate
@@ -136,10 +155,11 @@ module Datalog =
             ) 
         matchedTriples |> Seq.choose (fun t -> GetSubstitutions t mappedTriple)
                             
-    let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) =
-        ()
+    let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) : Substitution seq =
+         ruleMatch.Match.Rule.Body
+        |> List.fold ( fun subs tr -> subs |> Seq.collect (evaluatePattern rdf tr) ) [ruleMatch.Substitution]  
     
-    type DatalogProgram(Rules: Rule list) =
+    type DatalogProgram (Rules: Rule list, tripleStore : Rdf.TripleTable) =
         let mutable Rules = Rules
         let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
                             Rules
@@ -158,10 +178,11 @@ module Datalog =
                     | true, rules -> rules
                     | false, _ -> [])
                 |> List.distinct
-                |> List.collect (fun rules -> rules
-                                            |> List.map (fun r -> (r, GetSubstitutions fact r))
-                                            |> List.choose (fun (r, s) -> Option.map (fun s -> {Match = r; Substitution = s}) s)
-                                            )
-
-
-        
+                |> List.collect (List.collect (GetMatchesForRule fact))
+                
+        member this.materialise() =
+            for triple in tripleStore.TripleList do
+                for rules in this.GetRulesForFact triple do
+                    for subs in evaluate tripleStore rules triple do
+                        let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head
+                        tripleStore.AddTriple newTriple

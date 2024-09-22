@@ -81,23 +81,23 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             this.PredicateIndex.Add(predicate, [tripleIndex]) |> ignore
             
     member this.AddSubjectPredicateIndex (subject: ResourceId, predicate: ResourceId, tripleIndex: TripleListIndex) =
-        let existSubjectMap = match  (this.SubjectPredicateIndex.ContainsKey subject) with 
-                                |    true -> this.SubjectPredicateIndex.[subject]
-                                |    false -> new Dictionary<ResourceId, TripleListIndex list>()
-        let existSubjectPredicateList = match (existSubjectMap.ContainsKey predicate) with
-                                        | true -> existSubjectMap.[predicate]
-                                        | false -> []
-        existSubjectMap.[subject] <- tripleIndex :: existSubjectPredicateList
+        let existSubjectMap = match  (this.SubjectPredicateIndex.TryGetValue subject) with 
+                                |    true, subjMap -> subjMap
+                                |    false, _ -> new Dictionary<ResourceId, TripleListIndex list>()
+        let existSubjectPredicateList = match (existSubjectMap.TryGetValue predicate) with
+                                        | true, subjPredList -> subjPredList
+                                        | false,_ -> []
+        existSubjectMap.[predicate] <- tripleIndex :: existSubjectPredicateList
         this.SubjectPredicateIndex.[subject] <- existSubjectMap
         
     member this.AddObjectPredicateIndex (object: ResourceId, predicate: ResourceId, tripleIndex: TripleListIndex) =
-        let existObjectMap = match  (this.ObjectPredicateIndex.ContainsKey object) with 
-                                |    true -> this.ObjectPredicateIndex.[object]
-                                |    false -> new Dictionary<ResourceId, TripleListIndex list>()
-        let existSubjectPredicateList = match (existObjectMap.ContainsKey predicate) with
-                                        | true -> existObjectMap.[predicate]
-                                        | false -> []
-        existObjectMap.[object] <- tripleIndex :: existSubjectPredicateList
+        let existObjectMap = match  (this.ObjectPredicateIndex.TryGetValue object) with 
+                                |    true, objMap -> objMap
+                                |    false, _ -> new Dictionary<ResourceId, TripleListIndex list>()
+        let existSubjectPredicateList = match (existObjectMap.TryGetValue predicate) with
+                                        | true, objPredList -> objPredList
+                                        | false, _ -> []
+        existObjectMap.[predicate] <- tripleIndex :: existSubjectPredicateList
         this.ObjectPredicateIndex.[object] <- existObjectMap
             
     member this.AddTriple (triple : RDFStore.Triple) =
@@ -135,12 +135,6 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             this.ObjectPredicateIndex.[object].[predicate] |> Seq.map (fun e -> this.GetTripleListEntry e)
             
         member this.GetTriplesWithSubjectObject (subject: ResourceId, object: ResourceId) : Triple seq =
-            let subjectIndex = this.SubjectPredicateIndex.[subject]
-            let objectIndex = this.ObjectPredicateIndex.[object]
-            let (filter, idx) = match subjectIndex.Count > objectIndex.Count with
-                                | true -> ((fun t -> t.subject = subject), objectIndex)
-                                | false -> ((fun t -> t.object = object), subjectIndex)
-            idx |> Seq.collect (_.Value)
-                |> Seq.map this.GetTripleListEntry
-                |> Seq.where filter
+            this.GetTriplesWithSubject subject
+                |> Seq.where (fun triple ->  triple.object = object)
         

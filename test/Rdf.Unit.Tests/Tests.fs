@@ -13,6 +13,7 @@ open AlcTableau
 open AlcTableau.Rdf
 open Xunit
 open AlcTableau.Rdf.RDFStore
+open Faqt
 
 [<Fact>]
 let ``Can add resource to tripletable`` () =
@@ -66,6 +67,69 @@ let ``Can query with object to tripletable`` () =
     let query = tripleTable.GetTriplesWithObject(objdIndex)
     Assert.Single(query)
     
+    
+    
+[<Fact>]
+let ``Can query with subject object to tripletable`` () =
+    let tripleTable = Rdf.TripleTable(60u)
+    let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+    let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    tripleTable.AddTriple(Triple)
+    let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objdIndex)
+    Assert.Single(query)
+    
+    
+[<Fact>]
+let ``Can query with resources to larger tripletable`` () =
+    let tripleTable = Rdf.TripleTable(60u)
+    let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+    let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
+    let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    let Triple2 = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
+    tripleTable.AddTriple(Triple)
+    tripleTable.AddTriple(Triple2)
+    let squery = tripleTable.GetTriplesWithSubject(subjectIndex)
+    squery
+        .Should()
+        .HaveLength(2, "There are two triples in the store with the same subject") |> ignore
+    
+    let o1query = tripleTable.GetTriplesWithObject(objdIndex)
+    Assert.Single(o1query) |> ignore
+    let o2query = tripleTable.GetTriplesWithObject(objdIndex2)
+    Assert.Single(o2query) |> ignore
+    let pquery = tripleTable.GetTriplesWithPredicate predIndex
+    pquery
+        .Should()
+        .HaveLength(2, "There are two triples in the store with the same predicate") |> ignore
+    
+
+    
+[<Fact>]
+let ``Can query with subject object to larger tripletable`` () =
+    let tripleTable = Rdf.TripleTable(60u)
+    let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+    let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
+    let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    let Triple2 = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
+    tripleTable.AddTriple(Triple)
+    tripleTable.AddTriple(Triple2)
+    let squery = tripleTable.GetTriplesWithSubject(subjectIndex)
+    Assert.Equal(2, Seq.length squery)
+    
+    let o1query = tripleTable.GetTriplesWithObject(objdIndex)
+    Assert.Single(o1query) |> ignore
+    let o2query = tripleTable.GetTriplesWithObject(objdIndex2)
+    Assert.Single(o2query) |> ignore
+    let pquery = tripleTable.GetTriplesWithPredicate predIndex
+    Assert.Equal(2, Seq.length pquery)
+    let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objdIndex)
+    Assert.Single(query) |> ignore
     
 [<Fact>]
 let ``Can query with predicate to tripletable`` () =

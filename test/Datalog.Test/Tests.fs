@@ -43,7 +43,7 @@ module Tests =
                              }
         
         let rule = {Head =  triplepattern; Body = [triplepattern2]}
-        let prog = DatalogProgram [rule]
+        let prog = DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Single(rules)
         
@@ -71,7 +71,7 @@ module Tests =
                              }
         
         let rule = {Head =  triplepattern; Body = [triplepattern2]}
-        let prog = DatalogProgram [rule]
+        let prog = DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Empty(rules)
         
@@ -121,6 +121,35 @@ module Tests =
         let wildcards = WildcardTriplePattern triplepattern
         Assert.Equal(8, wildcards.Length)
         
+    [<Fact>]
+    let ``Can get matches on rule`` () =
+        let tripleTable = Rdf.TripleTable(60u)
+        Assert.Equal(0u, tripleTable.ResourceCount)
+        Assert.Equal(0u, tripleTable.TripleCount)
+        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+        let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+        tripleTable.AddTriple(Triple)
+        Assert.Equal(3u, tripleTable.ResourceCount)
+        Assert.Equal(1u, tripleTable.TripleCount)
+        let mappedTriple = tripleTable.TripleList.[0]
+        Assert.Equal(Triple, mappedTriple)
+        
+        let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
+        let Triple2 = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
+        
+        let rule =  {Head =  ConstantTriplePattern Triple2; Body = [ConstantTriplePattern Triple]}
+        let TriplePatter = {
+                            TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                            TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                            TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                            }
+        let partialRule = {Rule = rule; Match =  TriplePatter}
+        let matches = GetMatchesForRule Triple partialRule
+        Assert.Single matches
+   
+         
         
     [<Fact>]
     let ``Can add triple using rule over tripletable`` () =
@@ -141,8 +170,7 @@ module Tests =
         let Triple2 = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
         
         let rule =  {Head =  ConstantTriplePattern Triple2; Body = [ConstantTriplePattern Triple]}
-        let prog = DatalogProgram [rule]
-        /// TODO: Apply program to tripletable
-        /// Lacking code
+        let prog = DatalogProgram ([rule], tripleTable)
+        prog.materialise()
         Assert.Equal(2u, tripleTable.TripleCount)
         
