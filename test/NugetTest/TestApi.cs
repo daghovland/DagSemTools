@@ -16,4 +16,25 @@ public class TestApi(ITestOutputHelper output)
 
         Assert.NotNull(ont);
     }
+    
+    
+    [Fact]
+    public void TestDbPedia()
+    {
+        var ontology = new FileInfo("TestData/test2.ttl");
+        var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
+
+        Assert.NotNull(ont);
+    }
+    
+    
+    
+    [Fact]
+    public void TestDbPediaOntology()
+    {
+        var ontology = new FileInfo("TestData/ontology--DEV_type=parsed_sorted.nt");
+        var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
+
+        Assert.NotNull(ont);
+    }
 }

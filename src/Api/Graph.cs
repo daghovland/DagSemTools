@@ -18,10 +18,11 @@ public class Graph : IGraph
     public bool isEmpty() => Triples.TripleCount == 0;
 
     /// <inheritdoc />
-    public IEnumerator<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj)
-    {
-        throw new NotImplementedException();
-    }
+    public IEnumerator<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
+        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(obj), out uint objIdx)
+         && Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(predicate), out uint predIdx))
+            ? Triples.GetTriplesWithObjectPredicate(objIdx, predIdx)
+            : new Triple[]{};
 
     /// <inheritdoc />
     public IEnumerator<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate)
