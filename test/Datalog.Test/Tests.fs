@@ -12,6 +12,7 @@ open AlcTableau.Rdf
 open IriTools
 open Xunit 
 open RDFStore
+open Faqt
 open AlcTableau.Rdf.RDFStore
 open AlcTableau
 open AlcTableau.Datalog
@@ -171,6 +172,14 @@ module Tests =
         
         let rule =  {Head =  ConstantTriplePattern Triple2; Body = [ConstantTriplePattern Triple]}
         let prog = DatalogProgram ([rule], tripleTable)
+        let tripleAnswersBefore = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
+        Assert.Equal(1, tripleAnswersBefore |> Seq.length)
+        let triples2Answers = tripleAnswersBefore |> Seq.filter (fun tr -> tr = Triple2)
+        Assert.Equal(0, triples2Answers |> Seq.length)
+        
         prog.materialise()
+        
         Assert.Equal(2u, tripleTable.TripleCount)
+        let tripleAnswers2 = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
+        Assert.Contains(Triple2, tripleAnswers2)
         
