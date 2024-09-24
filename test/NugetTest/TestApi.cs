@@ -1,4 +1,6 @@
+using IriTools;
 using Xunit.Abstractions;
+using FluentAssertions;
 
 namespace NugetTest;
 
@@ -15,6 +17,8 @@ public class TestApi(ITestOutputHelper output)
         var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
+        var enemies = ont.GetTriplesWithPredicate(new IriReference("<http://www.perceive.net/schemas/relationship/enemyOf>"));
+        
     }
     
     
