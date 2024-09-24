@@ -22,7 +22,7 @@ public class Graph : IGraph
         (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(obj), out uint objIdx)
          && Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(predicate), out uint predIdx))
             ? Triples.GetTriplesWithObjectPredicate(objIdx, predIdx)
-            : new Triple[]{};
+            : new Triple[] { };
 
     /// <inheritdoc />
     public IEnumerator<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate)
