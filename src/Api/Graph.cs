@@ -21,15 +21,15 @@ public class Graph : IGraph
 
     private IriResource GetIriResource(uint resourceId)
     {
-        if(resourceId >= Triples.ResourceCount)
+        if (resourceId >= Triples.ResourceCount)
             throw new ArgumentOutOfRangeException(nameof(resourceId));
         var resource = Triples.ResourceList[resourceId];
-        if(!resource.IsIri)
+        if (!resource.IsIri)
             throw new ArgumentException("Resource is not an Iri");
         return new IriResource(new IriReference(resource.iri));
-        
-}
-    
+
+    }
+
     private Resource GetResource(uint resourceId)
     {
         var resource = Triples.ResourceList[resourceId];
@@ -37,7 +37,7 @@ public class Graph : IGraph
         {
             case RDFStore.Resource { IsIri: true } r:
                 return new IriResource(new IriReference(r.iri));
-            case  var r when r.IsLangLiteral:
+            case var r when r.IsLangLiteral:
                 return new LiteralResource(r.langliteral);
             case RDFStore.Resource { IsDateLiteral: true } r:
                 return new LiteralResource(r.literalDate.ToString());
@@ -51,7 +51,7 @@ public class Graph : IGraph
     new Triple(this.GetIriResource(triple.subject),
             GetIriResource(triple.predicate).Iri,
             GetResource(triple.@object));
-    
+
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
         (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(obj), out var objIdx)
@@ -61,7 +61,7 @@ public class Graph : IGraph
                 .Select(GetTriple)
             : [];
 
-    
+
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate) =>
         (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(subject), out var subjIdx)
@@ -94,5 +94,5 @@ public class Graph : IGraph
                 .GetTriplesWithObject(objIdx)
                 .Select(GetTriple)
             : [];
-    
+
 }
