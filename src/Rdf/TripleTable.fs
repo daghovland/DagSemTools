@@ -138,3 +138,4 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             this.GetTriplesWithSubject subject
                 |> Seq.where (fun triple ->  triple.object = object)
         
+       

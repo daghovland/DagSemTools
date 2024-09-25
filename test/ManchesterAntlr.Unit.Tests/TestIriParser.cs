@@ -7,7 +7,7 @@
 */
 
 using AlcTableau.Parser;
-using TurtleParser.Unit.Tests;
+using TestUtils;
 using Xunit.Abstractions;
 
 namespace ManchesterAntlr.Unit.Tests;

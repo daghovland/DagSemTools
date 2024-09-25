@@ -18,14 +18,39 @@ public class Graph : IGraph
     /// <inheritdoc />
     public bool isEmpty() => Triples.TripleCount == 0;
 
+
+    private IriResource GetIriResource(uint resourceId)
+    {
+        if(resourceId >= Triples.ResourceCount)
+            throw new ArgumentOutOfRangeException(nameof(resourceId));
+        var resource = Triples.ResourceList[resourceId];
+        if(!resource.IsIri)
+            throw new ArgumentException("Resource is not an Iri");
+        return new IriResource(new IriReference(resource.iri));
+        
+}
     
-    private IriResource GetIriResource(uint resourceId) =>
-        new IriResource(Triples.ResourceList[resourceId].iri);
+    private Resource GetResource(uint resourceId)
+    {
+        var resource = Triples.ResourceList[resourceId];
+        switch (resource)
+        {
+            case RDFStore.Resource { IsIri: true } r:
+                return new IriResource(new IriReference(r.iri));
+            case  var r when r.IsLangLiteral:
+                return new LiteralResource(r.langliteral);
+            case RDFStore.Resource { IsDateLiteral: true } r:
+                return new LiteralResource(r.literalDate.ToString());
+            case RDFStore.Resource { IsLiteralString: true } r:
+                return new LiteralResource(r.literal);
+            default: throw new NotImplementedException("Literal type not implemented. Sorry");
+        }
+    }
 
     private Triple GetTriple(RDFStore.Triple triple) =>
-        new Triple(GetIriResource(triple.subject),
+    new Triple(this.GetIriResource(triple.subject),
             GetIriResource(triple.predicate).Iri,
-            GetIriResource(triple.@object));
+            GetResource(triple.@object));
     
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>

@@ -2,6 +2,7 @@ using AlcTableau;
 using AlcTableau.Rdf;
 using FluentAssertions;
 using IriTools;
+using TestUtils;
 using Xunit.Abstractions;
 
 namespace TurtleParser.Unit.Tests;

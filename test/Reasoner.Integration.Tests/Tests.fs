@@ -11,7 +11,7 @@ module Tests
 open System
 open AlcTableau
 open Tableau
-open TurtleParser.Unit.Tests
+open TestUtils
 open Xunit
 open ALC
 open IriTools

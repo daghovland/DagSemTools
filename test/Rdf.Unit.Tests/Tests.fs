@@ -130,6 +130,23 @@ let ``Can query with subject object to larger tripletable`` () =
     Assert.Equal(2, Seq.length pquery)
     let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objdIndex)
     Assert.Single(query) |> ignore
+
+    
+[<Fact>]
+let ``Can query with subject predicate when object is literal`` () =
+    let tripleTable = Rdf.TripleTable(60u)
+    let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddResource(RDFStore.LangLiteral("object", "en"))
+    let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    tripleTable.AddTriple(Triple)
+    let squery = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
+    Assert.Equal(1, Seq.length squery)
+    Assert.Equal(Triple, Seq.head squery)
+    let literal = tripleTable.ResourceList.[int objdIndex]
+    Assert.Equal(RDFStore.LangLiteral("object", "en"), literal)
+
+
     
 [<Fact>]
 let ``Can query with predicate to tripletable`` () =

@@ -9,7 +9,7 @@
 using System.Text;
 using Xunit.Abstractions;
 
-namespace TurtleParser.Unit.Tests;
+namespace TestUtils;
 
 public class TestOutputTextWriter(ITestOutputHelper output) : TextWriter
 {

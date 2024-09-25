@@ -17,8 +17,11 @@ public class TestApi(ITestOutputHelper output)
         var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
-        var enemies = ont.GetTriplesWithPredicate(new IriReference("<http://www.perceive.net/schemas/relationship/enemyOf>"));
+        var enemies = ont.GetTriplesWithPredicate(new IriReference("http://www.perceive.net/schemas/relationship/enemyOf"));
+        enemies.Count().Should().Be(2, "There are two trples with enemies");
         
+
+
     }
     
     
@@ -29,6 +32,8 @@ public class TestApi(ITestOutputHelper output)
         var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
+        var subjects = ont.GetTriplesWithPredicate(new IriReference("http://purl.org/dc/terms/subject"));
+        subjects.Count().Should().BeGreaterThan(200, "There are many triples with subjects");
     }
     
     
@@ -40,5 +45,9 @@ public class TestApi(ITestOutputHelper output)
         var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
+        var labels = ont.GetTriplesWithSubjectPredicate(
+            new IriReference("http://dbpedia.org/datatype/FuelEfficiency"), 
+            new IriReference("http://www.w3.org/2000/01/rdf-schema#label"));
+        labels.Count().Should().Be(2, "There are two labels on fuel efficiency");
     }
 }
