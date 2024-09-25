@@ -1,0 +1,1005 @@
+## This is outdated data extracted from dbpedia for the sole purpose of testing AlcTableau
+## Copyright DBPedia association https://databus.dbpedia.org/imprint
+## License http://en.wikipedia.org/wiki/Wikipedia:Text_of_the_GNU_Free_Documentation_License
+
+
+<http://dbpedia.org/ontology/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Ontology> .
+<http://dbpedia.org/ontology/> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://purl.org/vocommons/voaf#Vocabulary> .
+<http://dbpedia.org/ontology/> <http://purl.org/vocab/vann/preferredNamespacePrefix> "dbo" .
+<http://dbpedia.org/ontology/> <http://purl.org/vocab/vann/preferredNamespaceUri> "http://dbpedia.org/ontology/" .
+<http://dbpedia.org/ontology/> <http://purl.org/dc/terms/title> "The DBpedia Ontology"@en .
+<http://dbpedia.org/ontology/> <http://purl.org/dc/terms/description> "\n              The DBpedia ontology provides the classes and properties used in the DBpedia data set.\n            "@en .
+<http://dbpedia.org/ontology/> <http://xmlns.com/foaf/0.1/homepage> <http://wiki.dbpedia.org/Ontology> .
+<http://dbpedia.org/ontology/> <http://purl.org/dc/terms/source> <http://mappings.dbpedia.org> .
+<http://dbpedia.org/ontology/> <http://purl.org/dc/terms/publisher> "DBpedia Maintainers" .
+<http://dbpedia.org/ontology/> <http://purl.org/dc/terms/creator> "DBpedia Maintainers and Contributors" .
+<http://dbpedia.org/ontology/> <http://purl.org/dc/terms/issued> "2008-11-17T12:00Z" .
+<http://dbpedia.org/ontology/> <http://www.w3.org/2002/07/owl#versionInfo> "latest-snapshot"@en .
+<http://dbpedia.org/ontology/> <http://www.w3.org/2000/01/rdf-schema#comment> "\n              This ontology is generated from the manually created specifications in the DBpedia Mappings\n              Wiki. Each release of this ontology corresponds to a new release of the DBpedia data set which\n              contains instance data extracted from the different language versions of Wikipedia. For\n              information regarding changes in this ontology, please refer to the DBpedia Mappings Wiki.\n            "@en .
+<http://dbpedia.org/ontology/> <http://creativecommons.org/ns#license> <http://creativecommons.org/licenses/by-sa/3.0/> .
+<http://dbpedia.org/ontology/> <http://purl.org/dc/terms/license> <http://creativecommons.org/licenses/by-sa/3.0/> .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "basketbal competitie"@nl .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\u039F\u03BC\u03BF\u03C3\u03C0\u03BF\u03BD\u03B4\u03AF\u03B1 \u039A\u03B1\u03BB\u03B1\u03B8\u03BF\u03C3\u03C6\u03B1\u03AF\u03C1\u03B9\u03C3\u03B7\u03C2"@el .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\uB18D\uAD6C \uB9AC\uADF8"@ko .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\u0628\u0627\u0633\u06A9\u0679 \u0628\u0627\u0644 \u06A9\u06CC \u0627\u0646\u062C\u0645\u0646"@ur .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "sraith cispheile"@ga .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "ligue de basketball"@fr .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "liga de baloncesto"@es .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "lega di pallacanestro"@it .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "basketball league"@en .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\u30D0\u30B9\u30B1\u30C3\u30C8\u30DC\u30FC\u30EB\u30EA\u30FC\u30B0"@ja .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#label> "Basketball-Liga"@de .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#comment> "a group of sports teams that compete against each other in Basketball"@en .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#comment> "\u06A9\u06BE\u06CC\u0644\u0648\u06BA \u06A9\u06CC \u0679\u06CC\u0645\u0648\u06BA \u06A9\u0627 \u0627\u06CC\u06A9 \u06AF\u0631\u0648\u067E \u062C\u0648 \u0628\u0627\u0633\u06A9\u0679 \u0628\u0627\u0644 \u0645\u06CC\u06BA \u0627\u06CC\u06A9 \u062F\u0648\u0633\u0631\u06D2 \u0633\u06D2 \u0645\u0642\u0627\u0628\u0644\u06C1 \u06A9\u0631\u062A\u0627 \u06C1\u06D2"@ur .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SportsLeague> .
+<http://dbpedia.org/ontology/BasketballLeague> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:BasketballLeague> .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#label> "gebeurtenis in de natuur"@nl .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C6\u03C5\u03C3\u03B9\u03BA\u03CC \u03B3\u03B5\u03B3\u03BF\u03BD\u03CC\u03C2"@el .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#label> "\u0642\u062F\u0631\u062A\u06CC \u0648\u0627\u0642\u0639\u06C1"@ur .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#label> "\u00E9v\u00E9nement naturel"@fr .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#label> "evento naturale"@it .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#label> "natural event"@en .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#label> "Naturereignis"@de .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#comment> "\u03A4\u03BF \u03C6\u03C5\u03C3\u03B9\u03BA\u03CC \u03B3\u03B5\u03B3\u03BF\u03BD\u03CC\u03C2 \u03C7\u03C1\u03B7\u03C3\u03B9\u03BC\u03BF\u03C0\u03BF\u03B9\u03B5\u03AF\u03C4\u03B1\u03B9 \u03B3\u03B9\u03B1 \u03BD\u03B1 \u03C0\u03B5\u03C1\u03B9\u03B3\u03C1\u03AC\u03C8\u03B5\u03B9 \u03AD\u03BD\u03B1 \u03C3\u03C5\u03BC\u03B2\u03AC\u03BD \u03C0\u03BF\u03C5 \u03C0\u03C1\u03B1\u03B3\u03BC\u03B1\u03C4\u03BF\u03C0\u03BF\u03B9\u03B5\u03AF\u03C4\u03B1\u03B9 \u03C6\u03C5\u03C3\u03B9\u03BA\u03AC"@el .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0645\u0627\u062F\u06CC \u062A\u0642\u0631\u06CC\u0628 \u06A9\u0627 \u0627\u0633\u062A\u0639\u0645\u0627\u0644 \u0642\u062F\u0631\u062A\u06CC \u0637\u0648\u0631 \u067E\u0631 \u0631\u0648\u0646\u0645\u0627 \u06C1\u0648\u0646\u06D2 \u0648\u0627\u0644\u06D2 \u0648\u0627\u0642\u0639\u06D2 \u06A9\u0648 \u0628\u06CC\u0627\u0646 \u06A9\u0631\u0646\u06D2 \u06A9\u06D2 \u0644\u06CC\u06D2 \u06A9\u06CC\u0627 \u062C\u0627\u062A\u0627 \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Event> .
+<http://dbpedia.org/ontology/NaturalEvent> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:NaturalEvent> .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#label> "provincie"@nl .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B5\u03C0\u03B1\u03C1\u03C7\u03AF\u03B1"@el .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#label> "\u0635\u0648\u0628\u06C1"@ur .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#label> "c\u00FAige"@ga .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#label> "province"@fr .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#label> "province"@en .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#label> "\u82F1\u8A9E\u570F\u306E\u884C\u653F\u533A\u753B"@ja .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#label> "Provinz"@de .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#comment> "An administrative body governing a territorial unity on the intermediate level, between local and national level"@en .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#comment> "Entit\u00E9 administrative en charge d'une unit\u00E9 territoriale se situant entre le niveau local et national; ex: Province Nord (Nouvelle-Cal\u00E9donie)"@fr .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0395\u03AF\u03BD\u03B1\u03B9 \u03B4\u03B9\u03BF\u03B9\u03BA\u03B7\u03C4\u03B9\u03BA\u03AE \u03B4\u03BF\u03BC\u03AE \u03C4\u03BF\u03C5 \u03BA\u03C1\u03AC\u03C4\u03BF\u03C5\u03C2 \u03C0\u03BF\u03C5 \u03B4\u03B9\u03BF\u03B9\u03BA\u03B5\u03AF \u03BC\u03B9\u03B1 \u03C0\u03B5\u03C1\u03B9\u03BF\u03C7\u03AE \u03C0\u03BF\u03C5 \u03B5\u03AF\u03BD\u03B1\u03B9 \u03C3\u03B5 \u03AD\u03BA\u03C4\u03B1\u03C3\u03B7 \u03BC\u03B5\u03B3\u03B1\u03BB\u03CD\u03C4\u03B5\u03C1\u03B7 \u03B1\u03C0\u03CC \u03C4\u03BF\u03C0\u03B9\u03BA\u03CC \u03B5\u03C0\u03AF\u03C0\u03B5\u03B4\u03BF \u03BA\u03B1\u03B9 \u03BC\u03B9\u03BA\u03C1\u03CC\u03C4\u03B5\u03C1\u03B7 \u03B1\u03C0\u03CC \u03B5\u03B8\u03BD\u03B9\u03BA\u03CC \u03B5\u03C0\u03AF\u03C0\u03B5\u03B4\u03BF."@el .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0627\u06CC\u06A9 \u0627\u0646\u062A\u0638\u0627\u0645\u06CC \u0627\u062F\u0627\u0631\u06C1 \u062C\u0648 \u0645\u0642\u0627\u0645\u06CC \u0627\u0648\u0631 \u0642\u0648\u0645\u06CC \u0633\u0637\u062D \u06A9\u06D2 \u062F\u0631\u0645\u06CC\u0627\u0646 \u0627\u0646\u0679\u0631\u0645\u06CC\u0688\u06CC\u0679 \u0633\u0637\u062D \u067E\u0631 \u0639\u0644\u0627\u0642\u0627\u0626\u06CC \u0648\u062D\u062F\u062A \u06A9\u0627 \u0627\u0646\u062A\u0638\u0627\u0645 \u06A9\u0631\u062A\u0627 \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/GovernmentalAdministrativeRegion> .
+<http://dbpedia.org/ontology/Province> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Province> .
+<http://dbpedia.org/ontology/TopLevelDomain> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/TopLevelDomain> <http://www.w3.org/2000/01/rdf-schema#label> "top level domain"@en .
+<http://dbpedia.org/ontology/TopLevelDomain> <http://www.w3.org/2000/01/rdf-schema#label> "\u0627\u0648\u067E\u0631 \u0633\u0637\u062D \u06A9\u06CC \u0688\u0648\u0645\u06CC\u0646"@ur .
+<http://dbpedia.org/ontology/TopLevelDomain> <http://www.w3.org/2000/01/rdf-schema#label> "top level domain"@de .
+<http://dbpedia.org/ontology/TopLevelDomain> <http://www.w3.org/2000/01/rdf-schema#label> "domaine de premier niveau"@fr .
+<http://dbpedia.org/ontology/TopLevelDomain> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Identifier> .
+<http://dbpedia.org/ontology/TopLevelDomain> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q14296> .
+<http://dbpedia.org/ontology/TopLevelDomain> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:TopLevelDomain> .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#label> "cratera lunar"@pt .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#label> "maankrater"@nl .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#label> "\u03A3\u03B5\u03BB\u03B7\u03BD\u03B9\u03B1\u03BA\u03CC\u03C2 \u03BA\u03C1\u03B1\u03C4\u03AE\u03C1\u03B1\u03C2"@el .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#label> "\u0642\u0645\u0631\u06CC \u06AF\u0691\u06BE\u0627"@ur .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#label> "cr\u00E1it\u00E9ar geala\u00ED"@ga .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#label> "crat\u00E8re lunaire"@fr .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#label> "lunar crater"@en .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#label> "Mondkrater"@de .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Crater> .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q1348589> .
+<http://dbpedia.org/ontology/LunarCrater> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:LunarCrater> .
+<http://dbpedia.org/ontology/MotorsportSeason> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/MotorsportSeason> <http://www.w3.org/2000/01/rdf-schema#label> "motorsport season"@en .
+<http://dbpedia.org/ontology/MotorsportSeason> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0648\u0679\u0631 \u06A9\u06BE\u06CC\u0644 \u06A9\u0627 \u0645\u0648\u0633\u0645"@ur .
+<http://dbpedia.org/ontology/MotorsportSeason> <http://www.w3.org/2000/01/rdf-schema#label> "motorsportseizoen"@nl .
+<http://dbpedia.org/ontology/MotorsportSeason> <http://www.w3.org/2000/01/rdf-schema#label> "Motorsportsaison"@de .
+<http://dbpedia.org/ontology/MotorsportSeason> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SportsSeason> .
+<http://dbpedia.org/ontology/MotorsportSeason> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:MotorsportSeason> .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "militair"@nl .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C3\u03C4\u03C1\u03B1\u03C4\u03B9\u03C9\u03C4\u03B9\u03BA\u03CC\u03C2"@el .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "\uAD70\uC778"@ko .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "\u0641\u0648\u062C\u06CC \u0634\u062E\u0635"@ur .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "militaire"@fr .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "militare"@it .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "military person"@en .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "\u8ECD\u4EBA"@ja .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#label> "milit\u00E4rische Person"@de .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/MilitaryPerson> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:MilitaryPerson> .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "tijdvak"@nl .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C7\u03C1\u03BF\u03BD\u03B9\u03BA\u03AE \u03C0\u03B5\u03C1\u03AF\u03BF\u03B4\u03BF\u03C2"@el .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "\u0648\u0642\u062A \u06A9\u06CC \u0645\u062F\u062A"@ur .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "tr\u00E9imhse"@ga .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "p\u00E9riode temporelle"@fr .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "periodo temporal"@es .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "time period"@en .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "tidsperiode"@da .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#label> "Zeitraum"@de .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Thing> .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.ontologydesignpatterns.org/ont/dul/DUL.owl#TimeInterval> .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/2002/07/owl#disjointWith> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/TimePeriod> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:TimePeriod> .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "motor de autom\u00F3vel"@pt .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "automotor"@nl .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "\u03BA\u03B9\u03BD\u03B7\u03C4\u03AE\u03C1\u03B1\u03C2 \u03B1\u03C5\u03C4\u03BF\u03BA\u03B9\u03BD\u03AE\u03C4\u03BF\u03C5"@el .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "\uC790\uB3D9\uCC28 \uC5D4\uC9C4"@ko .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0648\u0679\u0631 \u06AF\u0627\u0691\u06CC \u06A9\u0627 \u0627\u0646\u062C\u0646"@ur .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "inneall gluaiste\u00E1in"@ga .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "moteur d'automobile"@fr .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "motore d'automobile"@it .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "automobile engine"@en .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "\u5185\u71C3\u6A5F\u95A2"@ja .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#label> "Fahrzeugmotor"@de .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Engine> .
+<http://dbpedia.org/ontology/AutomobileEngine> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:AutomobileEngine> .
+<http://dbpedia.org/ontology/Nebula> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Nebula> <http://www.w3.org/2000/01/rdf-schema#label> "Nebula"@en .
+<http://dbpedia.org/ontology/Nebula> <http://www.w3.org/2000/01/rdf-schema#label> "N\u00E9buleuse"@fr .
+<http://dbpedia.org/ontology/Nebula> <http://www.w3.org/2000/01/rdf-schema#label> "\u0422\u0443\u043C\u0430\u043D\u043D\u043E\u0441\u0442\u044C"@ru .
+<http://dbpedia.org/ontology/Nebula> <http://www.w3.org/2000/01/rdf-schema#label> "\u0622\u0646\u06A9\u06BE \u06A9\u0627 \u062C\u0627\u0644\u0627"@ur .
+<http://dbpedia.org/ontology/Nebula> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/CelestialBody> .
+<http://dbpedia.org/ontology/Nebula> <http://www.w3.org/2002/07/owl#disjointWith> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/Nebula> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Nebula> .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "archeolog"@pl .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "archeoloog"@nl .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "\u0391\u03C1\u03C7\u03B1\u03B9\u03BF\u03BB\u03CC\u03B3\u03BF\u03C2"@el .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0627\u06C1\u0631 \u0622\u062B\u0627\u0631 \u0642\u062F\u06CC\u0645\u06C1"@ur .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "seand\u00E1la\u00ED"@ga .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "arch\u00E9ologue"@fr .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "Arque\u00F3logo"@es .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "archeologist"@en .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "\u8003\u53E4\u5B66\u8005"@ja .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#label> "Arch\u00E4ologe"@de .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q3621491> .
+<http://dbpedia.org/ontology/Archeologist> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Archeologist> .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "enzym"@nl .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "\u03AD\u03BD\u03B6\u03C5\u03BC\u03BF"@el .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "\uD6A8\uC18C"@ko .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "\u062E\u0627\u0645\u0631\u06C1"@ur .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "eins\u00EDm"@ga .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "enzyme"@fr .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "enzima"@it .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "enzyme"@en .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "\u9175\u7D20"@ja .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#label> "Enzym"@de .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Biomolecule> .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q8047> .
+<http://dbpedia.org/ontology/Enzyme> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Enzyme> .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#label> "songwriter (tekstdichter)"@nl .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#label> "\u0646\u063A\u0645\u06C1 \u0646\u06AF\u0627\u0631"@ur .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#label> "auteur-compositeur"@fr .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#label> "songwriter"@en .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#label> "sangskriver"@da .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#label> "Liedschreiber"@de .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#comment> "a person who writes songs."@en .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#comment> "een persoon die de muziek en/of de tekst voor populaire muzieknummers schrijft."@nl .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0627\u06CC\u06A9 \u0634\u062E\u0635 \u062C\u0648 \u06AF\u0627\u0646\u06D2 \u0644\u06A9\u06BE\u062A\u0627 \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Writer> .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q753110> .
+<http://dbpedia.org/ontology/SongWriter> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:SongWriter> .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2000/01/rdf-schema#label> "plein"@nl .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2000/01/rdf-schema#label> "\u0686\u0648\u06A9\u0648\u0631"@ur .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2000/01/rdf-schema#label> "cearn\u00F3g"@ga .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2000/01/rdf-schema#label> "place"@fr .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2000/01/rdf-schema#label> "square"@en .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2000/01/rdf-schema#label> "\u6B63\u65B9\u5F62"@ja .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2000/01/rdf-schema#label> "Platz"@de .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/ArchitecturalStructure> .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q174782> .
+<http://dbpedia.org/ontology/Square> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Square> .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "uniwersytet"@pl .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "universidade"@pt .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "universiteit"@nl .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03B1\u03BD\u03B5\u03C0\u03B9\u03C3\u03C4\u03AE\u03BC\u03B9\u03BF"@el .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "\uB300\uD559"@ko .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "\u062C\u0627\u0645\u0639 \u062F\u0631\u0633 \u06AF\u0627\u06C1"@ur .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "ollscoil"@ga .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "universit\u00E9"@fr .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "universidad"@es .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "university"@en .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "\u5927\u5B66"@ja .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#label> "Universit\u00E4t"@de .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/EducationalInstitution> .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://schema.org/CollegeOrUniversity> .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q3918> .
+<http://dbpedia.org/ontology/University> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:University> .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "anatomische structuur"@nl .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03BD\u03B1\u03C4\u03BF\u03BC\u03B9\u03BA\u03AE \u03B4\u03BF\u03BC\u03AE"@el .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "\uD574\uBD80\uD559"@ko .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "\u062C\u0633\u0645\u0627\u0646\u06CC \u0633\u0627\u062E\u062A"@ur .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "coirpeog"@ga .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "structure anatomique"@fr .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "estrutura anat\u00F3mica"@gl .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "struttura anatomica"@it .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "anatomska struktura"@sl .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "anatomical structure"@en .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "\u89E3\u5256\u69CB\u9020"@ja .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#label> "anatomischen Struktur"@de .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Thing> .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q4936952> .
+<http://dbpedia.org/ontology/AnatomicalStructure> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:AnatomicalStructure> .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "televisie show"@nl .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C4\u03B7\u03BB\u03B5\u03BF\u03C0\u03C4\u03B9\u03BA\u03AE \u03C3\u03B5\u03B9\u03C1\u03AC"@el .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "\u0679\u06CC \u0648\u06CC \u0634\u0648"@ur .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "cl\u00E1r teilif\u00EDse"@ga .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "\u00E9mission de t\u00E9l\u00E9vision"@fr .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "serie de televisi\u00F3n"@es .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0639\u0644\u0648\u0645\u0627\u062A \u062A\u0644\u0641\u0627\u0632"@ar .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "televizijska oddaja"@sl .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "television show"@en .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "\u30C6\u30EC\u30D3\u756A\u7D44"@ja .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#label> "Fernsehsendung"@de .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Work> .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q15416> .
+<http://dbpedia.org/ontology/TelevisionShow> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:TelevisionShow> .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2000/01/rdf-schema#label> "lanceerbasis"@nl .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C1\u03AC\u03BC\u03C0\u03B1 \u03C6\u03BF\u03C1\u03C4\u03CE\u03C3\u03B5\u03C9\u03C2"@el .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u06CC\u0632\u0627\u0626\u0644 \u0686\u0644\u0627\u0646\u06D2 \u06A9\u06CC \u062C\u06AF\u06C1"@ur .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2000/01/rdf-schema#label> "ceap lainse\u00E1la"@ga .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2000/01/rdf-schema#label> "rampe de lancement"@fr .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2000/01/rdf-schema#label> "launch pad"@en .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2000/01/rdf-schema#label> "Startrampe"@de .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Infrastructure> .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q1353183> .
+<http://dbpedia.org/ontology/LaunchPad> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:LaunchPad> .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "wielerronde"@nl .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\u039F\u03BC\u03BF\u03C3\u03C0\u03BF\u03BD\u03B4\u03AF\u03B1 \u03A0\u03BF\u03B4\u03B7\u03BB\u03B1\u03C3\u03AF\u03B1\u03C2"@el .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\uC0AC\uC774\uD074 \uB9AC\uADF8"@ko .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\u0633\u0627\u0626\u06CC\u06A9\u0644 \u0633\u0648\u0627\u0631 \u06A9\u06CC \u0627\u0646\u062C\u0645\u0646"@ur .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "ligue de cyclisme"@fr .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "liga de ciclismo"@es .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "cycling league"@en .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "Rad-Liga"@de .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#comment> "\u06A9\u06BE\u06CC\u0644\u0648\u06BA \u06A9\u06CC \u0679\u06CC\u0645\u0648\u06BA \u06A9\u0627 \u0627\u06CC\u06A9 \u06AF\u0631\u0648\u067E \u062C\u0648 \u0633\u0627\u0626\u06CC\u06A9\u0644\u0646\u06AF \u0645\u06CC\u06BA \u0627\u06CC\u06A9 \u062F\u0648\u0633\u0631\u06D2 \u06A9\u06D2 \u062E\u0644\u0627\u0641 \u0645\u0642\u0627\u0628\u0644\u06C1 \u06A9\u0631\u062A\u0627 \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#comment> "a group of sports teams that compete against each other in Cycling"@en .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SportsLeague> .
+<http://dbpedia.org/ontology/CyclingLeague> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:CyclingLeague> .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#label> "territorium"@nl .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03B5\u03C1\u03B9\u03BF\u03C7\u03AE"@el .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0627\u062A\u062D\u062A \u0639\u0644\u0627\u0642\u06C1"@ur .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#label> "Territoire"@fr .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#label> "territory"@en .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#label> "\u56FD\u571F"@ja .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#label> "Territorium"@de .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#comment> "A territory may refer to a country subdivision, a non-sovereign geographic region."@en .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#comment> "Un territoire peut d\u00E9signer une subdivision de pays, une r\u00E9gion g\u00E9ographique non souveraine."@fr .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0627\u06CC\u06A9 \u0645\u0627\u062A\u062D\u062A \u0639\u0644\u0627\u0642\u06C1 \u06A9\u0633\u06CC \u0645\u0644\u06A9 \u06A9\u06CC \u0630\u06CC\u0644\u06CC \u062A\u0642\u0633\u06CC\u0645\u060C \u0627\u06CC\u06A9 \u063A\u06CC\u0631 \u062E\u0648\u062F\u0645\u062E\u062A\u0627\u0631 \u062C\u063A\u0631\u0627\u0641\u06CC\u0627\u0626\u06CC \u062E\u0637\u06C1 \u06A9\u0627 \u062D\u0648\u0627\u0644\u06C1 \u062F\u06D2 \u0633\u06A9\u062A\u0627 \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/PopulatedPlace> .
+<http://dbpedia.org/ontology/Territory> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Territory> .
+<http://dbpedia.org/ontology/Tank> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Tank> <http://www.w3.org/2000/01/rdf-schema#label> "Tank"@en .
+<http://dbpedia.org/ontology/Tank> <http://www.w3.org/2000/01/rdf-schema#label> "\u062D\u0648\u0636"@ur .
+<http://dbpedia.org/ontology/Tank> <http://www.w3.org/2000/01/rdf-schema#label> "\u0422\u0430\u043D\u043A"@ru .
+<http://dbpedia.org/ontology/Tank> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Thing> .
+<http://dbpedia.org/ontology/Tank> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Tank> .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "curling competitie"@nl .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03C1\u03C9\u03C4\u03AC\u03B8\u03BB\u03B7\u03BC\u03B1 curling"@el .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\uCEEC\uB9C1 \uB9AC\uADF8"@ko .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "\u067E\u062A\u06BE\u0631 \u06A9\u0646\u0688\u0644\u06CC \u06A9\u06BE\u064A\u0644 \u06A9\u06CC \u0627\u0646\u062C\u0645\u0646"@ur .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "sraith curl\u00E1la"@ga .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "ligue de curling"@fr .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "liga de curling"@es .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "curling league"@en .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#label> "Curling-Liga"@de .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#comment> "a group of sports teams that compete against each other in Curling"@en .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#comment> "\u06A9\u06BE\u06CC\u0644\u0648\u06BA \u06A9\u06CC \u0679\u06CC\u0645\u0648\u06BA \u06A9\u0627 \u0627\u06CC\u06A9 \u06AF\u0631\u0648\u067E \u062C\u0648 \u06A9\u0631\u0644\u0646\u06AF \u0645\u06CC\u06BA \u0627\u06CC\u06A9 \u062F\u0648\u0633\u0631\u06D2 \u06A9\u06D2 \u062E\u0644\u0627\u0641 \u0645\u0642\u0627\u0628\u0644\u06C1 \u06A9\u0631\u062A\u06D2 \u06C1\u06CC\u06BA\u06D4"@ur .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SportsLeague> .
+<http://dbpedia.org/ontology/CurlingLeague> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:CurlingLeague> .
+<http://dbpedia.org/ontology/GatedCommunity> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/GatedCommunity> <http://www.w3.org/2000/01/rdf-schema#label> "Gated community"@en .
+<http://dbpedia.org/ontology/GatedCommunity> <http://www.w3.org/2000/01/rdf-schema#label> "Hofje / gebouw met woongemeenschap"@nl .
+<http://dbpedia.org/ontology/GatedCommunity> <http://www.w3.org/2000/01/rdf-schema#label> "bewachte Wohnanlage / Siedlung"@de .
+<http://dbpedia.org/ontology/GatedCommunity> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0633\u062F\u0648\u062F \u0628\u0631\u0627\u062F\u0631\u06CC"@ur .
+<http://dbpedia.org/ontology/GatedCommunity> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/PopulatedPlace> .
+<http://dbpedia.org/ontology/GatedCommunity> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:GatedCommunity> .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#label> "muziekfestival"@nl .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C6\u03B5\u03C3\u03C4\u03B9\u03B2\u03AC\u03BB \u03BC\u03BF\u03C5\u03C3\u03B9\u03BA\u03AE\u03C2"@el .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#label> "\uC74C\uC545\uC81C"@ko .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0648\u0633\u06CC\u0642\u06CC \u0645\u06CC\u0644\u06C1"@ur .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#label> "festival de musique"@fr .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#label> "festival de m\u00FAsica"@es .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#label> "music festival"@en .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#label> "Musikfestival"@de .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SocietalEvent> .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q868557> .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/2002/07/owl#equivalentClass> <http://schema.org/Festival> .
+<http://dbpedia.org/ontology/MusicFestival> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:MusicFestival> .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "belasting"@nl .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C6\u03CC\u03C1\u03BF\u03C2"@el .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u062D\u0635\u0648\u0644"@ur .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "c\u00E1in"@ga .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "taxe"@fr .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "impuesto"@es .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "tax"@en .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "\u79DF\u7A0E"@ja .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#label> "Steuer"@de .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/TopicalConcept> .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q8161> .
+<http://dbpedia.org/ontology/Tax> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Tax> .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#label> "renbaan"@nl .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B9\u03C0\u03C0\u03CC\u03B4\u03C1\u03BF\u03BC\u03BF\u03C2"@el .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#label> "\u0628\u06BE\u0627\u06AF\u0646\u06D2 \u0648\u0627\u0644\u0627 \u0631\u0633\u062A\u06C1"@ur .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#label> "r\u00E1sch\u00FArsa"@ga .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#label> "ippodromo"@it .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#label> "racecourse"@en .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#label> "\u7AF6\u99AC\u5834"@ja .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#label> "Rennbahn"@de .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#comment> "A racecourse is an alternate term for a horse racing track, found in countries such as the United Kingdom, Australia, Hong Kong, and the United Arab Emirates."@en .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0631\u06CC\u0633 \u06A9\u0648\u0631\u0633 \u06C1\u0627\u0631\u0633 \u0631\u06CC\u0633\u0646\u06AF \u0679\u0631\u06CC\u06A9 \u06A9\u06D2 \u0644\u06CC\u06D2 \u0627\u06CC\u06A9 \u0645\u062A\u0628\u0627\u062F\u0644 \u0627\u0635\u0637\u0644\u0627\u062D \u06C1\u06D2\u060C \u062C\u0648 \u0628\u0631\u0637\u0627\u0646\u06CC\u06C1\u060C \u0622\u0633\u0679\u0631\u06CC\u0644\u06CC\u0627\u060C \u06C1\u0627\u0646\u06AF \u06A9\u0627\u0646\u06AF \u0627\u0648\u0631 \u0645\u062A\u062D\u062F\u06C1 \u0639\u0631\u0628 \u0627\u0645\u0627\u0631\u0627\u062A \u062C\u06CC\u0633\u06D2 \u0645\u0645\u0627\u0644\u06A9 \u0645\u06CC\u06BA \u067E\u0627\u0626\u06CC \u062C\u0627\u062A\u06CC \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#comment> "\u039F \u03B9\u03C0\u03C0\u03CC\u03B4\u03C1\u03BF\u03BC\u03BF\u03C2,\u03B5\u03BD\u03B1\u03BB\u03BB\u03B1\u03BA\u03C4\u03B9\u03BA\u03CC\u03C2 \u03CC\u03C1\u03BF\u03C2 \u03B3\u03B9\u03B1 \u03C4\u03B7\u03BD \u03C0\u03AF\u03C3\u03C4\u03B1 \u03B4\u03B9\u03B5\u03BE\u03B1\u03B3\u03C9\u03B3\u03AE\u03C2 \u03B1\u03B3\u03CE\u03BD\u03C9\u03BD \u03BC\u03B5\u03C4\u03B1\u03BE\u03CD \u03AF\u03C0\u03C0\u03C9\u03BD,\u03C3\u03C5\u03BD\u03B1\u03BD\u03C4\u03AC\u03C4\u03B1\u03B9 \u03C3\u03B5 \u03C7\u03CE\u03C1\u03B5\u03C2 \u03CC\u03C0\u03C9\u03C2 \u03B7 \u0391\u03B3\u03B3\u03BB\u03AF\u03B1, \u0391\u03C5\u03C3\u03C4\u03C1\u03B1\u03BB\u03AF\u03B1, \u03A7\u03BF\u03BD\u03B3\u03BA \u039A\u03BF\u03BD\u03B3\u03BA \u03BA\u03B1\u03B9 \u03C4\u03B1 \u0397\u03BD\u03C9\u03BC\u03AD\u03BD\u03B1 \u0391\u03C1\u03B1\u03B2\u03B9\u03BA\u03AC \u0395\u03BC\u03B9\u03C1\u03AC\u03C4\u03B1."@el .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/RaceTrack> .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q1777138> .
+<http://dbpedia.org/ontology/Racecourse> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Racecourse> .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "tancerz"@pl .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "danser"@nl .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C7\u03BF\u03C1\u03B5\u03C5\u03C4\u03AE\u03C2"@el .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "\u0631\u0642\u0635 \u06A9\u0631\u0646\u06D2 \u0648\u0627\u0644\u0627"@ur .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "damhs\u00F3ir"@ga .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "danceur"@fr .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "ballerino"@it .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "dancer"@en .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "\u30C0\u30F3\u30B5\u30FC"@ja .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#label> "T\u00E4nzer"@de .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Artist> .
+<http://dbpedia.org/ontology/Dancer> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Dancer> .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "ijshockeyspeler"@nl .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03B1\u03AF\u03BA\u03C4\u03B7\u03C2 \u03C7\u03CC\u03BA\u03B5\u03CB"@el .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "\uC544\uC774\uC2A4\uD558\uD0A4 \uC120\uC218"@ko .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "\u0628\u0631\u0641\u0627\u0646\u06CC \u06C1\u0627\u06A9\u06CC \u06A9\u0627 \u06A9\u06BE\u0644\u0627\u0691\u06CC"@ur .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "joueur de hockey sur glace"@fr .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "ice hockey player"@en .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "Eishockeyspieler"@de .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/WinterSportPlayer> .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q11774891> .
+<http://dbpedia.org/ontology/IceHockeyPlayer> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:IceHockeyPlayer> .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#label> "openbaar vervoer systeem"@nl .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#label> "\u03BC\u03AD\u03C3\u03B1 \u03BC\u03B1\u03B6\u03B9\u03BA\u03AE\u03C2 \u03BC\u03B5\u03C4\u03B1\u03C6\u03BF\u03C1\u03AC\u03C2"@el .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#label> "\u0639\u0648\u0627\u0645\u06CC \u0631\u0627\u06C1\u062F\u0627\u0631\u06CC \u06A9\u0627 \u0646\u0638\u0627\u0645"@ur .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#label> "Syst\u00E8me de transport public"@fr .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#label> "Sistema de Transporte P\u00FAblico"@es .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#label> "public transit system"@en .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#label> "\u00D6ffentliches Personenverkehrssystem"@de .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#comment> "\u03A4\u03B1 \u03BC\u03AD\u03C3\u03B1 \u03BC\u03B1\u03B6\u03B9\u03BA\u03AE\u03C2 \u03BC\u03B5\u03C4\u03B1\u03C6\u03BF\u03C1\u03AC\u03C2 (\u03C3\u03C5\u03BD\u03C4\u03BF\u03BC\u03BF\u03B3\u03C1\u03B1\u03C6\u03AF\u03B1 \u039C\u039C\u039C) \u03B5\u03AF\u03BD\u03B1\u03B9 \u03C4\u03B1 \u03B4\u03B7\u03BC\u03CC\u03C3\u03B9\u03B1 \u03C3\u03C5\u03B3\u03BA\u03BF\u03B9\u03BD\u03C9\u03BD\u03B9\u03B1\u03BA\u03AC \u03BC\u03AD\u03C3\u03B1, \u03C0\u03BF\u03C5 \u03C0\u03B5\u03C1\u03B9\u03BB\u03B1\u03BC\u03B2\u03AC\u03BD\u03BF\u03C5\u03BD \u03C4\u03B1 \u03BB\u03B5\u03C9\u03C6\u03BF\u03C1\u03B5\u03AF\u03B1, \u03C4\u03B1 \u03C4\u03C1\u03CC\u03BB\u03B5\u03CA, \u03C4\u03B1 \u03C4\u03C1\u03B1\u03BC, \u03C4\u03B1 \u03C4\u03C1\u03AD\u03BD\u03B1, \u03C4\u03BF \u03BC\u03B5\u03C4\u03C1\u03CC, \u03C4\u03B1 \u03C0\u03BB\u03BF\u03AF\u03B1. \u03A5\u03C0\u03AC\u03C1\u03C7\u03BF\u03C5\u03BD \u03BA\u03B1\u03B9 \u03C4\u03B1 \u03C4\u03B1\u03C7\u03B5\u03AF\u03B1 \u03BC\u03AD\u03C3\u03B1 \u03C3\u03C5\u03B3\u03BA\u03BF\u03B9\u03BD\u03C9\u03BD\u03AF\u03B1\u03C2 \u03C0\u03BF\u03C5 \u03C0\u03B5\u03C1\u03B9\u03BB\u03B1\u03BC\u03B2\u03AC\u03BD\u03BF\u03C5\u03BD \u03C4\u03B1 \u03B1\u03B5\u03C1\u03BF\u03C0\u03BB\u03AC\u03BD\u03B1, \u03C5\u03C0\u03B5\u03C1\u03C4\u03B1\u03C7\u03B5\u03AF\u03B1 \u03C4\u03C1\u03AD\u03BD\u03B1."@el .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0639\u0648\u0627\u0645\u06CC \u0631\u0627\u06C1\u062F\u0627\u0631\u06CC \u06A9\u0627 \u0646\u0638\u0627\u0645 \u0627\u06CC\u06A9 \u0645\u0634\u062A\u0631\u06A9\u06C1 \u0639\u0648\u0627\u0645\u06CC \u0646\u0642\u0644 \u0648 \u062D\u0645\u0644 \u06A9\u06CC \u0633\u0631\u0648\u0633 \u06C1\u06D2 \u062C\u0648 \u0639\u0627\u0645 \u0644\u0648\u06AF\u0648\u06BA \u06A9\u06D2 \u0627\u0633\u062A\u0639\u0645\u0627\u0644 \u06A9\u06D2 \u0644\u06CC\u06D2 \u062F\u0633\u062A\u06CC\u0627\u0628 \u06C1\u06D2\u06D4\u0639\u0648\u0627\u0645\u06CC \u0646\u0642\u0644 \u0648 \u062D\u0645\u0644 \u06A9\u06D2 \u0637\u0631\u06CC\u0642\u0648\u06BA \u0645\u06CC\u06BA \u0628\u0633\u06CC\u06BA \u060C \u0679\u0631\u0627\u0644\u06CC \u0628\u0633\u06CC\u06BA \u060C \u0679\u0631\u0627\u0645 \u0627\u0648\u0631 \u0679\u0631\u06CC\u0646\u06CC\u06BA \u060C '\u062A\u06CC\u0632 \u0631\u0641\u062A\u0627\u0631\u0631\u0627\u06C1\u062F\u0627\u0631\u06CC' (\u0645\u06CC\u0679\u0631\u0648/\u0632\u0645\u06CC\u0646 \u062F\u0648\u0632 \u0628\u0631\u0642\u06CC \u0631\u06CC\u0644/\u0632\u06CC\u0631 \u0632\u0645\u06CC\u0646 \u0648\u063A\u06CC\u0631\u06C1) \u0627\u0648\u0631 \u0641\u06CC\u0631\u06CC \u0634\u0627\u0645\u0644 \u06C1\u06CC\u06BA\u06D4"@ur .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#comment> "Un syst\u00E8me de transport en commun est un service de transport partag\u00E9 de passagers mis \u00E0 la disposition du grand public. Les modes de transport public comprennent les bus, les trolleybus, les tramways et les trains, le \u00AB transport en commun rapide \u00BB (m\u00E9tro, TGV, etc.) et les ferries. Les transports publics interurbains sont domin\u00E9s par les compagnies a\u00E9riennes, les autocars et le rail intercit\u00E9. (http://en.wikipedia.org/wiki/Public_transit)."@fr .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#comment> "A public transit system is a shared passenger transportation service which is available for use by the general public. Public transport modes include buses, trolleybuses, trams and trains, 'rapid transit' (metro/subways/undergrounds etc) and ferries. Intercity public transport is dominated by airlines, coaches, and intercity rail. (http://en.wikipedia.org/wiki/Public_transit)."@en .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#comment> "Ein System des \u00D6ffentlichen Personenverkehrs auf Stra\u00DFe, Schiene oder Wasser."@de .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Company> .
+<http://dbpedia.org/ontology/PublicTransitSystem> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:PublicTransitSystem> .
+<http://dbpedia.org/ontology/BloodVessel> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/BloodVessel> <http://www.w3.org/2000/01/rdf-schema#label> "blood vessel"@en .
+<http://dbpedia.org/ontology/BloodVessel> <http://www.w3.org/2000/01/rdf-schema#label> "bloedvat"@nl .
+<http://dbpedia.org/ontology/BloodVessel> <http://www.w3.org/2000/01/rdf-schema#label> "vaisseau sanguin"@fr .
+<http://dbpedia.org/ontology/BloodVessel> <http://www.w3.org/2000/01/rdf-schema#label> "\u062E\u0648\u0646 \u06A9\u06CC \u0634\u0631\u06CC\u0627\u0646"@ur .
+<http://dbpedia.org/ontology/BloodVessel> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/AnatomicalStructure> .
+<http://dbpedia.org/ontology/BloodVessel> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:BloodVessel> .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#label> "mecz pi\u0142ki no\u017Cnej"@pl .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#label> "voetbal wedstrijd"@nl .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03B3\u03CE\u03BD\u03B1\u03C2 \u03C0\u03BF\u03B4\u03BF\u03C3\u03C6\u03B1\u03AF\u03C1\u03BF\u03C5"@el .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#label> "\u0641\u0679 \u0628\u0627\u0644 \u0645\u0642\u0627\u0628\u0644\u06C1"@ur .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#label> "cluiche peile"@ga .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#label> "partido de f\u00FAtbol"@es .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#label> "football match"@en .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#label> "Fu\u00DFballspiel"@de .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#comment> "a competition between two football teams"@en .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#comment> "\u062F\u0648 \u0641\u0679 \u0628\u0627\u0644 \u0679\u06CC\u0645\u0648\u06BA \u06A9\u06D2 \u062F\u0631\u0645\u06CC\u0627\u0646 \u0645\u0642\u0627\u0628\u0644\u06C1"@ur .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SportsEvent> .
+<http://dbpedia.org/ontology/FootballMatch> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:FootballMatch> .
+<http://dbpedia.org/ontology/MouseGeneLocation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/MouseGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "muisgenoom locatie"@nl .
+<http://dbpedia.org/ontology/MouseGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "\u0686\u0648\u06C1\u06D2 \u06A9\u06D2 \u0646\u064E\u0633\u0628\u06C1 \u06A9\u0627 \u0645\u0642\u0627\u0645"@ur .
+<http://dbpedia.org/ontology/MouseGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "MouseGeneLocation"@en .
+<http://dbpedia.org/ontology/MouseGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "\u30DE\u30A6\u30B9\u907A\u4F1D\u5B50\u5EA7"@ja .
+<http://dbpedia.org/ontology/MouseGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "Mausgenom Lokation"@de .
+<http://dbpedia.org/ontology/MouseGeneLocation> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/GeneLocation> .
+<http://dbpedia.org/ontology/MouseGeneLocation> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:MouseGeneLocation> .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#label> "militair conflict"@nl .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C3\u03C4\u03C1\u03B1\u03C4\u03B9\u03C9\u03C4\u03B9\u03BA\u03AE \u03C3\u03CD\u03B3\u03BA\u03C1\u03BF\u03C5\u03C3\u03B7"@el .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#label> "\uC804\uC7C1"@ko .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#label> "\u0641\u0648\u062C\u06CC \u062A\u0646\u0627\u0632\u0639\u06C1"@ur .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#label> "conflit militaire"@fr .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#label> "military conflict"@en .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#label> "milit\u00E6r konflikt"@da .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#label> "milit\u00E4rischer Konflikt"@de .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SocietalEvent> .
+<http://dbpedia.org/ontology/MilitaryConflict> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:MilitaryConflict> .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#label> "Aangenomen Besluit"@nl .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#label> "\u0631\u06CC\u0627\u0633\u062A\u06CC \u0642\u0631\u0627\u0631\u062F\u0627\u062F"@ur .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#label> "R\u00E9solution adopt\u00E9e"@fr .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#label> "Stated Resolution"@en .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#label> "Angenommen Beschlu\u00DF"@de .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#comment> "A Resolution describes a formal statement adopted by a meeting or convention."@en .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0627\u06CC\u06A9 \u0642\u0631\u0627\u0631\u062F\u0627\u062F \u0645\u06CC\u0679\u0646\u06AF \u06CC\u0627 \u06A9\u0646\u0648\u0646\u0634\u0646 \u06A9\u06D2 \u0630\u0631\u06CC\u0639\u06C1 \u0627\u062E\u062A\u06CC\u0627\u0631 \u06A9\u0631\u062F\u06C1 \u0627\u06CC\u06A9 \u0631\u0633\u0645\u06CC \u0628\u06CC\u0627\u0646 \u06A9\u06CC \u0648\u0636\u0627\u062D\u062A \u06A9\u0631\u062A\u06CC \u06C1\u06D2"@ur .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#comment> "Une r\u00E9solution d\u00E9crit une d\u00E9claration officielle adopt\u00E9e par une r\u00E9union ou une convention."@fr .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#comment> "Een Besluit of Verklaring beschrijft een formeel besluit of formele aanbeveling aangenomen door een vergadering."@nl .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/WrittenWork> .
+<http://dbpedia.org/ontology/StatedResolution> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:StatedResolution> .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/2000/01/rdf-schema#label> "tram"@nl .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/2000/01/rdf-schema#label> "\u0679\u0631\u0627\u0645 \u06AF\u0627\u0691\u06CC"@ur .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/2000/01/rdf-schema#label> "tramway"@fr .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/2000/01/rdf-schema#label> "streetcar"@en .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/2000/01/rdf-schema#label> "\u8DEF\u9762\u96FB\u8ECA"@ja .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/2000/01/rdf-schema#label> "Stra\u00DFenbahn"@de .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/MeanOfTransportation> .
+<http://dbpedia.org/ontology/Tram> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Tram> .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "festiwal filmowy"@pl .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "filmfestival"@nl .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C6\u03B5\u03C3\u03C4\u03B9\u03B2\u03AC\u03BB \u03BA\u03B9\u03BD\u03B7\u03BC\u03B1\u03C4\u03BF\u03B3\u03C1\u03AC\u03C6\u03BF\u03C5"@el .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "\uC601\uD654\uC81C"@ko .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "\u0641\u0644\u0645\u06CC \u0645\u06CC\u0644\u06C1"@ur .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "f\u00E9ile scann\u00E1n"@ga .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "festival du film"@fr .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "film festival"@en .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "\u6620\u753B\u796D"@ja .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "filmfestival"@da .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#label> "Filmfestival"@de .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SocietalEvent> .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://schema.org/Festival> .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q220505> .
+<http://dbpedia.org/ontology/FilmFestival> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:FilmFestival> .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/2000/01/rdf-schema#label> "monoklonaler Antik\u00F6rper"@de .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/2000/01/rdf-schema#label> "monoclonal antibody"@en .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0648\u0646\u0648\u06A9\u0644\u0648\u0646\u0644 \u062F\u0627\u0641\u0650\u0639 \u062C\u0650\u0633\u0645"@ur .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/2000/01/rdf-schema#label> "monoclonal anticorps"@fr .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/2000/01/rdf-schema#comment> "Medikamente welche monoklonale Antik\u00F6rper sind"@en .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0648\u06C1 \u062F\u0648\u0627\u0626\u06CC\u06BA \u062C\u0648 \u0627\u06CC\u06A9 \u0645\u0648\u0646\u0648\u06A9\u0644\u0648\u0646\u0644 \u062F\u0627\u0641\u0650\u0639 \u062C\u0650\u0633\u0645 \u06C1\u06CC\u06BA\u06D4\u200E\u200E"@ur .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Drug> .
+<http://dbpedia.org/ontology/MonoclonalAntibody> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:MonoclonalAntibody> .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2000/01/rdf-schema#label> "theaterdirecteur"@nl .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2000/01/rdf-schema#label> "\u062A\u06BE\u06CC\u0679\u0631 \u06C1\u062F\u0627\u06CC\u062A \u06A9\u0627\u0631"@ur .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2000/01/rdf-schema#label> "directeur de th\u00E9\u00E2tre"@fr .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2000/01/rdf-schema#label> "Theatre director"@en .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2000/01/rdf-schema#label> "Theaterdirektor"@de .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2000/01/rdf-schema#comment> "A director in the theatre field who oversees and orchestrates the mounting of a theatre production."@en .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2000/01/rdf-schema#comment> "\u062A\u06BE\u06CC\u0679\u0631 \u06A9\u06D2 \u0645\u06CC\u062F\u0627\u0646 \u0645\u06CC\u06BA \u0627\u06CC\u06A9 \u0688\u0627\u0626\u0631\u06CC\u06A9\u0679\u0631 \u062C\u0648 \u062A\u06BE\u06CC\u0679\u0631 \u067E\u0631\u0648\u0688\u06A9\u0634\u0646 \u06A9\u06D2 \u0628\u0691\u06BE\u062A\u06D2 \u06C1\u0648\u0626\u06D2 \u06A9\u0627\u0645 \u06A9\u06CC \u0646\u06AF\u0631\u0627\u0646\u06CC \u0627\u0648\u0631 \u0622\u0631\u06A9\u06CC\u0633\u0679\u0631\u06CC\u0679 \u06A9\u0631\u062A\u0627 \u06C1\u06D2"@ur .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q3387717> .
+<http://dbpedia.org/ontology/TheatreDirector> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:TheatreDirector> .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "drank"@nl .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03BD\u03B1\u03C8\u03C5\u03BA\u03C4\u03B9\u03BA\u03CC"@el .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "\uC74C\uB8CC"@ko .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0634\u0631\u0648\u0628"@ur .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "deoch"@ga .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "boisson"@fr .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "bebida"@es .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "bevanda"@it .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "beverage"@en .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "\u98F2\u6599"@ja .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "drik"@da .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#label> "Getr\u00E4nk"@de .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#comment> "A drink, or beverage, is a liquid which is specifically prepared for human consumption."@en .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#comment> "Ein Getr\u00E4nk ist eine zum Trinken zubereitete Fl\u00FCssigkeit. Getr\u00E4nke werden entweder zum Stillen von Durst und damit zur Wasseraufnahme des K\u00F6rpers, als Nahrungsmittel oder auch als reine Genussmittel aufgenommen."@de .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0388\u03BD\u03B1 \u03C0\u03CC\u03C3\u03B9\u03BC\u03BF \u03C5\u03B3\u03C1\u03CC \u03C1\u03CC\u03C6\u03B7\u03BC\u03B1, \u03C3\u03C5\u03BD\u03AE\u03B8\u03C9\u03C2 \u03BC\u03B5 \u03BC\u03B7\u03B4\u03B5\u03BD\u03B9\u03BA\u03AE \u03AE \u03B5\u03BB\u03AC\u03C7\u03B9\u03C3\u03C4\u03B7 \u03C0\u03B5\u03C1\u03B9\u03B5\u03BA\u03C4\u03B9\u03BA\u03CC\u03C4\u03B7\u03C4\u03B1 \u03B1\u03BB\u03BA\u03BF\u03CC\u03BB\u03B7\u03C2."@el .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#comment> "\u06CC\u06A9 \u0645\u0634\u0631\u0648\u0628 \u0645\u0627\u0626\u0639 \u06C1\u06D2 \u062C\u0648 \u062E\u0627\u0635 \u0637\u0648\u0631 \u067E\u0631 \u0627\u0646\u0633\u0627\u0646\u06CC \u0627\u0633\u062A\u0639\u0645\u0627\u0644 \u06A9\u06D2 \u0644\u06CC\u06D2 \u062A\u06CC\u0627\u0631 \u06A9\u06CC\u0627 \u062C\u0627\u062A\u0627 \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Food> .
+<http://dbpedia.org/ontology/Beverage> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Beverage> .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#label> "ruimteveer"@nl .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B4\u03B9\u03B1\u03C3\u03C4\u03B7\u03BC\u03B9\u03BA\u03CC \u03BB\u03B5\u03C9\u03C6\u03BF\u03C1\u03B5\u03AF\u03BF"@el .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#label> "\uC6B0\uC8FC \uC655\uBCF5\uC120"@ko .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#label> "\u062E\u0644\u0627\u0626\u06CC \u062C\u06C1\u0627\u0632"@ur .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#label> "sp\u00E1stointe\u00E1il"@ga .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#label> "navette spatiale"@fr .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#label> "space shuttle"@en .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#label> "Raumf\u00E4hre"@de .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/MeanOfTransportation> .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q48806> .
+<http://dbpedia.org/ontology/SpaceShuttle> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:SpaceShuttle> .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/2000/01/rdf-schema#label> "werkgeversorganisatie"@nl .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/2000/01/rdf-schema#label> "\u0622\u062C\u0631\u0648\u06BA \u06A9\u06CC \u062A\u0646\u0638\u06CC\u0645"@ur .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/2000/01/rdf-schema#label> "syndicat de patrons"@fr .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/2000/01/rdf-schema#label> "Employers' Organisation"@en .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/2000/01/rdf-schema#label> "Arbeitgeberverb\u00E4nde"@de .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0645\u0644\u0627\u0632\u0645\u06CC\u0646 \u06A9\u06CC \u062A\u0646\u0638\u06CC\u0645 \u062A\u0627\u062C\u0631\u0648\u06BA \u06A9\u06CC \u0627\u06CC\u06A9 \u062A\u0646\u0638\u06CC\u0645 \u06C1\u06D2 \u062C\u0648 \u0645\u0632\u062F\u0648\u0631 \u062A\u0639\u0644\u0642\u0627\u062A \u06A9\u06D2 \u0645\u06CC\u062F\u0627\u0646 \u0645\u06CC\u06BA \u0627\u067E\u0646\u06D2 \u0627\u0639\u0645\u0627\u0644 \u06A9\u0648 \u0645\u0631\u0628\u0648\u0637 \u06A9\u0631\u0646\u06D2 \u06A9\u06D2 \u0644\u06CC\u06D2 \u0645\u0644 \u06A9\u0631 \u06A9\u0627\u0645 \u06A9\u0631\u062A\u06CC \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/2000/01/rdf-schema#comment> "An employers' organisation is an organisation of entrepreneurs who work together to coordinate their actions in the field of labour relations"@en .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Organisation> .
+<http://dbpedia.org/ontology/EmployersOrganisation> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:EmployersOrganisation> .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "gevangenis"@nl .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C6\u03C5\u03BB\u03B1\u03BA\u03AE"@el .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "\u062C\u06CC\u0644"@ur .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "pr\u00EDos\u00FAn"@ga .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "prison"@fr .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "prigione"@it .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "prison"@en .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "\u5211\u52D9\u6240"@ja .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#label> "gef\u00E4ngnis"@de .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Building> .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q40357> .
+<http://dbpedia.org/ontology/Prison> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Prison> .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "Archaea (oerbacteri\u00EBn)"@nl .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03C1\u03C7\u03B1\u03AF\u03B1"@el .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "\uACE0\uC138\uADE0"@ko .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "\u0622\u062B\u0627\u0631 \u0642\u062F\u06CC\u0645\u06C1"@ur .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "arch\u00E9es"@fr .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "archei"@it .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "archaea"@en .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "\u53E4\u7D30\u83CC"@ja .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#label> "Archaeen"@de .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Species> .
+<http://dbpedia.org/ontology/Archaea> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Archaea> .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "handballer"@nl .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03B1\u03AF\u03BA\u03C4\u03B7\u03C2 \u03C4\u03BF\u03C5 handball"@el .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "\u06C1\u06CC\u0646\u0688 \u0628\u0627\u0644 \u06A9\u0627 \u06A9\u06BE\u0644\u0627\u0691\u06CC"@ur .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "imreoir liathr\u00F3id l\u00E1imhe"@ga .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "joueur de handball"@fr .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "jugador de balonmano"@es .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "handball player"@en .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "h\u00E5ndboldspiller"@da .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#label> "Handballspieler"@de .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0627\u06CC\u06A9 \u06A9\u06BE\u06CC\u0644 \u062C\u0650\u0633 \u0645\u06CC\u06BA \u062F\u0648 \u06CC\u0627 \u0686\u0627\u0631 \u06A9\u06BE\u0650\u0644\u0627\u0691\u06CC \u0628\u064E\u0646\u062F \u0627\u062D\u0627\u0637\u06D2 \u0645\u06CC\u06BA \u0631\u0628\u064E\u0691 \u06A9\u06CC \u0686\u06BE\u0648\u0679\u06CC \u06AF\u06CC\u0646\u062F \u06A9\u0648 \u06C1\u0627\u062A\u06BE\u0648\u06BA \u0633\u06D2 \u062F\u06CC\u0648\u0627\u0631 \u067E\u064E\u0631 \u0645\u0627\u0631\u062A\u06D2 \u06C1\u06CC\u06BA"@ur .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Athlete> .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q13365117> .
+<http://dbpedia.org/ontology/HandballPlayer> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:HandballPlayer> .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "M\u0119\u017Cczyzna"@pl .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "Mens"@nl .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "\uB0A8\uC790"@ko .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "\u0622\u062F\u0645\u06CC"@ur .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "Homme"@fr .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "Uomo"@it .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "\u043C\u0443\u0436\u0447\u0438\u043D\u0430"@ru .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "man"@en .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "\u304A\u3068\u3053"@ja .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "Mand"@da .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#label> "Mann"@de .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q8441> .
+<http://dbpedia.org/ontology/Man> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Man> .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#label> "COVID-19 pandemic"@en .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#label> "Pand\u00E9mie COVID-19"@fr .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#label> "2019\u51A0\u72B6\u75C5\u6BD2\u75C5\u75AB\u60C5"@zh .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#label> "\u06A9\u0648\u0631\u0648\u0646\u0627 \u0648\u0627\u0626\u0631\u06332019"@ur .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#comment> "\u06A9\u0648\u0631\u0648\u0646\u0627 \u0648\u0627\u0626\u0631\u0633 \u06A9\u06CC \u0628\u06CC\u0645\u0627\u0631\u06CC 2019 \u06A9\u06CC \u062C\u0627\u0631\u06CC \u0648\u0628\u0627\u0626\u06CC \u0628\u06CC\u0645\u0627\u0631\u06CC\u06D4"@ur .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#comment> "Ongoing pandemic of coronavirus disease 2019"@en .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#comment> "Pand\u00E9mie actuelle de maladie coronavirus 2019"@fr .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#comment> "2019\u51A0\u72C0\u75C5\u6BD2\u75C5\u75AB\u60C5\u662F\u4E00\u6B21\u7531\u4E25\u91CD\u6025\u6027\u547C\u5438\u7CFB\u7EDF\u7EFC\u5408\u5F81\u51A0\u72B6\u75C5\u6BD2\u5BFC\u81F4\u76842019\u51A0\u72B6\u75C5\u6BD2\u75C5\u6240\u5F15\u767C\u7684\u5168\u7403\u5927\u6D41\u884C\u75AB\u60C5"@zh .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Thing> .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q84263196> .
+<http://dbpedia.org/ontology/Covid19> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Covid19> .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "kobieta"@pl .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "vrouw"@nl .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "\uC5EC\uC790"@ko .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "\u0639\u0648\u0631\u062A"@ur .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "femme"@fr .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "donna"@it .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "\u0436\u0435\u043D\u0449\u0438\u043D\u0430"@ru .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "woman"@en .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "\u5973\u6027"@ja .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "kvinde"@da .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#label> "Frauen"@de .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q467> .
+<http://dbpedia.org/ontology/Woman> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Woman> .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/2000/01/rdf-schema#label> "religieus"@nl .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B8\u03C1\u03B7\u03C3\u03BA\u03B5\u03C5\u03C4\u03B9\u03BA\u03CC\u03C2"@el .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0630\u06C1\u0628\u06CC"@ur .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/2000/01/rdf-schema#label> "religieux"@fr .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/2000/01/rdf-schema#label> "religious"@en .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/2000/01/rdf-schema#label> "religi\u00F6s"@de .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q2566598> .
+<http://dbpedia.org/ontology/Religious> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Religious> .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "aracn\u00EDdeos"@pt .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "spinachtigen"@nl .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03C1\u03B1\u03C7\u03BD\u03BF\u03B5\u03B9\u03B4\u03AD\u03C2"@el .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "\uAC70\uBBF8\uAC15"@ko .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "\u0639\u0646\u06A9\u0628\u0627\u062A"@ur .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "araicnid"@ga .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "arachnides"@fr .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "ar\u00E1cnido"@es .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "aracnide"@it .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "arachnid"@en .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "\u30AF\u30E2\u7DB1"@ja .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#label> "Spinnentier"@de .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#comment> "\u062D\u06CC\u0648\u0627\u0646\u06CC\u0627\u062A \u0645\u06CC\u06BA \u0627\u0650\u0633 \u062E\u0627\u0646\u062F\u0627\u0646 \u06A9\u0627 \u0646\u0627\u0645 \u062C\u0650\u0633 \u0645\u06CC\u06BA \u0645\u06A9\u0691\u06CC \u0627\u0648\u0631 \u0628\u0686\u06BE\u0648 \u0648\u063A\u06CC\u0631\u06C1 \u0634\u0627\u0645\u0650\u0644 \u06C1\u06CC\u06BA"@ur .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Animal> .
+<http://dbpedia.org/ontology/Arachnid> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Arachnid> .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "departement"@nl .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C4\u03BC\u03AE\u03BC\u03B1"@el .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "\uBD80\uC11C"@ko .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "\u0634\u0639\u0628\u06C1"@ur .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "roinn"@ga .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "d\u00E9partement"@fr .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "Distrito"@es .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "department"@en .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#label> "Distrikt"@de .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/GovernmentalAdministrativeRegion> .
+<http://dbpedia.org/ontology/Department> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Department> .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#label> "windrichting"@nl .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#label> "\u06C1\u0648\u0627 \u06A9\u06CC \u0633\u0645\u062A"@ur .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#label> "direction cardinale"@fr .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#label> "Cardinal direction"@en .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#label> "Windrichtung"@de .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#comment> "One of the four main directions on a compass or any other system to determine a geographical position"@en .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#comment> "Une des 4 principales directions d'un compas ou  de tout autre syst\u00E8me pour d\u00E9terminer une position geographique"@fr .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#comment> "\u062C\u063A\u0631\u0627\u0641\u06CC\u0627\u0626\u06CC \u067E\u0648\u0632\u06CC\u0634\u0646 \u06A9\u0627 \u062A\u0639\u06CC\u0646 \u06A9\u0631\u0646\u06D2 \u06A9\u06D2 \u0644\u06CC\u06D2 \u06A9\u0645\u067E\u0627\u0633 \u06CC\u0627 \u06A9\u0633\u06CC \u062F\u0648\u0633\u0631\u06D2 \u0646\u0638\u0627\u0645 \u067E\u0631 \u0686\u0627\u0631 \u0627\u06C1\u0645 \u0633\u0645\u062A\u0648\u06BA \u0645\u06CC\u06BA \u0633\u06D2 \u0627\u06CC\u06A9"@ur .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/TopicalConcept> .
+<http://dbpedia.org/ontology/CardinalDirection> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:CardinalDirection> .
+<http://dbpedia.org/ontology/Chief> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Chief> <http://www.w3.org/2000/01/rdf-schema#label> "Chief"@en .
+<http://dbpedia.org/ontology/Chief> <http://www.w3.org/2000/01/rdf-schema#label> "\u0686\u06CC\u0641(\u0633\u0631\u062F\u0627\u0631)"@ur .
+<http://dbpedia.org/ontology/Chief> <http://www.w3.org/2000/01/rdf-schema#label> "Chef"@fr .
+<http://dbpedia.org/ontology/Chief> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Politician> .
+<http://dbpedia.org/ontology/Chief> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q1259323> .
+<http://dbpedia.org/ontology/Chief> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Chief> .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#label> "schilder"@nl .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B6\u03C9\u03B3\u03C1\u03AC\u03C6\u03BF\u03C2"@el .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#label> "\u0631\u0646\u06AF \u0633\u0627\u0632"@ur .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#label> "peintre"@fr .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#label> "painter"@en .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#label> "\u753B\u5BB6"@ja .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#label> "maler"@da .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#label> "Maler"@de .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Artist> .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q1028181> .
+<http://dbpedia.org/ontology/Painter> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Painter> .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#label> "modelijn"@nl .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#label> "\u0642\u0637\u0627\u0631 \u0631\u0627\u0626\u062C"@ur .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#label> "type de couture"@fr .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#label> "line of fashion"@en .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#label> "Modelinie"@de .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#comment> "A coherent type of clothing or dressing following a particular fashion"@en .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0627\u06CC\u06A9 \u0645\u0631\u0628\u0648\u0637 \u0642\u0633\u0645 \u06A9\u0627 \u0644\u0628\u0627\u0633 \u06CC\u0627 \u0644\u0628\u0627\u0633 \u06A9\u0633\u06CC \u062E\u0627\u0635 \u0641\u06CC\u0634\u0646 \u06A9\u06D2 \u0628\u0639\u062F"@ur .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#comment> "Een samenhangend geheel van kleding in een bepaalde stijl volgens een bepaalde mode."@nl .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Work> .
+<http://dbpedia.org/ontology/LineOfFashion> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:LineOfFashion> .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/2000/01/rdf-schema#label> "\u0928\u093E\u0935\u093F\u0915"@hi .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0644\u0627\u062D"@ur .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/2000/01/rdf-schema#label> "Navigatrice"@fr .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/2000/01/rdf-schema#label> "\u0628\u062D\u0627\u0631"@ar .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/2000/01/rdf-schema#label> "Sailor"@en .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/2000/01/rdf-schema#label> "S\u00F8mand"@da .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/2000/01/rdf-schema#label> "Marinela"@eu .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Athlete> .
+<http://dbpedia.org/ontology/Sailor> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Sailor> .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "parque"@pt .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "park"@nl .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03AC\u03C1\u03BA\u03BF"@el .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "\uACF5\uC6D0"@ko .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "\u062A\u0641\u0631\u06CC\u062D \u06AF\u0627\u06C1"@ur .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "p\u00E1irc"@ga .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "parc"@fr .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "park"@en .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "\u516C\u5712"@ja .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#label> "Park"@de .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#comment> "A park is an area of open space provided for recreational use. http://en.wikipedia.org/wiki/Park"@en .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#comment> "\u067E\u0627\u0631\u06A9 \u06A9\u06BE\u0644\u06CC \u062C\u06AF\u06C1 \u06A9\u0627 \u0627\u06CC\u06A9 \u0639\u0644\u0627\u0642\u06C1 \u06C1\u06D2 \u062C\u0648 \u062A\u0641\u0631\u06CC\u062D\u06CC \u0627\u0633\u062A\u0639\u0645\u0627\u0644 \u06A9\u06D2 \u0644\u06CC\u06D2 \u0641\u0631\u0627\u06C1\u0645 \u06A9\u06CC \u062C\u0627\u062A\u06CC \u06C1\u06D2\u06D4"@ur .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Place> .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/2002/07/owl#equivalentClass> <http://schema.org/Park> .
+<http://dbpedia.org/ontology/Park> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Park> .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "wielerploeg"@nl .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "\u03BF\u03BC\u03AC\u03B4\u03B1 \u03C0\u03BF\u03B4\u03B7\u03BB\u03B1\u03C3\u03AF\u03B1\u03C2"@el .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "\uC0AC\uC774\uD074 \uD300"@ko .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "\u0633\u0627\u0626\u06CC\u06A9\u0644\u0646\u06AF \u062C\u0645\u0627\u0639\u062A"@ur .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "foireann rotha\u00EDochta"@ga .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "\u00E9quipe cycliste"@fr .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "squadra di ciclismo"@it .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "cycling team"@en .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "cykelhold"@da .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#label> "Radsportteam"@de .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SportsTeam> .
+<http://dbpedia.org/ontology/CyclingTeam> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:CyclingTeam> .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/2000/01/rdf-schema#label> "bruto nationaal product"@nl .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03BA\u03B1\u03B8\u03AC\u03C1\u03B9\u03C3\u03C4\u03BF \u03B5\u03B3\u03C7\u03CE\u03C1\u03B9\u03BF \u03C0\u03C1\u03BF\u03CA\u03CC\u03BD"@el .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u062C\u0645\u0648\u0639\u06CC \u0645\u0644\u06A9\u06CC \u067E\u06CC\u062F\u0627\u0648\u0627\u0631"@ur .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/2000/01/rdf-schema#label> "ollt\u00E1irgeacht int\u00EDre"@ga .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/2000/01/rdf-schema#label> "gross domestic product"@en .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/2000/01/rdf-schema#label> "Bruttoinlandsprodukt"@de .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Thing> .
+<http://dbpedia.org/ontology/GrossDomesticProduct> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:GrossDomesticProduct> .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/2000/01/rdf-schema#label> "waterbaan"@nl .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/2000/01/rdf-schema#label> "\u067E\u0627\u0646\u06CC \u06A9\u06CC \u0633\u0648\u0627\u0631\u06CC"@ur .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/2000/01/rdf-schema#label> "marca\u00EDocht uisce"@ga .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/2000/01/rdf-schema#label> "water ride"@en .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/2000/01/rdf-schema#label> "Wasserbahn"@de .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/AmusementParkAttraction> .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q2870166> .
+<http://dbpedia.org/ontology/WaterRide> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:WaterRide> .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/2000/01/rdf-schema#label> "legervoertuig"@nl .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/2000/01/rdf-schema#label> "\u0641\u0648\u062C\u06CC \u06AF\u0627\u0691\u06CC"@ur .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/2000/01/rdf-schema#label> "v\u00E9hicule militaire"@fr .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/2000/01/rdf-schema#label> "military vehicle"@en .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/2000/01/rdf-schema#label> "Milit\u00E4rfahrzeug"@de .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/MeanOfTransportation> .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://schema.org/Product> .
+<http://dbpedia.org/ontology/MilitaryVehicle> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:MilitaryVehicle> .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#label> "kunstsoort"@nl .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#label> "\u0641\u0646\u06A9\u0627\u0631\u0627\u0646\u06C1 \u0635\u0646\u0641"@ur .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#label> "genre artistique"@fr .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#label> "artistic genre"@en .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#label> "Kunstgattung"@de .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#comment> "Genres of art, e.g. Pointillist, Modernist"@en .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#comment> "Gattung nennt man in den Kunstwissenschaften die auf das k\u00FCnstlerische Ausdrucksmedium bezogenen Formen der Kunst."@de .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#comment> "genre d'art, ex: Pointillisme, Modernisme"@fr .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0641\u0646 \u06A9\u06CC \u0627\u0646\u0648\u0627\u0639"@ur .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Genre> .
+<http://dbpedia.org/ontology/ArtisticGenre> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:ArtisticGenre> .
+<http://dbpedia.org/ontology/SportsSeason> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/SportsSeason> <http://www.w3.org/2000/01/rdf-schema#label> "sportseizoen"@nl .
+<http://dbpedia.org/ontology/SportsSeason> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03B5\u03C1\u03AF\u03BF\u03B4\u03BF\u03C2 \u03B1\u03B8\u03BB\u03B7\u03BC\u03AC\u03C4\u03C9\u03BD"@el .
+<http://dbpedia.org/ontology/SportsSeason> <http://www.w3.org/2000/01/rdf-schema#label> "\u06A9\u06BE\u06CC\u0644\u0648\u06BA \u06A9\u0627 \u0645\u0648\u0633\u0645"@ur .
+<http://dbpedia.org/ontology/SportsSeason> <http://www.w3.org/2000/01/rdf-schema#label> "sports season"@en .
+<http://dbpedia.org/ontology/SportsSeason> <http://www.w3.org/2000/01/rdf-schema#label> "Sportsaison"@de .
+<http://dbpedia.org/ontology/SportsSeason> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Thing> .
+<http://dbpedia.org/ontology/SportsSeason> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:SportsSeason> .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "cricketspeler"@nl .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03B1\u03AF\u03BA\u03C4\u03B7\u03C2 \u03C4\u03BF\u03C5 \u03BA\u03C1\u03AF\u03BA\u03B5\u03C4"@el .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "\uD06C\uB9AC\uCF13 \uC120\uC218"@ko .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "\u06A9\u0631\u06A9\u0679 \u06A9\u0627 \u06A9\u06BE\u0644\u0627\u0691\u06CC"@ur .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "imreoir cruic\u00E9id"@ga .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "joueur de cricket"@fr .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "cricketer"@en .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "\u30AF\u30EA\u30B1\u30C3\u30C8\u9078\u624B"@ja .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#label> "Cricketspieler"@de .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Athlete> .
+<http://dbpedia.org/ontology/Cricketer> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Cricketer> .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "bedektzadigen"@nl .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03BD\u03B8\u03BF\u03C6\u03CC\u03C1\u03BF \u03C6\u03C5\u03C4\u03CC"@el .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "\u067E\u06BE\u0648\u0644\u0648\u06BA \u06A9\u0627 \u067E\u0648\u062F\u0627"@ur .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "angiospermes"@fr .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "angiosperma"@es .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "magnoliofita"@it .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "flowering plant"@en .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "\u88AB\u5B50\u690D\u7269"@ja .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#label> "bedecktsamige Pflanze"@de .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Plant> .
+<http://dbpedia.org/ontology/FloweringPlant> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:FloweringPlant> .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/2000/01/rdf-schema#label> "Spreadsheet"@en .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/2000/01/rdf-schema#label> "\u042D\u043B\u0435\u043A\u0442\u0440\u043E\u043D\u043D\u0430\u044F \u0442\u0430\u0431\u043B\u0438\u0446\u0430"@ru .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/2000/01/rdf-schema#label> "\u0633\u067E\u0631\u06CC\u0688 \u0634\u06CC\u0679"@ur .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/2000/01/rdf-schema#label> "tableur"@fr .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0645\u0631\u062A\u0628 \u0648 \u0634\u0645\u0627\u0631 \u06CC\u0627 \u0645\u0639\u0644\u0648\u0645\u0627\u062A \u06A9\u0648 \u06A9\u0627\u0645 \u0645\u06CC\u06BA \u0644\u0627\u0646\u06D2\u0648\u0627\u0644\u0627\u0627\u06CC\u06A9 \u06A9\u0645\u067E\u06CC\u0648\u0679\u0631 \u067E\u0631\u0648\u06AF\u0631\u0627\u0645"@ur .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/2000/01/rdf-schema#comment> "Programme informatique qui utilise des statistiques ou des informations"@fr .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Thing> .
+<http://dbpedia.org/ontology/Spreadsheet> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Spreadsheet> .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "televisie seizoen"@nl .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B5\u03C0\u03B5\u03B9\u03C3\u03CC\u03B4\u03B9\u03BF \u03C4\u03B7\u03BB\u03B5\u03CC\u03C1\u03B1\u03C3\u03B7\u03C2"@el .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "\uD154\uB808\uBE44\uC804 \uC5D0\uD53C\uC18C\uB4DC"@ko .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "\u0679\u06CC \u0648\u06CC \u06A9\u06CC \u0642\u0633\u0637"@ur .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "eagr\u00E1n de chl\u00E1r teilif\u00EDse"@ga .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "\u00E9pisode t\u00E9l\u00E9vis\u00E9"@fr .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "cap\u00EDtulo de serie de televisi\u00F3n"@es .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "television episode"@en .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "\u30C6\u30EC\u30D3\u653E\u9001\u56DE"@ja .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#label> "Fernsehfolge"@de .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#comment> "A television episode is a part of serial television program."@en .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0679\u06CC\u0644\u06CC \u0648\u06CC\u0698\u0646 \u0627\u06CC\u067E\u06CC \u0633\u0648\u0688 \u0633\u06CC\u0631\u06CC\u0644 \u0679\u06CC\u0644\u06CC \u0648\u06CC\u0698\u0646 \u067E\u0631\u0648\u06AF\u0631\u0627\u0645 \u06A9\u0627 \u0627\u06CC\u06A9 \u062D\u0635\u06C1 \u06C1\u06D2"@ur .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Work> .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/2002/07/owl#equivalentClass> <http://schema.org/TVEpisode> .
+<http://dbpedia.org/ontology/TelevisionEpisode> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:TelevisionEpisode> .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/2000/01/rdf-schema#label> "baronet"@nl .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/2000/01/rdf-schema#label> "\u0686\u06BE\u0648\u0679\u0627 \u0646\u0648\u0627\u0628"@ur .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/2000/01/rdf-schema#label> "baronetto"@it .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/2000/01/rdf-schema#label> "baronet"@en .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/2000/01/rdf-schema#label> "\u6E96\u7537\u7235"@ja .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/2000/01/rdf-schema#label> "Baronet"@de .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/BritishRoyalty> .
+<http://dbpedia.org/ontology/Baronet> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Baronet> .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#label> "kanton"@nl .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#label> "\u0636\u0650\u0644\u064E\u0639"@ur .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#label> "canton"@fr .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#label> "canton"@en .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#label> "\u30B9\u30A4\u30B9\u9023\u90A6\u306E\u5DDE\u307E\u305F\u306F\u30D5\u30E9\u30F3\u30B9\u306E\u7FA4"@ja .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#label> "Kanton"@de .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#comment> "An administrative (France) or lawcourts (Netherlands) body governing a territorial unity on the municipal level or somewhat above"@en .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#comment> "Das Wort Kanton dient zur Bezeichnung verschiedener (niederen) Verwaltungsbezirke in Frankreich, Belgien, Kanada und anderen L\u00E4ndern"@de .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0627\u06CC\u06A9 \u0627\u0646\u062A\u0638\u0627\u0645\u06CC (\u0641\u0631\u0627\u0646\u0633) \u06CC\u0627 \u0642\u0627\u0646\u0648\u0646 \u06A9\u06CC \u0639\u062F\u0627\u0644\u062A (\u0646\u06CC\u062F\u0631\u0644\u06CC\u0646\u0688\u0632) \u06A9\u0627 \u0627\u062F\u0627\u0631\u06C1 \u062C\u0648 \u0639\u0644\u0627\u0642\u0627\u0626\u06CC \u0648\u062D\u062F\u062A \u06A9\u0627 \u0627\u0646\u062A\u0638\u0627\u0645 \u06A9\u0631\u062A\u0627 \u06C1\u06D2 \u0628\u0644\u062F\u06CC\u0627\u062A\u06CC \u0633\u0637\u062D \u067E\u0631 \u06CC\u0627 \u0627\u0633 \u0633\u06D2 \u06A9\u0686\u06BE \u0627\u0648\u067E\u0631"@ur .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/GovernmentalAdministrativeRegion> .
+<http://dbpedia.org/ontology/Canton> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Canton> .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#label> "bioscoop"@nl .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#label> "\u03BA\u03B9\u03BD\u03B7\u03BC\u03B1\u03C4\u03BF\u03B3\u03C1\u03AC\u03C6\u03BF\u03C2"@el .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#label> "\u0633\u0646\u06CC\u0645\u0627"@ur .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#label> "cin\u00E9ma"@fr .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#label> "cinema (movie theater)"@en .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#label> "Theater"@de .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#comment> "A building for viewing films."@en .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0641\u0644\u0645 \u062F\u06CC\u06A9\u06BE\u0646\u06D2 \u06A9\u06D2 \u0644\u06CC\u06D2 \u0627\u06CC\u06A9 \u0639\u0645\u0627\u0631\u062A\u06D4"@ur .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Venue> .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q41253> .
+<http://dbpedia.org/ontology/Cinema> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Cinema> .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/2000/01/rdf-schema#label> "Gnetales"@nl .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/2000/01/rdf-schema#label> "Gnetophytes"@el .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/2000/01/rdf-schema#label> "\u06AF\u0645\u0679\u06CC\u0644\u0627 \u067E\u0648\u062F\u0627"@ur .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/2000/01/rdf-schema#label> "gn\u00E9tophytes"@fr .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/2000/01/rdf-schema#label> "Gnetophytes"@en .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/2000/01/rdf-schema#label> "\u30B0\u30CD\u30C4\u30E0\u7DB1"@ja .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/2000/01/rdf-schema#label> "Gnetophyta"@de .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Plant> .
+<http://dbpedia.org/ontology/Gnetophytes> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Gnetophytes> .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#label> "jockey"@nl .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03BD\u03B1\u03B2\u03AC\u03C4\u03B7\u03C2 \u03B1\u03BB\u03CC\u03B3\u03BF\u03C5 \u03B1\u03B3\u03CE\u03BD\u03C9\u03BD"@el .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#label> "\u067E\u06CC\u0634\u06C1 \u0648\u0631 \u06AF\u06BE\u0691 \u0633\u0648\u0627\u0631"@ur .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#label> "marcach"@ga .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#label> "jockey (coureur \u00E0 cheval)"@fr .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#label> "jockey (horse racer)"@en .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#label> "\u9A0E\u624B"@ja .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#label> "Jockey (Pferderennprofi)"@de .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Athlete> .
+<http://dbpedia.org/ontology/Jockey> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Jockey> .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#label> "wetenschappelijke theorie"@nl .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#label> "\u0633\u0627\u0626\u0646\u0633\u06CC \u062A\u0635\u0648\u0631"@ur .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#label> "concept scientifique"@fr .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#label> "Scientific concept"@en .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#label> "wissenschaftliche Theorie"@de .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#comment> "Scientific concepts, e.g. Theory of relativity, Quantum gravity"@en .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#comment> "Concepts scientifiques tels que la th\u00E9orie de la relativit\u00E9, la gravit\u00E9 quantique"@fr .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0633\u0627\u0626\u0646\u0633\u06CC \u062A\u0635\u0648\u0631\u0627\u062A\u060C \u062C\u06CC\u0633\u06D2 \u0646\u0638\u0631\u06CC\u06C1 \u0627\u0636\u0627\u0641\u06CC\u062A\u060C \u06A9\u0648\u0627\u0646\u0679\u0645 \u06A9\u0634\u0634 \u062B\u0642\u0644"@ur .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/TopicalConcept> .
+<http://dbpedia.org/ontology/ScientificConcept> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:ScientificConcept> .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/2000/01/rdf-schema#label> "uitslag van een sport competitie"@nl .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B1\u03C0\u03BF\u03C4\u03B5\u03BB\u03AD\u03C3\u03BC\u03B1\u03C4\u03B1 \u03B1\u03B8\u03BB\u03B7\u03C4\u03B9\u03BA\u03BF\u03CD \u03B4\u03B9\u03B1\u03B3\u03C9\u03BD\u03B9\u03C3\u03BC\u03BF\u03CD"@el .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/2000/01/rdf-schema#label> "\u06A9\u06BE\u06CC\u0644\u0648\u06BA \u06A9\u06D2 \u0645\u0642\u0627\u0628\u0644\u06D2 \u06A9\u0627 \u0646\u062A\u06CC\u062C\u06C1"@ur .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/2000/01/rdf-schema#label> "r\u00E9sultats d'une comp\u00E9tition sportive"@fr .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/2000/01/rdf-schema#label> "resultados de una competici\u00F3n deportiva"@es .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/2000/01/rdf-schema#label> "results of a sport competition"@en .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/2000/01/rdf-schema#label> "Ergebnisse eines Sportwettbewerbs"@de .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://www.w3.org/2002/07/owl#Thing> .
+<http://dbpedia.org/ontology/SportCompetitionResult> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:SportCompetitionResult> .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#label> "toren"@nl .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03CD\u03C1\u03B3\u03BF\u03C2"@el .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u06CC\u0646\u0627\u0631"@ur .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#label> "t\u00FAr"@ga .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#label> "tour"@fr .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#label> "tower"@en .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#label> "\u5854"@ja .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#label> "Turm"@de .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#comment> "A Tower is a kind of structure (not necessarily a building) that is higher than the rest"@en .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0645\u06CC\u0646\u0627\u0631 \u0627\u06CC\u06A9 \u0642\u0633\u0645 \u06A9\u0627 \u0688\u06BE\u0627\u0646\u0686\u06C1 \u06C1\u06D2 (\u0636\u0631\u0648\u0631\u06CC \u0646\u06C1\u06CC\u06BA \u06A9\u06C1 \u06A9\u0648\u0626\u06CC \u0639\u0645\u0627\u0631\u062A) \u062C\u0648 \u0628\u0627\u0642\u06CC \u0633\u06D2 \u0627\u0648\u0646\u0686\u06CC \u06C1\u0648"@ur .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/ArchitecturalStructure> .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q12518> .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/2002/07/owl#disjointWith> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/Tower> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Tower> .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "prote\u00EDna"@pt .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "prote\u00EFne"@nl .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03C1\u03C9\u03C4\u03B5\u0390\u03BD\u03B7"@el .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "\uB2E8\uBC31\uC9C8"@ko .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "\u0644\u062D\u0645\u06CC\u0627\u062A"@ur .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "pr\u00F3it\u00E9in"@ga .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "prot\u00E9ine"@fr .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "proteina"@it .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "protein"@en .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "\u30BF\u30F3\u30D1\u30AF\u8CEA"@ja .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#label> "Protein"@de .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Biomolecule> .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q8054> .
+<http://dbpedia.org/ontology/Protein> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Protein> .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "menselijk genoom locatie"@nl .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C4\u03BF\u03C0\u03BF\u03B8\u03B5\u03C3\u03AF\u03B1 \u03C4\u03BF\u03C5 \u03B1\u03BD\u03B8\u03C1\u03CE\u03C0\u03B9\u03BD\u03BF\u03C5 \u03B3\u03BF\u03BD\u03B9\u03B4\u03AF\u03BF\u03C5"@el .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "\u0627\u0646\u0633\u0627\u0646\u06CC \u0646\u064E\u0633\u0628\u06C1 \u06A9\u0627 \u0645\u0642\u0627\u0645"@ur .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "Position de g\u00E8ne chez l'homme"@fr .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "HumanGeneLocation"@en .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "\u30D2\u30C8\u907A\u4F1D\u5B50\u5EA7"@ja .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/2000/01/rdf-schema#label> "Humangen Lokation"@de .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/GeneLocation> .
+<http://dbpedia.org/ontology/HumanGeneLocation> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:HumanGeneLocation> .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/2000/01/rdf-schema#label> "klub \u017Cu\u017Clowy"@pl .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/2000/01/rdf-schema#label> "speedwayteam"@nl .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/2000/01/rdf-schema#label> "\u0633\u067E\u06CC\u0688 \u0648\u06D2 \u0679\u06CC\u0645"@ur .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/2000/01/rdf-schema#label> "foireann luasbhealaigh"@ga .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/2000/01/rdf-schema#label> "speedway team"@en .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/2000/01/rdf-schema#label> "Speedwayteam"@de .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/SportsTeam> .
+<http://dbpedia.org/ontology/SpeedwayTeam> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:SpeedwayTeam> .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "patriarcha chrze\u015Bcija\u0144ski"@pl .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "christelijk patriarch"@nl .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C7\u03C1\u03B9\u03C3\u03C4\u03B9\u03B1\u03BD\u03CC\u03C2 \u03C0\u03B1\u03C4\u03C1\u03B9\u03AC\u03C1\u03C7\u03B7\u03C2"@el .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "\uAE30\uB3C5\uAD50 \uCD1D\uB300\uC8FC\uAD50"@ko .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "\u0639\u06CC\u0633\u0627\u0626\u06CC \u067E\u0627\u062F\u0631\u06CC"@ur .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "patriarche chr\u00E9tien"@fr .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "patriarca cristiano"@it .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "Christian Patriarch"@en .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#label> "christlicher Patriarch"@de .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Cleric> .
+<http://dbpedia.org/ontology/ChristianPatriarch> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:ChristianPatriarch> .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#label> "regeringsvorm"@nl .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#label> "\u0395\u03AF\u03B4\u03B7 \u0394\u03B9\u03B1\u03BA\u03C5\u03B2\u03AD\u03C1\u03BD\u03B7\u03C3\u03B7\u03C2"@el .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#label> "\u062D\u06A9\u0648\u0645\u062A \u06A9\u06CC \u0642\u0633\u0645"@ur .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#label> "r\u00E9gime politique"@fr .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#label> "Government Type"@en .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#label> "Regierungsform"@de .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#comment> "a form of government"@en .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#comment> "\u062D\u06A9\u0648\u0645\u062A \u06A9\u06CC \u0627\u06CC\u06A9 \u0634\u06A9\u0644"@ur .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Type> .
+<http://dbpedia.org/ontology/GovernmentType> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:GovernmentType> .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "miasteczko"@pl .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "stad"@nl .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C0\u03CC\u03BB\u03B7"@el .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "\u0928\u0917\u0930"@hi .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "\u0642\u0635\u0628\u06C1"@ur .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "baile"@ga .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "ville"@fr .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "town"@en .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "\u753A"@ja .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#label> "Stadt"@de .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#comment> "a settlement ranging from a few hundred to several thousand (occasionally hundreds of thousands). The precise meaning varies between countries and is not always a matter of legal definition. Usually, a town is thought of as larger than a village but smaller than a city, though there are exceptions to this rule."@en .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#comment> "\u0686\u0646\u062F \u0633\u0648 \u0633\u06D2 \u0644\u06D2 \u06A9\u0631 \u06A9\u0626\u06CC \u06C1\u0632\u0627\u0631 (\u06A9\u0628\u06BE\u06CC \u06A9\u0628\u06BE\u0627\u0631 \u0633\u06CC\u06A9\u0691\u0648\u06BA \u06C1\u0632\u0627\u0631\u0648\u06BA) \u062A\u06A9 \u06A9\u06CC \u062A\u0635\u0641\u06CC\u06C1\u06D4 \u062F\u0631\u0633\u062A \u0645\u0639\u0646\u06CC \u0645\u0645\u0627\u0644\u06A9 \u06A9\u06D2 \u062F\u0631\u0645\u06CC\u0627\u0646 \u0645\u062E\u062A\u0644\u0641 \u06C1\u0648\u062A\u06D2 \u06C1\u06CC\u06BA \u0627\u0648\u0631 \u06CC\u06C1 \u06C1\u0645\u06CC\u0634\u06C1 \u0642\u0627\u0646\u0648\u0646\u06CC \u062A\u0639\u0631\u06CC\u0641 \u06A9\u0627 \u0645\u0639\u0627\u0645\u0644\u06C1 \u0646\u06C1\u06CC\u06BA \u06C1\u0648\u062A\u0627 \u06C1\u06D2\u06D4 \u0639\u0627\u0645 \u0637\u0648\u0631 \u067E\u0631\u060C \u0627\u06CC\u06A9 \u0642\u0635\u0628\u06C1 \u06A9\u0648 \u06AF\u0627\u0624\u06BA \u0633\u06D2 \u0628\u0691\u0627 \u0644\u06CC\u06A9\u0646 \u0634\u06C1\u0631 \u0633\u06D2 \u0686\u06BE\u0648\u0679\u0627 \u0633\u0645\u062C\u06BE\u0627 \u062C\u0627\u062A\u0627 \u06C1\u06D2\u060C \u062D\u0627\u0644\u0627\u0646\u06A9\u06C1 \u0627\u0633 \u0627\u0635\u0648\u0644 \u0645\u06CC\u06BA \u0645\u0633\u062A\u062B\u0646\u06CC\u0627\u062A \u06C1\u06CC\u06BA"@ur .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Settlement> .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q3957> .
+<http://dbpedia.org/ontology/Town> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:Town> .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/2000/01/rdf-schema#label> "Romeinse keizer"@nl .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/2000/01/rdf-schema#label> "\u03C1\u03C9\u03BC\u03B1\u03AF\u03BF\u03C2 \u03B1\u03C5\u03C4\u03BF\u03BA\u03C1\u03AC\u03C4\u03BF\u03C1\u03B1\u03C2"@el .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/2000/01/rdf-schema#label> "\u0631\u0648\u0645\u0646 \u0634\u06C1\u0646\u0634\u0627\u06C1"@ur .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/2000/01/rdf-schema#label> "empereur romain"@fr .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/2000/01/rdf-schema#label> "roman emperor"@en .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/2000/01/rdf-schema#label> "r\u00F6mischer Kaiser"@de .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Person> .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q842606> .
+<http://dbpedia.org/ontology/RomanEmperor> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:RomanEmperor> .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "cultusgebouw"@nl .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "\u03B8\u03C1\u03B7\u03C3\u03BA\u03B5\u03C5\u03C4\u03B9\u03BA\u03CC \u03BA\u03C4\u03AF\u03C1\u03B9\u03BF"@el .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "\uC885\uAD50 \uAC74\uBB3C"@ko .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "\u0645\u0630\u06C1\u0628\u06CC \u0639\u0645\u0627\u0631\u062A"@ur .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "\u00E9difice religieux"@fr .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "edificio religioso"@es .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "edificio religioso"@it .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "religious building"@en .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "\u5B97\u6559\u5EFA\u7BC9"@ja .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "religi\u00F8s bygning"@da .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#label> "religi\u00F6ses Geb\u00E4ude"@de .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2000/01/rdf-schema#subClassOf> <http://dbpedia.org/ontology/Building> .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/2002/07/owl#equivalentClass> <http://www.wikidata.org/entity/Q1370598> .
+<http://dbpedia.org/ontology/ReligiousBuilding> <http://www.w3.org/ns/prov#wasDerivedFrom> <http://mappings.dbpedia.org/index.php/OntologyClass:ReligiousBuilding> .
+<http://dbpedia.org/ontology/Minister> <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> <http://www.w3.org/2002/07/owl#Class> .
+<http://dbpedia.org/ontology/Minister> <http://www.w3.org/2000/01/rdf-schema#label> "minister"@nl .
+<http://dbpedia.org/ontology/Minister> <http://www.w3.org/2000/01/rdf-schema#label> "\u0648\u0632\u06CC\u0631"@ur .

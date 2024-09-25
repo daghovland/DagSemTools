@@ -54,7 +54,6 @@ public static class Parser
     /// <returns></returns>
     public static TripleTable ParseReader(TextReader textReader, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
-
         var input = new AntlrInputStream(textReader);
         var lexer = new TurtleLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);

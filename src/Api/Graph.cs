@@ -12,38 +12,87 @@ public class Graph : IGraph
     {
         Triples = triples;
     }
-    internal TripleTable Triples { get; init; }
+
+    private TripleTable Triples { get; init; }
 
     /// <inheritdoc />
     public bool isEmpty() => Triples.TripleCount == 0;
 
-    /// <inheritdoc />
-    public IEnumerator<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj)
+
+    private IriResource GetIriResource(uint resourceId)
     {
-        throw new NotImplementedException();
+        if (resourceId >= Triples.ResourceCount)
+            throw new ArgumentOutOfRangeException(nameof(resourceId));
+        var resource = Triples.ResourceList[resourceId];
+        if (!resource.IsIri)
+            throw new ArgumentException("Resource is not an Iri");
+        return new IriResource(new IriReference(resource.iri));
+
     }
 
-    /// <inheritdoc />
-    public IEnumerator<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate)
+    private Resource GetResource(uint resourceId)
     {
-        throw new NotImplementedException();
+        var resource = Triples.ResourceList[resourceId];
+        switch (resource)
+        {
+            case RDFStore.Resource { IsIri: true } r:
+                return new IriResource(new IriReference(r.iri));
+            case var r when r.IsLangLiteral:
+                return new LiteralResource(r.langliteral);
+            case RDFStore.Resource { IsDateLiteral: true } r:
+                return new LiteralResource(r.literalDate.ToString());
+            case RDFStore.Resource { IsLiteralString: true } r:
+                return new LiteralResource(r.literal);
+            default: throw new NotImplementedException("Literal type not implemented. Sorry");
+        }
     }
 
-    /// <inheritdoc />
-    public IEnumerator<Triple> GetTriplesWithSubject(IriReference subject)
-    {
-        throw new NotImplementedException();
-    }
+    private Triple GetTriple(RDFStore.Triple triple) =>
+    new Triple(this.GetIriResource(triple.subject),
+            GetIriResource(triple.predicate).Iri,
+            GetResource(triple.@object));
 
     /// <inheritdoc />
-    public IEnumerator<Triple> GetTriplesWithPredicate(IriReference predicate)
-    {
-        throw new NotImplementedException();
-    }
+    public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
+        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(obj), out var objIdx)
+         && Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(predicate), out var predIdx))
+            ? Triples
+                .GetTriplesWithObjectPredicate(objIdx, predIdx)
+                .Select(GetTriple)
+            : [];
+
 
     /// <inheritdoc />
-    public IEnumerator<Triple> GetTriplesWithObject(IriReference @object)
-    {
-        throw new NotImplementedException();
-    }
+    public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate) =>
+        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(subject), out var subjIdx)
+         && Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(predicate), out var predIdx))
+            ? Triples
+                .GetTriplesWithSubjectPredicate(subjIdx, predIdx)
+                .Select(GetTriple)
+            : [];
+
+    /// <inheritdoc />
+    public IEnumerable<Triple> GetTriplesWithSubject(IriReference subject) =>
+        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(subject), out var subjIdx))
+            ? Triples
+                .GetTriplesWithSubject(subjIdx)
+                .Select(GetTriple)
+            : [];
+
+    /// <inheritdoc />
+    public IEnumerable<Triple> GetTriplesWithPredicate(IriReference predicate) =>
+        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(predicate), out var predIdx))
+            ? Triples
+                .GetTriplesWithPredicate(predIdx)
+                .Select(GetTriple)
+            : [];
+
+    /// <inheritdoc />
+    public IEnumerable<Triple> GetTriplesWithObject(IriReference @object) =>
+        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(@object), out var objIdx))
+            ? Triples
+                .GetTriplesWithObject(objIdx)
+                .Select(GetTriple)
+            : [];
+
 }

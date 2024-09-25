@@ -8,6 +8,7 @@ namespace AlcTableau.Api;
 /// </summary>
 public class Triple(IriResource subject, IriReference predicate, Resource @object)
 {
+
     /// <summary>
     /// The subject of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-subject
     /// </summary>
@@ -22,4 +23,6 @@ public class Triple(IriResource subject, IriReference predicate, Resource @objec
     /// The object of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-object
     /// </summary>
     public Resource Object { get; } = @object;
+
 }
+

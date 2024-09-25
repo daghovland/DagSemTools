@@ -20,8 +20,8 @@ module RDFStore =
     [<StructuralComparison>]
     [<StructuralEquality>]
     [<Struct>]
-    type Resource =
-        Iri of iri:  IriReference
+    type public Resource =
+        public Iri of iri:  IriReference
         | LiteralString of literal: string
         | BooleanLiteral of literalBool: bool
         | DecimalLiteral of literalDec: decimal
