@@ -26,15 +26,15 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Content Include="example1.ttl">
-        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      </Content>
+      <None Update="TestData\example1.ttl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="FluentAssertions">
-        <HintPath>..\..\..\..\..\.nuget\packages\fluentassertions\6.12.0\lib\net6.0\FluentAssertions.dll</HintPath>
-      </Reference>
+      <None Update="TestData\quotedliterals.ttl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>

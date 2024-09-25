@@ -202,11 +202,20 @@ public class TestParser : IDisposable, IAsyncDisposable
     [Fact]
     public void Test1()
     {
-        var ontology = File.ReadAllText("example1.ttl");
+        var ontology = File.ReadAllText("TestData/example1.ttl");
         var ont = TestOntology(ontology);
         Assert.NotNull(ont);
     }
 
+    
+    [Fact]
+    public void TestQuotedLiterals()
+    {
+        var ontology = File.ReadAllText("TestData/quotedliterals.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+    }
+    
     public void Dispose()
     {
         _outputWriter.Dispose();
