@@ -22,6 +22,8 @@ module RDFStore =
     [<Struct>]
     type public Resource =
         public Iri of iri:  IriReference
+        | NamedBlankNode of blankNode: string
+        | AnonymousBlankNode of anon_blankNode: uint32
         | LiteralString of literal: string
         | BooleanLiteral of literalBool: bool
         | DecimalLiteral of literalDec: decimal

@@ -215,6 +215,60 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology(ontology);
         Assert.NotNull(ont);
     }
+
+    [Fact]
+    public void TestBooleans()
+    {
+        var ontology = File.ReadAllText("TestData/booleans.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+    }
+
+    [Fact]
+    public void TestBlankNodes()
+    {
+        var ontology = File.ReadAllText("TestData/blank_nodes.ttl");
+        var ont = TestOntology(ontology);
+        var knows = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows"))];
+        ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
+        Assert.NotNull(ont);
+    }
+    
+    
+    [Fact]
+    public void TestBlankNodePropertyList()
+    {
+        var ontology = File.ReadAllText("TestData/blank_node_property_list.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+        
+        var knows = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows"))];
+        var triplesWithKnows = ont.GetTriplesWithPredicate(knows).ToList();
+        triplesWithKnows.Should().HaveCount(1);
+        
+        
+        var name = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))];
+        var triplesWithName = ont.GetTriplesWithPredicate(name).ToList();
+        triplesWithName.Should().HaveCount(1);
+        
+        triplesWithKnows.First().@object.Should().Be(triplesWithName.First().subject);
+    }
+
+    
+    [Fact]
+    public void TestBlankNodes2()
+    {
+        var ont = TestOntology("""
+                                    prefix foaf: <http://xmlns.com/foaf/0.1/>
+                                    prefix : <http://example.org/>
+                                    [] foaf:knows :person1, :person2 .
+                                    """);
+        var knows = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows"))];
+        ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
+        Assert.NotNull(ont);
+        var person2 = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://example.org/person2"))];
+        ont.GetTriplesWithObjectPredicate(person2, knows).Should().HaveCount(1);
+    }
     
     public void Dispose()
     {

@@ -61,7 +61,28 @@ internal class ResourceVisitor : TurtleBaseVisitor<uint>
         return TripleTable.AddResource(resource);
     }
 
-
+    public override uint VisitNamedBlankNode(NamedBlankNodeContext context)
+    {
+        var blankNode = RDFStore.Resource.NewNamedBlankNode(context.BLANK_NODE_LABEL().GetText());
+        return TripleTable.AddResource(blankNode);
+    }
+    
+    public override uint VisitAnonymousBlankNode(AnonymousBlankNodeContext context)
+    {
+        var anonNumber = TripleTable.ResourceCount;
+        var blankNode = RDFStore.Resource.NewAnonymousBlankNode(anonNumber);
+        return TripleTable.AddResource(blankNode);
+    }
+    
+    public override uint VisitBlankNodePropertyList(BlankNodePropertyListContext context)
+    {
+        var anonNumber = TripleTable.ResourceCount;
+        var blankNode = RDFStore.Resource.NewAnonymousBlankNode(anonNumber);
+        var triples = Visit(context.predicateObjectList());
+        TripleTable.AddTriples(triples, blankNode);
+        return blankNode;
+    }
+    
     public override uint VisitTrueBooleanLiteral(TrueBooleanLiteralContext context)
         => TripleTable.AddResource(RDFStore.Resource.NewBooleanLiteral(true));
 

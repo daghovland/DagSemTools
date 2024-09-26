@@ -18,6 +18,7 @@ internal class TurtleListener : TurtleBaseListener
 
     private IriGrammarVisitor _iriGrammarVisitor;
     private ResourceVisitor _resourceVisitor;
+    private PredicateObjectListVisitor _predicateObjectListVisitor;
     private FSharpOption<IriReference> _graphName;
     private readonly IVistorErrorListener _errorListener;
     public TripleTable TripleTable { get; init; }
@@ -28,6 +29,7 @@ internal class TurtleListener : TurtleBaseListener
         _graphName = FSharpOption<IriReference>.None;
         _iriGrammarVisitor = new IriGrammarVisitor();
         _resourceVisitor = new ResourceVisitor(TripleTable, _iriGrammarVisitor);
+        _predicateObjectListVisitor = new PredicateObjectListVisitor(_resourceVisitor);
         _errorListener = errorListener;
     }
 
@@ -80,18 +82,16 @@ internal class TurtleListener : TurtleBaseListener
     public override void ExitNamedSubjectTriples(TurtleParser.NamedSubjectTriplesContext context)
     {
         var curSubject = _resourceVisitor.Visit(context.subject());
-        var triples = VisitPredicateObjectList(context.predicateObjectList())
-            .SelectMany(predicateObject => predicateObject.objects
-                .Select(obj => new RDFStore.Triple(curSubject, predicateObject.verb, obj)));
+        var triples = _predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
         triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
     }
-
-    public IEnumerable<(UInt32 verb, IEnumerable<UInt32> objects)> VisitPredicateObjectList(TurtleParser.PredicateObjectListContext context)
-    =>
-        context.verbObjectList().Select(VisitVerbObjectList);
-
-    public (UInt32, IEnumerable<UInt32>) VisitVerbObjectList(TurtleParser.VerbObjectListContext context) =>
-    (_resourceVisitor.Visit(context.verb()), context.rdfobject().Select(rdfObj => _resourceVisitor.Visit(rdfObj)));
+    
+    public override void ExitBlankNodeTriples(TurtleParser.BlankNodeTriplesContext context)
+    {
+        var blankNode = TripleTable.AddResource(RDFStore.Resource.NewAnonymousBlankNode(TripleTable.ResourceCount));
+        var triples = _predicateObjectListVisitor.Visit(context.predicateObjectList())(blankNode);
+        triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
+    }
 
 }
 
