@@ -21,11 +21,13 @@ internal class ResourceVisitor : TurtleBaseVisitor<uint>
 {
     private StringVisitor _stringVisitor = new();
     private IriGrammarVisitor _iriGrammarVisitor;
+    internal PredicateObjectListVisitor _predicateObjectListVisitor { get; private init; }
     public TripleTable TripleTable { get; init; }
     public ResourceVisitor(TripleTable tripleTable, IriGrammarVisitor iriGrammarVisitor)
     {
         TripleTable = tripleTable;
         _iriGrammarVisitor = iriGrammarVisitor;
+        _predicateObjectListVisitor = new PredicateObjectListVisitor(this);
     }
 
     private UInt32 GetIriId(IriReference iri)
@@ -76,10 +78,9 @@ internal class ResourceVisitor : TurtleBaseVisitor<uint>
     
     public override uint VisitBlankNodePropertyList(BlankNodePropertyListContext context)
     {
-        var anonNumber = TripleTable.ResourceCount;
-        var blankNode = RDFStore.Resource.NewAnonymousBlankNode(anonNumber);
-        var triples = Visit(context.predicateObjectList());
-        TripleTable.AddTriples(triples, blankNode);
+        var blankNode = TripleTable.AddResource(RDFStore.Resource.NewAnonymousBlankNode(TripleTable.ResourceCount));
+        var triples = _predicateObjectListVisitor.Visit(context.predicateObjectList())(blankNode);
+        triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
         return blankNode;
     }
     

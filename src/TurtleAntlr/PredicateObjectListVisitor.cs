@@ -9,19 +9,32 @@ public class PredicateObjectListVisitor : TurtleBaseVisitor<Func<uint, IEnumerab
     {
         _resourceVisitor = resourceVisitor;
     }
+
     /// <summary>
     /// Visits the grammar rule predicateObjectList used in https://www.w3.org/TR/rdf12-turtle/#grammar-production-blankNodePropertyList
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Func<uint, IEnumerable<RDFStore.Triple>> VisitPredicateObjectList(TurtleParser.PredicateObjectListContext context) =>
-    (node) => 
-       context.verbObjectList()
-           .Select(VisitVerbObjectList)
-            .SelectMany(predicateObject => predicateObject.objects
-                .Select(obj => new RDFStore.Triple(node, predicateObject.verb, obj)));
-    
-    public (UInt32 verb, IEnumerable<UInt32> objects) VisitVerbObjectList(TurtleParser.VerbObjectListContext context) =>
-        (_resourceVisitor.Visit(context.verb()), context.rdfobject().Select(rdfObj => _resourceVisitor.Visit(rdfObj)));
+    public override Func<uint, IEnumerable<RDFStore.Triple>> VisitPredicateObjectList(
+        TurtleParser.PredicateObjectListContext context) =>
+        (node) =>
+            context.verbObjectList()
+                .SelectMany(vo => VisitVerbObjectList(vo)(node));
+
+
+    /// <summary>
+    /// Visits the grammar rule verbObjectList used in https://www.w3.org/TR/rdf12-turtle/#grammar-production-verbObjectList
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public override Func<uint, IEnumerable<RDFStore.Triple>> VisitVerbObjectList(
+        TurtleParser.VerbObjectListContext context) =>
+        (node) =>
+        {
+            var predicate = _resourceVisitor.Visit(context.verb());
+            return context.rdfobject()
+                .Select(rdfObj => _resourceVisitor.Visit(rdfObj))
+                .Select(obj => new RDFStore.Triple(node, predicate, obj));
+        };
 
 }

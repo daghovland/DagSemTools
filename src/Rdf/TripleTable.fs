@@ -70,6 +70,8 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             this.ResourceCount <- nextResourceIndex
             nextResourceIndex - 1u
         
+    member this.NewAnonymousBlankNode() =
+        this.AddResource(RDFStore.Resource.AnonymousBlankNode this.ResourceCount);
     member this.GetTripleListEntry (index: TripleListIndex) : Triple =
         this.TripleList.[int index]
         

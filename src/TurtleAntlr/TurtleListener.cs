@@ -18,7 +18,6 @@ internal class TurtleListener : TurtleBaseListener
 
     private IriGrammarVisitor _iriGrammarVisitor;
     private ResourceVisitor _resourceVisitor;
-    private PredicateObjectListVisitor _predicateObjectListVisitor;
     private FSharpOption<IriReference> _graphName;
     private readonly IVistorErrorListener _errorListener;
     public TripleTable TripleTable { get; init; }
@@ -29,7 +28,6 @@ internal class TurtleListener : TurtleBaseListener
         _graphName = FSharpOption<IriReference>.None;
         _iriGrammarVisitor = new IriGrammarVisitor();
         _resourceVisitor = new ResourceVisitor(TripleTable, _iriGrammarVisitor);
-        _predicateObjectListVisitor = new PredicateObjectListVisitor(_resourceVisitor);
         _errorListener = errorListener;
     }
 
@@ -82,14 +80,14 @@ internal class TurtleListener : TurtleBaseListener
     public override void ExitNamedSubjectTriples(TurtleParser.NamedSubjectTriplesContext context)
     {
         var curSubject = _resourceVisitor.Visit(context.subject());
-        var triples = _predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
+        var triples = _resourceVisitor._predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
         triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
     }
     
     public override void ExitBlankNodeTriples(TurtleParser.BlankNodeTriplesContext context)
     {
-        var blankNode = TripleTable.AddResource(RDFStore.Resource.NewAnonymousBlankNode(TripleTable.ResourceCount));
-        var triples = _predicateObjectListVisitor.Visit(context.predicateObjectList())(blankNode);
+        var blankNode = TripleTable.NewAnonymousBlankNode();
+        var triples = _resourceVisitor._predicateObjectListVisitor.Visit(context.predicateObjectList())(blankNode);
         triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
     }
 
