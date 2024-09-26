@@ -1,8 +1,8 @@
 lexer grammar TurtleTokens;
 
-ABSOLUTEIRIREF: '<' URI_SCHEMES '://'  (~[<>"{}|^`\\] | UCHAR)* '>';
+ABSOLUTEIRIREF: '<' URI_SCHEMES  (~[<>"{}|^`\\] | UCHAR)* '>';
 
-URI_SCHEMES: 'http'|'https';
+URI_SCHEMES: 'http://'|'https://'|'mailto:';
 
 RELATIVEIRIREF: '<' (~[<>"{}|^`\\] | UCHAR)* '>';
 

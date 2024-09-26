@@ -33,7 +33,7 @@ LOCALNAME:  ~([/():<>[\] \t\r\n,0123456789]) ~([/():<>[\] \t\r\n,]) *;
 
 // This is the IRI from the new RDF-1.2 spec
 IRI  :   SCHEME COLON IHIERPART  ;
-SCHEME  :   'http'|'https';
+SCHEME  :   'http'|'https'|'mailto';
 
 // This is super-loose, but we dont really need to parse the iri structure anyway
 IHIERPART  : '//' IAUTHORITY IPATH ;

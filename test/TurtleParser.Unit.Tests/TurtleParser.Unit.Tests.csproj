@@ -38,6 +38,15 @@
       <None Update="TestData\blank_node_property_list.ttl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+      <None Update="TestData\abbreviated_blank_nodes.ttl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\abbreviated_blank_nodes_expanded.ttl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\example26.ttl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
     <ItemGroup>

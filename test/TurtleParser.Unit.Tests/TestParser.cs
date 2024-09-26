@@ -236,6 +236,15 @@ public class TestParser : IDisposable, IAsyncDisposable
     
     
     [Fact]
+    public void TestExample26()
+    {
+        var ontology = File.ReadAllText("TestData/example26.ttl");
+        var ont = TestOntology(ontology);
+        ont.TripleCount.Should().Be(4);
+    }
+
+
+    [Fact]
     public void TestBlankNodePropertyList()
     {
         var ontology = File.ReadAllText("TestData/blank_node_property_list.ttl");
@@ -253,7 +262,41 @@ public class TestParser : IDisposable, IAsyncDisposable
         
         triplesWithKnows.First().@object.Should().Be(triplesWithName.First().subject);
     }
+    [Fact]
+    public void TestAbbreviatedBlankNode()
+    {
+        var ontology = File.ReadAllText("TestData/abbreviated_blank_nodes.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+        
+        var knows = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows"))];
+        var triplesWithKnows = ont.GetTriplesWithPredicate(knows).ToList();
+        triplesWithKnows.Should().HaveCount(2);
+        
+        
+        var name = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))];
+        var triplesWithName = ont.GetTriplesWithPredicate(name).ToList();
+        triplesWithName.Should().HaveCount(2);
+        
+        triplesWithKnows.First().@object.Should().Be(triplesWithName.First().subject);
+        
+        var mbox = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox"))];
+        var triplesWithMail = ont.GetTriplesWithPredicate(name).ToList();
+        triplesWithMail.Should().HaveCount(1);
+        ont.TripleCount.Should().Be(6);
 
+        
+        var ontologyExp = File.ReadAllText("TestData/abbreviated_blank_nodes_expanded.ttl");
+        var ontexp = TestOntology(ontologyExp);
+        Assert.NotNull(ontexp);
+
+        ontexp.TripleCount.Should().Be(ont.TripleCount);
+        ontexp.ResourceCount.Should().Be(ont.ResourceCount);
+        
+        var triplesWithKnowsE = ontexp.GetTriplesWithPredicate(knows).ToList();
+        triplesWithKnowsE.Should().HaveCount(2);
+
+    }
     
     [Fact]
     public void TestBlankNodes2()
