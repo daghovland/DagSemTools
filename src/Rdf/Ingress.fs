@@ -38,6 +38,7 @@ module Ingress =
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
     type TripleListIndex = uint
+    type QuadListIndex = uint
         
     [<Struct>]
     type Triple = {
@@ -47,7 +48,7 @@ module Ingress =
         }
         
     [<Struct>]
-    type ReifiedTriple = {
+    type Quad = {
             tripleId: ResourceId
             subject: ResourceId
             predicate: ResourceId
