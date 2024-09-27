@@ -70,8 +70,17 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
             this.ResourceCount <- nextResourceIndex
             nextResourceIndex - 1u
         
+    member this.NewAnonymousBlankNode() =
+        this.AddResource(RDFStore.Resource.AnonymousBlankNode this.ResourceCount);
     member this.GetTripleListEntry (index: TripleListIndex) : Triple =
         this.TripleList.[int index]
+    
+    member this.GetResourceTriple(triple: Triple) =
+        {
+          TripleResource.subject = this.ResourceList.[int triple.subject]
+          TripleResource.predicate = this.ResourceList.[int triple.predicate]
+          TripleResource.obj = this.ResourceList.[int triple.object]
+        }
         
     member this.AddPredicateIndex (predicate: ResourceId, tripleIndex: TripleListIndex) =
         if this.PredicateIndex.ContainsKey predicate then

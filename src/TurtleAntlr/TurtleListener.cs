@@ -80,18 +80,23 @@ internal class TurtleListener : TurtleBaseListener
     public override void ExitNamedSubjectTriples(TurtleParser.NamedSubjectTriplesContext context)
     {
         var curSubject = _resourceVisitor.Visit(context.subject());
-        var triples = VisitPredicateObjectList(context.predicateObjectList())
-            .SelectMany(predicateObject => predicateObject.objects
-                .Select(obj => new RDFStore.Triple(curSubject, predicateObject.verb, obj)));
+        var triples = _resourceVisitor._predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
         triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
     }
 
-    public IEnumerable<(UInt32 verb, IEnumerable<UInt32> objects)> VisitPredicateObjectList(TurtleParser.PredicateObjectListContext context)
-    =>
-        context.verbObjectList().Select(VisitVerbObjectList);
-
-    public (UInt32, IEnumerable<UInt32>) VisitVerbObjectList(TurtleParser.VerbObjectListContext context) =>
-    (_resourceVisitor.Visit(context.verb()), context.rdfobject().Select(rdfObj => _resourceVisitor.Visit(rdfObj)));
-
+    public override void ExitBlankNodeTriples(TurtleParser.BlankNodeTriplesContext context)
+    {
+        var blankNode = TripleTable.NewAnonymousBlankNode();
+        var internalTriples =
+            _resourceVisitor._predicateObjectListVisitor.Visit(
+                context.blankNodePropertyList().predicateObjectList())(blankNode);
+        var postTriples = context.predicateObjectList() switch
+        {
+            null => new List<RDFStore.Triple>(),
+            var c => _resourceVisitor._predicateObjectListVisitor.Visit(c)(blankNode)
+        };
+        var triples = internalTriples.Concat(postTriples);
+        triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
+    }
 }
 

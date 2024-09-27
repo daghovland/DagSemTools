@@ -4,7 +4,7 @@ using IriTools;
 /// <summary>
 /// Represents a resource that is identified by an IRI.
 /// </summary>
-public class IriResource : Resource
+public class IriResource : BlankNodeOrIriResource
 {
     /// <summary>
     /// The IRI that identifies the resource.
@@ -17,21 +17,29 @@ public class IriResource : Resource
         Iri = iri ?? throw new ArgumentNullException(nameof(iri));
     }
 
+    /// <summary>
+    /// Two Iri resources are equal if their IRIs are equal.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public override bool Equals(Resource? other) =>
+        other != null && (ReferenceEquals(this, other) ||
+                          (other is IriResource iri && iri.Iri.Equals(Iri)));
+
+
     /// <inheritdoc />
     public override string ToString()
     {
         return Iri.ToString();
     }
 
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        if (obj is IriResource other)
-        {
-            return Iri.Equals(other.Iri);
-        }
-        return false;
-    }
+    /// <summary>
+    /// Two Iri resources are equal if their IRIs are equal.
+    /// </summary>
+    /// <param name="obj"></param>
+    /// <returns></returns>
+    public override bool Equals(object? obj) =>
+        obj != null && obj is Resource r && Equals(r);
 
     /// <inheritdoc />
     public override int GetHashCode()

@@ -65,6 +65,7 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
         var uriString = ctxt.ABSOLUTEIRIREF().GetText()[1..^1];
         return new IriReference(uriString);
     }
+
     /// <summary>
     /// Visits a prefixed IRI, f.ex. ex:A or rdfs:label
     /// This is the PNAME_LN rule in the SPARQL grammars
@@ -76,7 +77,8 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
         var prefixedIriString = ctxt.PNAME_LN().GetText();
         var components = prefixedIriString.Split(':', 2);
         var prefix = components[0];
-        var namespaceName = _prefixes[prefix];
+        if (!_prefixes.TryGetValue(prefix, out var namespaceName))
+            throw new Exception($"Prefix {prefix} is not defined.");
         var localName = components[1];
         var iriString = $"{namespaceName}{localName}";
         return new IriReference(iriString);

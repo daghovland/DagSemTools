@@ -1,34 +1,26 @@
 namespace AlcTableau.Api;
 
 /// <inheritdoc />
-public class LiteralResource : Resource
+public class LiteralResource(string value) : Resource
 {
     /// <summary>
     /// The string value of the literal. 
     /// </summary>
-    public string Value { get; }
+    public string Value { get; } = value;
+
+
+    /// <summary>
+    /// Two literals are equal if their string values are equal.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
+    public override bool Equals(Resource? other) =>
+        other != null && (ReferenceEquals(this, other) ||
+                          (other is LiteralResource literal && literal.Value.Equals(Value)));
 
     /// <inheritdoc />
-    public LiteralResource(string value)
-    {
-        Value = value ?? throw new ArgumentNullException(nameof(value));
-    }
+    public override string ToString() => Value;
 
-    /// <inheritdoc />
-    public override string ToString()
-    {
-        return Value;
-    }
-
-    /// <inheritdoc />
-    public override bool Equals(object? obj)
-    {
-        if (obj != null && obj is LiteralResource other)
-        {
-            return Value.Equals(other.Value);
-        }
-        return false;
-    }
 
     /// <inheritdoc />
     public override int GetHashCode()

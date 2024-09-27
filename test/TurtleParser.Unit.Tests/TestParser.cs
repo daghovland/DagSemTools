@@ -202,9 +202,148 @@ public class TestParser : IDisposable, IAsyncDisposable
     [Fact]
     public void Test1()
     {
-        var ontology = File.ReadAllText("example1.ttl");
+        var ontology = File.ReadAllText("TestData/example1.ttl");
         var ont = TestOntology(ontology);
         Assert.NotNull(ont);
+    }
+
+
+    [Fact]
+    public void TestQuotedLiterals()
+    {
+        var ontology = File.ReadAllText("TestData/quotedliterals.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+    }
+
+    [Fact]
+    public void TestBooleans()
+    {
+        var ontology = File.ReadAllText("TestData/booleans.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+    }
+
+    [Fact]
+    public void TestBlankNodes()
+    {
+        var ontology = File.ReadAllText("TestData/blank_nodes.ttl");
+        var ont = TestOntology(ontology);
+        var knows = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows"))];
+        ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
+        Assert.NotNull(ont);
+    }
+
+
+    [Fact]
+    public void TestExample26()
+    {
+        var ontology = File.ReadAllText("TestData/example26.ttl");
+        var ont = TestOntology(ontology);
+        ont.TripleCount.Should().Be(4);
+    }
+
+
+    [Fact]
+    public void TestBlankNodePropertyList()
+    {
+        var ontology = File.ReadAllText("TestData/blank_node_property_list.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+
+        var knows = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows"))];
+        var triplesWithKnows = ont.GetTriplesWithPredicate(knows).ToList();
+        triplesWithKnows.Should().HaveCount(1);
+
+
+        var name = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))];
+        var triplesWithName = ont.GetTriplesWithPredicate(name).ToList();
+        triplesWithName.Should().HaveCount(1);
+
+        triplesWithKnows.First().@object.Should().Be(triplesWithName.First().subject);
+    }
+    [Fact]
+    public void TestAbbreviatedBlankNode()
+    {
+        var ontology = File.ReadAllText("TestData/abbreviated_blank_nodes.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+
+        var knows = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows"))];
+        var triplesWithKnows = ont.GetTriplesWithPredicate(knows).ToList();
+        triplesWithKnows.Should().HaveCount(2);
+
+
+        var name = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))];
+        var triplesWithName = ont.GetTriplesWithPredicate(name).ToList();
+        triplesWithName.Should().HaveCount(3);
+
+        triplesWithKnows.First().@object.Should().Be(triplesWithName.Skip(1).First().subject);
+
+        var mbox = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox"))];
+
+        var triplesWithMail = ont.GetTriplesWithPredicate(mbox).ToList();
+        triplesWithMail.Should().HaveCount(1);
+        var ontTriples = ont.TripleList.Select(tr => ont.GetResourceTriple(tr));
+
+        var eve = ont
+            .GetTriplesWithPredicate(ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))])
+            .Where(tr => ont.ResourceList[tr.@object].literal.Equals("Eve"));
+        eve.Should().HaveCount(1);
+
+
+        var alice = ont
+            .GetTriplesWithPredicate(ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))])
+            .Where(tr => ont.ResourceList[tr.@object].literal.Equals("Alice"));
+        alice.Should().HaveCount(1);
+
+
+        ont.TripleCount.Should().Be(
+            6);
+
+
+        var ontologyExp = File.ReadAllText("TestData/abbreviated_blank_nodes_expanded.ttl");
+        var ontexp = TestOntology(ontologyExp);
+        Assert.NotNull(ontexp);
+
+        var ontexpTriples = ontexp.TripleList.Select(tr => ont.GetResourceTriple(tr));
+        ontexpTriples.Should().BeEquivalentTo(ontTriples);
+        ontexp.TripleCount.Should().Be(ont.TripleCount);
+        ontexp.ResourceCount.Should().Be(ont.ResourceCount);
+
+        var triplesWithKnowsE = ontexp.GetTriplesWithPredicate(knows).ToList();
+        triplesWithKnowsE.Should().HaveCount(2);
+
+    }
+
+    [Fact]
+    public void TestBlankNodePropertyList2()
+    {
+        var ont = AlcTableau.TurtleAntlr.Parser.ParseString("""
+               PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+               
+                [ foaf:name "Alice" ].
+            """, _outputWriter);
+        var alice = ont
+            .GetTriplesWithPredicate(ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))])
+            .Where(tr => ont.ResourceList[tr.@object].literal.Equals("Alice"));
+        alice.Should().HaveCount(1);
+
+    }
+
+    [Fact]
+    public void TestBlankNodes2()
+    {
+        var ont = TestOntology("""
+                                    prefix foaf: <http://xmlns.com/foaf/0.1/>
+                                    prefix : <http://example.org/>
+                                    [] foaf:knows :person1, :person2 .
+                                    """);
+        var knows = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows"))];
+        ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
+        Assert.NotNull(ont);
+        var person2 = ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference("http://example.org/person2"))];
+        ont.GetTriplesWithObjectPredicate(person2, knows).Should().HaveCount(1);
     }
 
     public void Dispose()

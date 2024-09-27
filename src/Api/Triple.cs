@@ -6,13 +6,13 @@ namespace AlcTableau.Api;
 /// <summary>
 /// Represents a triple in RDF. https://www.w3.org/TR/rdf12-concepts/#dfn-rdf-triple
 /// </summary>
-public class Triple(IriResource subject, IriReference predicate, Resource @object)
+public class Triple(BlankNodeOrIriResource subject, IriReference predicate, Resource @object)
 {
 
     /// <summary>
     /// The subject of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-subject
     /// </summary>
-    public IriResource Subject { get; } = subject;
+    public BlankNodeOrIriResource Subject { get; } = subject;
 
     /// <summary>
     /// The predicate of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-predicate

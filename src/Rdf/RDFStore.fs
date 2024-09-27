@@ -17,11 +17,14 @@ open IriTools
 
 module RDFStore =
     type ResourceId = uint32
+    
     [<StructuralComparison>]
     [<StructuralEquality>]
     [<Struct>]
     type public Resource =
         public Iri of iri:  IriReference
+        | NamedBlankNode of blankNode: string
+        | AnonymousBlankNode of anon_blankNode: uint32
         | LiteralString of literal: string
         | BooleanLiteral of literalBool: bool
         | DecimalLiteral of literalDec: decimal
@@ -41,6 +44,13 @@ module RDFStore =
             subject: ResourceId
             predicate: ResourceId
             object: ResourceId
+        }
+    
+    [<Struct>]
+    type TripleResource = {
+            subject: Resource
+            predicate: Resource
+            obj: Resource
         }
     
     type prefixDeclaration =

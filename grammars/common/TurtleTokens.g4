@@ -1,8 +1,8 @@
 lexer grammar TurtleTokens;
 
-ABSOLUTEIRIREF: '<' URI_SCHEMES '://'  (~[<>"{}|^`\\] | UCHAR)* '>';
+ABSOLUTEIRIREF: '<' URI_SCHEMES  (~[<>"{}|^`\\] | UCHAR)* '>';
 
-URI_SCHEMES: 'http'|'https';
+URI_SCHEMES: 'http://'|'https://'|'mailto:';
 
 RELATIVEIRIREF: '<' (~[<>"{}|^`\\] | UCHAR)* '>';
 
@@ -22,13 +22,14 @@ DOUBLE: [+-]? (([0-9]+ '.' [0-9]* EXPONENT) | ('.' [0-9]+ EXPONENT) | ([0-9]+ EX
 
 EXPONENT: [eE] [+-]? [0-9]+;
 
+
+STRING_LITERAL_LONG_SINGLE_QUOTE: '\'\'\'' ( ('\'' | '\'\'')? (~['\\] | ECHAR | UCHAR) )* '\'\'\'' ;
+
+STRING_LITERAL_LONG_QUOTE: '"""' ( ('"' | '""')? (~["\\] | ECHAR | UCHAR) )* '"""' ;
+
 STRING_LITERAL_QUOTE: '"' (~["\\\n\r] | ECHAR | UCHAR)* '"' ;
 
 STRING_LITERAL_SINGLE_QUOTE: '\'' (~['\\\n\r] | ECHAR | UCHAR)* '\'' ;
-
-STRING_LITERAL_LONG_SINGLE_QUOTE: '\'\'\'' ( ('\'' | '\'\'') (~['\\] | ECHAR | UCHAR)* )* '\'\'\'' ;
-
-STRING_LITERAL_LONG_QUOTE: '"""' ( ('"' | '""') (~["\\] | ECHAR | UCHAR)* )* '"""' ;
 
 
 UCHAR: '\\u' HEX HEX HEX HEX | '\\U' HEX HEX HEX HEX HEX HEX HEX HEX;

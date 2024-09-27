@@ -27,7 +27,7 @@ PREFIX_STRING: [Pp] [Rr] [Ee] [Ff] [Ii] [Xx];
 triples: 
     subject predicateObjectList #NamedSubjectTriples 
     | blankNodePropertyList predicateObjectList? #BlankNodeTriples
-    | reifiedTriple predicateObjectList?  #ReifiedTriples
+//TODO:     | reifiedTriple predicateObjectList?  #ReifiedTriples
     ;
     
 predicateObjectList: verbObjectList (SEMICOLON (verbObjectList)?)*;
@@ -92,7 +92,9 @@ turtleIri:
     | PNAME_NS #iriPrefix
     ;
 
-blankNode: BLANK_NODE_LABEL | ANON;
+blankNode: BLANK_NODE_LABEL #namedBlankNode 
+    | ANON #anonymousBlankNode
+    ;
 
 reifier: '~' (iri | blankNode);
 
