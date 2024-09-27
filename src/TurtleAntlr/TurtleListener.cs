@@ -19,10 +19,10 @@ internal class TurtleListener : TurtleBaseListener
     private IriGrammarVisitor _iriGrammarVisitor;
     private ResourceVisitor _resourceVisitor;
     private FSharpOption<IriReference> _graphName;
-    private readonly IVistorErrorListener _errorListener;
+    private readonly IVisitorErrorListener _errorListener;
     public Datastore datastore { get; init; }
-
-    public TurtleListener(uint initSize, IVistorErrorListener errorListener)
+    
+    public TurtleListener(uint initSize, IVisitorErrorListener errorListener)
     {
         datastore = new Datastore(initSize);
         _graphName = FSharpOption<IriReference>.None;

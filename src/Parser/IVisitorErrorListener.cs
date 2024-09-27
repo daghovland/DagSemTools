@@ -6,7 +6,7 @@ namespace AlcTableau.Parser;
 /// The interface for the error listener used by the visitor patterns for the turtle and manchester parsers
 /// Currently only ParserErrorListener implements this interface
 /// </summary>
-public interface IVistorErrorListener
+public interface IVisitorErrorListener
 {
     /// <summary>
     /// The method that is called by the visitor when a syntax error is encountered

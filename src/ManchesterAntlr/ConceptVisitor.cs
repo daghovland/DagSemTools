@@ -18,8 +18,8 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
 {
     public IriGrammarVisitor IriGrammarVisitor { get; init; }
     private RoleVisitor _roleVisitor;
-    private IVistorErrorListener _errorListener;
-    public ConceptVisitor(IVistorErrorListener errorListener)
+    private IVisitorErrorListener _errorListener;
+    public ConceptVisitor(IVisitorErrorListener errorListener)
     : this(new IriGrammarVisitor(errorListener))
     { _errorListener = errorListener; }
     public ConceptVisitor(IriGrammarVisitor iriGrammarVisitor)
@@ -30,7 +30,7 @@ public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
     }
 
 
-    public ConceptVisitor(Dictionary<string, IriReference> prefixes, IVistorErrorListener errorListener)
+    public ConceptVisitor(Dictionary<string, IriReference> prefixes, IVisitorErrorListener errorListener)
     : this(new IriGrammarVisitor(prefixes, errorListener))
     { }
 
