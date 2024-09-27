@@ -11,9 +11,9 @@ open System
 open AlcTableau.Rdf
 open IriTools
 open Xunit 
-open RDFStore
+open Ingress
 open Faqt
-open AlcTableau.Rdf.RDFStore
+open AlcTableau.Rdf.Ingress
 open AlcTableau
 open AlcTableau.Datalog
 
@@ -22,12 +22,12 @@ module Tests =
     
     [<Fact>]
     let ``Datalog program fetches rule`` () =
-        let tripleTable = Rdf.TripleTable(60u)
+        let tripleTable = Rdf.Datastore(60u)
         
-        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
-        let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
+        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+        let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
         let triplepattern = {
                              TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
@@ -49,13 +49,13 @@ module Tests =
         Assert.Single(rules)
         
     let ``Datalog program does not fetch when no matching rule`` () =
-        let tripleTable = Rdf.TripleTable(60u)
+        let tripleTable = Rdf.Datastore(60u)
         
-        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
-        let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
-        let objdIndex3 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object3"))
+        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+        let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+        let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
         let triplepattern = {
                              TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
@@ -87,11 +87,11 @@ module Tests =
         
     [<Fact>]
     let ``Wildcard triple patterns with one variable are correctly generated`` () =
-        let tripleTable = Rdf.TripleTable(60u)
+        let tripleTable = Rdf.Datastore(60u)
         
-        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
         let triplepattern = {TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
@@ -111,11 +111,11 @@ module Tests =
         
     [<Fact>]
     let ``Wildcard triple patterns with no variables are correctly generated`` () =
-        let tripleTable = Rdf.TripleTable(60u)
+        let tripleTable = Rdf.Datastore(60u)
         
-        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
+        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
         let triplepattern = {TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                              TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
@@ -124,21 +124,21 @@ module Tests =
         
     [<Fact>]
     let ``Can get matches on rule`` () =
-        let tripleTable = Rdf.TripleTable(60u)
-        Assert.Equal(0u, tripleTable.ResourceCount)
-        Assert.Equal(0u, tripleTable.TripleCount)
-        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
-        let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+        let tripleTable = Rdf.Datastore(60u)
+        Assert.Equal(0u, tripleTable.Resources.ResourceCount)
+        Assert.Equal(0u, tripleTable.Triples.TripleCount)
+        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+        let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
         tripleTable.AddTriple(Triple)
-        Assert.Equal(3u, tripleTable.ResourceCount)
-        Assert.Equal(1u, tripleTable.TripleCount)
-        let mappedTriple = tripleTable.TripleList.[0]
+        Assert.Equal(3u, tripleTable.Resources.ResourceCount)
+        Assert.Equal(1u, tripleTable.Triples.TripleCount)
+        let mappedTriple = tripleTable.Triples.TripleList.[0]
         Assert.Equal(Triple, mappedTriple)
         
-        let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
-        let Triple2 = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
+        let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+        let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
         
         let rule =  {Head =  ConstantTriplePattern Triple2; Body = [ConstantTriplePattern Triple]}
         let TriplePatter = {
@@ -154,21 +154,21 @@ module Tests =
         
     [<Fact>]
     let ``Can add triple using rule over tripletable`` () =
-        let tripleTable = Rdf.TripleTable(60u)
-        Assert.Equal(0u, tripleTable.ResourceCount)
-        Assert.Equal(0u, tripleTable.TripleCount)
-        let subjectIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object"))
-        let Triple = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+        let tripleTable = Rdf.Datastore(60u)
+        Assert.Equal(0u, tripleTable.Resources.ResourceCount)
+        Assert.Equal(0u, tripleTable.Triples.TripleCount)
+        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+        let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
         tripleTable.AddTriple(Triple)
-        Assert.Equal(3u, tripleTable.ResourceCount)
-        Assert.Equal(1u, tripleTable.TripleCount)
-        let mappedTriple = tripleTable.TripleList.[0]
+        Assert.Equal(3u, tripleTable.Resources.ResourceCount)
+        Assert.Equal(1u, tripleTable.Triples.TripleCount)
+        let mappedTriple = tripleTable.Triples.TripleList.[0]
         Assert.Equal(Triple, mappedTriple)
         
-        let objdIndex2 = tripleTable.AddResource(RDFStore.Resource.Iri(new IriReference "http://example.com/object2"))
-        let Triple2 = {RDFStore.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
+        let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+        let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
         
         let rule =  {Head =  ConstantTriplePattern Triple2; Body = [ConstantTriplePattern Triple]}
         let prog = DatalogProgram ([rule], tripleTable)
@@ -179,7 +179,7 @@ module Tests =
         
         prog.materialise()
         
-        Assert.Equal(2u, tripleTable.TripleCount)
+        Assert.Equal(2u, tripleTable.Triples.TripleCount)
         let tripleAnswers2 = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
         Assert.Contains(Triple2, tripleAnswers2)
         

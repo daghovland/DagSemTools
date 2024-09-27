@@ -26,7 +26,7 @@ public static class Parser
     /// <param name="filename"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static TripleTable ParseFile(string filename, TextWriter errorOutput)
+    public static Datastore ParseFile(string filename, TextWriter errorOutput)
     {
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader, (uint)(new FileInfo(filename).Length), errorOutput);
@@ -38,7 +38,7 @@ public static class Parser
     /// <param name="fInfo"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static TripleTable ParseFile(FileInfo fInfo, TextWriter errorOutput)
+    public static Datastore ParseFile(FileInfo fInfo, TextWriter errorOutput)
     {
         using TextReader textReader = File.OpenText(fInfo.FullName);
         return ParseReader(textReader, (uint)(fInfo.Length), errorOutput);
@@ -52,7 +52,7 @@ public static class Parser
     /// <param name="prefixes"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static TripleTable ParseReader(TextReader textReader, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    public static Datastore ParseReader(TextReader textReader, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
         var input = new AntlrInputStream(textReader);
         var lexer = new TurtleLexer(input);
@@ -69,7 +69,7 @@ public static class Parser
         {
             throw new Exception("Syntax errors in Turtle file");
         }
-        return listener.TripleTable;
+        return listener.datastore;
     }
 
     /// <summary>
@@ -79,7 +79,7 @@ public static class Parser
     /// <param name="initSize"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static TripleTable ParseReader(TextReader textReader, UInt32 initSize, TextWriter errorOutput) =>
+    public static Datastore ParseReader(TextReader textReader, UInt32 initSize, TextWriter errorOutput) =>
         ParseReader(textReader, initSize, new Dictionary<string, IriReference>(), errorOutput);
 
     /// <summary>
@@ -88,7 +88,7 @@ public static class Parser
     /// <param name="owl"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static TripleTable ParseString(string owl, TextWriter errorOutput)
+    public static Datastore ParseString(string owl, TextWriter errorOutput)
     {
         using TextReader textReader = new StringReader(owl);
         return ParseReader(textReader, (uint)owl.Length, errorOutput);

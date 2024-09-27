@@ -2,7 +2,7 @@ using AlcTableau.Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 
-public class PredicateObjectListVisitor : TurtleBaseVisitor<Func<uint, List<RDFStore.Triple>>>
+public class PredicateObjectListVisitor : TurtleBaseVisitor<Func<uint, List<Ingress.Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
     internal PredicateObjectListVisitor(ResourceVisitor resourceVisitor)
@@ -15,7 +15,7 @@ public class PredicateObjectListVisitor : TurtleBaseVisitor<Func<uint, List<RDFS
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Func<uint, List<RDFStore.Triple>> VisitPredicateObjectList(
+    public override Func<uint, List<Ingress.Triple>> VisitPredicateObjectList(
         TurtleParser.PredicateObjectListContext context) =>
         (node) =>
             context.verbObjectList()
@@ -28,14 +28,14 @@ public class PredicateObjectListVisitor : TurtleBaseVisitor<Func<uint, List<RDFS
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Func<uint, List<RDFStore.Triple>> VisitVerbObjectList(
+    public override Func<uint, List<Ingress.Triple>> VisitVerbObjectList(
         TurtleParser.VerbObjectListContext context) =>
         (node) =>
         {
             var predicate = _resourceVisitor.Visit(context.verb());
             return context.rdfobject()
                 .Select(rdfObj => _resourceVisitor.Visit(rdfObj))
-                .Select(obj => new RDFStore.Triple(node, predicate, obj))
+                .Select(obj => new Ingress.Triple(node, predicate, obj))
                 .ToList();
         };
 

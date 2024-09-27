@@ -1,29 +1,17 @@
 namespace AlcTableau.Rdf
-open AlcTableau.Rdf.RDFStore
-open RDFStore
+open AlcTableau.Rdf.Ingress
+open Ingress
 
 open System
 open System.Collections.Generic
 
-
-
-
-
-
-
-type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
-                 resourceList: Resource array,
-                 resourceCount: uint,
-                 tripleList: Triple array,
+type TripleTable(tripleList: Triple array,
                  tripleCount: TripleListIndex,
                  threeKeysIndex: Dictionary<Triple, TripleListIndex>,
                  predicateIndex: Dictionary<ResourceId, TripleListIndex list>,
                  subjectPredicateIndex: Dictionary<ResourceId, Dictionary<ResourceId, TripleListIndex list>>,
                  objectPredicateIndex: Dictionary<ResourceId, Dictionary<ResourceId, TripleListIndex list>>) =
         
-    member val ResourceMap = resourceMap with get, set
-    member val ResourceList = resourceList with get, set
-    member val ResourceCount = resourceCount with get, set
     member val TripleList = tripleList with get, set
     member val TripleCount = tripleCount with get, set
     member val ThreeKeysIndex = threeKeysIndex with get, set
@@ -34,10 +22,7 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
     new(init_rdf_size : uint) =
         let init_resources = max 10 (int init_rdf_size / 10)
         let init_triples = max 10 (int init_rdf_size / 60)
-        TripleTable(new Dictionary<Resource, ResourceId>(),
-                    Array.zeroCreate init_resources,
-                    0u,
-                    Array.zeroCreate init_triples,
+        TripleTable(Array.zeroCreate init_triples,
                     0u,
                     new Dictionary<Triple, TripleListIndex>(),
                     new Dictionary<ResourceId, TripleListIndex list>(),
@@ -45,43 +30,12 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
                     new Dictionary<ResourceId, Dictionary<ResourceId, TripleListIndex list>>()
                     )
         
-    member this.doubleArraySize (originalArray: 'T array) : 'T array =
-        let newSize = originalArray.Length * 2
-        let newArray = Array.zeroCreate<'T> newSize
-        Array.blit originalArray 0 newArray 0 originalArray.Length
-        newArray    
-         
-    member this.doubleResourceListSize () =
-        this.ResourceList <- this.doubleArraySize this.ResourceList
-        
         
     member this.doubleTripleListSize () =
-        this.TripleList <- this.doubleArraySize this.TripleList
-        
-    member this.AddResource resource =
-        if this.ResourceMap.ContainsKey resource then
-            this.ResourceMap[resource]
-        else
-            let nextResourceIndex = this.ResourceCount + 1u
-            if nextResourceIndex > uint32(this.ResourceList.Length) then
-                    this.doubleResourceListSize()
-            this.ResourceList.[int(this.ResourceCount)] <- resource
-            this.ResourceMap.Add (resource, this.ResourceCount) |> ignore
-            this.ResourceCount <- nextResourceIndex
-            nextResourceIndex - 1u
-        
-    member this.NewAnonymousBlankNode() =
-        this.AddResource(RDFStore.Resource.AnonymousBlankNode this.ResourceCount);
+        this.TripleList <- doubleArraySize this.TripleList
     member this.GetTripleListEntry (index: TripleListIndex) : Triple =
         this.TripleList.[int index]
     
-    member this.GetResourceTriple(triple: Triple) =
-        {
-          TripleResource.subject = this.ResourceList.[int triple.subject]
-          TripleResource.predicate = this.ResourceList.[int triple.predicate]
-          TripleResource.obj = this.ResourceList.[int triple.object]
-        }
-        
     member this.AddPredicateIndex (predicate: ResourceId, tripleIndex: TripleListIndex) =
         if this.PredicateIndex.ContainsKey predicate then
             let existList = this.PredicateIndex.[predicate]
@@ -109,13 +63,13 @@ type TripleTable(resourceMap: Dictionary<Resource, ResourceId>,
         existObjectMap.[predicate] <- tripleIndex :: existSubjectPredicateList
         this.ObjectPredicateIndex.[object] <- existObjectMap
             
-    member this.AddTriple (triple : RDFStore.Triple) =
+    member this.AddTriple (triple : Ingress.Triple) =
             if this.ThreeKeysIndex.ContainsKey triple then
                 ()
             else
                 let nextTripleCount = this.TripleCount + 1u
                 if nextTripleCount > uint32(this.TripleList.Length) then
-                        this.doubleResourceListSize()
+                        this.doubleTripleListSize()   
                 this.AddSubjectPredicateIndex(triple.subject, triple.predicate, this.TripleCount)
                 this.AddObjectPredicateIndex(triple.object, triple.predicate, this.TripleCount)
                 this.AddPredicateIndex(triple.predicate, this.TripleCount) 
