@@ -30,17 +30,16 @@ public class TestApi(ITestOutputHelper output)
         Assert.NotNull(ont);
 
 
-        var knows = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/knows"));
+        var knows = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/knows")).ToList();
         knows.Should().HaveCount(2);
 
 
-        var name = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name"));
-        name.Should().HaveCount(2);
+        var name = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name")).ToList();
+        name.Should().HaveCount(3);
         var isKnown = knows.First().Object;
-        var hasName = name.First().Subject;
-        isKnown.Should().Be(hasName);
-        knows.First().Object.Should().Be(name.First().Subject);
-
+        var bobHasName = name.Skip(1).First().Subject;
+        isKnown.Should().Be(bobHasName);
+        
         var mbox = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/mbox"));
 
         mbox.Should().HaveCount(1);

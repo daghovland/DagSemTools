@@ -9,6 +9,11 @@ public class LiteralResource(string value) : Resource
     public string Value { get; } = value;
 
 
+    /// <summary>
+    /// Two literals are equal if their string values are equal.
+    /// </summary>
+    /// <param name="other"></param>
+    /// <returns></returns>
     public override bool Equals(Resource? other) =>
         other != null && (ReferenceEquals(this, other) ||
                           (other is LiteralResource literal && literal.Value.Equals(Value)));

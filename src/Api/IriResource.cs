@@ -36,7 +36,7 @@ public class IriResource : BlankNodeOrIriResource
     /// <summary>
     /// Two Iri resources are equal if their IRIs are equal.
     /// </summary>
-    /// <param name="other"></param>
+    /// <param name="obj"></param>
     /// <returns></returns>
     public override bool Equals(object? obj) =>
         obj != null && obj is Resource r && Equals(r);
