@@ -39,7 +39,7 @@ public class TestApi(ITestOutputHelper output)
         var isKnown = knows.First().Object;
         var bobHasName = name.Skip(1).First().Subject;
         isKnown.Should().Be(bobHasName);
-        
+
         var mbox = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/mbox"));
 
         mbox.Should().HaveCount(1);
