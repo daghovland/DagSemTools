@@ -18,25 +18,47 @@ public class Graph : IGraph
     /// <inheritdoc />
     public bool isEmpty() => Triples.TripleCount == 0;
 
+    
+    private BlankNodeOrIriResource GetBlankNodeOrIriResource(uint resourceId)
+    {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, Triples.ResourceCount);
+        var resource = Triples.ResourceList[resourceId];
 
+            switch (resource)
+            {
+                case RDFStore.Resource { IsIri: true } r:
+                    return new IriResource(new IriReference(r.iri));
+                case var r when r.IsAnonymousBlankNode:
+                    return new BlankNodeResource($"{r.anon_blankNode}");
+                case var r when r.IsNamedBlankNode:
+                    return new BlankNodeResource($"{r.blankNode}");
+                default: throw new ArgumentException($"Resource {resource.ToString()} is not an Iri or a blank node");;
+            }
+        }        
+    
+    
     private IriResource GetIriResource(uint resourceId)
     {
-        if (resourceId >= Triples.ResourceCount)
-            throw new ArgumentOutOfRangeException(nameof(resourceId));
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, Triples.ResourceCount);
         var resource = Triples.ResourceList[resourceId];
         if (!resource.IsIri)
-            throw new ArgumentException("Resource is not an Iri");
+            throw new ArgumentException($"Resource {resource.ToString()} is not an Iri");
         return new IriResource(new IriReference(resource.iri));
 
     }
 
     private Resource GetResource(uint resourceId)
     {
+        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, Triples.ResourceCount);
         var resource = Triples.ResourceList[resourceId];
         switch (resource)
         {
             case RDFStore.Resource { IsIri: true } r:
                 return new IriResource(new IriReference(r.iri));
+            case var r when r.IsAnonymousBlankNode:
+                return new BlankNodeResource($"{r.anon_blankNode}");
+            case var r when r.IsNamedBlankNode:
+                return new BlankNodeResource($"{r.blankNode}");
             case var r when r.IsLangLiteral:
                 return new LiteralResource(r.langliteral);
             case RDFStore.Resource { IsDateLiteral: true } r:
@@ -48,7 +70,7 @@ public class Graph : IGraph
     }
 
     private Triple GetTriple(RDFStore.Triple triple) =>
-    new Triple(this.GetIriResource(triple.subject),
+    new Triple(this.GetBlankNodeOrIriResource(triple.subject),
             GetIriResource(triple.predicate).Iri,
             GetResource(triple.@object));
 

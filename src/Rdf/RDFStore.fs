@@ -17,6 +17,7 @@ open IriTools
 
 module RDFStore =
     type ResourceId = uint32
+    
     [<StructuralComparison>]
     [<StructuralEquality>]
     [<Struct>]
@@ -43,6 +44,13 @@ module RDFStore =
             subject: ResourceId
             predicate: ResourceId
             object: ResourceId
+        }
+    
+    [<Struct>]
+    type TripleResource = {
+            subject: Resource
+            predicate: Resource
+            obj: Resource
         }
     
     type prefixDeclaration =
