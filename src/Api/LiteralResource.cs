@@ -10,7 +10,7 @@ public class LiteralResource(string value) : Resource
 
 
     public override bool Equals(Resource? other) =>
-        other != null && (ReferenceEquals(this, other) || 
+        other != null && (ReferenceEquals(this, other) ||
                           (other is LiteralResource literal && literal.Value.Equals(Value)));
 
     /// <inheritdoc />

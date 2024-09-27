@@ -7,5 +7,5 @@ namespace AlcTableau.Api;
 /// </summary>
 public abstract class BlankNodeOrIriResource : Resource
 {
-       
+
 }

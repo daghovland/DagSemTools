@@ -83,7 +83,7 @@ internal class TurtleListener : TurtleBaseListener
         var triples = _resourceVisitor._predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
         triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
     }
-    
+
     public override void ExitBlankNodeTriples(TurtleParser.BlankNodeTriplesContext context)
     {
         var blankNode = TripleTable.NewAnonymousBlankNode();
@@ -93,9 +93,9 @@ internal class TurtleListener : TurtleBaseListener
         var postTriples = context.predicateObjectList() switch
         {
             null => new List<RDFStore.Triple>(),
-            var c => _resourceVisitor._predicateObjectListVisitor.Visit(c)(blankNode) 
+            var c => _resourceVisitor._predicateObjectListVisitor.Visit(c)(blankNode)
         };
-        var triples = internalTriples.Concat(postTriples); 
+        var triples = internalTriples.Concat(postTriples);
         triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
     }
 }

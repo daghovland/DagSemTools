@@ -9,7 +9,7 @@ namespace AlcTableau.Api
     {
         /// <inheritdoc />
         public abstract bool Equals(Resource? other);
-        
+
 
         /// <summary>
         /// Compares to Resources based on the string representation in ToString()
@@ -32,7 +32,7 @@ namespace AlcTableau.Api
         /// <param name="obj"></param>
         /// <returns></returns>
         /// <exception cref="ArgumentException"></exception>
-        public int CompareTo(object? obj)=>
+        public int CompareTo(object? obj) =>
             obj switch
             {
                 null => 1,

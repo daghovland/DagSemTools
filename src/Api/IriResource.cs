@@ -23,9 +23,9 @@ public class IriResource : BlankNodeOrIriResource
     /// <param name="other"></param>
     /// <returns></returns>
     public override bool Equals(Resource? other) =>
-        other != null && (ReferenceEquals(this, other) || 
+        other != null && (ReferenceEquals(this, other) ||
                           (other is IriResource iri && iri.Iri.Equals(Iri)));
-    
+
 
     /// <inheritdoc />
     public override string ToString()
@@ -38,7 +38,7 @@ public class IriResource : BlankNodeOrIriResource
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(object? obj) => 
+    public override bool Equals(object? obj) =>
         obj != null && obj is Resource r && Equals(r);
 
     /// <inheritdoc />

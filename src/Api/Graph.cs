@@ -18,25 +18,25 @@ public class Graph : IGraph
     /// <inheritdoc />
     public bool isEmpty() => Triples.TripleCount == 0;
 
-    
+
     private BlankNodeOrIriResource GetBlankNodeOrIriResource(uint resourceId)
     {
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, Triples.ResourceCount);
         var resource = Triples.ResourceList[resourceId];
 
-            switch (resource)
-            {
-                case RDFStore.Resource { IsIri: true } r:
-                    return new IriResource(new IriReference(r.iri));
-                case var r when r.IsAnonymousBlankNode:
-                    return new BlankNodeResource($"{r.anon_blankNode}");
-                case var r when r.IsNamedBlankNode:
-                    return new BlankNodeResource($"{r.blankNode}");
-                default: throw new ArgumentException($"Resource {resource.ToString()} is not an Iri or a blank node");;
-            }
-        }        
-    
-    
+        switch (resource)
+        {
+            case RDFStore.Resource { IsIri: true } r:
+                return new IriResource(new IriReference(r.iri));
+            case var r when r.IsAnonymousBlankNode:
+                return new BlankNodeResource($"{r.anon_blankNode}");
+            case var r when r.IsNamedBlankNode:
+                return new BlankNodeResource($"{r.blankNode}");
+            default: throw new ArgumentException($"Resource {resource.ToString()} is not an Iri or a blank node"); ;
+        }
+    }
+
+
     private IriResource GetIriResource(uint resourceId)
     {
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, Triples.ResourceCount);
