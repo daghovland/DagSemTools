@@ -15,26 +15,29 @@ namespace AlcTableau.TurtleAntlr;
 /// </summary>
 public static class Namespaces
 {
-    internal const string Rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
-    internal const string Rdfs = "http://www.w3.org/2000/01/rdf-schema#";
-    internal const string Owl = "http://www.w3.org/2002/07/owl#";
-    internal const string Xsd = "http://www.w3.org/2001/XMLSchema#";
+    public const string Rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
+    public const string Rdfs = "http://www.w3.org/2000/01/rdf-schema#";
+    public const string Owl = "http://www.w3.org/2002/07/owl#";
+    public const string Xsd = "http://www.w3.org/2001/XMLSchema#";
 
-    internal const string RdfType = $"{Rdf}type";
+    public const string RdfType = $"{Rdf}type";
+    public const string RdfNil = $"{Rdf}nil";
+    public const string RdfFirst = $"{Rdf}first";
+    public const string RdfRest = $"{Rdf}rest";
 
-    internal const string XsdString = $"{Xsd}string";
-    internal const string XsdBoolean = $"{Xsd}boolean";
-    internal const string XsdDecimal = $"{Xsd}decimal";
-    internal const string XsdFloat = $"{Xsd}float";
-    internal const string XsdDouble = $"{Xsd}double";
-    internal const string XsdDuration = $"{Xsd}duration";
-    internal const string XsdDateTime = $"{Xsd}dateTime";
-    internal const string XsdTime = $"{Xsd}time";
-    internal const string XsdDate = $"{Xsd}date";
-    internal const string XsdInt = $"{Xsd}int";
-    internal const string XsdInteger = $"{Xsd}integer";
-    internal const string XsdHexBinary = $"{Xsd}hexBinary";
-    internal const string XsdBase64Binary = $"{Xsd}base64Binary";
-    internal const string XsdAnyUri = $"{Xsd}anyURI";
+    public const string XsdString = $"{Xsd}string";
+    public const string XsdBoolean = $"{Xsd}boolean";
+    public const string XsdDecimal = $"{Xsd}decimal";
+    public const string XsdFloat = $"{Xsd}float";
+    public const string XsdDouble = $"{Xsd}double";
+    public const string XsdDuration = $"{Xsd}duration";
+    public const string XsdDateTime = $"{Xsd}dateTime";
+    public const string XsdTime = $"{Xsd}time";
+    public const string XsdDate = $"{Xsd}date";
+    public const string XsdInt = $"{Xsd}int";
+    public const string XsdInteger = $"{Xsd}integer";
+    public const string XsdHexBinary = $"{Xsd}hexBinary";
+    public const string XsdBase64Binary = $"{Xsd}base64Binary";
+    public const string XsdAnyUri = $"{Xsd}anyURI";
 
 }

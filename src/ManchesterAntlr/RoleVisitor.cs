@@ -17,8 +17,8 @@ namespace ManchesterAntlr;
 public class RoleVisitor : ManchesterBaseVisitor<ALC.Role>
 {
     private IriGrammarVisitor _iriGrammarVisitor;
-    private IVistorErrorListener _errorListener;
-    public RoleVisitor(IriGrammarVisitor iriGrammarVisitor, IVistorErrorListener errorListener)
+    private IVisitorErrorListener _errorListener;
+    public RoleVisitor(IriGrammarVisitor iriGrammarVisitor, IVisitorErrorListener errorListener)
     {
         _iriGrammarVisitor = iriGrammarVisitor;
         _errorListener = errorListener;

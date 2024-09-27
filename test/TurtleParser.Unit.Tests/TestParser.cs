@@ -1,5 +1,6 @@
 using AlcTableau;
 using AlcTableau.Rdf;
+using AlcTableau.TurtleAntlr;
 using FluentAssertions;
 using IriTools;
 using TestUtils;
@@ -244,6 +245,21 @@ public class TestParser : IDisposable, IAsyncDisposable
     }
 
 
+    [Fact]
+    public void TestCollection()
+    {
+        var ontology = File.ReadAllText("TestData/collections.ttl");
+        var ont = TestOntology(ontology);
+        ont.TripleCount.Should().Be(8);
+        ont.GetTriplesWithObject(ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfNil))])
+            .Should().HaveCount(2);
+        ont.GetTriplesWithPredicate(ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfFirst))])
+            .Should().HaveCount(3);
+    }
+
+
+    
+    
     [Fact]
     public void TestBlankNodePropertyList()
     {

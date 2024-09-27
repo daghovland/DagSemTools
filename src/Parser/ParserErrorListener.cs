@@ -3,7 +3,7 @@
 namespace AlcTableau.Parser;
 
 /// <inheritdoc />
-public class ParserErrorListener : IAntlrErrorListener<IToken>, IVistorErrorListener
+public class ParserErrorListener : IAntlrErrorListener<IToken>, IVisitorErrorListener
 {
     private readonly TextWriter _output;
 
