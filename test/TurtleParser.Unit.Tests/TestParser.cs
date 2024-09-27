@@ -258,8 +258,8 @@ public class TestParser : IDisposable, IAsyncDisposable
     }
 
 
-    
-    
+
+
     [Fact]
     public void TestBlankNodePropertyList()
     {

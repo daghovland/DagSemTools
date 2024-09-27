@@ -78,12 +78,12 @@ internal class ResourceVisitor : TurtleBaseVisitor<uint>
 
     public override uint VisitCollection(CollectionContext context)
     {
-        
+
         var rdfnil = TripleTable.AddResource(RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfNil)));
         var rdffirst = TripleTable.AddResource(RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfFirst)));
         var rdfrest = TripleTable.AddResource(RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfRest)));
-        
-        return  context.rdfobject()
+
+        return context.rdfobject()
             .Aggregate(
                 rdfnil,
                 (rest, rdfobject) =>
@@ -96,7 +96,7 @@ internal class ResourceVisitor : TurtleBaseVisitor<uint>
                 }
             );
     }
-    
+
     public override uint VisitBlankNodePropertyList(BlankNodePropertyListContext context)
     {
         var blankNode = TripleTable.AddResource(RDFStore.Resource.NewAnonymousBlankNode(TripleTable.ResourceCount));
