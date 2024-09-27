@@ -17,20 +17,20 @@ namespace AlcTableau.ManchesterAntlr;
 public class DataRangeVisitor : ManchesterBaseVisitor<AlcTableau.DataRange.Datarange>
 {
     DatatypeRestrictionVisitor _datatypeRestrictionVisitor = new DatatypeRestrictionVisitor();
-    IVistorErrorListener _errorListener;
+    readonly IVisitorErrorListener _errorListener;
     public IriGrammarVisitor IriGrammarVisitor { get; init; }
-    public DataRangeVisitor(IVistorErrorListener errorListener)
+    public DataRangeVisitor(IVisitorErrorListener errorListener)
     {
         IriGrammarVisitor = new IriGrammarVisitor(errorListener);
         _errorListener = errorListener;
     }
-    public DataRangeVisitor(IriGrammarVisitor iriGrammarVisitor, IVistorErrorListener errorListener)
+    public DataRangeVisitor(IriGrammarVisitor iriGrammarVisitor, IVisitorErrorListener errorListener)
     {
         IriGrammarVisitor = iriGrammarVisitor;
         _errorListener = errorListener;
     }
 
-    public DataRangeVisitor(Dictionary<string, IriReference> prefixes, IVistorErrorListener errorListener)
+    public DataRangeVisitor(Dictionary<string, IriReference> prefixes, IVisitorErrorListener errorListener)
     {
         _errorListener = errorListener;
         IriGrammarVisitor = new IriGrammarVisitor(prefixes, _errorListener);

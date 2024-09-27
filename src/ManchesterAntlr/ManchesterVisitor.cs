@@ -23,9 +23,9 @@ public class ManchesterVisitor : ManchesterBaseVisitor<AlcTableau.ALC.OntologyDo
 {
     private ConceptVisitor? _conceptVisitor;
     private FrameVisitor? _frameVisitor;
-    private IVistorErrorListener _errorListener;
+    private IVisitorErrorListener _errorListener;
 
-    public ManchesterVisitor(IVistorErrorListener errorListener)
+    public ManchesterVisitor(IVisitorErrorListener errorListener)
     {
         _errorListener = errorListener;
     }

@@ -17,8 +17,8 @@ using static ManchesterParser;
 public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
 {
     private readonly Dictionary<string, IriReference> _prefixes;
-    public readonly IVistorErrorListener ErrorListener;
-    public IriGrammarVisitor(IVistorErrorListener errorListener)
+    public readonly IVisitorErrorListener ErrorListener;
+    public IriGrammarVisitor(IVisitorErrorListener errorListener)
     {
         _prefixes = new Dictionary<string, IriReference>();
         ErrorListener = errorListener;
@@ -34,7 +34,7 @@ public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
         _prefixes.TryAdd("owl", new IriReference("https://www.w3.org/2002/07/owl#"));
     }
 
-    public IriGrammarVisitor(Dictionary<string, IriReference> prefixes, IVistorErrorListener errorListener)
+    public IriGrammarVisitor(Dictionary<string, IriReference> prefixes, IVisitorErrorListener errorListener)
     {
         _prefixes = prefixes;
         AddDefaultPrefixes();

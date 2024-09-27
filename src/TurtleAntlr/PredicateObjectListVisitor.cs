@@ -2,7 +2,7 @@ using AlcTableau.Rdf;
 
 namespace AlcTableau.TurtleAntlr;
 
-public class PredicateObjectListVisitor : TurtleBaseVisitor<Func<uint, List<RDFStore.Triple>>>
+internal class PredicateObjectListVisitor : TurtleBaseVisitor<Func<uint, List<RDFStore.Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
     internal PredicateObjectListVisitor(ResourceVisitor resourceVisitor)
