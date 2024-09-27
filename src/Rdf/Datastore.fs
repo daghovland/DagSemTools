@@ -7,15 +7,18 @@ open System.Collections.Generic
 
 type Datastore(triples: TripleTable,
                reifiedTriples: QuadTable,
+               namedGraphs: QuadTable,
                resources: ResourceManager) =
     member val Triples = triples with get, set
     member val ReifiedTriples = reifiedTriples with get, set
+    member val NamedGraphs = namedGraphs with get, set
     member val Resources = resources with get, set
     
     new(init_rdf_size : uint) =
         let init_resources : uint = uint ( max 10 (int init_rdf_size / 10) )
         let init_triples = uint ( max 10 (int init_rdf_size / 60) )
         Datastore(new TripleTable(init_triples),
+                  new QuadTable(init_triples),
                   new QuadTable(init_triples),
                   new ResourceManager(init_resources))
         

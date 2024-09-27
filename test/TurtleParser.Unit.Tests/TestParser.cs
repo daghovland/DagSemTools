@@ -260,7 +260,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.Triples.TripleCount.Should().Be(4);
     }
 
-    
+
     [Fact]
     public void TestTripleTermWithIri()
     {
@@ -268,7 +268,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology(ontology);
         ont.Triples.TripleCount.Should().Be(4);
     }
-    
+
     [Fact]
     public void TestBlankNodePropertyList()
     {
