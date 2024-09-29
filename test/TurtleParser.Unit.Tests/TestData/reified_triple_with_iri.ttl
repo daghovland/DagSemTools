@@ -1,0 +1,5 @@
+
+PREFIX :    <http://www.example.org/>
+
+:employee38 :familyName "Smith" .
+<< :employee38 :jobTitle "Assistant Designer" ~ _:id >> :accordingTo :employee22 .

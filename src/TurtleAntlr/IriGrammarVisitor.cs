@@ -44,12 +44,12 @@ public class IriGrammarVisitor : TurtleBaseVisitor<IriReference>
     /// Returns a list of prefix declarations.
     /// </summary>
     /// <returns></returns>
-    public FSharpList<RDFStore.prefixDeclaration> CreatePrefixList()
+    public FSharpList<Ingress.prefixDeclaration> CreatePrefixList()
     {
-        var prefixList = new List<RDFStore.prefixDeclaration>();
+        var prefixList = new List<Ingress.prefixDeclaration>();
         foreach (var kvp in _prefixes)
         {
-            var prefix = RDFStore.prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
+            var prefix = Ingress.prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
             prefixList.Add(prefix);
         }
         return ListModule.OfSeq(prefixList);

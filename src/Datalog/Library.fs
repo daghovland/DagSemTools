@@ -8,21 +8,21 @@
 namespace AlcTableau
 
 open AlcTableau.Rdf
-open AlcTableau.Rdf.RDFStore
+open AlcTableau.Rdf.Ingress
 
 module Datalog =
 
     [<StructuralComparison>]
     [<StructuralEquality>]
     type ResourceOrVariable = 
-        | Resource of RDFStore.ResourceId
+        | Resource of Ingress.ResourceId
         | Variable of string
 
     
     [<StructuralComparison>]
     [<StructuralEquality>]
     type ResourceOrWildcard = 
-        | Resource of RDFStore.ResourceId
+        | Resource of Ingress.ResourceId
         | Wildcard
     
     [<StructuralComparison>]
@@ -35,7 +35,7 @@ module Datalog =
     type TripleWildcard = 
         {Subject: ResourceOrWildcard; Predicate: ResourceOrWildcard; Object: ResourceOrWildcard}
 
-    let ConstantTriplePattern (triple : RDFStore.Triple) : TriplePattern = 
+    let ConstantTriplePattern (triple : Ingress.Triple) : TriplePattern = 
         {Subject = ResourceOrVariable.Resource triple.subject; Predicate = ResourceOrVariable.Resource triple.predicate; Object = ResourceOrVariable.Resource triple.object}
     
     /// Generate all 8 possible triple patterns with wildcards for a given triple pattern
@@ -60,16 +60,16 @@ module Datalog =
     type Rule = 
         {Head: TriplePattern; Body: TriplePattern list}
     type Substitution = 
-        Map<string, RDFStore.ResourceId>
+        Map<string, Ingress.ResourceId>
         
     let ApplySubstitutionResource (sub : Substitution) (res : ResourceOrVariable) : ResourceId =
         match res with
         | ResourceOrVariable.Resource r -> r
         | Variable v -> sub[v]
     let ApplySubstitutionTriple sub (triple : TriplePattern) : Triple =
-        {Rdf.RDFStore.subject = ApplySubstitutionResource sub triple.Subject
-         RDFStore.predicate = ApplySubstitutionResource sub triple.Predicate
-         RDFStore.object = ApplySubstitutionResource sub triple.Object 
+        {Rdf.Ingress.subject = ApplySubstitutionResource sub triple.Subject
+         Ingress.predicate = ApplySubstitutionResource sub triple.Predicate
+         Ingress.object = ApplySubstitutionResource sub triple.Object 
          }
     type PartialRule = 
         {Rule: Rule; Match : TriplePattern}
@@ -77,7 +77,7 @@ module Datalog =
         {Match: PartialRule; Substitution: Substitution}
     
     
-    let GetSubstitution (resource : RDFStore.ResourceId, variable : ResourceOrVariable) (subs : Substitution)  : Substitution option =
+    let GetSubstitution (resource : Ingress.ResourceId, variable : ResourceOrVariable) (subs : Substitution)  : Substitution option =
         match variable, resource with
         | Variable v, _  ->
             match subs.TryGetValue v with
@@ -87,7 +87,7 @@ module Datalog =
         | ResourceOrVariable.Resource r, s when r = s -> Some Map.empty
         | _ -> None
     
-    let GetSubstitutionOption (subs : Substitution option) (resource : RDFStore.ResourceId, variable : ResourceOrVariable) : Substitution option =
+    let GetSubstitutionOption (subs : Substitution option) (resource : Ingress.ResourceId, variable : ResourceOrVariable) : Substitution option =
         Option.bind (GetSubstitution (resource, variable)) subs    
     let GetSubstitutions (fact : Triple) (factPattern : TriplePattern)  : Substitution option =
         let resourceList = [(fact.subject, factPattern.Subject); (fact.predicate, factPattern.Predicate); (fact.object, factPattern.Object)]
@@ -159,7 +159,7 @@ module Datalog =
          ruleMatch.Match.Rule.Body
         |> List.fold ( fun subs tr -> subs |> Seq.collect (evaluatePattern rdf tr) ) [ruleMatch.Substitution]  
     
-    type DatalogProgram (Rules: Rule list, tripleStore : Rdf.TripleTable) =
+    type DatalogProgram (Rules: Rule list, tripleStore : Rdf.Datastore) =
         let mutable Rules = Rules
         let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
                             Rules
@@ -170,7 +170,7 @@ module Datalog =
             Rules <- rule :: Rules
             RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
             
-        member this.GetRulesForFact(fact: RDFStore.Triple) : PartialRuleMatch list = 
+        member this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch list = 
             ConstantTriplePattern fact
                 |> WildcardTriplePattern
                 |> List.map (fun wildcardFact ->
@@ -181,8 +181,8 @@ module Datalog =
                 |> List.collect (List.collect (GetMatchesForRule fact))
                 
         member this.materialise() =
-            for triple in tripleStore.TripleList do
+            for triple in tripleStore.Triples.TripleList do
                 for rules in this.GetRulesForFact triple do
-                    for subs in evaluate tripleStore rules triple do
+                    for subs in evaluate tripleStore.Triples rules triple do
                         let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head
                         tripleStore.AddTriple newTriple

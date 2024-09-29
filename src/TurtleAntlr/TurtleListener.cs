@@ -20,15 +20,25 @@ internal class TurtleListener : TurtleBaseListener
     private ResourceVisitor _resourceVisitor;
     private FSharpOption<IriReference> _graphName;
     private readonly IVisitorErrorListener _errorListener;
-    public TripleTable TripleTable { get; init; }
+    public Datastore datastore { get; init; }
 
     public TurtleListener(uint initSize, IVisitorErrorListener errorListener)
     {
-        TripleTable = new TripleTable(initSize);
+        datastore = new Datastore(initSize);
         _graphName = FSharpOption<IriReference>.None;
-        _iriGrammarVisitor = new IriGrammarVisitor();
-        _resourceVisitor = new ResourceVisitor(TripleTable, _iriGrammarVisitor);
+        _iriGrammarVisitor = new IriGrammarVisitor(DefaultPrefixes());
+        _resourceVisitor = new ResourceVisitor(datastore, _iriGrammarVisitor);
         _errorListener = errorListener;
+    }
+
+    private static Dictionary<string, IriReference> DefaultPrefixes()
+    {
+        var prefixes = new Dictionary<string, IriReference>();
+        prefixes.TryAdd("rdf", new IriReference("https://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+        prefixes.TryAdd("rdfs", new IriReference("https://www.w3.org/2000/01/rdf-schema#"));
+        prefixes.TryAdd("xsd", new IriReference("https://www.w3.org/2001/XMLSchema#"));
+        prefixes.TryAdd("owl", new IriReference("https://www.w3.org/2002/07/owl#"));
+        return prefixes;
     }
 
     /// <summary>
@@ -81,22 +91,23 @@ internal class TurtleListener : TurtleBaseListener
     {
         var curSubject = _resourceVisitor.Visit(context.subject());
         var triples = _resourceVisitor._predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
-        triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
+        triples.ToList().ForEach(triple => datastore.AddTriple(triple));
     }
+
 
     public override void ExitBlankNodeTriples(TurtleParser.BlankNodeTriplesContext context)
     {
-        var blankNode = TripleTable.NewAnonymousBlankNode();
+        var blankNode = datastore.NewAnonymousBlankNode();
         var internalTriples =
             _resourceVisitor._predicateObjectListVisitor.Visit(
                 context.blankNodePropertyList().predicateObjectList())(blankNode);
         var postTriples = context.predicateObjectList() switch
         {
-            null => new List<RDFStore.Triple>(),
+            null => new List<Ingress.Triple>(),
             var c => _resourceVisitor._predicateObjectListVisitor.Visit(c)(blankNode)
         };
         var triples = internalTriples.Concat(postTriples);
-        triples.ToList().ForEach(triple => TripleTable.AddTriple(triple));
+        triples.ToList().ForEach(triple => datastore.AddTriple(triple));
     }
 }
 

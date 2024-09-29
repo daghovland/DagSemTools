@@ -15,7 +15,7 @@ open System
 open System.Resources
 open IriTools
 
-module RDFStore =
+module Ingress =
     type ResourceId = uint32
     
     [<StructuralComparison>]
@@ -38,9 +38,18 @@ module RDFStore =
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
     type TripleListIndex = uint
+    type QuadListIndex = uint
         
     [<Struct>]
     type Triple = {
+            subject: ResourceId
+            predicate: ResourceId
+            object: ResourceId
+        }
+        
+    [<Struct>]
+    type Quad = {
+            tripleId: ResourceId
             subject: ResourceId
             predicate: ResourceId
             object: ResourceId
@@ -60,6 +69,11 @@ module RDFStore =
             match x with
             | PrefixDefinition (name, iri) -> (name, iri)
       
+    let doubleArraySize (originalArray: 'T array) : 'T array =
+        let newSize = originalArray.Length * 2
+        let newArray = Array.zeroCreate<'T> newSize
+        Array.blit originalArray 0 newArray 0 originalArray.Length
+        newArray    
     
     
   

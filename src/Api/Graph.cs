@@ -8,25 +8,23 @@ namespace AlcTableau.Api;
 /// </summary>
 public class Graph : IGraph
 {
-    internal Graph(TripleTable triples)
+    internal Graph(Datastore triples)
     {
         Triples = triples;
     }
 
-    private TripleTable Triples { get; init; }
+    private Datastore Triples { get; init; }
 
     /// <inheritdoc />
-    public bool isEmpty() => Triples.TripleCount == 0;
+    public bool isEmpty() => Triples.Triples.TripleCount == 0;
 
 
     private BlankNodeOrIriResource GetBlankNodeOrIriResource(uint resourceId)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, Triples.ResourceCount);
-        var resource = Triples.ResourceList[resourceId];
-
+        var resource = Triples.GetResource(resourceId);
         switch (resource)
         {
-            case RDFStore.Resource { IsIri: true } r:
+            case Ingress.Resource { IsIri: true } r:
                 return new IriResource(new IriReference(r.iri));
             case var r when r.IsAnonymousBlankNode:
                 return new BlankNodeResource($"{r.anon_blankNode}");
@@ -39,8 +37,7 @@ public class Graph : IGraph
 
     private IriResource GetIriResource(uint resourceId)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, Triples.ResourceCount);
-        var resource = Triples.ResourceList[resourceId];
+        var resource = Triples.GetResource(resourceId);
         if (!resource.IsIri)
             throw new ArgumentException($"Resource {resource.ToString()} is not an Iri");
         return new IriResource(new IriReference(resource.iri));
@@ -49,11 +46,10 @@ public class Graph : IGraph
 
     private Resource GetResource(uint resourceId)
     {
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, Triples.ResourceCount);
-        var resource = Triples.ResourceList[resourceId];
+        var resource = Triples.GetResource(resourceId);
         switch (resource)
         {
-            case RDFStore.Resource { IsIri: true } r:
+            case Ingress.Resource { IsIri: true } r:
                 return new IriResource(new IriReference(r.iri));
             case var r when r.IsAnonymousBlankNode:
                 return new BlankNodeResource($"{r.anon_blankNode}");
@@ -61,23 +57,23 @@ public class Graph : IGraph
                 return new BlankNodeResource($"{r.blankNode}");
             case var r when r.IsLangLiteral:
                 return new LiteralResource(r.langliteral);
-            case RDFStore.Resource { IsDateLiteral: true } r:
+            case Ingress.Resource { IsDateLiteral: true } r:
                 return new LiteralResource(r.literalDate.ToString());
-            case RDFStore.Resource { IsLiteralString: true } r:
+            case Ingress.Resource { IsLiteralString: true } r:
                 return new LiteralResource(r.literal);
             default: throw new NotImplementedException("Literal type not implemented. Sorry");
         }
     }
 
-    private Triple GetTriple(RDFStore.Triple triple) =>
+    private Triple GetTriple(Ingress.Triple triple) =>
     new Triple(this.GetBlankNodeOrIriResource(triple.subject),
             GetIriResource(triple.predicate).Iri,
             GetResource(triple.@object));
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
-        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(obj), out var objIdx)
-         && Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(predicate), out var predIdx))
+        (Triples.Resources.ResourceMap.TryGetValue(Ingress.Resource.NewIri(obj), out var objIdx)
+         && Triples.Resources.ResourceMap.TryGetValue(Ingress.Resource.NewIri(predicate), out var predIdx))
             ? Triples
                 .GetTriplesWithObjectPredicate(objIdx, predIdx)
                 .Select(GetTriple)
@@ -86,8 +82,8 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate) =>
-        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(subject), out var subjIdx)
-         && Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(predicate), out var predIdx))
+        (Triples.Resources.ResourceMap.TryGetValue(Ingress.Resource.NewIri(subject), out var subjIdx)
+         && Triples.Resources.ResourceMap.TryGetValue(Ingress.Resource.NewIri(predicate), out var predIdx))
             ? Triples
                 .GetTriplesWithSubjectPredicate(subjIdx, predIdx)
                 .Select(GetTriple)
@@ -95,7 +91,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubject(IriReference subject) =>
-        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(subject), out var subjIdx))
+        (Triples.Resources.ResourceMap.TryGetValue(Ingress.Resource.NewIri(subject), out var subjIdx))
             ? Triples
                 .GetTriplesWithSubject(subjIdx)
                 .Select(GetTriple)
@@ -103,7 +99,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicate(IriReference predicate) =>
-        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(predicate), out var predIdx))
+        (Triples.Resources.ResourceMap.TryGetValue(Ingress.Resource.NewIri(predicate), out var predIdx))
             ? Triples
                 .GetTriplesWithPredicate(predIdx)
                 .Select(GetTriple)
@@ -111,7 +107,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithObject(IriReference @object) =>
-        (Triples.ResourceMap.TryGetValue(RDFStore.Resource.NewIri(@object), out var objIdx))
+        (Triples.Resources.ResourceMap.TryGetValue(Ingress.Resource.NewIri(@object), out var objIdx))
             ? Triples
                 .GetTriplesWithObject(objIdx)
                 .Select(GetTriple)
