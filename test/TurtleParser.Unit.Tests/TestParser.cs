@@ -244,7 +244,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.Triples.TripleCount.Should().Be(4);
     }
 
-    
+
     [Fact]
     public void TestExample27()
     {
@@ -252,9 +252,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology(ontology);
         ont.Triples.TripleCount.Should().Be(5);
     }
-    
-    
-    
+
+
+
     [Fact]
     public void TestExample30()
     {
@@ -262,7 +262,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology(ontology);
         ont.Triples.TripleCount.Should().Be(7);
     }
-    
+
     [Fact]
     public void TestReifiedTriple()
     {

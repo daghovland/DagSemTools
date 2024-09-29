@@ -35,13 +35,13 @@ public class PredicateObjectListVisitor : TurtleBaseVisitor<Func<uint, List<Ingr
         internal IEnumerable<Ingress.Triple> triples = _triples;
         internal IEnumerable<uint> tripleIds = _tripleIds;
     }
-    
+
     private void HandleAnnotation((TurtleParser.AnnotationContext? annot, Ingress.Triple triple) rdfobj)
     {
         if (rdfobj.annot != null && rdfobj.annot.children != null)
         {
             var reifications = rdfobj.annot.children
-                .Aggregate(seed: new AnnotationStatus(_resourceVisitor.Datastore.NewAnonymousBlankNode(),new List<Ingress.Triple>(), new List<uint>()),
+                .Aggregate(seed: new AnnotationStatus(_resourceVisitor.Datastore.NewAnonymousBlankNode(), new List<Ingress.Triple>(), new List<uint>()),
                     func: (aggr, child) => child switch
                     {
                         TurtleParser.PredicateObjectListContext predobj => HandlePredicateObjectReification(predobj, aggr),
