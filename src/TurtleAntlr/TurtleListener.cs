@@ -21,14 +21,24 @@ internal class TurtleListener : TurtleBaseListener
     private FSharpOption<IriReference> _graphName;
     private readonly IVisitorErrorListener _errorListener;
     public Datastore datastore { get; init; }
-    
+
     public TurtleListener(uint initSize, IVisitorErrorListener errorListener)
     {
         datastore = new Datastore(initSize);
         _graphName = FSharpOption<IriReference>.None;
-        _iriGrammarVisitor = new IriGrammarVisitor();
+        _iriGrammarVisitor = new IriGrammarVisitor(DefaultPrefixes());
         _resourceVisitor = new ResourceVisitor(datastore, _iriGrammarVisitor);
         _errorListener = errorListener;
+    }
+
+    private static Dictionary<string, IriReference> DefaultPrefixes()
+    {
+        var prefixes = new Dictionary<string, IriReference>();
+        prefixes.TryAdd("rdf", new IriReference("https://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+        prefixes.TryAdd("rdfs", new IriReference("https://www.w3.org/2000/01/rdf-schema#"));
+        prefixes.TryAdd("xsd", new IriReference("https://www.w3.org/2001/XMLSchema#"));
+        prefixes.TryAdd("owl", new IriReference("https://www.w3.org/2002/07/owl#"));
+        return prefixes;
     }
 
     /// <summary>
@@ -83,6 +93,7 @@ internal class TurtleListener : TurtleBaseListener
         var triples = _resourceVisitor._predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
         triples.ToList().ForEach(triple => datastore.AddTriple(triple));
     }
+
 
     public override void ExitBlankNodeTriples(TurtleParser.BlankNodeTriplesContext context)
     {

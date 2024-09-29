@@ -74,23 +74,53 @@ internal class ResourceVisitor : TurtleBaseVisitor<uint>
     public override uint VisitCollection(CollectionContext context)
     {
 
-        var rdfnil = TripleTable.AddResource(RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfNil)));
-        var rdffirst = TripleTable.AddResource(RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfFirst)));
-        var rdfrest = TripleTable.AddResource(RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfRest)));
+        var rdfnil = Datastore.AddResource(Ingress.Resource.NewIri(new IriReference(Namespaces.RdfNil)));
+        var rdffirst = Datastore.AddResource(Ingress.Resource.NewIri(new IriReference(Namespaces.RdfFirst)));
+        var rdfrest = Datastore.AddResource(Ingress.Resource.NewIri(new IriReference(Namespaces.RdfRest)));
 
         return context.rdfobject()
             .Aggregate(
                 rdfnil,
                 (rest, rdfobject) =>
                 {
-                    var node = TripleTable.NewAnonymousBlankNode();
+                    var node = Datastore.NewAnonymousBlankNode();
                     var value = Visit(rdfobject);
-                    TripleTable.AddTriple(new RDFStore.Triple(node, rdffirst, value));
-                    TripleTable.AddTriple(new RDFStore.Triple(node, rdfrest, rest));
+                    Datastore.AddTriple(new Ingress.Triple(node, rdffirst, value));
+                    Datastore.AddTriple(new Ingress.Triple(node, rdfrest, rest));
                     return node;
                 }
             );
     }
+
+    private uint GetTripleId(ReifiedTripleContext context) =>
+        context.reifier() switch
+        {
+            null => Datastore.NewAnonymousBlankNode(),
+            var reifier => Visit(reifier)
+        };
+
+    public override uint VisitReifiedTriple(ReifiedTripleContext context)
+    {
+        var subject = Visit(context.subjectOrReifiedTriple());
+        var predicate = Visit(context.predicate());
+        var rdfobject = Visit(context.rdfobject());
+        var triple = new Ingress.Triple(subject, predicate, rdfobject);
+        var tripleId = GetTripleId(context);
+        Datastore.AddReifiedTriple(triple, tripleId);
+        return tripleId;
+    }
+
+    public override uint VisitTripleTerm(TripleTermContext context)
+    {
+        var subject = Visit(context.ttSubject());
+        var predicate = Visit(context.predicate());
+        var rdfobject = Visit(context.ttObject());
+        var triple = new Ingress.Triple(subject, predicate, rdfobject);
+        var tripleId = Datastore.NewAnonymousBlankNode();
+        Datastore.AddReifiedTriple(triple, tripleId);
+        return tripleId;
+    }
+
 
     public override uint VisitBlankNodePropertyList(BlankNodePropertyListContext context)
     {
@@ -140,8 +170,5 @@ internal class ResourceVisitor : TurtleBaseVisitor<uint>
         };
         return Datastore.AddResource(typedLiteral);
     }
-    public override UInt32 VisitRdfobject(RdfobjectContext context) =>
-        Visit(context.GetChild(0));
-
 
 }

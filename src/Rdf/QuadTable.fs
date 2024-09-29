@@ -46,9 +46,9 @@ type QuadTable(quadList: Quad array,
     member this.AddTripleIdIndex (id: ResourceId, tripleIndex: QuadListIndex) =
         if this.TripleIdIndex.ContainsKey id then
             let existList = this.TripleIdIndex.[id]
-            this.PredicateIndex.[id] <- tripleIndex :: existList
+            this.TripleIdIndex.[id] <- tripleIndex :: existList
         else
-            this.PredicateIndex.Add(id, [tripleIndex]) |> ignore
+            this.TripleIdIndex.Add(id, [tripleIndex]) |> ignore
             
     member this.AddPredicateIndex (predicate: ResourceId, tripleIndex: QuadListIndex) =
         if this.PredicateIndex.ContainsKey predicate then

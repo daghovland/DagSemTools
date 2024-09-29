@@ -25,6 +25,8 @@ public static class Namespaces
     public const string RdfFirst = $"{Rdf}first";
     public const string RdfRest = $"{Rdf}rest";
 
+    public const string RdfReifies = $"{Rdf}reifies";
+
     public const string XsdString = $"{Xsd}string";
     public const string XsdBoolean = $"{Xsd}boolean";
     public const string XsdDecimal = $"{Xsd}decimal";

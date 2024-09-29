@@ -249,16 +249,34 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/reified_triple.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(4);
+        ont.Triples.TripleCount.Should().Be(2);
+        var reifiedTriples = ont.GetReifiedTriplesWithPredicate(
+            ont.GetResourceId(Ingress.Resource.NewIri(new IriReference("http://www.example.org/jobTitle"))))
+            .ToList();
+        reifiedTriples.Should().HaveCount(1);
+        var employee38 = reifiedTriples.First().subject;
+        ont.GetTriplesWithSubject(employee38).Should().HaveCount(1);
     }
 
+    [Fact]
+    public void TestAnnotatedTriple()
+    {
+        var ontology = File.ReadAllText("TestData/annotated_triple.ttl");
+        var ont = TestOntology(ontology);
+        ont.Triples.TripleCount.Should().Be(3);
+        ont.ReifiedTriples.QuadCount.Should().Be(1);
+    }
 
     [Fact]
     public void TestTripleTerm()
     {
         var ontology = File.ReadAllText("TestData/triple_term.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(4);
+        ont.Triples.TripleCount.Should().Be(3);
+        var reifications = ont.GetTriplesWithPredicate(ont.GetResourceId(Ingress.Resource.NewIri(new IriReference(Namespaces.RdfReifies)))).ToList();
+        reifications.Should().HaveCount(1);
+        var tripleId = reifications.First().@object;
+        ont.GetReifiedTriplesWithId(tripleId).Should().HaveCount(1);
     }
 
 
@@ -267,7 +285,8 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/reified_triple_with_iri.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(4);
+        ont.Triples.TripleCount.Should().Be(2);
+        ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
 
     [Fact]
@@ -275,10 +294,10 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/collections.ttl");
         var ont = TestOntology(ontology);
-        ont.TripleCount.Should().Be(8);
-        ont.GetTriplesWithObject(ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfNil))])
+        ont.Triples.TripleCount.Should().Be(8);
+        ont.GetTriplesWithObject(ont.GetResourceId(Ingress.Resource.NewIri(new IriReference(Namespaces.RdfNil))))
             .Should().HaveCount(2);
-        ont.GetTriplesWithPredicate(ont.ResourceMap[RDFStore.Resource.NewIri(new IriReference(Namespaces.RdfFirst))])
+        ont.GetTriplesWithPredicate(ont.GetResourceId(Ingress.Resource.NewIri(new IriReference(Namespaces.RdfFirst))))
             .Should().HaveCount(3);
     }
 

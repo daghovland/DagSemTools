@@ -27,19 +27,21 @@ PREFIX_STRING: [Pp] [Rr] [Ee] [Ff] [Ii] [Xx];
 triples: 
     subject predicateObjectList #NamedSubjectTriples 
     | blankNodePropertyList predicateObjectList? #BlankNodeTriples
-//TODO:     | reifiedTriple predicateObjectList?  #ReifiedTriples
+    | reifiedTriple predicateObjectList?  #ReifiedTriples
     ;
     
 predicateObjectList: verbObjectList (SEMICOLON (verbObjectList)?)*;
 
-verbObjectList: verb rdfobject (COMMA rdfobject)*;
+verbObjectList: verb annotatedObject (COMMA annotatedObject)*;
+
+annotatedObject : rdfobject annotation ;
 
 
 verb: predicate | RDF_TYPE_ABBR;
 
 RDF_TYPE_ABBR : 'a' ;
 
-subject: iri | blankNode | collection;
+subject: iri | blankNode | collection | reifiedTriple;
 
 predicate: iri;
 
@@ -98,7 +100,9 @@ blankNode: BLANK_NODE_LABEL #namedBlankNode
 
 reifier: '~' (iri | blankNode);
 
-reifiedTriple: '<<' (subject | reifiedTriple) predicate rdfobject reifier* '>>';
+subjectOrReifiedTriple: subject | reifiedTriple;
+
+reifiedTriple: '<<' subjectOrReifiedTriple predicate rdfobject reifier? '>>';
 
 tripleTerm: '<<(' ttSubject predicate ttObject ')>>';
 
