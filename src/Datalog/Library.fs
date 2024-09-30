@@ -67,6 +67,20 @@ module Datalog =
     [<StructuralEquality>]
     type Rule = 
         {Head: TriplePattern; Body: RuleAtom list}
+        
+    (* Safe rules are those where the head only has variable that are in the body *)
+    let isSafeRule (rule) : bool =
+        let variablesInBody = rule.Body
+                                |> Seq.collect (fun atom -> match atom with
+                                                            | Triple t -> [t.Subject; t.Predicate; t.Object]
+                                                            | NotTriple t -> [t.Subject; t.Predicate; t.Object]
+                                )
+                                |> Seq.choose (fun r -> match r with
+                                                        | Variable v -> Some (Variable v)
+                                                        | _ -> None
+                                )
+        let variablesInHead = [rule.Head.Subject; rule.Head.Predicate; rule.Head.Object]
+        variablesInHead |> Seq.forall (fun v -> variablesInBody |> Seq.exists (fun b -> b = v))
     type Substitution = 
         Map<string, Ingress.ResourceId>
         
@@ -75,10 +89,11 @@ module Datalog =
         | ResourceOrVariable.Resource r -> r
         | Variable v -> sub[v]
     let ApplySubstitutionTriple sub (triple : TriplePattern) : Triple =
-        {Rdf.Ingress.subject = ApplySubstitutionResource sub triple.Subject
+        {
+         Ingress.subject = ApplySubstitutionResource sub triple.Subject
          Ingress.predicate = ApplySubstitutionResource sub triple.Predicate
          Ingress.object = ApplySubstitutionResource sub triple.Object 
-         }
+        }
     type PartialRule = 
         {Rule: Rule; Match : TriplePattern}
     type PartialRuleMatch = 
@@ -209,8 +224,11 @@ module Datalog =
                                 |> mergeMaps
                                    
         member this.AddRule(rule: Rule)  =
+            if not (isSafeRule rule) then
+                raise (new System.ArgumentException("Rule is not safe"))
             Rules <- rule :: Rules
             RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
+                
             
         member this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq = 
             ConstantTriplePattern fact
@@ -221,6 +239,8 @@ module Datalog =
                     | false, _ -> [])
                 |> Seq.distinct
                 |> Seq.collect (Seq.collect (GetMatchesForRule fact))
+        
+      
                 
         member this.materialise() =
             for triple in tripleStore.Triples.TripleList do

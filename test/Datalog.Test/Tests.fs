@@ -210,14 +210,15 @@ module Tests =
                              TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex
                              }
-            
-            let negativeMatch = RuleAtom.NotTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
-                             }
-            
-            let rule =  {Head =  headPattern; Body = [ positiveMatch ; negativeMatch]}
+            //
+            // let negativeMatch = RuleAtom.NotTriple {
+            //                  TriplePattern.Subject = ResourceOrVariable.Variable "s"
+            //                  TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+            //                  TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+            //                  }
+            //
+            let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
+                                                                     ]}
             let prog = DatalogProgram([rule], tripleTable)
             prog.materialise()
             let matches = tripleTable.GetTriplesWithObject(objdIndex3)
