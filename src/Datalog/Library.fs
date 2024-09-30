@@ -188,7 +188,7 @@ module Datalog =
     
     
                             
-    let evaluatePositive (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) : Substitution seq =
+    let evaluatePositive (rdf : TripleTable) (ruleMatch : PartialRuleMatch) : Substitution seq =
          ruleMatch.Match.Rule.Body
         |> Seq.choose (fun atom -> match atom with
                                     | Triple t -> Some t
@@ -199,7 +199,7 @@ module Datalog =
                     subs |> Seq.collect (evaluatePattern rdf tr) )
             [ruleMatch.Substitution]  
     
-    let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) : Substitution seq =
+    let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch)  : Substitution seq =
         ruleMatch.Match.Rule.Body
         |> Seq.choose (fun atom -> match atom with
                                     | Triple _ -> None
@@ -214,7 +214,7 @@ module Datalog =
                                             else None
                                 )
             )
-            (evaluatePositive rdf ruleMatch fact)
+            (evaluatePositive rdf ruleMatch)
     
     type DatalogProgram (Rules: Rule list, tripleStore : Rdf.Datastore) =
         let mutable Rules = Rules
@@ -245,6 +245,6 @@ module Datalog =
         member this.materialise() =
             for triple in tripleStore.Triples.TripleList do
                 for rules in this.GetRulesForFact triple do
-                    for subs in evaluate tripleStore.Triples rules triple do
+                    for subs in evaluate tripleStore.Triples rules  do
                         let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head
                         tripleStore.AddTriple newTriple

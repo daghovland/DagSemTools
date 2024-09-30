@@ -12,6 +12,7 @@ open AlcTableau.Rdf
 open IriTools
 open Xunit 
 open Ingress
+open AlcTableau.Datalog
 open Faqt
 open AlcTableau.Rdf.Ingress
 open AlcTableau
@@ -224,7 +225,42 @@ module Tests =
             let matches = tripleTable.GetTriplesWithObject(objdIndex3)
             Assert.Single matches
           
+    [<Fact>]
+    let ``Can get substitution``() =
+        let resource = 1u
+        let variable = ResourceOrVariable.Variable "s"
+        let subbed = GetSubstitution (resource, variable) (Map.empty)
+        Assert.Equal(1u, subbed.Value.["s"])
+    
+    [<Fact>]
+    let ``Can get substitution option``() =
+        let resource = 1u
+        let variable = ResourceOrVariable.Variable "s"
+        let subbed = GetSubstitutionOption (Some Map.empty) (resource, variable) 
+        Assert.Equal(1u, subbed.Value.["s"])
         
+    [<Fact>]
+    let ``Can get substitutions option``() =
+        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; object = 3u}
+        let factPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Variable "p"
+                             TriplePattern.Object = ResourceOrVariable.Variable "o"}
+        
+        let subbed = GetSubstitutions fact factPattern 
+        Assert.Equal(1u, subbed.Value.["s"])
+        Assert.Equal(2u, subbed.Value.["p"])
+        Assert.Equal(3u, subbed.Value.["o"])
+        
+        
+        
+    [<Fact>]
+    let ``No subsititution if mismatch``() =
+        let resource = 1u
+        let variable = ResourceOrVariable.Variable "s"
+        let subbed = GetSubstitution (resource, variable) (Map.empty.Add("s", 2u))
+        Assert.Equal(None, subbed)
+    
     [<Fact>]
     let ``Can add triple using rule over tripletable`` () =
         let tripleTable = Rdf.Datastore(60u)
