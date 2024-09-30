@@ -25,11 +25,19 @@ module Datalog =
         | Resource of Ingress.ResourceId
         | Wildcard
     
+    
     [<StructuralComparison>]
     [<StructuralEquality>]
     type TriplePattern = 
         {Subject: ResourceOrVariable; Predicate: ResourceOrVariable; Object: ResourceOrVariable}
 
+    [<StructuralComparison>]
+    [<StructuralEquality>]
+    type RuleAtom = 
+        | Triple of TriplePattern
+        | NotTriple of TriplePattern
+    
+    
     [<StructuralComparison>]
     [<StructuralEquality>]
     type TripleWildcard = 
@@ -58,7 +66,7 @@ module Datalog =
     [<StructuralComparison>]
     [<StructuralEquality>]
     type Rule = 
-        {Head: TriplePattern; Body: TriplePattern list}
+        {Head: TriplePattern; Body: RuleAtom list}
     type Substitution = 
         Map<string, Ingress.ResourceId>
         
@@ -99,17 +107,25 @@ module Datalog =
     *)
     let GetMatchesForRule fact rule =
         rule.Rule.Body
-        |> List.map (fun r -> r, GetSubstitutions fact r) 
-        |> List.choose (fun (r, s) -> Option.map (fun s -> {Match = rule; Substitution = s}) s)
+        |> Seq.choose (fun r -> match r with
+                                | Triple t -> Some t
+                                | NotTriple t -> None
+                    )
+        |> Seq.map (fun r -> r, GetSubstitutions fact r) 
+        |> Seq.choose (fun (r, s) -> Option.map (fun s -> {Match = rule; Substitution = s}) s)
         
     let GetPartialMatch (triple : TriplePattern)  =
         WildcardTriplePattern triple
         
     let GetPartialMatches (rule : Rule) : Map<TripleWildcard, PartialRule list> =
-       Map.ofList (rule.Body
-       |> List.collect (fun pat ->
+       Map.ofSeq (rule.Body
+       |> Seq.choose (fun atom -> match atom with
+                                    | Triple t -> Some t
+                                    | NotTriple t -> None
+                    )
+       |> Seq.collect (fun pat ->
            WildcardTriplePattern pat
-            |> List.map  (fun t -> (t, [{Rule = rule; Match = pat}]))
+            |> Seq.map  (fun t -> (t, [{Rule = rule; Match = pat}]))
             )
        )
     
@@ -154,10 +170,36 @@ module Datalog =
             | Variable s, Variable p, Variable o -> rdf.TripleList
             ) 
         matchedTriples |> Seq.choose (fun t -> GetSubstitutions t mappedTriple)
+    
+    
                             
-    let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) : Substitution seq =
+    let evaluatePositive (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) : Substitution seq =
          ruleMatch.Match.Rule.Body
-        |> List.fold ( fun subs tr -> subs |> Seq.collect (evaluatePattern rdf tr) ) [ruleMatch.Substitution]  
+        |> Seq.choose (fun atom -> match atom with
+                                    | Triple t -> Some t
+                                    | NotTriple t -> None
+                    )
+        |> Seq.fold
+            ( fun subs tr ->
+                    subs |> Seq.collect (evaluatePattern rdf tr) )
+            [ruleMatch.Substitution]  
+    
+    let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch) (fact : Triple) : Substitution seq =
+        ruleMatch.Match.Rule.Body
+        |> Seq.choose (fun atom -> match atom with
+                                    | Triple _ -> None
+                                    | NotTriple t -> Some t
+                    )
+        |> Seq.fold
+            ( fun subs tr ->
+                    subs |> Seq.choose
+                                (fun sub -> if Seq.isEmpty (evaluatePattern rdf tr sub)
+                                            then
+                                                Some sub
+                                            else None
+                                )
+            )
+            (evaluatePositive rdf ruleMatch fact)
     
     type DatalogProgram (Rules: Rule list, tripleStore : Rdf.Datastore) =
         let mutable Rules = Rules
@@ -170,15 +212,15 @@ module Datalog =
             Rules <- rule :: Rules
             RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
             
-        member this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch list = 
+        member this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq = 
             ConstantTriplePattern fact
                 |> WildcardTriplePattern
-                |> List.map (fun wildcardFact ->
+                |> Seq.map (fun wildcardFact ->
                     match RuleMap.TryGetValue(wildcardFact) with
                     | true, rules -> rules
                     | false, _ -> [])
-                |> List.distinct
-                |> List.collect (List.collect (GetMatchesForRule fact))
+                |> Seq.distinct
+                |> Seq.collect (Seq.collect (GetMatchesForRule fact))
                 
         member this.materialise() =
             for triple in tripleStore.Triples.TripleList do
