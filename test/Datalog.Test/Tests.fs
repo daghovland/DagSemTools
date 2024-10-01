@@ -327,8 +327,10 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
             
-            let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
-                                                                     ]}
+            let rule =  {Head =  headPattern; Body = [ positiveMatch
+                                                       negativeMatch
+                                                       ]
+            }
             let prog = DatalogProgram([rule], tripleTable)
             prog.materialise()
             let matches = tripleTable.GetTriplesWithObject(objdIndex3)
