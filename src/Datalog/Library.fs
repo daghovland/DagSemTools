@@ -104,17 +104,21 @@ module Datalog =
         match variable, resource with
         | Variable v, _  ->
             match subs.TryGetValue v with
-            | true, r when r = resource -> Some Map.empty
+            | true, r when r = resource -> Some subs
             | true, _ -> None
-            | false, _ -> Some (Map.ofList [(v, resource)])
-        | ResourceOrVariable.Resource r, s when r = s -> Some Map.empty
+            | false, _ -> Some (subs.Add (v, resource))
+        | ResourceOrVariable.Resource r, s when r = s -> Some subs
         | _ -> None
     
     let GetSubstitutionOption (subs : Substitution option) (resource : Ingress.ResourceId, variable : ResourceOrVariable) : Substitution option =
         Option.bind (GetSubstitution (resource, variable)) subs    
-    let GetSubstitutions (fact : Triple) (factPattern : TriplePattern)  : Substitution option =
-        let resourceList = [(fact.subject, factPattern.Subject); (fact.predicate, factPattern.Predicate); (fact.object, factPattern.Object)]
-        resourceList |> List.fold GetSubstitutionOption (Some Map.empty)
+    let GetSubstitutions (subs) (fact : Triple) (factPattern : TriplePattern)  : Substitution option =
+        let resourceList = [
+                            (fact.subject, factPattern.Subject)
+                            (fact.predicate, factPattern.Predicate)
+                            (fact.object, factPattern.Object)
+                            ]
+        resourceList |> Seq.fold GetSubstitutionOption (Some subs)
         
     (*
         For a given triple/fact and a rule, return 
@@ -126,7 +130,7 @@ module Datalog =
                                 | Triple t -> Some t
                                 | NotTriple t -> None
                     )
-        |> Seq.map (fun r -> r, GetSubstitutions fact r) 
+        |> Seq.map (fun r -> r, GetSubstitutions (Map.empty) fact r) 
         |> Seq.choose (fun (r, s) -> Option.map (fun s -> {Match = rule; Substitution = s}) s)
         
     let GetPartialMatch (triple : TriplePattern)  =
@@ -184,7 +188,7 @@ module Datalog =
                 rdf.GetTriplesWithSubjectObject (s, o)
             | Variable s, Variable p, Variable o -> rdf.TripleList
             ) 
-        matchedTriples |> Seq.choose (fun t -> GetSubstitutions t mappedTriple)
+        matchedTriples |> Seq.choose (fun t -> GetSubstitutions sub t mappedTriple)
     
     
                             

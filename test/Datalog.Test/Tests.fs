@@ -16,6 +16,7 @@ open AlcTableau.Datalog
 open Faqt
 open AlcTableau.Rdf.Ingress
 open AlcTableau
+open Faqt
 open AlcTableau.Datalog
 
 module Tests =
@@ -182,8 +183,116 @@ module Tests =
             let partialRule = {Rule = rule; Match =  TriplePatter}
             let matches = GetMatchesForRule Triple partialRule
             Assert.Single matches
+
+           
+    [<Fact>]
+    let ``Can evaluate rules positively`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; object = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; object = objdIndex2}
+            tripleTable.AddTriple(Subject1Obj1)
+            tripleTable.AddTriple(Subject2Obj1)
+            tripleTable.AddTriple(Subject2Obj2)
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             }
+            let positiveMatch = RuleAtom.Triple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
+                                                                     ]}
+            let prog = DatalogProgram([rule], tripleTable)
+            let triple = Subject1Obj1
+            for rules in prog.GetRulesForFact triple do
+                for subs in evaluatePositive tripleTable.Triples rules do
+                    Assert.NotEmpty subs 
+            
+           
+           
+    [<Fact>]
+    let ``Can evaluate pattern`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; object = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; object = objdIndex2}
+            tripleTable.AddTriple(Subject1Obj1)
+            tripleTable.AddTriple(Subject2Obj1)
+            tripleTable.AddTriple(Subject2Obj2)
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             }
+            let positiveMatch = RuleAtom.Triple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
+                                                                     ]}
+            let prog = DatalogProgram([rule], tripleTable)
+            let triple = Subject1Obj1
+            for rules in prog.GetRulesForFact triple do
+                for subs in evaluatePattern tripleTable.Triples rules.Match.Match rules.Substitution do
+                    Assert.NotEmpty subs
        
-       
+    [<Fact>]
+    let ``Can get matches on complex rule that matches two triples`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; object = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; object = objdIndex2}
+            tripleTable.AddTriple(Subject1Obj1)
+            tripleTable.AddTriple(Subject2Obj1)
+            tripleTable.AddTriple(Subject2Obj2)
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             }
+            let positiveMatch = RuleAtom.Triple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
+                                                                     ]}
+            let prog = DatalogProgram([rule], tripleTable)
+            prog.materialise()
+            let matches = tripleTable.GetTriplesWithObject(objdIndex3) |> List.ofSeq
+            Assert.Equal(2, matches.Length)
+          
+          
     [<Fact>]
     let ``Can get matches on complex rule with negative atom`` () =
             let tripleTable = Rdf.Datastore(60u)
@@ -211,13 +320,13 @@ module Tests =
                              TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex
                              }
-            //
-            // let negativeMatch = RuleAtom.NotTriple {
-            //                  TriplePattern.Subject = ResourceOrVariable.Variable "s"
-            //                  TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-            //                  TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
-            //                  }
-            //
+            
+            let negativeMatch = RuleAtom.NotTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             }
+            
             let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
                                                                      ]}
             let prog = DatalogProgram([rule], tripleTable)
@@ -247,12 +356,37 @@ module Tests =
                              TriplePattern.Predicate = ResourceOrVariable.Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Variable "o"}
         
-        let subbed = GetSubstitutions fact factPattern 
+        let subbed = GetSubstitutions Map.empty fact factPattern 
         Assert.Equal(1u, subbed.Value.["s"])
         Assert.Equal(2u, subbed.Value.["p"])
         Assert.Equal(3u, subbed.Value.["o"])
         
+            
+    [<Fact>]
+    let ``Can get substitutions option map``() =
+        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; object = 3u}
+        let factPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource 2u
+                             TriplePattern.Object = ResourceOrVariable.Variable "o"}
         
+        let subbed = GetSubstitutions Map.empty fact factPattern 
+        Assert.Equal(1u, subbed.Value.["s"])
+        Assert.Equal(3u, subbed.Value.["o"])
+        
+        
+                    
+    [<Fact>]
+    let ``Can increase substitutions option map``() =
+        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; object = 3u}
+        let factPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource 2u
+                             TriplePattern.Object = ResourceOrVariable.Variable "o"}
+        
+        let subbed = GetSubstitutions (Map.empty.Add ("t", 2u)) fact factPattern 
+        Assert.Equal(1u, subbed.Value.["s"])
+        Assert.Equal(3u, subbed.Value.["o"])
         
     [<Fact>]
     let ``No subsititution if mismatch``() =
