@@ -81,6 +81,7 @@ module Datalog =
                                 )
         let variablesInHead = [rule.Head.Subject; rule.Head.Predicate; rule.Head.Object]
         variablesInHead |> Seq.forall (fun v -> variablesInBody |> Seq.exists (fun b -> b = v))
+        
     type Substitution = 
         Map<string, Ingress.ResourceId>
         
