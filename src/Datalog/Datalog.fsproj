@@ -7,6 +7,8 @@
 
     <ItemGroup>
         <Compile Include="Library.fs"/>
+        <Compile Include="Stratifier.fs" />
+        <Compile Include="Reasoner.fs" />
     </ItemGroup>
 
     <ItemGroup>

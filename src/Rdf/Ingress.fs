@@ -37,6 +37,26 @@ module Ingress =
         | DateLiteral of literalDate: DateOnly
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
+            override this.ToString() =
+                match this with
+                | Iri iri -> $"<(%A{iri})>"
+                | NamedBlankNode blankNode -> $"_:(%s{blankNode})"
+                | AnonymousBlankNode anon_blankNode -> $"_:(%u{anon_blankNode})"
+                | LiteralString literal -> $"(%s{literal})"
+                | BooleanLiteral literalBool -> match literalBool with
+                                                    | true -> $"(true)"
+                                                    | false -> $"(false)"
+                | DecimalLiteral literalDec -> $"DecimalLiteral(%M{literalDec})"
+                | FloatLiteral literalFloat -> $"FloatLiteral(%f{literalFloat})"
+                | DoubleLiteral literalDouble -> $"DoubleLiteral(%f{literalDouble})"
+                | DurationLiteral literalDuration -> $"DurationLiteral(%A{literalDuration})"
+                | IntegerLiteral literalInt -> $"IntegerLiteral(%d{literalInt})"
+                | DateTimeLiteral literalDateTime -> $"DateTimeLiteral(%A{literalDateTime})"
+                | TimeLiteral literalTime -> $"TimeLiteral(%A{literalTime})"
+                | DateLiteral literalDate -> $"DateLiteral(%A{literalDate})"
+                | LangLiteral (lang, langliteral) -> $"%s{lang}@%s{langliteral})"
+                | TypedLiteral (typeIri, typedLiteral) -> $"%s{typedLiteral}^^%A{typeIri}"
+                
     type TripleListIndex = uint
     type QuadListIndex = uint
         
@@ -60,7 +80,7 @@ module Ingress =
             subject: Resource
             predicate: Resource
             obj: Resource
-        }
+    }
     
     type prefixDeclaration =
         | PrefixDefinition of PrefixName: string * PrefixIri: IriReference
