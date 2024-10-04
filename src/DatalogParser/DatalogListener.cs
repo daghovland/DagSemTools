@@ -23,7 +23,7 @@ internal class DatalogListener : DatalogBaseListener
     private readonly IriGrammarVisitor _iriGrammarVisitor;
     private readonly RuleAtomVisitor _ruleAtomVisitor;
     public IEnumerable<Datalog.Rule> DatalogProgram { get; private set; }
-    
+
     internal DatalogListener(Datastore datastore, IVisitorErrorListener errorListener)
     {
         _errorListener = errorListener;
@@ -33,8 +33,8 @@ internal class DatalogListener : DatalogBaseListener
         var predicateVisitor = new PredicateVisitor(resourceVisitor);
         _ruleAtomVisitor = new RuleAtomVisitor(predicateVisitor);
     }
-    
-    
+
+
     private static Dictionary<string, IriReference> DefaultPrefixes()
     {
         var prefixes = new Dictionary<string, IriReference>();
@@ -89,8 +89,8 @@ internal class DatalogListener : DatalogBaseListener
         var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
         var iri = _iriGrammarVisitor.Visit(context.iri());
         _iriGrammarVisitor.AddPrefix(prefix, iri);
-    } 
-    
+    }
+
     public override void ExitRule(DatalogParser.RuleContext context)
     {
         var head = _ruleAtomVisitor.Visit(context.head()) switch
@@ -98,10 +98,10 @@ internal class DatalogListener : DatalogBaseListener
             Datalog.RuleAtom.PositiveTriple t => t.Item,
             Datalog.RuleAtom.NotTriple _ => throw new Exception("Head of rule must be a triple")
         };
-        
+
         FSharpList<Datalog.RuleAtom> body = (FSharpList<Datalog.RuleAtom>)context.body().ruleAtom()
             .Select(b => _ruleAtomVisitor.Visit(b));
         DatalogProgram = DatalogProgram.Append(new Datalog.Rule(head, body));
     }
-    
+
 }
