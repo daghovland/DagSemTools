@@ -17,7 +17,7 @@ using System.Collections.Generic;
 using IriTools;
 using static TurtleParser;
 
-internal class ResourceVisitor : TurtleBaseVisitor<uint>
+public class ResourceVisitor : TurtleBaseVisitor<uint>
 {
     private StringVisitor _stringVisitor = new();
     private IriGrammarVisitor _iriGrammarVisitor;

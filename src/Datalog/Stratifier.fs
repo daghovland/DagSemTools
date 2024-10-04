@@ -20,7 +20,7 @@ module Stratifier =
     
     let GetRuleAtomRelation (atom : RuleAtom) : ResourceId option =
         let triple = match atom with
-                        | Triple t -> t
+                        | PositiveTriple t -> t
                         | NotTriple t -> t
         GetTriplePatternRelation triple                        
                  

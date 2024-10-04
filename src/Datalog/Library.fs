@@ -41,12 +41,12 @@ module Datalog =
     [<StructuralComparison>]
     [<StructuralEquality>]
     type RuleAtom = 
-        | Triple of TriplePattern
+        | PositiveTriple of TriplePattern
         | NotTriple of TriplePattern
     
     let ResourceAtom (tripleTable : Datastore) (ruleAtom : RuleAtom) : string =
         match ruleAtom with
-        | Triple t -> TriplePatternToString tripleTable t
+        | PositiveTriple t -> TriplePatternToString tripleTable t
         | NotTriple t -> $"not {TriplePatternToString tripleTable t}"
         
     [<StructuralComparison>]
@@ -89,7 +89,7 @@ module Datalog =
     let isSafeRule (rule) : bool =
         let variablesInBody = rule.Body
                                 |> Seq.collect (fun atom -> match atom with
-                                                            | Triple t -> [t.Subject; t.Predicate; t.Object]
+                                                            | PositiveTriple t -> [t.Subject; t.Predicate; t.Object]
                                                             | NotTriple t -> [t.Subject; t.Predicate; t.Object]
                                 )
                                 |> Seq.choose (fun r -> match r with
@@ -145,7 +145,7 @@ module Datalog =
     let GetMatchesForRule fact rule =
         rule.Rule.Body
         |> Seq.choose (fun r -> match r with
-                                | Triple t -> Some t
+                                | PositiveTriple t -> Some t
                                 | NotTriple t -> None
                     )
         |> Seq.map (fun r -> r, GetSubstitutions (Map.empty) fact r) 
@@ -157,7 +157,7 @@ module Datalog =
     let GetPartialMatches (rule : Rule) : Map<TripleWildcard, PartialRule list> =
        Map.ofSeq (rule.Body
        |> Seq.choose (fun atom -> match atom with
-                                    | Triple t -> Some t
+                                    | PositiveTriple t -> Some t
                                     | NotTriple t -> None
                     )
        |> Seq.collect (fun pat ->
@@ -213,7 +213,7 @@ module Datalog =
     let evaluatePositive (rdf : TripleTable) (ruleMatch : PartialRuleMatch) : Substitution seq =
          ruleMatch.Match.Rule.Body
         |> Seq.choose (fun atom -> match atom with
-                                    | Triple t -> Some t
+                                    | PositiveTriple t -> Some t
                                     | NotTriple t -> None
                     )
         |> Seq.fold
@@ -224,7 +224,7 @@ module Datalog =
     let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch)  : Substitution seq =
         ruleMatch.Match.Rule.Body
         |> Seq.choose (fun atom -> match atom with
-                                    | Triple _ -> None
+                                    | PositiveTriple _ -> None
                                     | NotTriple t -> Some t
                     )
         |> Seq.fold
