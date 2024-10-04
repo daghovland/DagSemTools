@@ -294,7 +294,7 @@ module Tests =
           
           
     [<Fact>]
-    let ``Can get matches on complex rule with negative atom`` () =
+    let ``Non-semipositive programs are rejected`` () =
             let tripleTable = Rdf.Datastore(60u)
             let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
             let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
@@ -324,6 +324,48 @@ module Tests =
             let negativeMatch = RuleAtom.NotTriple {
                              TriplePattern.Subject = ResourceOrVariable.Variable "s"
                              TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             }
+            
+            let rule =  {Head =  headPattern; Body = [ positiveMatch
+                                                       negativeMatch
+                                                       ]
+            }
+            let isSemiPositive = Stratifier.IsSemiPositiveProgram [rule]
+            Assert.False isSemiPositive
+            
+    [<Fact>]
+    let ``Can get matches on complex rule with negative atom`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; object = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex2; object = objdIndex2}
+            tripleTable.AddTriple(Subject1Obj1)
+            tripleTable.AddTriple(Subject2Obj1)
+            tripleTable.AddTriple(Subject2Obj2)
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             }
+            let positiveMatch = RuleAtom.Triple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let negativeMatch = RuleAtom.NotTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex2
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
             

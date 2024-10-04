@@ -18,6 +18,10 @@ module Datalog =
         | Resource of Ingress.ResourceId
         | Variable of string
 
+    let ResourceOrVariableToString (tripleTable : Datastore) (res : ResourceOrVariable) : string =
+        match res with
+        | Resource r -> (tripleTable.GetResource r).ToString()
+        | Variable v -> $"?{v}"
     
     [<StructuralComparison>]
     [<StructuralEquality>]
@@ -31,13 +35,20 @@ module Datalog =
     type TriplePattern = 
         {Subject: ResourceOrVariable; Predicate: ResourceOrVariable; Object: ResourceOrVariable}
 
+    let TriplePatternToString (tripleTable : Datastore) (triplePatter : TriplePattern) : string =
+        $"[{ResourceOrVariableToString tripleTable triplePatter.Subject}, {ResourceOrVariableToString tripleTable triplePatter.Predicate}, {ResourceOrVariableToString tripleTable triplePatter.Object} ]"
+    
     [<StructuralComparison>]
     [<StructuralEquality>]
     type RuleAtom = 
         | Triple of TriplePattern
         | NotTriple of TriplePattern
     
-    
+    let ResourceAtom (tripleTable : Datastore) (ruleAtom : RuleAtom) : string =
+        match ruleAtom with
+        | Triple t -> TriplePatternToString tripleTable t
+        | NotTriple t -> $"not {TriplePatternToString tripleTable t}"
+        
     [<StructuralComparison>]
     [<StructuralEquality>]
     type TripleWildcard = 
@@ -67,6 +78,12 @@ module Datalog =
     [<StructuralEquality>]
     type Rule = 
         {Head: TriplePattern; Body: RuleAtom list}
+        
+    let RuleToString (tripleTable : Datastore) (rule : Rule) : string =
+        let mutable headString = rule.Head |> TriplePatternToString tripleTable
+        headString <- headString + " :- "
+        rule.Body |> List.iter (fun atom -> headString <- headString + ResourceAtom tripleTable atom + ", ")
+        headString
         
     (* Safe rules are those where the head only has variable that are in the body *)
     let isSafeRule (rule) : bool =
@@ -221,35 +238,3 @@ module Datalog =
             )
             (evaluatePositive rdf ruleMatch)
     
-    type DatalogProgram (Rules: Rule list, tripleStore : Rdf.Datastore) =
-        let mutable Rules = Rules
-        let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
-                            Rules
-                                |> List.map GetPartialMatches
-                                |> mergeMaps
-                                   
-        member this.AddRule(rule: Rule)  =
-            if not (isSafeRule rule) then
-                raise (new System.ArgumentException("Rule is not safe"))
-            Rules <- rule :: Rules
-            RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
-                
-            
-        member this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq = 
-            ConstantTriplePattern fact
-                |> WildcardTriplePattern
-                |> Seq.map (fun wildcardFact ->
-                    match RuleMap.TryGetValue(wildcardFact) with
-                    | true, rules -> rules
-                    | false, _ -> [])
-                |> Seq.distinct
-                |> Seq.collect (Seq.collect (GetMatchesForRule fact))
-        
-      
-                
-        member this.materialise() =
-            for triple in tripleStore.Triples.TripleList do
-                for rules in this.GetRulesForFact triple do
-                    for subs in evaluate tripleStore.Triples rules  do
-                        let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head
-                        tripleStore.AddTriple newTriple

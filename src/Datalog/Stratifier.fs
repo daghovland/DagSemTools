@@ -38,21 +38,27 @@ module Stratifier =
                                 rule.Body |> Seq.choose GetRuleAtomRelation
                                 )
         bodyRules |> Seq.except intentionalRelations |> Seq.distinct
-        
-    (* A datalog program is semi-positive if negations only occur onextensional relations (Relations that do not occur in the head of any rule) *)
-    let IsSemiPositiveProgram (rules : Rule list) =
+  
+    
+    (* Returns any rules containing negations of intensional properties. These relations make the program not semipositive *)
+    let NegativeIntenstionalProperties (rules : Rule list) =
         let intentionalRelations =
                 rules
                 |> GetIntentionalRelations
                 |> Seq.map ResourceOrVariable.Resource
-        rules |> Seq.exists (fun rule ->
+        rules |> Seq.filter (fun rule ->
                             rule.Body |> Seq.exists (fun atom ->
                                 match atom with
                                     | NotTriple t -> intentionalRelations |> Seq.contains (t.Predicate)
                                     | _ -> false
                                 ) 
                             )
+          
+    (* A datalog program is semi-positive if negations only occur onextensional relations (Relations that do not occur in the head of any rule) *)
+    let IsSemiPositiveProgram (rules : Rule list) =
+        NegativeIntenstionalProperties rules |> Seq.isEmpty
   
+    
     type RulePartitioner(num_concepts: int, rules: Rule list) =
         let preprocess_rules =
             let ordered = Array.init num_concepts (fun i -> { Relation = uint i; Successors = []; num_predecessors = 0 })
