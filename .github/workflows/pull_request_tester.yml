@@ -23,16 +23,16 @@ jobs:
         dotnet-version: '8.x'
 
     - name: Restore dependencies
-      run: dotnet restore ./AlcTableau.sln
+      run: dotnet restore ./DagSemTools.sln
       
     - name: Build Release
-      run: dotnet build --configuration Release ./AlcTableau.sln
+      run: dotnet build --configuration Release ./DagSemTools.sln
       
     - name: Format code
-      run: dotnet format ./AlcTableau.sln --verbosity diagnostic --verify-no-changes --no-restore
+      run: dotnet format ./DagSemTools.sln --verbosity diagnostic --verify-no-changes --no-restore
 
     - name: Run tests
-      run: dotnet test ./AlcTableau.sln --no-restore
+      run: dotnet test ./DagSemTools.sln --no-restore
       
     - name: Run nuget package tests
       run: dotnet test test/NugetTest/NugetTest.sln
