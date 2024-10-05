@@ -25,7 +25,7 @@ public class TestParser
 
     }
 
-    
+
     public IEnumerable<Datalog.Rule> TestProgramFile(FileInfo datalog)
     {
         var datastore = new Datastore(1000);

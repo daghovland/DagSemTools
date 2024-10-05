@@ -48,7 +48,7 @@ public class Parser
         return ParseReader(textReader, errorOutput, datastore);
     }
 
-    
+
     /// <summary>
     /// Parses the content of the string containing datalog 
     /// </summary>
@@ -60,7 +60,7 @@ public class Parser
         using TextReader textReader = new StringReader(datalog);
         return ParseReader(textReader, errorOutput, datastore);
     }
-    
+
     /// <summary>
     /// Parses the content of the TextReader containing Datalog.
     /// </summary>
