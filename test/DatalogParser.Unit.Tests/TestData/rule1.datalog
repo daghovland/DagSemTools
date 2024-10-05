@@ -1,0 +1,15 @@
+prefix data: <https://assetid.equinor.com/plantx/document/12345#>
+
+data:insideBoundary [?new_node] :- 
+    data:insideBoundary [?node] ,
+    imf:adjacentTo [?node, ?new_node] ,
+    NOT data:boundary [?node] .
+
+data:insideBoundary [?new_node] :- 
+    data:insideBoundary [?node],
+    imf:hasPart[?new_node, ?node] .
+
+
+data:boundary [?new_node] :- 
+    data:boundary [?node],
+    imf:hasPart[?new_node, ?node] .

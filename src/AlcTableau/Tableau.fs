@@ -7,12 +7,12 @@
 *)
 
 
-module AlcTableau.Tableau
+module DagSemTools.AlcTableau.Tableau
 
 
 open System
 open System.Collections.Generic
-open AlcTableau.ALC
+open ALC
 open IriTools
 open MapUtils
 

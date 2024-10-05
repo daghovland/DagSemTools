@@ -1,6 +1,6 @@
-using AlcTableau;
-using AlcTableau.Rdf;
-using AlcTableau.TurtleAntlr;
+using DagSemTools;
+using DagSemTools.Rdf;
+using DagSemTools.TurtleAntlr;
 using FluentAssertions;
 using IriTools;
 using TestUtils;
@@ -20,7 +20,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     }
     public Datastore TestOntology(string ontology)
     {
-        return AlcTableau.TurtleAntlr.Parser.ParseString(ontology, _outputWriter);
+        return Parser.ParseString(ontology, _outputWriter);
 
     }
 
@@ -398,7 +398,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     [Fact]
     public void TestBlankNodePropertyList2()
     {
-        var ont = AlcTableau.TurtleAntlr.Parser.ParseString("""
+        var ont = DagSemTools.TurtleAntlr.Parser.ParseString("""
                PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                
                 [ foaf:name "Alice" ].

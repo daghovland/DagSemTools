@@ -59,7 +59,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
-      <ProjectReference Include="..\..\src\ManchesterAntlr\ManchesterAntlr.csproj" />
+      <ProjectReference Include="..\..\src\Manchester.Parser\Manchester.Parser.csproj" />
       <ProjectReference Include="..\..\src\Manchester\Manchester.fsproj" />
       <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>

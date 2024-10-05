@@ -6,15 +6,15 @@
     Contact: hovlanddag@gmail.com
 */
 
-using AlcTableau.Parser;
+using DagSemTools.Parser;
 using TestUtils;
 using Xunit.Abstractions;
 
-namespace ManchesterAntlr.Unit.Tests;
+namespace DagSemTools.Manchester.Parser.Unit.Tests;
 using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using AlcTableau.ManchesterAntlr;
+using DagSemTools.ManchesterAntlr;
 using FluentAssertions;
 using IriTools;
 

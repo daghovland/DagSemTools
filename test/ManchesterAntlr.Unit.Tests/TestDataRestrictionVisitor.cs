@@ -6,14 +6,13 @@
     Contact: hovlanddag@gmail.com
 */
 
-using AlcTableau;
-using AlcTableau.ManchesterAntlr;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
+using DagSemTools.AlcTableau;
 using FluentAssertions;
 using IriTools;
 
-namespace ManchesterAntlr.Unit.Tests;
+namespace DagSemTools.Manchester.Parser.Unit.Tests;
 
 public class TestDataRestrictionVisitor
 {

@@ -5,16 +5,15 @@
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
     Contact: hovlanddag@gmail.com
 *)
-namespace AlcTableau
+namespace DagSemTools.Datalog
 
-open AlcTableau.Rdf
+open DagSemTools.Rdf
 open Datalog
-open AlcTableau.Rdf.Ingress
 open Stratifier
 
 
 
-    type DatalogProgram (Rules: Rule list, tripleStore : Rdf.Datastore) =
+    type DatalogProgram (Rules: Rule list, tripleStore : Datastore) =
         let mutable Rules = Rules
         let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
                             Rules

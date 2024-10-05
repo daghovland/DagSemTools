@@ -5,19 +5,18 @@
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
     Contact: hovlanddag@gmail.com
 *)
-module Tests
+module DagSemTools.Rdf.Tests
 
-open System
-open IriTools
-open AlcTableau
-open AlcTableau.Rdf
+open DagSemTools.Rdf
 open Xunit
-open AlcTableau.Rdf.Ingress
+open DagSemTools
+open DagSemTools.Rdf.Ingress
 open Faqt
+open IriTools
 
 [<Fact>]
 let ``Can add resource to tripletable`` () =
-    let tripleTable = Rdf.Datastore(1u)
+    let tripleTable = Datastore(1u)
     Assert.Equal(0u, tripleTable.Resources.ResourceCount)
     let newIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com"))
     Assert.Equal(0u, newIndex)

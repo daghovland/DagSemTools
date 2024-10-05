@@ -9,12 +9,10 @@
 module Tests
 
 open System
-open AlcTableau.ALC
+open DagSemTools.AlcTableau
+open DagSemTools.AlcTableau.ALC
 open Xunit
-open AlcTableau
 open IriTools
-open System.IO
-open Manchester.Printer
 
 [<Fact>]
 let ``Alc Can Be Created`` () =

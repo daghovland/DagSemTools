@@ -1,7 +1,7 @@
-module AlcTableau.ConjunctiveQueryAnswer
+module DagSemTools.AlcTableau.ConjunctiveQueryAnswer
 
-open AlcTableau.ALC
-open AlcTableau.ConjunctiveQuery
+open DagSemTools.AlcTableau.ALC
+open DagSemTools.AlcTableau.ConjunctiveQuery
 open ConjunctiveQuery
 open IriTools
 open System.Collections.Generic

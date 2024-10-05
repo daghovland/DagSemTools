@@ -1,4 +1,4 @@
-namespace AlcTableau.Api;
+namespace DagSemTools.Api;
 
 /// <inheritdoc />
 public class LiteralResource(string value) : Resource

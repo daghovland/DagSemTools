@@ -5,10 +5,10 @@
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
     Contact: hovlanddag@gmail.com
 *)
-namespace AlcTableau
+namespace DagSemTools.Datalog
 
-open AlcTableau.Rdf
-open AlcTableau.Rdf.Ingress
+open DagSemTools.Rdf
+open DagSemTools.Rdf.Ingress
 
 module Datalog =
 

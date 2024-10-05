@@ -25,7 +25,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\Rdf\Rdf.fsproj" />
-      <ProjectReference Include="..\TurtleAntlr\TurtleAntlr.csproj" />
+      <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
     </ItemGroup>
 
     <ItemGroup>

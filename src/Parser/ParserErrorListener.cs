@@ -1,6 +1,6 @@
 ﻿using Antlr4.Runtime;
 
-namespace AlcTableau.Parser;
+namespace DagSemTools.Parser;
 
 /// <inheritdoc />
 public class ParserErrorListener : IAntlrErrorListener<IToken>, IVisitorErrorListener

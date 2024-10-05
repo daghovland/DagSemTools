@@ -8,23 +8,24 @@
 namespace AlcTableau.Datalog.Tests
 
 open System
-open AlcTableau.Rdf
+open DagSemTools.Datalog.Datalog
+open DagSemTools.Rdf
 open IriTools
 open Xunit 
 open Ingress
-open AlcTableau.Datalog
+open DagSemTools.Datalog
+open DagSemTools
 open Faqt
-open AlcTableau.Rdf.Ingress
-open AlcTableau
+open DagSemTools.Rdf.Ingress
+open DagSemTools.Datalog
 open Faqt
-open AlcTableau.Datalog
 
 module Tests =
     
     
     [<Fact>]
     let ``Datalog program fetches rule`` () =
-        let tripleTable = Rdf.Datastore(60u)
+        let tripleTable = Datastore(60u)
         
         let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
         let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))

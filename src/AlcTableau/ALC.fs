@@ -6,7 +6,7 @@
     Contact: hovlanddag@gmail.com
 *)
 
-namespace AlcTableau
+namespace DagSemTools.AlcTableau
 
 open System
 open IriTools

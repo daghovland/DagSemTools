@@ -1,4 +1,4 @@
-namespace AlcTableau.Api;
+namespace DagSemTools.Api;
 
 /// <summary>
 /// Represents a resource that is identified by an IRI or is a blank node.

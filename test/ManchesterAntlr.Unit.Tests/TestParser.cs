@@ -7,19 +7,20 @@
 */
 
 using Antlr4.Runtime.Misc;
+using DagSemTools.AlcTableau;
 using Microsoft.FSharp.Collections;
 using TestUtils;
 using Xunit.Abstractions;
 
-namespace ManchesterAntlr.Unit.Tests;
+namespace DagSemTools.Manchester.Parser.Unit.Tests;
 using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using AlcTableau.ManchesterAntlr;
+using DagSemTools.ManchesterAntlr;
 using FluentAssertions;
-using AlcTableau;
+using DagSemTools;
 using IriTools;
-using ManchesterAntlr;
+using Manchester.Parser;
 
 public class TestParser
 {
@@ -32,7 +33,7 @@ public class TestParser
     }
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseFile(filename, _errorOutput);
+        var parsedOntology = Manchester.Parser.Parser.ParseFile(filename, _errorOutput);
         return TestOntology(parsedOntology);
     }
 
@@ -57,14 +58,14 @@ public class TestParser
 
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseString(ontology, _errorOutput);
+        var parsedOntology = Manchester.Parser.Parser.ParseString(ontology, _errorOutput);
         return TestOntology(parsedOntology);
     }
 
     [Fact]
     public void TestSmallestOntology()
     {
-        var parsed = ManchesterAntlr.Parser.ParseString("Ontology:", _errorOutput);
+        var parsed = Manchester.Parser.Parser.ParseString("Ontology:", _errorOutput);
         parsed.Should().NotBeNull();
     }
 
@@ -72,11 +73,11 @@ public class TestParser
     public void TestErrorHandling()
     {
         var customErrorOutput = new TestOutputTextWriter(_output);
-        var parsed = ManchesterAntlr.Parser.ParseString("""
-                                                        Prefix fam: <https://ex.com/owl2/families#>
-                                                        Ontology: <https://ex.com/owl2/families>
-                                                        Class: fam:Person
-                                                        """, customErrorOutput);
+        var parsed = Manchester.Parser.Parser.ParseString("""
+                                                          Prefix fam: <https://ex.com/owl2/families#>
+                                                          Ontology: <https://ex.com/owl2/families>
+                                                          Class: fam:Person
+                                                          """, customErrorOutput);
         customErrorOutput.LastError.Should().Be("line 1:0 mismatched input 'Prefix' expecting {'Ontology:', 'Prefix:'}");
 
     }
@@ -85,10 +86,10 @@ public class TestParser
     public void TestLackingPrefixErrorHandling()
     {
         var customErrorOutput = new TestOutputTextWriter(_output);
-        var parsed = ManchesterAntlr.Parser.ParseString("""
-                                                        Ontology: <https://ex.com/owl2/families>
-                                                        Class: fam:Person
-                                                        """, customErrorOutput);
+        var parsed = Manchester.Parser.Parser.ParseString("""
+                                                          Ontology: <https://ex.com/owl2/families>
+                                                          Class: fam:Person
+                                                          """, customErrorOutput);
         customErrorOutput.LastError.Should().Be("line 2:7 Prefix fam not defined.");
 
     }
@@ -96,7 +97,7 @@ public class TestParser
     [Fact]
     public void TestOntologyWithIri()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>", _errorOutput);
+        var parsedOntology = Manchester.Parser.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>", _errorOutput);
         parsedOntology.Should().NotBeNull();
 
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
@@ -138,7 +139,7 @@ public class TestParser
                          Class: ex:Class
                          """;
         var customErrorOutput = new TestOutputTextWriter(_output);
-        var parsedOntology = ManchesterAntlr.Parser.ParseString(ontologyString, customErrorOutput);
+        var parsedOntology = Manchester.Parser.Parser.ParseString(ontologyString, customErrorOutput);
         customErrorOutput.LastError.Should().Be("line 1:0 mismatched input 'Prefax' expecting {'Ontology:', 'Prefix:'}");
 
     }
@@ -147,11 +148,11 @@ public class TestParser
     public void TestWrongOntology2()
     {
         var customErrorOutput = new TestOutputTextWriter(_output);
-        var parsedOntology = ManchesterAntlr.Parser.ParseString("""
-                                                Prefix: ex: <https://example.com/> 
-                                                Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
-                                                Class: ax:Class
-                                                """, customErrorOutput);
+        var parsedOntology = Manchester.Parser.Parser.ParseString("""
+                                                                  Prefix: ex: <https://example.com/> 
+                                                                  Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
+                                                                  Class: ax:Class
+                                                                  """, customErrorOutput);
         customErrorOutput.LastError.Should().Be("line 3:7 Prefix ax not defined.");
     }
 
@@ -379,12 +380,12 @@ public class TestParser
     [Fact]
     public void TestAlcTableauExample()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseString("""
-                      Prefix: : <http://example.com/>
-                    Ontology: 
-                    Individual: a 
-                        Types: A and s some F, B and s only F
-                    """, _errorOutput
+        var parsedOntology = Manchester.Parser.Parser.ParseString("""
+                                                                    Prefix: : <http://example.com/>
+                                                                  Ontology: 
+                                                                  Individual: a 
+                                                                      Types: A and s some F, B and s only F
+                                                                  """, _errorOutput
         );
     }
 
@@ -398,12 +399,12 @@ public class TestParser
     [Fact]
     public void TestOntologyWithManyRoleAssertions()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseString("""
-                                           Prefix: : <https://example.com/> 
-                                           Ontology:  
-                                           Individual: a 
-                                               Facts: r b, s c
-                                           """, _errorOutput
+        var parsedOntology = Manchester.Parser.Parser.ParseString("""
+                                                                  Prefix: : <https://example.com/> 
+                                                                  Ontology:  
+                                                                  Individual: a 
+                                                                      Facts: r b, s c
+                                                                  """, _errorOutput
         );
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
@@ -419,7 +420,7 @@ public class TestParser
     [Fact(Skip = "Not implemented yet, See Issue https://github.com/daghovland/AlcTableau/issues/2")]
     public void TestDefinitionExample()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/def_example.owl", _errorOutput);
+        var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/def_example.owl", _errorOutput);
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var tboxAxioms = tbox.ToList();
         tboxAxioms.Should().HaveCount(2);
@@ -431,13 +432,13 @@ public class TestParser
     [Fact]
     public void TestDataTypeFacet()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseString("""
-                                                                Prefix: : <https://example.com/>
-                                                                Ontology: 
-                                                                Datatype: NegInt
-                                                                  Annotations: rdfs:comment "Negative Integer"
-                                                                  EquivalentTo: integer[< 0]   
-                                                                """, _errorOutput);
+        var parsedOntology = Manchester.Parser.Parser.ParseString("""
+                                                                  Prefix: : <https://example.com/>
+                                                                  Ontology: 
+                                                                  Datatype: NegInt
+                                                                    Annotations: rdfs:comment "Negative Integer"
+                                                                    EquivalentTo: integer[< 0]   
+                                                                  """, _errorOutput);
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);
@@ -447,7 +448,7 @@ public class TestParser
     [Fact]
     public void TestAnnotationsExample()
     {
-        var parsedOntology = ManchesterAntlr.Parser.ParseFile("TestData/annotations.owl", _errorOutput);
+        var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/annotations.owl", _errorOutput);
         var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);

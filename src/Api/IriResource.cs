@@ -1,4 +1,4 @@
-namespace AlcTableau.Api;
+namespace DagSemTools.Api;
 using IriTools;
 
 /// <summary>

@@ -1,4 +1,4 @@
-using AlcTableau.Api;
+using DagSemTools.Api;
 using IriTools;
 using FluentAssertions;
 using Xunit.Abstractions;
@@ -13,7 +13,7 @@ public class TestApi(ITestOutputHelper output)
     public void Test1()
     {
         var ontology = new FileInfo("TestData/example1.ttl");
-        var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var labels = ont.GetTriplesWithSubjectPredicate(
@@ -26,7 +26,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestAbbreviatedBlankNode()
     {
         var ontology = new FileInfo("TestData/abbreviated_blank_nodes.ttl");
-        var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
         Assert.NotNull(ont);
 
 

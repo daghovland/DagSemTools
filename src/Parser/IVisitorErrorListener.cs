@@ -1,6 +1,6 @@
 using Antlr4.Runtime;
 
-namespace AlcTableau.Parser;
+namespace DagSemTools.Parser;
 
 /// <summary>
 /// The interface for the error listener used by the visitor patterns for the turtle and manchester parsers

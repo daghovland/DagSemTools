@@ -1,5 +1,4 @@
-namespace AlcTableau.Rdf
-open AlcTableau.Rdf.Ingress
+namespace DagSemTools.Rdf
 open Ingress
 
 open System

@@ -6,21 +6,16 @@
     Contact: hovlanddag@gmail.com
 *)
 
-module AlcTest.ReasonerTests
+module DagSemTools.AlcTableay.Tests.ReasonerTests
 
-open System
-open AlcTableau.ALC
-open Microsoft.FSharp.Quotations
+open DagSemTools.AlcTableau
+open DagSemTools.AlcTableau.ALC
 open Xunit
-open AlcTableau
+open DagSemTools
 open IriTools
-open System.IO
-open Manchester.Printer
 open Tableau
 open AlcTableau.ConjunctiveQuery
-open ReasonerService
 
-open AlcTableau
 
 let initReasonerState concept_map =
         { known_concept_assertions = concept_map

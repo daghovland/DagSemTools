@@ -1,7 +1,7 @@
 ﻿using IriTools;
-using AlcTableau.Rdf;
+using DagSemTools.Rdf;
 
-namespace AlcTableau.Api;
+namespace DagSemTools.Api;
 
 /// <summary>
 /// Implementation of a rdf graph. 

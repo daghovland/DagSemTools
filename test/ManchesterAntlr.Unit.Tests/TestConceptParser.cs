@@ -6,19 +6,16 @@
     Contact: hovlanddag@gmail.com
 */
 
-using AlcTableau.Parser;
-using Microsoft.FSharp.Collections;
+using DagSemTools.AlcTableau;
+using DagSemTools.Parser;
 using TestUtils;
 using Xunit.Abstractions;
-
-namespace ManchesterAntlr.Unit.Tests;
-using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using AlcTableau.ManchesterAntlr;
-using AlcTableau;
 using FluentAssertions;
 using IriTools;
+
+namespace DagSemTools.Manchester.Parser.Unit.Tests;
 
 public class TestConceptParser
 {
