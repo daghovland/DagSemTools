@@ -5,11 +5,15 @@ datalogProgram : (directive | rule)* EOF ;
 
 rule : head ':-' body PERIOD ;
 
-head : ruleAtom ;
+head : positiveRuleAtom ;
 
 body : ruleAtom (COMMA ruleAtom)* ;
 
-ruleAtom : tripleAtom | typeAtom  ;
+ruleAtom : 'NOT' positiveRuleAtom #NegativeRuleAtom
+    | positiveRuleAtom #YesRuleAtom 
+    ;
+
+positiveRuleAtom : tripleAtom | typeAtom  ;
 
 tripleAtom :
     '[' term COMMA predicate COMMA term ']'

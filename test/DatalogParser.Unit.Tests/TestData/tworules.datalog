@@ -4,4 +4,4 @@ ex:prop[?s, ex:obj] :- ex:prop2[?s, ex:obj],
     ex:prop3[?s, ex:obj].
     
 ex:prop3[?s, ex:obj] :- ex:prop4[?s, ex:obj],
-    ex:prop5[?s, ex:obj].
+    ex:type3[?s].

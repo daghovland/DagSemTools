@@ -35,9 +35,9 @@ public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
         );
     }
 
-    public override Datalog.RuleAtom VisitRuleAtom(DatalogParser.RuleAtomContext context)
+    public override Datalog.RuleAtom VisitNegativeRuleAtom(DatalogParser.NegativeRuleAtomContext context)
     {
-        return Visit(context.GetChild(0));
+        return Datalog.RuleAtom.NewNotTriple(context.GetChild(0).Accept(this));
     }
 
     /// <inheritdoc />
