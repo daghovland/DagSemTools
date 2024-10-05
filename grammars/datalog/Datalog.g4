@@ -1,17 +1,25 @@
 grammar Datalog;
 import Turtle;
 
-datalogProgram : (directive | rule)* ;
+datalogProgram : (directive | rule)* EOF ;
 
-rule : head ':-' body '.' ;
+rule : head ':-' body PERIOD ;
 
 head : ruleAtom ;
 
-body : ruleAtom (',' ruleAtom)* ;
+body : ruleAtom (COMMA ruleAtom)* ;
 
-ruleAtom : '[' resource ',' resource ',' resource ']' ;
+ruleAtom : tripleAtom | typeAtom  ;
 
-resource : iri | literal | variable ;
+tripleAtom :
+    '[' term COMMA predicate COMMA term ']'
+    | predicate '[' term COMMA term ']'
+    ;
+typeAtom: predicate '[' term ']'  ; 
 
-variable : '?' PN_LOCAL ;
+predicate : iri ;
+
+term : iri | literal | variable ;
+
+variable : '?' PN_CHARS_BASE PN_CHARS_BASE* ;
 

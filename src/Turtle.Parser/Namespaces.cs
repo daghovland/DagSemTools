@@ -15,11 +15,20 @@ namespace DagSemTools.TurtleAntlr;
 /// </summary>
 public static class Namespaces
 {
+    /// <summary>
+    /// The rdf namespace
+    /// </summary>
     public const string Rdf = "http://www.w3.org/1999/02/22-rdf-syntax-ns#";
     public const string Rdfs = "http://www.w3.org/2000/01/rdf-schema#";
     public const string Owl = "http://www.w3.org/2002/07/owl#";
+    /// <summary>
+    /// The XML Schema namespace
+    /// </summary>
     public const string Xsd = "http://www.w3.org/2001/XMLSchema#";
 
+    /// <summary>
+    /// The IRI for rdf:type, also abbreviated 'a' in turtle
+    /// </summary>
     public const string RdfType = $"{Rdf}type";
     public const string RdfNil = $"{Rdf}nil";
     public const string RdfFirst = $"{Rdf}first";

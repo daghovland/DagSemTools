@@ -1,6 +1,7 @@
 using DagSemTools;
 using DagSemTools.Datalog;
 using DagSemTools.Rdf;
+using FluentAssertions;
 using TestUtils;
 using Xunit.Abstractions;
 
@@ -32,8 +33,41 @@ public class TestParser
         return DagSemTools.Datalog.Parser.Parser.ParseFile(datalog, _outputWriter, datastore);
 
     }
+
+
     [Fact]
-    public void TestSingleTriple()
+    public void TestSingleRule()
+    {
+        var fInfo = File.ReadAllText("TestData/rule1.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+    }
+
+
+    [Fact]
+    public void TestRuleWithAnd()
+    {
+        var fInfo = File.ReadAllText("TestData/ruleand.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+        ont.First().Body.Count().Should().Be(2);
+    }
+
+    [Fact]
+    public void TestTwoRules()
+    {
+        var fInfo = File.ReadAllText("TestData/tworules.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(2);
+        ont.First().Body.Count().Should().Be(2);
+    }
+
+
+    [Fact]
+    public void TestRealData()
     {
         var fInfo = File.ReadAllText("TestData/noaka_boundary.datalog");
         var ont = TestProgram(fInfo);

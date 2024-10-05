@@ -1,15 +1,4 @@
-prefix data: <https://assetid.equinor.com/plantx/document/12345#>
+prefix ex: <https://example.com/data#>
 
-data:insideBoundary [?new_node] :- 
-    data:insideBoundary [?node] ,
-    imf:adjacentTo [?node, ?new_node] ,
-    NOT data:boundary [?node] .
-
-data:insideBoundary [?new_node] :- 
-    data:insideBoundary [?node],
-    imf:hasPart[?new_node, ?node] .
-
-
-data:boundary [?new_node] :- 
-    data:boundary [?node],
-    imf:hasPart[?new_node, ?node] .
+[?s, <https://example.com/data#predicate>, ex:obj] :- 
+    [?s, <https://example.com/data#predicate2>, ex:obj].

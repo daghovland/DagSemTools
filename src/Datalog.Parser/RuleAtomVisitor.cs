@@ -1,5 +1,6 @@
 using DagSemTools;
 using DagSemTools.TurtleAntlr;
+using IriTools;
 
 namespace DagSemTools.Datalog.Parser;
 
@@ -14,12 +15,37 @@ public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
         _predicateVisitor = predicateVisitor;
     }
 
+
     /// <inheritdoc />
+    public override Datalog.RuleAtom VisitTypeAtom(DatalogParser.TypeAtomContext context)
+    {
+        var subject = context.term();
+        var predicate = Datalog.ResourceOrVariable
+            .NewResource(_predicateVisitor.ResourceVisitor.Datastore
+                .AddResource(Rdf.Ingress.Resource
+                    .NewIri(new IriReference(Namespaces.RdfType))));
+        var @class = context.predicate();
+
+        return Datalog.RuleAtom.NewPositiveTriple(
+            new Datalog.TriplePattern(
+                _predicateVisitor.Visit(subject),
+                predicate,
+                _predicateVisitor.Visit(@class)
+            )
+        );
+    }
+
     public override Datalog.RuleAtom VisitRuleAtom(DatalogParser.RuleAtomContext context)
     {
-        var subject = context.resource(0);
-        var predicate = context.resource(1);
-        var @object = context.resource(2);
+        return Visit(context.GetChild(0));
+    }
+
+    /// <inheritdoc />
+    public override Datalog.RuleAtom VisitTripleAtom(DatalogParser.TripleAtomContext context)
+    {
+        var subject = context.term(0);
+        var predicate = context.predicate();
+        var @object = context.term(1);
 
         return Datalog.RuleAtom.NewPositiveTriple(
             new Datalog.TriplePattern(

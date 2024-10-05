@@ -54,6 +54,7 @@ public class Parser
     /// </summary>
     /// <param name="datalog"></param>
     /// <param name="errorOutput"></param>
+    /// <param name="datastore"></param>
     /// <returns></returns>
     public static IEnumerable<Datalog.Rule> ParseString(string datalog, TextWriter errorOutput, Datastore datastore)
     {

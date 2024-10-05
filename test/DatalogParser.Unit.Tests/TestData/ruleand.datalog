@@ -1,0 +1,4 @@
+prefix ex: <https://example.com/data#>
+
+ex:prop[?s, ex:obj] :- ex:prop2[?s, ex:obj],
+    ex:prop3[?s, ex:obj].
