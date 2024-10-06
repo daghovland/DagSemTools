@@ -1,0 +1,4 @@
+prefix ex: <https://assetid.equinor.com/plantx/document/12345#>
+
+ex:insideBoundary [?new_node] :- 
+    ex:insideBoundary [?node] .

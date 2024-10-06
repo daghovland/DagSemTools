@@ -16,14 +16,16 @@ ruleAtom : 'NOT' positiveRuleAtom #NegativeRuleAtom
 positiveRuleAtom : tripleAtom | typeAtom  ;
 
 tripleAtom :
-    '[' term COMMA predicate COMMA term ']'
-    | predicate '[' term COMMA term ']'
+    LSQPAREN term COMMA predicate COMMA term RSQPAREN
+    | predicate LSQPAREN term COMMA term RSQPAREN
     ;
-typeAtom: predicate '[' term ']'  ; 
+typeAtom: predicate LSQPAREN term RSQPAREN  ; 
 
 predicate : iri ;
 
 term : iri | literal | variable ;
 
-variable : '?' PN_CHARS_BASE PN_CHARS_BASE* ;
+variable : '?' PN_PREFIX;
+ 
+    
 

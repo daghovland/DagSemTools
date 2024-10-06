@@ -8,51 +8,34 @@ namespace DagSemTools.Datalog.Parser;
 public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
 {
     private readonly PredicateVisitor _predicateVisitor;
-
+    internal TriplePatternVisitor TriplePatternVisitor { get;  }
     /// <inheritdoc />
     public RuleAtomVisitor(PredicateVisitor predicateVisitor)
     {
         _predicateVisitor = predicateVisitor;
+        TriplePatternVisitor = new TriplePatternVisitor(predicateVisitor);
     }
 
+    
 
-    /// <inheritdoc />
-    public override Datalog.RuleAtom VisitTypeAtom(DatalogParser.TypeAtomContext context)
+    /// <summary>
+    /// Visit a rule atom that does not have NOT in front of it
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public override Datalog.RuleAtom VisitYesRuleAtom(DatalogParser.YesRuleAtomContext context)
     {
-        var subject = context.term();
-        var predicate = Datalog.ResourceOrVariable
-            .NewResource(_predicateVisitor.ResourceVisitor.Datastore
-                .AddResource(Rdf.Ingress.Resource
-                    .NewIri(new IriReference(Namespaces.RdfType))));
-        var @class = context.predicate();
-
-        return Datalog.RuleAtom.NewPositiveTriple(
-            new Datalog.TriplePattern(
-                _predicateVisitor.Visit(subject),
-                predicate,
-                _predicateVisitor.Visit(@class)
-            )
-        );
+        return Datalog.RuleAtom.NewPositiveTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
     }
-
+    
+    /// <summary>
+    /// Visit a rule atom that has NOT in front of it
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
     public override Datalog.RuleAtom VisitNegativeRuleAtom(DatalogParser.NegativeRuleAtomContext context)
     {
-        return Datalog.RuleAtom.NewNotTriple(context.GetChild(0).Accept(this));
+        return Datalog.RuleAtom.NewNotTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
     }
 
-    /// <inheritdoc />
-    public override Datalog.RuleAtom VisitTripleAtom(DatalogParser.TripleAtomContext context)
-    {
-        var subject = context.term(0);
-        var predicate = context.predicate();
-        var @object = context.term(1);
-
-        return Datalog.RuleAtom.NewPositiveTriple(
-            new Datalog.TriplePattern(
-                _predicateVisitor.Visit(subject),
-                _predicateVisitor.Visit(predicate),
-                _predicateVisitor.Visit(@object)
-            )
-        );
-    }
 }

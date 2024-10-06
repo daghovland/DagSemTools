@@ -53,7 +53,7 @@ PN_CHARS_BASE: [A-Z]
                	| 	[\u3001-\uD7FF]
                	| 	[\uF900-\uFDCF]
                	| 	[\uFDF0-\uFFFD]
-               	| 	SUPPLEMENTARY_PLANE;
+               	| 	SUPPLEMENTARY_PLANE ;
                	
 fragment SUPPLEMENTARY_PLANE : [\uD800-\uDBFF][\uDC00-\uDFFF];
                	

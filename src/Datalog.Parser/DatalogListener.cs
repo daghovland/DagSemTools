@@ -94,24 +94,12 @@ internal class DatalogListener : DatalogBaseListener
     public override void ExitRule(DatalogParser.RuleContext context)
     {
         var headCtxt = context.head();
-        var headAtom = _ruleAtomVisitor.Visit(headCtxt);
-        Datalog.TriplePattern head;
-        switch (headAtom)
-        {
-            case Datalog.RuleAtom.PositiveTriple t:
-                head = t.Item;
-                break;
-            case Datalog.RuleAtom.NotTriple _:
-            case null:
-                throw new Exception("Head of rule must be a triple");
-            default:
-                throw new ArgumentOutOfRangeException("_ruleAtomVisitor.Visit(context.head())");
-        }
-
+        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt);
+        
         var body =
             context.body().ruleAtom()
                 .Select(b => _ruleAtomVisitor.Visit(b));
-        DatalogProgram = DatalogProgram.Append(new Datalog.Rule(head, ListModule.OfSeq(body)));
+        DatalogProgram = DatalogProgram.Append(new Datalog.Rule(headAtom, ListModule.OfSeq(body)));
     }
 
 }

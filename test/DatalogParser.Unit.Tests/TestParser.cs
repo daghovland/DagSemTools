@@ -67,6 +67,39 @@ public class TestParser
 
 
     [Fact]
+    public void TestNot()
+    {
+        var fInfo = File.ReadAllText("TestData/rulenot.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+        ont.First().Body.Count().Should().Be(2);
+    }
+
+    
+    [Fact]
+    public void TestTypeAtom()
+    {
+        var fInfo = File.ReadAllText("TestData/ruletypeatom.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+        ont.First().Body.Count().Should().Be(2);
+    }
+
+
+    [Fact]
+    public void TestTypeAtom2()
+    {
+        var fInfo = File.ReadAllText("TestData/typeatom2.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+        ont.First().Body.Count().Should().Be(2);
+    }
+
+    
+    [Fact]
     public void TestRealData()
     {
         var fInfo = File.ReadAllText("TestData/noaka_boundary.datalog");
