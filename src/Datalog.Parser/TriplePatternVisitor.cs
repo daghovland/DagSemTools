@@ -29,7 +29,7 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Datalog.TriplePattern>
             _predicateVisitor.Visit(@object)
         );
     }
-    
+
     /// <inheritdoc />
     public override Datalog.TriplePattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
     {
@@ -47,5 +47,5 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Datalog.TriplePattern>
             );
     }
 
-    
+
 }

@@ -95,7 +95,7 @@ internal class DatalogListener : DatalogBaseListener
     {
         var headCtxt = context.head();
         var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt);
-        
+
         var body =
             context.body().ruleAtom()
                 .Select(b => _ruleAtomVisitor.Visit(b));

@@ -25,7 +25,7 @@ predicate : iri ;
 
 term : iri | literal | variable ;
 
-variable : '?' PN_PREFIX;
+variable : '?' (PN_CHARS_BASE | PN_PREFIX);
  
     
 

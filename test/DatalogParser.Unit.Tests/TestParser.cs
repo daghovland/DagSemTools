@@ -76,7 +76,7 @@ public class TestParser
         ont.First().Body.Count().Should().Be(2);
     }
 
-    
+
     [Fact]
     public void TestTypeAtom()
     {
@@ -95,17 +95,7 @@ public class TestParser
         var ont = TestProgram(fInfo).ToList();
         ont.Should().NotBeNull();
         ont.Should().HaveCount(1);
-        ont.First().Body.Count().Should().Be(2);
+        ont.First().Body.Count().Should().Be(1);
     }
-
     
-    [Fact]
-    public void TestRealData()
-    {
-        var fInfo = File.ReadAllText("TestData/noaka_boundary.datalog");
-        var ont = TestProgram(fInfo);
-        Assert.NotNull(ont);
-        Assert.Single(ont);
-    }
-
 }

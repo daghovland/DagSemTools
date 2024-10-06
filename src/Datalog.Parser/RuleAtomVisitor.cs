@@ -8,7 +8,7 @@ namespace DagSemTools.Datalog.Parser;
 public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
 {
     private readonly PredicateVisitor _predicateVisitor;
-    internal TriplePatternVisitor TriplePatternVisitor { get;  }
+    internal TriplePatternVisitor TriplePatternVisitor { get; }
     /// <inheritdoc />
     public RuleAtomVisitor(PredicateVisitor predicateVisitor)
     {
@@ -16,7 +16,7 @@ public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
         TriplePatternVisitor = new TriplePatternVisitor(predicateVisitor);
     }
 
-    
+
 
     /// <summary>
     /// Visit a rule atom that does not have NOT in front of it
@@ -27,7 +27,7 @@ public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
     {
         return Datalog.RuleAtom.NewPositiveTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
     }
-    
+
     /// <summary>
     /// Visit a rule atom that has NOT in front of it
     /// </summary>
