@@ -33,7 +33,7 @@ type Datastore(triples: TripleTable,
     
     member this.GetResource (resourceId: ResourceId) : Resource =
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, this.Resources.ResourceCount);
-        this.Resources.ResourceList.[int resourceId]
+        this.Resources.GetResource(resourceId)
         
     member this.GetResourceId (resource : Resource) =
         this.Resources.ResourceMap.[resource]

@@ -1,8 +1,17 @@
-using DagSemTools;
-using DagSemTools.Rdf;
-using DagSemTools.TurtleAntlr;
+/*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*/
 
 namespace DagSemTools.Datalog.Parser;
+
+using DagSemTools;
+using DagSemTools.Rdf;
+using DagSemTools.Datalog.Parser;
+using static DatalogParser;
 
 /// <inheritdoc />
 public class PredicateVisitor : DatalogBaseVisitor<Datalog.ResourceOrVariable>
@@ -18,14 +27,16 @@ public class PredicateVisitor : DatalogBaseVisitor<Datalog.ResourceOrVariable>
     /// <inheritdoc />
     public override Datalog.ResourceOrVariable VisitIri(DatalogParser.IriContext context)
     {
-        var resource = ResourceVisitor.Visit(context);
+        var resource = ResourceVisitor.VisitIri(context);
         return Datalog.ResourceOrVariable.NewResource(resource);
     }
 
     /// <inheritdoc />
     public override Datalog.ResourceOrVariable VisitLiteral(DatalogParser.LiteralContext context)
     {
-        return Datalog.ResourceOrVariable.NewResource(ResourceVisitor.Visit(context));
+        var iriContext = new LiteralContext(context, context.invokingState);
+
+        return Datalog.ResourceOrVariable.NewResource(ResourceVisitor.VisitLiteral(iriContext));
     }
 
     /// <inheritdoc />

@@ -37,14 +37,12 @@ open Stratifier
                 |> Seq.distinct
                 |> Seq.collect (Seq.collect (GetMatchesForRule fact))
         
-      
-                
         member this.materialise() =
             let negRules = NegativeIntenstionalProperties Rules
             if not(negRules |> Seq.isEmpty) then
                 let exRuleString = negRules |> Seq.head |> RuleToString tripleStore
                 raise (new System.ArgumentException($"Program is not semi-positive, f.ex. rule {exRuleString}"))
-            for triple in tripleStore.Triples.TripleList do
+            for triple in tripleStore.Triples.GetTriples() do
                 for rules in this.GetRulesForFact triple do
                     for subs in evaluate tripleStore.Triples rules  do
                         let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head

@@ -1,5 +1,5 @@
 using DagSemTools;
-using DagSemTools.TurtleAntlr;
+using DagSemTools.Datalog.Parser;
 using IriTools;
 
 namespace DagSemTools.Datalog.Parser;
@@ -7,12 +7,10 @@ namespace DagSemTools.Datalog.Parser;
 /// <inheritdoc />
 public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
 {
-    private readonly PredicateVisitor _predicateVisitor;
     internal TriplePatternVisitor TriplePatternVisitor { get; }
     /// <inheritdoc />
     public RuleAtomVisitor(PredicateVisitor predicateVisitor)
     {
-        _predicateVisitor = predicateVisitor;
         TriplePatternVisitor = new TriplePatternVisitor(predicateVisitor);
     }
 

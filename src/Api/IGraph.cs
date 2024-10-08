@@ -50,4 +50,13 @@ public interface IGraph
     /// <param name="obj"></param>
     /// <returns></returns>
     public IEnumerable<Triple> GetTriplesWithObject(IriReference obj);
+
+    /// <summary>
+    /// Loads and runs datalog rules from the file
+    /// Note that this adds new triples to the datastore
+    /// </summary>
+    /// <param name="datalog">The file with the datalog program</param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void LoadDatalog(FileInfo datalog);
+
 }

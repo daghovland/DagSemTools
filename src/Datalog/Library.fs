@@ -204,7 +204,7 @@ module Datalog =
                     | true, v -> [rdf.GetTripleListEntry v]                    
             | ResourceOrVariable.Resource s, Variable p, ResourceOrVariable.Resource o ->
                 rdf.GetTriplesWithSubjectObject (s, o)
-            | Variable s, Variable p, Variable o -> rdf.TripleList
+            | Variable s, Variable p, Variable o -> rdf.GetTriples()
             ) 
         matchedTriples |> Seq.choose (fun t -> GetSubstitutions sub t mappedTriple)
     

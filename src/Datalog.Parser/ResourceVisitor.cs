@@ -6,19 +6,16 @@
  Contact: hovlanddag@gmail.com
 */
 
-
 using System.Globalization;
-using System.Security.Cryptography;
 using DagSemTools.Rdf;
-using DagSemTools.Turtle.Parser;
 
-namespace DagSemTools.Turtle.Parser;
+namespace DagSemTools.Datalog.Parser;
 
 using System.Collections.Generic;
 using IriTools;
-using static TurtleDocParser;
+using static DatalogParser;
 
-public class ResourceVisitor : TurtleDocBaseVisitor<uint>
+public class ResourceVisitor : DatalogBaseVisitor<uint>
 {
     private StringVisitor _stringVisitor = new();
     private IriGrammarVisitor _iriGrammarVisitor;

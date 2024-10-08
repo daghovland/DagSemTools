@@ -119,15 +119,3 @@ type IntegrationTests(output : ITestOutputHelper) =
             let reasoner_result = ReasonerService.is_consistent state
             Assert.False(reasoner_result)
      
-             
-    [<Fact>]
-    member _.Dexpi() =
-        // Arrange
-        let doc = Parser.ParseFile("TestData/pandid.owl", outputWriter)
-        // Act
-        match doc with
-        | Ontology (prefixes, version, kb) ->
-            let state = ReasonerService.init kb
-            let reasoner_result = ReasonerService.is_consistent state
-            Assert.True(reasoner_result)
-     

@@ -1,4 +1,4 @@
-using DagSemTools.TurtleAntlr;
+using DagSemTools.Datalog.Parser;
 using IriTools;
 
 namespace DagSemTools.Datalog.Parser;
@@ -37,7 +37,7 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Datalog.TriplePattern>
         var predicate = Datalog.ResourceOrVariable
             .NewResource(_predicateVisitor.ResourceVisitor.Datastore
                 .AddResource(Rdf.Ingress.Resource
-                    .NewIri(new IriReference(Namespaces.RdfType))));
+                    .NewIri(new IriReference(Rdf.Namespaces.RdfType))));
         var @class = context.predicate();
 
         return new Datalog.TriplePattern(

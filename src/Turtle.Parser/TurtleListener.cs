@@ -6,15 +6,14 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.TurtleAntlr;
 using IriTools;
 using Microsoft.FSharp.Core;
 using DagSemTools.Rdf;
 using DagSemTools.Parser;
 
-namespace DagSemTools.TurtleAntlr;
+namespace DagSemTools.Turtle.Parser;
 
-internal class TurtleListener : TurtleBaseListener
+internal class TurtleListener : TurtleDocBaseListener
 {
 
     private IriGrammarVisitor _iriGrammarVisitor;
@@ -68,27 +67,27 @@ internal class TurtleListener : TurtleBaseListener
         }
         throw new Exception($"Invalid prefix {prefixNs}. Prefix should end with ':'");
     }
-    public override void ExitBaseDeclaration(TurtleParser.BaseDeclarationContext context)
+    public override void ExitBaseDeclaration(TurtleDocParser.BaseDeclarationContext context)
     {
         var iriString = GetStringExcludingFirstAndLast(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.SetBase(iri);
     }
 
-    public override void ExitPrefixId(TurtleParser.PrefixIdContext context)
+    public override void ExitPrefixId(TurtleDocParser.PrefixIdContext context)
     {
         var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
         var iri = _iriGrammarVisitor.Visit(context.iri());
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
-    public override void ExitSparqlPrefix(TurtleParser.SparqlPrefixContext context)
+    public override void ExitSparqlPrefix(TurtleDocParser.SparqlPrefixContext context)
     {
         var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
         var iri = _iriGrammarVisitor.Visit(context.iri());
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
 
-    public override void ExitNamedSubjectTriples(TurtleParser.NamedSubjectTriplesContext context)
+    public override void ExitNamedSubjectTriples(TurtleDocParser.NamedSubjectTriplesContext context)
     {
         var curSubject = _resourceVisitor.Visit(context.subject());
         var triples = _resourceVisitor._predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
@@ -96,7 +95,7 @@ internal class TurtleListener : TurtleBaseListener
     }
 
 
-    public override void ExitBlankNodeTriples(TurtleParser.BlankNodeTriplesContext context)
+    public override void ExitBlankNodeTriples(TurtleDocParser.BlankNodeTriplesContext context)
     {
         var blankNode = datastore.NewAnonymousBlankNode();
         var internalTriples =

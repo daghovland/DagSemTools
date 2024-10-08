@@ -137,7 +137,8 @@ module Tests =
         tripleTable.AddTriple(Triple)
         Assert.Equal(3u, tripleTable.Resources.ResourceCount)
         Assert.Equal(1u, tripleTable.Triples.TripleCount)
-        let mappedTriple = tripleTable.Triples.TripleList.[0]
+        let allTriples = tripleTable.Triples.GetTriples()
+        let mappedTriple = allTriples |> Seq.head
         Assert.Equal(Triple, mappedTriple)
         
         let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
@@ -165,7 +166,7 @@ module Tests =
             tripleTable.AddTriple(Triple)
             Assert.Equal(3u, tripleTable.Resources.ResourceCount)
             Assert.Equal(1u, tripleTable.Triples.TripleCount)
-            let mappedTriple = tripleTable.Triples.TripleList.[0]
+            let mappedTriple = tripleTable.Triples.GetTriples() |> Seq.head
             Assert.Equal(Triple, mappedTriple)
             
             let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
@@ -452,7 +453,7 @@ module Tests =
         tripleTable.AddTriple(Triple)
         Assert.Equal(3u, tripleTable.Resources.ResourceCount)
         Assert.Equal(1u, tripleTable.Triples.TripleCount)
-        let mappedTriple = tripleTable.Triples.TripleList.[0]
+        let mappedTriple = tripleTable.Triples.GetTriples() |> Seq.head
         Assert.Equal(Triple, mappedTriple)
         
         let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))

@@ -2,6 +2,7 @@ using DagSemTools;
 using DagSemTools.Datalog;
 using DagSemTools.Rdf;
 using FluentAssertions;
+using IriTools;
 using TestUtils;
 using Xunit.Abstractions;
 
@@ -86,16 +87,34 @@ public class TestParser
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(2);
     }
-
-
+    
     [Fact]
     public void TestTypeAtom2()
     {
         var fInfo = File.ReadAllText("TestData/typeatom2.datalog");
-        var ont = TestProgram(fInfo).ToList();
+        var datastore = new Datastore(1000);
+        var ont = DagSemTools.Datalog.Parser.Parser.ParseString(fInfo, _outputWriter, datastore).ToList();
+
         ont.Should().NotBeNull();
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(1);
+        ont.First().Head.Should().Be(new Datalog.TriplePattern(
+            Datalog.ResourceOrVariable.NewVariable("?new_node"),
+            Datalog.ResourceOrVariable
+                .NewResource(datastore.GetResourceId(Ingress.Resource
+                    .NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
+            Datalog.ResourceOrVariable
+                .NewResource(datastore.GetResourceId(Ingress.Resource
+                    .NewIri(new IriReference("https://example.com/data#type"))))));
+        
+        ont.First().Body.First().Should().Be(Datalog.RuleAtom.NewPositiveTriple(new Datalog.TriplePattern(
+            Datalog.ResourceOrVariable.NewVariable("?node"),
+            Datalog.ResourceOrVariable
+                .NewResource(datastore.GetResourceId(Ingress.Resource
+                    .NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
+            Datalog.ResourceOrVariable
+                .NewResource(datastore.GetResourceId(Ingress.Resource
+                    .NewIri(new IriReference("https://example.com/data#type")))))));
     }
     
 }

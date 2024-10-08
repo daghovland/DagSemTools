@@ -6,16 +6,16 @@
     Contact: hovlanddag@gmail.com
 */
 
-namespace DagSemTools.Turtle.Parser;
+namespace DagSemTools.Datalog.Parser;
 
-internal class StringVisitor : TurtleDocBaseVisitor<string>
+internal class StringVisitor : DatalogBaseVisitor<string>
 {
-    public override string VisitString_single_quote(TurtleDocParser.String_single_quoteContext context)
+    public override string VisitString_single_quote(DatalogParser.String_single_quoteContext context)
     {
         return context.GetText()[1..^1];
     }
 
-    public override string VisitString_triple_quote(TurtleDocParser.String_triple_quoteContext context)
+    public override string VisitString_triple_quote(DatalogParser.String_triple_quoteContext context)
     {
         return context.GetText()[3..^3];
     }

@@ -32,7 +32,7 @@
         <Antlr4 Include="grammars\Datalog.g4">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
-        <Antlr4 Include="grammars\Turtle.g4">
+        <Antlr4 Include="grammars\TurtleResource.g4">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
         <None Update="grammars\TurtleTokens.g4">
@@ -43,10 +43,11 @@
         <ProjectReference Include="..\Parser\Parser.csproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
-        <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
+        
     </ItemGroup>
     <ItemGroup>
         <Folder Include="grammars\" />
+        <Folder Include="grammars\gen\" />
     </ItemGroup>
 
     <ItemGroup>

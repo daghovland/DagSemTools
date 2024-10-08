@@ -1,6 +1,8 @@
-using DagSemTools.TurtleAntlr;
+
 
 namespace DagSemTools.Api;
+
+using DagSemTools.Turtle.Parser;
 
 /// <summary>
 /// Parses a Turtle file into an RDF graph. https://www.w3.org/TR/rdf12-turtle/
@@ -16,7 +18,7 @@ public static class TurtleParser
     /// <returns></returns>
     public static IGraph Parse(FileInfo rdfFile, TextWriter errorOutput)
     {
-        var tt = TurtleAntlr.Parser.ParseFile(rdfFile, errorOutput);
+        var tt = DagSemTools.Turtle.Parser.Parser.ParseFile(rdfFile, errorOutput);
         return new Graph(tt);
     }
 }

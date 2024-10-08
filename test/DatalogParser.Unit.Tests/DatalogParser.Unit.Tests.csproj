@@ -29,9 +29,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <None Update="TestData\noaka_boundary.datalog">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
       <None Update="TestData\rule1.datalog">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

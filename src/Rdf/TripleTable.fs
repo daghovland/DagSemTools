@@ -11,8 +11,17 @@ type TripleTable(tripleList: Triple array,
                  subjectPredicateIndex: Dictionary<ResourceId, Dictionary<ResourceId, TripleListIndex list>>,
                  objectPredicateIndex: Dictionary<ResourceId, Dictionary<ResourceId, TripleListIndex list>>) =
         
-    member val TripleList = tripleList with get, set
+    let mutable TripleList = tripleList
     member val TripleCount = tripleCount with get, set
+    
+    member this.GetTriples() : Triple seq =
+        seq {
+            let mutable index = 0u
+            while index < this.TripleCount do
+                yield this.GetTripleListEntry index
+                index <- index + 1u
+        }
+            
     member val ThreeKeysIndex = threeKeysIndex with get, set
     member val PredicateIndex = predicateIndex with get, set
     member val SubjectPredicateIndex = subjectPredicateIndex with get, set
@@ -31,9 +40,9 @@ type TripleTable(tripleList: Triple array,
         
         
     member this.doubleTripleListSize () =
-        this.TripleList <- doubleArraySize this.TripleList
+        TripleList <- doubleArraySize TripleList
     member this.GetTripleListEntry (index: TripleListIndex) : Triple =
-        this.TripleList.[int index]
+        TripleList.[int index]
     
     member this.AddPredicateIndex (predicate: ResourceId, tripleIndex: TripleListIndex) =
         if this.PredicateIndex.ContainsKey predicate then
@@ -67,12 +76,12 @@ type TripleTable(tripleList: Triple array,
                 ()
             else
                 let nextTripleCount = this.TripleCount + 1u
-                if nextTripleCount > uint32(this.TripleList.Length) then
+                if nextTripleCount > uint32(TripleList.Length) then
                         this.doubleTripleListSize()   
                 this.AddSubjectPredicateIndex(triple.subject, triple.predicate, this.TripleCount)
                 this.AddObjectPredicateIndex(triple.object, triple.predicate, this.TripleCount)
                 this.AddPredicateIndex(triple.predicate, this.TripleCount) 
-                this.TripleList.[int(this.TripleCount)] <- triple
+                TripleList.[int(this.TripleCount)] <- triple
                 this.ThreeKeysIndex.Add(triple, this.TripleCount) |> ignore
                 this.TripleCount <- nextTripleCount
                 ()

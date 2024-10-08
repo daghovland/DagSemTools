@@ -1,11 +1,8 @@
-grammar Turtle;
+grammar TurtleResource;
 import TurtleTokens;
 
-turtleDoc : statement* EOF;
-
-statement: directive | triples PERIOD;
-
 directive: prefix | baseDeclaration ;
+
 
 prefix: PREFIX_STRING PNAME_NS iri  #sparqlPrefix
     | ATPREFIX PNAME_NS iri PERIOD #prefixId

@@ -11,7 +11,7 @@ using DagSemTools;
 using DagSemTools.Parser;
 using Microsoft.FSharp.Collections;
 using DagSemTools.Rdf;
-using DagSemTools.TurtleAntlr;
+using DagSemTools.Datalog.Parser;
 using IriTools;
 
 namespace DagSemTools.Datalog.Parser;

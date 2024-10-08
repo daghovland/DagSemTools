@@ -1,6 +1,6 @@
 using DagSemTools;
 using DagSemTools.Rdf;
-using DagSemTools.TurtleAntlr;
+using DagSemTools.Turtle.Parser;
 using FluentAssertions;
 using IriTools;
 using TestUtils;
@@ -30,7 +30,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology("<http://example.org/subject> a <http://example.org/object> .");
         Assert.NotNull(ont);
         Assert.Equal(1u, ont.Triples.TripleCount);
-        Assert.NotNull(ont.Triples.TripleList);
+        Assert.NotNull(ont.Triples.GetTriples());
     }
 
     [Fact]
@@ -72,7 +72,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """);
         Assert.NotNull(ont);
         ont.Triples.TripleCount.Should().Be(1);
-        var subjectId = ont.Triples.TripleList[0].subject;
+        var subjectId = ont.Triples.GetTriples().First().subject;
         var subjectIri = ont.GetResource(subjectId).iri;
         subjectIri.Should().Be("http://one.example/subject2");
     }
@@ -132,8 +132,8 @@ public class TestParser : IDisposable, IAsyncDisposable
                                p:subject4 p:predicate4 p:object4 .     # prefixed name, e.g., http://one.example/path/subject4
                                """);
         ont.Triples.TripleCount.Should().Be(1);
-        ont.Triples.TripleList[0].subject.Should().BeGreaterOrEqualTo(0);
-        ont.Triples.TripleList[0].predicate.Should().BeGreaterOrEqualTo(0);
+        ont.Triples.GetTriples().First().subject.Should().BeGreaterOrEqualTo(0);
+        ont.Triples.GetTriples().First().predicate.Should().BeGreaterOrEqualTo(0);
     }
 
     [Fact]
@@ -171,7 +171,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """);
         Assert.NotNull(ont);
         ont.Triples.TripleCount.Should().Be(1);
-        var triple = ont.Triples.TripleList[0];
+        var triple = ont.Triples.GetTriples().First();
         triple.subject.Should().BeGreaterOrEqualTo(0);
         triple.predicate.Should().BeGreaterOrEqualTo(0);
         triple.@object.Should().BeGreaterOrEqualTo(0);
@@ -363,7 +363,7 @@ public class TestParser : IDisposable, IAsyncDisposable
 
         var triplesWithMail = ont.GetTriplesWithPredicate(mbox).ToList();
         triplesWithMail.Should().HaveCount(1);
-        var ontTriples = ont.Triples.TripleList.Select(tr => ont.GetResourceTriple(tr));
+        var ontTriples = ont.Triples.GetTriples().Select(tr => ont.GetResourceTriple(tr));
 
         var eve = ont
             .GetTriplesWithPredicate(ont.GetResourceId(Ingress.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
@@ -385,7 +385,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ontexp = TestOntology(ontologyExp);
         Assert.NotNull(ontexp);
 
-        var ontexpTriples = ontexp.Triples.TripleList.Select(tr => ont.GetResourceTriple(tr));
+        var ontexpTriples = ontexp.Triples.GetTriples().Select(tr => ont.GetResourceTriple(tr));
         ontexpTriples.Should().BeEquivalentTo(ontTriples);
         ontexp.Triples.TripleCount.Should().Be(ont.Triples.TripleCount);
         ontexp.Resources.ResourceCount.Should().Be(ont.Resources.ResourceCount);
@@ -398,7 +398,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     [Fact]
     public void TestBlankNodePropertyList2()
     {
-        var ont = DagSemTools.TurtleAntlr.Parser.ParseString("""
+        var ont = Parser.ParseString("""
                PREFIX foaf: <http://xmlns.com/foaf/0.1/>
                
                 [ foaf:name "Alice" ].

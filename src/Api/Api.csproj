@@ -24,6 +24,8 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
+      <ProjectReference Include="..\Datalog\Datalog.fsproj" />
       <ProjectReference Include="..\Rdf\Rdf.fsproj" />
       <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
     </ItemGroup>

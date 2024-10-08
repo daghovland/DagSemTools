@@ -10,15 +10,15 @@ using System.Globalization;
 using Microsoft.FSharp.Collections;
 using DagSemTools.Rdf;
 
-namespace DagSemTools.Turtle.Parser;
+namespace DagSemTools.Datalog.Parser;
 using System.Collections.Generic;
 using IriTools;
-using static TurtleDocParser;
+using static DatalogParser;
 
 /// <summary>
 /// Visitor for the IRI grammar in the Turtle language.
 /// </summary>
-public class IriGrammarVisitor : TurtleDocBaseVisitor<IriReference>
+public class IriGrammarVisitor : DatalogBaseVisitor<IriReference>
 {
     private Dictionary<string, IriReference> _prefixes;
     private IriReference? _baseIriReference;

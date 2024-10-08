@@ -28,9 +28,12 @@
         <PackageReference Include="FSharp.Core" Version="8.0.400" />
     </ItemGroup>
     <ItemGroup>
-        <Antlr4 Include="grammars\Turtle.g4">
+        <Antlr4 Include="grammars\TurtleDoc.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
+        <None Update="grammars\TurtleResource.g4">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
         <None Update="grammars\TurtleTokens.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
@@ -42,6 +45,7 @@
     </ItemGroup>
     <ItemGroup>
       <Folder Include="grammars\" />
+      <Folder Include="grammars\gen\" />
     </ItemGroup>
 
             <ItemGroup>

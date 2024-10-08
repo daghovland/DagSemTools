@@ -13,7 +13,7 @@ using IriTools;
 using DagSemTools.Rdf;
 using DagSemTools.Parser;
 
-namespace DagSemTools.TurtleAntlr;
+namespace DagSemTools.Turtle.Parser;
 
 /// <summary>
 /// Parser for the Turtle language.
@@ -55,9 +55,9 @@ public static class Parser
     public static Datastore ParseReader(TextReader textReader, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
         var input = new AntlrInputStream(textReader);
-        var lexer = new TurtleLexer(input);
+        var lexer = new TurtleDocLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        var parser = new TurtleParser(tokens);
+        var parser = new TurtleDocParser(tokens);
         var customErrorListener = new ParserErrorListener(errorOutput);
         parser.RemoveErrorListeners();
         parser.AddErrorListener(customErrorListener);

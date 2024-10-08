@@ -1,5 +1,5 @@
 grammar Datalog;
-import Turtle;
+import TurtleResource;
 
 datalogProgram : (directive | rule)* EOF ;
 
