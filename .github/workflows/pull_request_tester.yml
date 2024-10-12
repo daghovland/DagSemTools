@@ -29,7 +29,7 @@ jobs:
       run: | 
         mkdir localNugetPackages
         dotnet build --configuration Release --output localNugetPackages  ./src/Rdf/Rdf.fsproj  
-        dotnet build --configuration Release --output localNugetPackages  ./src/AlcTableau/AlcTableau.fsproj ./src/Parser/Parser.csproj
+        dotnet build --configuration Release --output localNugetPackages  ./src/AlcTableau/AlcTableau.fsproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Parser/Parser.csproj
         dotnet build --configuration Release --output localNugetPackages  ./src/AlcTableau/AlcTableau.fsproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Datalog/Datalog.fsproj
