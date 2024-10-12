@@ -124,6 +124,17 @@ public class ResourceVisitor : DatalogBaseVisitor<uint>
         return tripleId;
     }
 
+    
+    /// <summary>
+    /// Visits the abbreviation 'a' for rdf:type
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public override uint VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context)
+    {
+        var iri = new IriReference(Namespaces.RdfType);
+        return GetIriId(iri);
+    }
 
     public override uint VisitBlankNodePropertyList(BlankNodePropertyListContext context)
     {

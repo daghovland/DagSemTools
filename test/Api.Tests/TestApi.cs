@@ -1,4 +1,5 @@
 using DagSemTools.Api;
+using DagSemTools.Rdf;
 using IriTools;
 using FluentAssertions;
 using Xunit.Abstractions;
@@ -69,6 +70,18 @@ public class TestApi(ITestOutputHelper output)
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsAfter.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void TestDatalog2()
+    {
+        var ontology = new FileInfo("TestData/test2.ttl");
+        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetTriplesWithObject(
+            new IriReference("http://example.com/data#insideBoundary")).ToList();
+        resultsData.Should().HaveCount(1);
+        resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
+        
     }
 
 }

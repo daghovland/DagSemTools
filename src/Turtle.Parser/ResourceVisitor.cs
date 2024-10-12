@@ -48,6 +48,17 @@ public class ResourceVisitor : TurtleDocBaseVisitor<uint>
         return GetIriId(iri);
     }
 
+    /// <summary>
+    /// Visits the abbreviation 'a' for rdf:type
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public override uint VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context)
+    {
+        var iri = new IriReference(Namespaces.RdfType);
+        return GetIriId(iri);
+    }
+    
     public override uint VisitIntegerLiteral(IntegerLiteralContext context)
     {
         int literal = int.Parse(context.INTEGER().GetText());

@@ -34,7 +34,10 @@ verbObjectList: verb annotatedObject (COMMA annotatedObject)*;
 annotatedObject : rdfobject annotation ;
 
 
-verb: predicate | RDF_TYPE_ABBR;
+verb: 
+    predicate #predicateVerb 
+    | RDF_TYPE_ABBR #rdfTypeAbbrVerb
+    ;
 
 RDF_TYPE_ABBR : 'a' ;
 
