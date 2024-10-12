@@ -25,11 +25,9 @@ jobs:
     - name: Format code
       run: dotnet format ./DagSemTools.sln --verbosity diagnostic --verify-no-changes --no-restore
 
-    - name: Restore dependencies
-      run: dotnet restore ./DagSemTools.sln
-
     - name: Build First round
       run: 
+        mkdir localNugetPackages
         dotnet build --configuration Release --output localNugetPackages  ./src/Rdf/Rdf.fsproj  
         dotnet build --configuration Release --output localNugetPackages  ./src/AlcTableau/AlcTableau.fsproj ./src/Parser/Parser.csproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Parser/Parser.csproj
@@ -39,12 +37,6 @@ jobs:
         dotnet build --configuration Release --output localNugetPackages  ./src/Manchester/Manchester.fsproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Manchester.Parser/Manchester.Parser.csproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Api/Api.csproj
-      
-    
-    
-    - name: Build Release
-      run: dotnet build --configuration Release ./DagSemTools.sln
-      
 
     - name: Run tests
       run: dotnet test ./DagSemTools.sln --no-restore
