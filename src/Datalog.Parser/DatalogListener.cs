@@ -22,12 +22,12 @@ internal class DatalogListener : DatalogBaseListener
 
     private readonly IriGrammarVisitor _iriGrammarVisitor;
     private readonly RuleAtomVisitor _ruleAtomVisitor;
-    public IEnumerable<Datalog.Rule> DatalogProgram { get; private set; }
+    public IEnumerable<Rule> DatalogProgram { get; private set; }
 
     internal DatalogListener(Datastore datastore, IVisitorErrorListener errorListener)
     {
         _errorListener = errorListener;
-        DatalogProgram = new List<Datalog.Rule>();
+        DatalogProgram = new List<Rule>();
         _iriGrammarVisitor = new IriGrammarVisitor(DefaultPrefixes());
         var resourceVisitor = new ResourceVisitor(datastore, _iriGrammarVisitor);
         var predicateVisitor = new PredicateVisitor(resourceVisitor);
@@ -99,7 +99,7 @@ internal class DatalogListener : DatalogBaseListener
         var body =
             context.body().ruleAtom()
                 .Select(b => _ruleAtomVisitor.Visit(b));
-        DatalogProgram = DatalogProgram.Append(new Datalog.Rule(headAtom, ListModule.OfSeq(body)));
+        DatalogProgram = DatalogProgram.Append(new Rule(headAtom, ListModule.OfSeq(body)));
     }
 
 }

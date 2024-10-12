@@ -9,7 +9,7 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Datalog</PackageId>
-        <Version>0.1.0</Version>
+        <Version>0.2.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For semi-positive datalog rules over Rdf</Description>
         <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>

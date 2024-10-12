@@ -29,7 +29,7 @@ public class Parser
     /// <param name="errorOutput"></param>
     /// <param name="datastore"></param>
     /// <returns></returns>
-    public static IEnumerable<Datalog.Rule> ParseFile(string filename, TextWriter errorOutput, Datastore datastore)
+    public static IEnumerable<Rule> ParseFile(string filename, TextWriter errorOutput, Datastore datastore)
     {
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader, errorOutput, datastore);
@@ -42,7 +42,7 @@ public class Parser
     /// <param name="errorOutput"></param>
     /// <param name="datastore"></param>
     /// <returns></returns>
-    public static IEnumerable<Datalog.Rule> ParseFile(FileInfo fInfo, TextWriter errorOutput, Datastore datastore)
+    public static IEnumerable<Rule> ParseFile(FileInfo fInfo, TextWriter errorOutput, Datastore datastore)
     {
         using TextReader textReader = File.OpenText(fInfo.FullName);
         return ParseReader(textReader, errorOutput, datastore);
@@ -56,7 +56,7 @@ public class Parser
     /// <param name="errorOutput"></param>
     /// <param name="datastore"></param>
     /// <returns></returns>
-    public static IEnumerable<Datalog.Rule> ParseString(string datalog, TextWriter errorOutput, Datastore datastore)
+    public static IEnumerable<Rule> ParseString(string datalog, TextWriter errorOutput, Datastore datastore)
     {
         using TextReader textReader = new StringReader(datalog);
         return ParseReader(textReader, errorOutput, datastore);
@@ -69,7 +69,7 @@ public class Parser
     /// <param name="errorOutput"></param>
     /// <param name="datastore"></param>
     /// <returns></returns>
-    public static IEnumerable<Datalog.Rule> ParseReader(TextReader textReader, TextWriter errorOutput,
+    public static IEnumerable<Rule> ParseReader(TextReader textReader, TextWriter errorOutput,
         Datastore datastore)
     {
         var input = new AntlrInputStream(textReader);

@@ -42,12 +42,19 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
-    <ItemGroup>
+    <!-- Use project references if BuildingProject is true -->
+    <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
         <ProjectReference Include="..\Parser\Parser.csproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
-        
     </ItemGroup>
+    <!-- Use NuGet package references if BuildingProject is not true -->
+    <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+        <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="0.2.0" />
+    </ItemGroup>
+
     <ItemGroup>
         <Folder Include="grammars\" />
         <Folder Include="grammars\gen\" />

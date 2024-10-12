@@ -5,7 +5,7 @@ using IriTools;
 namespace DagSemTools.Datalog.Parser;
 
 /// <inheritdoc />
-public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
+public class RuleAtomVisitor : DatalogBaseVisitor<RuleAtom>
 {
     internal TriplePatternVisitor TriplePatternVisitor { get; }
     /// <inheritdoc />
@@ -21,9 +21,9 @@ public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Datalog.RuleAtom VisitYesRuleAtom(DatalogParser.YesRuleAtomContext context)
+    public override RuleAtom VisitYesRuleAtom(DatalogParser.YesRuleAtomContext context)
     {
-        return Datalog.RuleAtom.NewPositiveTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
+        return RuleAtom.NewPositiveTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
     }
 
     /// <summary>
@@ -31,9 +31,9 @@ public class RuleAtomVisitor : DatalogBaseVisitor<Datalog.RuleAtom>
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Datalog.RuleAtom VisitNegativeRuleAtom(DatalogParser.NegativeRuleAtomContext context)
+    public override RuleAtom VisitNegativeRuleAtom(DatalogParser.NegativeRuleAtomContext context)
     {
-        return Datalog.RuleAtom.NewNotTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
+        return RuleAtom.NewNotTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
     }
 
 }

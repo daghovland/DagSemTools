@@ -3,7 +3,7 @@ using IriTools;
 
 namespace DagSemTools.Datalog.Parser;
 
-internal class TriplePatternVisitor : DatalogBaseVisitor<Datalog.TriplePattern>
+internal class TriplePatternVisitor : DatalogBaseVisitor<TriplePattern>
 {
     private readonly PredicateVisitor _predicateVisitor;
 
@@ -17,13 +17,13 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Datalog.TriplePattern>
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Datalog.TriplePattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
+    public override TriplePattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
     {
         var subject = context.term(0);
         var predicate = context.predicate();
         var @object = context.term(1);
 
-        return new Datalog.TriplePattern(
+        return new TriplePattern(
             _predicateVisitor.Visit(subject),
             _predicateVisitor.Visit(predicate),
             _predicateVisitor.Visit(@object)
@@ -31,16 +31,16 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Datalog.TriplePattern>
     }
 
     /// <inheritdoc />
-    public override Datalog.TriplePattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
+    public override TriplePattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
     {
         var subject = context.term();
-        var predicate = Datalog.ResourceOrVariable
+        var predicate = ResourceOrVariable
             .NewResource(_predicateVisitor.ResourceVisitor.Datastore
                 .AddResource(Rdf.Ingress.Resource
                     .NewIri(new IriReference(Rdf.Namespaces.RdfType))));
         var @class = context.predicate();
 
-        return new Datalog.TriplePattern(
+        return new TriplePattern(
                 _predicateVisitor.Visit(subject),
                 predicate,
                 _predicateVisitor.Visit(@class)

@@ -8,7 +8,7 @@
     <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.Turtle</PackageId>
+        <PackageId>DagSemTools.Turtle.Parser</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For parsing Rdf-1.2 Turtle</Description>

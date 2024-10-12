@@ -14,7 +14,7 @@ using DagSemTools.Datalog.Parser;
 using static DatalogParser;
 
 /// <inheritdoc />
-public class PredicateVisitor : DatalogBaseVisitor<Datalog.ResourceOrVariable>
+public class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
 {
     internal ResourceVisitor ResourceVisitor { get; }
 
@@ -25,23 +25,23 @@ public class PredicateVisitor : DatalogBaseVisitor<Datalog.ResourceOrVariable>
     }
 
     /// <inheritdoc />
-    public override Datalog.ResourceOrVariable VisitIri(DatalogParser.IriContext context)
+    public override ResourceOrVariable VisitIri(DatalogParser.IriContext context)
     {
         var resource = ResourceVisitor.VisitIri(context);
-        return Datalog.ResourceOrVariable.NewResource(resource);
+        return ResourceOrVariable.NewResource(resource);
     }
 
     /// <inheritdoc />
-    public override Datalog.ResourceOrVariable VisitLiteral(DatalogParser.LiteralContext context)
+    public override ResourceOrVariable VisitLiteral(DatalogParser.LiteralContext context)
     {
         var iriContext = new LiteralContext(context, context.invokingState);
 
-        return Datalog.ResourceOrVariable.NewResource(ResourceVisitor.VisitLiteral(iriContext));
+        return ResourceOrVariable.NewResource(ResourceVisitor.VisitLiteral(iriContext));
     }
 
     /// <inheritdoc />
-    public override Datalog.ResourceOrVariable VisitVariable(DatalogParser.VariableContext context)
+    public override ResourceOrVariable VisitVariable(DatalogParser.VariableContext context)
     {
-        return Datalog.ResourceOrVariable.NewVariable(context.GetText());
+        return ResourceOrVariable.NewVariable(context.GetText());
     }
 }
