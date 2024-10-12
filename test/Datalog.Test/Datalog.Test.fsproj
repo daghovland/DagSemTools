@@ -6,6 +6,8 @@
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
@@ -29,9 +31,19 @@
         <PackageReference Update="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\Datalog\Datalog.fsproj" />
+    <!-- Use project references for local development -->
+    <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
+    <ProjectReference Include="..\..\src\Datalog\Datalog.fsproj" />
       <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
+    </ItemGroup>
+
+    <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
+    <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+        <PackageReference Include="DagSemTools.Datalog" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
+    </ItemGroup>
+    
+    <ItemGroup>
       <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>
 
