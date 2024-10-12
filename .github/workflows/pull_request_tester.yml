@@ -31,7 +31,7 @@ jobs:
         dotnet build --configuration Release --output localNugetPackages  ./src/Rdf/Rdf.fsproj  
         dotnet build --configuration Release --output localNugetPackages  ./src/AlcTableau/AlcTableau.fsproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Parser/Parser.csproj
-        dotnet build --configuration Release --output localNugetPackages  ./src/AlcTableau/AlcTableau.fsproj
+        dotnet build --configuration Release --output localNugetPackages  ./src/Turtle.Parser/Turtle.Parser.csproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Datalog/Datalog.fsproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Datalog.Parser/Datalog.Parser.csproj
         dotnet build --configuration Release --output localNugetPackages  ./src/Manchester/Manchester.fsproj
