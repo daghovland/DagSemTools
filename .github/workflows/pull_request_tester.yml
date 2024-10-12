@@ -25,18 +25,25 @@ jobs:
     - name: Format code
       run: dotnet format ./DagSemTools.sln --verbosity diagnostic --verify-no-changes --no-restore
 
-    - name: Build First round
+    - name: Build projects
       run: | 
         mkdir localNugetPackages
-        dotnet build --configuration Release --output localNugetPackages  ./src/Rdf/Rdf.fsproj  
-        dotnet build --configuration Release --output localNugetPackages  ./src/AlcTableau/AlcTableau.fsproj
-        dotnet build --configuration Release --output localNugetPackages  ./src/Parser/Parser.csproj
-        dotnet build --configuration Release --output localNugetPackages  ./src/Turtle.Parser/Turtle.Parser.csproj
-        dotnet build --configuration Release --output localNugetPackages  ./src/Datalog/Datalog.fsproj
-        dotnet build --configuration Release --output localNugetPackages  ./src/Datalog.Parser/Datalog.Parser.csproj
-        dotnet build --configuration Release --output localNugetPackages  ./src/Manchester/Manchester.fsproj
-        dotnet build --configuration Release --output localNugetPackages  ./src/Manchester.Parser/Manchester.Parser.csproj
-        dotnet build --configuration Release --output localNugetPackages  ./src/Api/Api.csproj
+        projects=(
+          "Rdf"
+          "AlcTableau"
+          "Parser"
+          "Turtle.Parser"
+          "Datalog"
+          "Datalog.Parser"
+          "Manchester"
+          "Manchester.Parser"
+          "Api"
+        )
+        for project in "${projects[@]}"; do
+            echo "Building and packing project: $project"
+            dotnet build --configuration Release ".src/$project/$project.*sproj"
+            dotnet pack --configuration Release --output localNugetPackages ".src/$project/$project.*sproj"
+        done
 
     - name: Run tests
       run: dotnet test ./DagSemTools.sln --no-restore

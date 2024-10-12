@@ -89,6 +89,16 @@ public class TestParser
     }
 
     [Fact]
+    public void TestPrefixes()
+    {
+        var fInfo = File.ReadAllText("TestData/prefixes.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+        ont.First().Body.Count().Should().Be(2);
+    }
+    
+    [Fact]
     public void TestTypeAtom2()
     {
         var fInfo = File.ReadAllText("TestData/typeatom2.datalog");
