@@ -8,7 +8,7 @@
     <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageId>AlcTableau.Turtle</PackageId>
+        <PackageId>DagSemTools.Turtle</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For parsing Rdf-1.2 Turtle</Description>
@@ -21,6 +21,9 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+      <Configurations>Debug;Release;LocalDevelopment</Configurations>
+      <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
@@ -39,10 +42,19 @@
         </None>
         
     </ItemGroup>
-    <ItemGroup>
+
+    <!-- Use project references if BuildingProject is true -->
+    <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
         <ProjectReference Include="..\Parser\Parser.csproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
     </ItemGroup>
+    
+    <!-- Use NuGet package references if BuildingProject is not true -->
+    <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+        <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />
+    </ItemGroup>
+    
     <ItemGroup>
       <Folder Include="grammars\" />
       <Folder Include="grammars\gen\" />

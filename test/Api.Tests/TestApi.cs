@@ -70,4 +70,5 @@ public class TestApi(ITestOutputHelper output)
             new IriReference("https://example.com/data#object2"));
         resultsAfter.Should().HaveCount(1);
     }
+
 }

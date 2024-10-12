@@ -6,7 +6,7 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageId>AlcTableau.Rdf</PackageId>
+        <PackageId>DagSemTools.Rdf</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For Rdf, reasoning and querying</Description>

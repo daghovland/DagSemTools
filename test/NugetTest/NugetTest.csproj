@@ -21,10 +21,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="AlcTableau.Parser" Version="0.1.0"/>
-    <PackageReference Include="AlcTableau.Rdf" Version="0.1.0" />
-    <PackageReference Include="AlcTableau.Turtle" Version="0.1.0"/>
-    <PackageReference Include="AlcTableau.Api" Version="0.1.0"/>
+    <PackageReference Include="DagSemTools.Parser" Version="0.2.0"/>
+    <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
+    <PackageReference Include="DagSemTools.Turtle" Version="0.1.0"/>
+    <PackageReference Include="DagSemTools.Api" Version="0.2.0"/>
+    <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.2.0"/>
   </ItemGroup>
 
   <ItemGroup>

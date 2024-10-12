@@ -8,8 +8,8 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageId>AlcTableau.DatalogParser</PackageId>
-        <Version>0.1.0</Version>
+        <PackageId>DagSemTools.Datalog.Parser</PackageId>
+        <Version>0.2    .0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For parsing Datalog</Description>
         <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
@@ -21,8 +21,11 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <RootNamespace>DatalogAntlr</RootNamespace>
+        
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
+    
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
         <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />

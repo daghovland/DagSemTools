@@ -8,8 +8,8 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageId>AlcTableau.Parser</PackageId>
-        <Version>0.1.0</Version>
+        <PackageId>DagSemTools.Parser</PackageId>
+        <Version>0.2.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>Common parser library for AlcTableau</Description>
         <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
@@ -21,6 +21,8 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>

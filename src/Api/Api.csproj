@@ -8,8 +8,8 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageId>AlcTableau.Api</PackageId>
-        <Version>0.1.0</Version>
+        <PackageId>DagSemTools.Api</PackageId>
+        <Version>0.2.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For Rdf, reasoning and querying</Description>
         <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
@@ -21,15 +21,28 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
-    <ItemGroup>
+    <!-- Use project references if BuildingProject is true -->
+    <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
       <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
       <ProjectReference Include="..\Datalog\Datalog.fsproj" />
       <ProjectReference Include="..\Rdf\Rdf.fsproj" />
       <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
     </ItemGroup>
 
+    <!-- Use NuGet package references if BuildingProject is not true -->
+    <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+        <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.2.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Turtle" Version="0.1.0" />
+    </ItemGroup>
+    
     <ItemGroup>
         <None Update="README.md">
             <Pack>true</Pack>

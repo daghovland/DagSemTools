@@ -1,10 +1,11 @@
+using DagSemTools.Api;
 using IriTools;
 using Xunit.Abstractions;
 using FluentAssertions;
 
 namespace NugetTest;
 
-using AlcTableau.Api;
+using DagSemTools.Api;
 
 public class TestApi(ITestOutputHelper output)
 {
@@ -14,7 +15,7 @@ public class TestApi(ITestOutputHelper output)
     public void Test1()
     {
         var ontology = new FileInfo("TestData/example1.ttl");
-        var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = TurtleParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var enemies = ont.GetTriplesWithPredicate(new IriReference("http://www.perceive.net/schemas/relationship/enemyOf"));
@@ -29,7 +30,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestDbPedia()
     {
         var ontology = new FileInfo("DbpediaTests/test2.ttl");
-        var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = TurtleParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var subjects = ont.GetTriplesWithPredicate(new IriReference("http://purl.org/dc/terms/subject"));
@@ -42,7 +43,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestDbPediaOntology()
     {
         var ontology = new FileInfo("DbpediaTests/test1.ttl");
-        var ont = AlcTableau.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = TurtleParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var labels = ont.GetTriplesWithSubjectPredicate(
