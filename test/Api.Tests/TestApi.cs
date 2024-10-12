@@ -48,7 +48,7 @@ public class TestApi(ITestOutputHelper output)
             .Where(tr => tr.Object.Equals(new LiteralResource("Eve")));
         eve.Should().HaveCount(1);
     }
-    
+
     [Fact]
     public void TestDatalogReasoning()
     {

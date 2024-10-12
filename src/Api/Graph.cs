@@ -2,6 +2,7 @@
 using IriTools;
 using DagSemTools.Rdf;
 using Microsoft.FSharp.Collections;
+using DagSemTools.Datalog.Parser;
 
 namespace DagSemTools.Api;
 

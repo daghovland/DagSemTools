@@ -38,11 +38,15 @@
     <!-- Use NuGet package references if BuildingProject is not true -->
     <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
         <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
-        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.2.0" />
         <PackageReference Include="DagSemTools.Datalog" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.2.0" />
         <PackageReference Include="DagSemTools.Turtle" Version="0.1.0" />
     </ItemGroup>
     
+    <ItemGroup>
+        <PackageReference Include="FSharp.Core" Version="8.0.401" />
+        <PackageReference Include="IriTools" Version="2.2.0" />
+    </ItemGroup>    
     <ItemGroup>
         <None Update="README.md">
             <Pack>true</Pack>

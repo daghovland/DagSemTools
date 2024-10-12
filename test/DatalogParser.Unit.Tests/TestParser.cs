@@ -87,7 +87,7 @@ public class TestParser
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(2);
     }
-    
+
     [Fact]
     public void TestTypeAtom2()
     {
@@ -106,7 +106,7 @@ public class TestParser
             Datalog.ResourceOrVariable
                 .NewResource(datastore.GetResourceId(Ingress.Resource
                     .NewIri(new IriReference("https://example.com/data#type"))))));
-        
+
         ont.First().Body.First().Should().Be(Datalog.RuleAtom.NewPositiveTriple(new Datalog.TriplePattern(
             Datalog.ResourceOrVariable.NewVariable("?node"),
             Datalog.ResourceOrVariable
@@ -116,5 +116,5 @@ public class TestParser
                 .NewResource(datastore.GetResourceId(Ingress.Resource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }
-    
+
 }
