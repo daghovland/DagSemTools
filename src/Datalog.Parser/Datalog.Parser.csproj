@@ -9,7 +9,7 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Datalog.Parser</PackageId>
-        <Version>0.2    .0</Version>
+        <Version>0.2.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For parsing Datalog</Description>
         <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
