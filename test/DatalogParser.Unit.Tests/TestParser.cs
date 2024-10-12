@@ -97,7 +97,7 @@ public class TestParser
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(2);
     }
-    
+
     [Fact]
     public void TestTypeAtom2()
     {
