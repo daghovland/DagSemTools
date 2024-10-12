@@ -11,6 +11,6 @@ asset:Node-1 a test2:Block, example3:ExComponent;
                   test2:partOf asset:ExNetworkSegment-12;
                   <http://www.w3.org/2000/01/rdf-schema#label> "Node" .
 
-asset:Point-1 a test2:Block, example3:Equipment, <http://example.com/data#insideBoundary>;
+asset:Point-1 a test2:Block, example3:Equipment, <http://example.com/data#property>;
                    test2:hasTerminal asset:Nozzle-1, asset:Nozzle-2;
                    <http://www.w3.org/2000/01/rdf-schema#label> "Pump" .

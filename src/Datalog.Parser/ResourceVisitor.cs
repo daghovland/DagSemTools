@@ -124,7 +124,7 @@ public class ResourceVisitor : DatalogBaseVisitor<uint>
         return tripleId;
     }
 
-    
+
     /// <summary>
     /// Visits the abbreviation 'a' for rdf:type
     /// </summary>

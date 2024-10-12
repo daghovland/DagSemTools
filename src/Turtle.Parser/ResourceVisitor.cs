@@ -58,7 +58,7 @@ public class ResourceVisitor : TurtleDocBaseVisitor<uint>
         var iri = new IriReference(Namespaces.RdfType);
         return GetIriId(iri);
     }
-    
+
     public override uint VisitIntegerLiteral(IntegerLiteralContext context)
     {
         int literal = int.Parse(context.INTEGER().GetText());

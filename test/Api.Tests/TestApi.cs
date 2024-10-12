@@ -78,10 +78,10 @@ public class TestApi(ITestOutputHelper output)
         var ontology = new FileInfo("TestData/test2.ttl");
         var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
         var resultsData = ont.GetTriplesWithObject(
-            new IriReference("http://example.com/data#insideBoundary")).ToList();
+            new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
-        
+
     }
 
 }
