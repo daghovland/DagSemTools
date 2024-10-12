@@ -91,11 +91,22 @@ public class TestParser
     [Fact]
     public void TestPrefixes()
     {
+        
+        var datastore = new Datastore(1000);
         var fInfo = File.ReadAllText("TestData/prefixes.datalog");
-        var ont = TestProgram(fInfo).ToList();
+        var ont = DagSemTools.Datalog.Parser.Parser.ParseString(fInfo, _outputWriter, datastore).ToList();
+        
         ont.Should().NotBeNull();
         ont.Should().HaveCount(1);
-        ont.First().Body.Count().Should().Be(2);
+        ont.First().Body.Count().Should().Be(1);
+        ont.First().Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
+            ResourceOrVariable.NewVariable("?s"),
+            ResourceOrVariable
+                .NewResource(datastore.GetResourceId(Ingress.Resource
+                    .NewIri(new IriReference("https://example.com/data#predicate2")))),
+            ResourceOrVariable
+                .NewResource(datastore.GetResourceId(Ingress.Resource
+                    .NewIri(new IriReference("https://example.com/data3#obj")))))));
     }
 
     [Fact]
