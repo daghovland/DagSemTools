@@ -3,6 +3,26 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <OutputType>Library</OutputType>
+        <PackageReadMeFile>README.md</PackageReadMeFile>
+        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>DagSemTools.AlcTableau</PackageId>
+        <Version>0.1.0</Version>
+        <Authors>Dag Hovland</Authors>
+        <Description>For acyclic ALC ontologies</Description>
+        <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSource>true</IncludeSource>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        
     </PropertyGroup>
 
     <ItemGroup>
@@ -15,11 +35,21 @@
         <Compile Include="QueryingService.fs" />
         <Compile Include="ConjunctiveQuery.fs" />
         <Compile Include="ConjunctiveQueryAnswer.fs" />
+        <Content Include="README.md">
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </Content>
     </ItemGroup>
 
     <ItemGroup>
       <PackageReference Include="IriTools" Version="2.2.0" />
-      <PackageReference Update="FSharp.Core" Version="8.0.400" />
+      <PackageReference Update="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
 
+    <ItemGroup>
+        <None Update="README.md">
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </None>
+    </ItemGroup>
 </Project>

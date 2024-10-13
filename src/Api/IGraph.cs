@@ -1,7 +1,7 @@
 using IriTools;
-using AlcTableau.Rdf;
+using DagSemTools.Rdf;
 
-namespace AlcTableau.Api;
+namespace DagSemTools.Api;
 
 /// <summary>
 /// Represents an RDF Graph https://www.w3.org/TR/rdf12-concepts/
@@ -50,4 +50,13 @@ public interface IGraph
     /// <param name="obj"></param>
     /// <returns></returns>
     public IEnumerable<Triple> GetTriplesWithObject(IriReference obj);
+
+    /// <summary>
+    /// Loads and runs datalog rules from the file
+    /// Note that this adds new triples to the datastore
+    /// </summary>
+    /// <param name="datalog">The file with the datalog program</param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void LoadDatalog(FileInfo datalog);
+
 }

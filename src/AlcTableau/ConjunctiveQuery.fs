@@ -12,9 +12,9 @@
 
 *)
 
-module AlcTableau.ConjunctiveQuery
+module DagSemTools.AlcTableau.ConjunctiveQuery
 
-open AlcTableau.ALC
+open ALC
 open IriTools
 
 type ConceptSignature =

@@ -1,9 +1,8 @@
-namespace AlcTableau
+namespace DagSemTools.Datalog
 
 open System.Collections.Generic
-open AlcTableau.Rdf
-open AlcTableau.Rdf.Ingress
-open AlcTableau.Datalog
+open DagSemTools.Rdf.Ingress
+open DagSemTools.Datalog.Datalog
 
 
 module Stratifier =
@@ -20,7 +19,7 @@ module Stratifier =
     
     let GetRuleAtomRelation (atom : RuleAtom) : ResourceId option =
         let triple = match atom with
-                        | Triple t -> t
+                        | PositiveTriple t -> t
                         | NotTriple t -> t
         GetTriplePatternRelation triple                        
                  

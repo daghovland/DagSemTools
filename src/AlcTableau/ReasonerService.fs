@@ -10,11 +10,11 @@
     Contact: hovlanddag@gmail.com
 *)
 
-module AlcTableau.ReasonerService
+module DagSemTools.AlcTableau.ReasonerService
 
 open System
 open System.Collections.Generic
-open AlcTableau.ALC
+open DagSemTools.AlcTableau.ALC
 open IriTools
 
 open IriTools

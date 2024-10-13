@@ -22,17 +22,31 @@ jobs:
       with:
         dotnet-version: '8.x'
 
-    - name: Restore dependencies
-      run: dotnet restore ./AlcTableau.sln
-      
-    - name: Build Release
-      run: dotnet build --configuration Release ./AlcTableau.sln
-      
     - name: Format code
-      run: dotnet format ./AlcTableau.sln --verbosity diagnostic --verify-no-changes --no-restore
+      run: dotnet format ./DagSemTools.sln --verbosity diagnostic --verify-no-changes --no-restore
+
+    - name: Build projects
+      run: | 
+        mkdir localNugetPackages
+        projects=(
+          "Rdf"
+          "AlcTableau"
+          "Parser"
+          "Turtle.Parser"
+          "Datalog"
+          "Datalog.Parser"
+          "Manchester"
+          "Manchester.Parser"
+          "Api"
+        )
+        for project in "${projects[@]}"; do
+            echo "Building and packing project: $project"
+            dotnet build --configuration Release ./src/$project/$project.*sproj
+            dotnet pack --configuration Release --output localNugetPackages ./src/$project/$project.*sproj
+        done
 
     - name: Run tests
-      run: dotnet test ./AlcTableau.sln --no-restore
+      run: dotnet test ./DagSemTools.sln 
       
     - name: Run nuget package tests
       run: dotnet test test/NugetTest/NugetTest.sln

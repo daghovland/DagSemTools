@@ -3,12 +3,44 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageReadMeFile>README.md</PackageReadMeFile>
+        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageId>DagSemTools.Datalog</PackageId>
+        <Version>0.2.0</Version>
+        <Authors>Dag Hovland</Authors>
+        <Description>For semi-positive datalog rules over Rdf</Description>
+        <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSource>true</IncludeSource>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
         <Compile Include="Library.fs"/>
         <Compile Include="Stratifier.fs" />
         <Compile Include="Reasoner.fs" />
+        <Content Include="README.md">
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </Content>
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <None Update="README.md">
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </None>
     </ItemGroup>
 
     <ItemGroup>
@@ -16,7 +48,7 @@
     </ItemGroup>
 
     <ItemGroup>
-      <PackageReference Update="FSharp.Core" Version="8.0.400" />
+      <PackageReference Update="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
 
 </Project>

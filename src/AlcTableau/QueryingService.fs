@@ -11,11 +11,11 @@
     Contact: hovlanddag@gmail.com
 
 *)
-module AlcTableau.QueryingService
+module DagSemTools.AlcTableau.QueryingService
 
 open System
 open System.Collections.Generic
-open AlcTableau.ALC
+open ALC
 open IriTools
 
 type QueryingCache = {

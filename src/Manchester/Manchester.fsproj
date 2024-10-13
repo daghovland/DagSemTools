@@ -3,12 +3,14 @@
         <OutputType>Library</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     <ItemGroup>
         <Compile Include="Printer.fs" />
     </ItemGroup>
     <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="8.0.400" />
+        <PackageReference Update="FSharp.Core" Version="8.0.401" />
         <PackageReference Include="IriTools" Version="2.2.0" />
     </ItemGroup>
     <ItemGroup>

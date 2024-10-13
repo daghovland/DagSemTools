@@ -11,10 +11,9 @@
     Contact: hovlanddag@gmail.com
 
 *)
-module Manchester.Printer
+module DagSemTools.Manchester.Printer
 
-open AlcTableau.ALC
-open IriTools
+open DagSemTools.AlcTableau.ALC
 
 let printRole (role: Role) = 
     role.ToString()

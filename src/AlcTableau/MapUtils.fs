@@ -6,7 +6,7 @@
     Contact: hovlanddag@gmail.com
 *)
 
-module AlcTableau.MapUtils
+module DagSemTools.AlcTableau.MapUtils
 
 open System
 open IriTools

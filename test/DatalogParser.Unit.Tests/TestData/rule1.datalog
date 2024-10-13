@@ -1,0 +1,4 @@
+prefix ex: <https://example.com/data#>
+
+[?s, <https://example.com/data#predicate>, ex:obj] :- 
+    [?s, <https://example.com/data#predicate2>, ex:obj].

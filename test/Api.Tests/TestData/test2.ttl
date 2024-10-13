@@ -1,0 +1,16 @@
+@prefix test2: <http://ns.test2id.org/test2#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix test2: <http://ns.test2id.org/test2#> .
+prefix asset: <http://example.com/asset#> 
+prefix example3: <http://example.com/example3#> 
+prefix data: <http://example.com/data#> 
+
+
+asset:Node-1 a test2:Block, example3:ExComponent;
+                  test2:hasTerminal asset:Node-1_input, asset:Node-1_output;
+                  test2:partOf asset:ExNetworkSegment-12;
+                  <http://www.w3.org/2000/01/rdf-schema#label> "Node" .
+
+asset:Point-1 a test2:Block, example3:Equipment, <http://example.com/data#property>;
+                   test2:hasTerminal asset:Nozzle-1, asset:Nozzle-2;
+                   <http://www.w3.org/2000/01/rdf-schema#label> "Pump" .

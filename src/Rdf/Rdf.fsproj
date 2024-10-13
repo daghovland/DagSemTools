@@ -6,7 +6,7 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-        <PackageId>AlcTableau.Rdf</PackageId>
+        <PackageId>DagSemTools.Rdf</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For Rdf, reasoning and querying</Description>
@@ -19,9 +19,12 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Namespaces.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
@@ -37,7 +40,7 @@
 
     <ItemGroup>
         <PackageReference Include="IriTools" Version="2.2.0" />
-        <PackageReference Update="FSharp.Core" Version="8.0.400" />
+        <PackageReference Update="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
 
     <ItemGroup>

@@ -1,0 +1,4 @@
+prefix ex: <https://example.com/data#>
+
+ex:type [?new_node] :- 
+    ex:type [?node] .

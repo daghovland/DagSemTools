@@ -1,7 +1,10 @@
-﻿using IriTools;
-using AlcTableau.Rdf;
+﻿using DagSemTools.Datalog;
+using IriTools;
+using DagSemTools.Rdf;
+using Microsoft.FSharp.Collections;
+using DagSemTools.Datalog.Parser;
 
-namespace AlcTableau.Api;
+namespace DagSemTools.Api;
 
 /// <summary>
 /// Implementation of a rdf graph. 
@@ -14,6 +17,21 @@ public class Graph : IGraph
     }
 
     private Datastore Triples { get; init; }
+
+    /// <summary>
+    /// Loads and runs datalog rules from the file
+    /// Note that this adds new triples to the datastore
+    /// </summary>
+    /// <param name="datalog">The file with the datalog program</param>
+    /// <exception cref="InvalidOperationException"></exception>
+    public void LoadDatalog(FileInfo datalog)
+    {
+        var rules = Datalog.Parser.Parser.ParseFile(datalog, System.Console.Error,
+            Triples ?? throw new InvalidOperationException());
+        var datalogProgram = new DatalogProgram(ListModule.OfSeq(rules), Triples);
+        datalogProgram.materialise();
+    }
+
 
     /// <inheritdoc />
     public bool isEmpty() => Triples.Triples.TripleCount == 0;

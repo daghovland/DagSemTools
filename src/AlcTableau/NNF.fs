@@ -7,10 +7,8 @@
 *)
 
 
-namespace AlcTableau
+namespace DagSemTools.AlcTableau
 
-open AlcTableau.ALC
-open IriTools
 open ALC
 
 module NNF = 

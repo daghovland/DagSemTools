@@ -6,6 +6,8 @@
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
+        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
@@ -35,9 +37,6 @@
         <Content Include="TestData\exist_univ.owl">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Content Include="TestData\pandid.owl">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Content>
         <Content Include="TestData\simple_disjunction.owl">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
@@ -49,18 +48,31 @@
     <ItemGroup>
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
         
-        <PackageReference Include="xunit" Version="2.9.0" />
+        <PackageReference Include="xunit" Version="2.9.2" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Update="FSharp.Core" Version="8.0.400" />
+        <PackageReference Update="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
-      <ProjectReference Include="..\..\src\ManchesterAntlr\ManchesterAntlr.csproj" />
+    <!-- Use project references for local development -->
+    <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
+    <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
+      <ProjectReference Include="..\..\src\Manchester.Parser\Manchester.Parser.csproj" />
       <ProjectReference Include="..\..\src\Manchester\Manchester.fsproj" />
+    </ItemGroup>
+
+
+    <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
+    <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+        <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Manchester.Parser" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Manchester" Version="0.1.0" />
+    </ItemGroup>
+    
+    
+    <ItemGroup>
       <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>
 
