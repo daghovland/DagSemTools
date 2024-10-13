@@ -72,7 +72,7 @@ module Datalog =
         | NotTriple t -> $"not {TriplePatternToString tripleTable t}"
         
     let ConstantTriplePattern (triple : Ingress.Triple) : TriplePattern = 
-        {Subject = ResourceOrVariable.Resource triple.subject; Predicate = ResourceOrVariable.Resource triple.predicate; Object = ResourceOrVariable.Resource triple.object}
+        {Subject = ResourceOrVariable.Resource triple.subject; Predicate = ResourceOrVariable.Resource triple.predicate; Object = ResourceOrVariable.Resource triple.obj}
     
     /// Generate all 8 possible triple patterns with wildcards for a given triple pattern
     /// Duplicate patterns are ok since these are used as a key in a dictionary
@@ -121,7 +121,7 @@ module Datalog =
         {
          Ingress.subject = ApplySubstitutionResource sub triple.Subject
          Ingress.predicate = ApplySubstitutionResource sub triple.Predicate
-         Ingress.object = ApplySubstitutionResource sub triple.Object 
+         Ingress.obj = ApplySubstitutionResource sub triple.Object 
         }
     
     
@@ -141,7 +141,7 @@ module Datalog =
         let resourceList = [
                             (fact.subject, factPattern.Subject)
                             (fact.predicate, factPattern.Predicate)
-                            (fact.object, factPattern.Object)
+                            (fact.obj, factPattern.Object)
                             ]
         resourceList |> Seq.fold GetSubstitutionOption (Some subs)
         
@@ -195,18 +195,18 @@ module Datalog =
                             }
         let matchedTriples = (
             match mappedTriple.Subject, mappedTriple.Predicate, mappedTriple.Object with
-            | ResourceOrVariable.Resource s, Variable p, Variable o -> 
+            | ResourceOrVariable.Resource s, Variable _p, Variable _o -> 
                     rdf.GetTriplesWithSubject(s)
-            | Variable s, ResourceOrVariable.Resource p, Variable o -> 
-                    rdf.GetTriplesWithObject(p)
-            | Variable s, Variable p, ResourceOrVariable.Resource o -> 
-                    rdf.GetTriplesWithSubject(o)
-            | ResourceOrVariable.Resource s, ResourceOrVariable.Resource p, Variable o -> 
+            | Variable _s, ResourceOrVariable.Resource p, Variable _o -> 
+                    rdf.GetTriplesWithPredicate(p)
+            | Variable _s, Variable _p, ResourceOrVariable.Resource o -> 
+                    rdf.GetTriplesWithObject(o)
+            | ResourceOrVariable.Resource s, ResourceOrVariable.Resource p, Variable _o -> 
                     rdf.GetTriplesWithSubjectPredicate(s, p)
-            | Variable s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
+            | Variable _s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
                     rdf.GetTriplesWithObjectPredicate(o, p)
             | ResourceOrVariable.Resource s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
-                    match rdf.ThreeKeysIndex.TryGetValue {subject = s; predicate = p; object = o} with
+                    match rdf.ThreeKeysIndex.TryGetValue {subject = s; predicate = p; obj = o} with
                     | false,_ -> []
                     | true, v -> [rdf.GetTripleListEntry v]                    
             | ResourceOrVariable.Resource s, Variable p, ResourceOrVariable.Resource o ->

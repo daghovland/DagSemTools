@@ -34,7 +34,7 @@ let ``Can add triple to tripletable`` () =
     let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     Assert.Equal(3u, tripleTable.Resources.ResourceCount)
     Assert.Equal(1u, tripleTable.Triples.TripleCount)
@@ -49,7 +49,7 @@ let ``Can query with subject to tripletable`` () =
     let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithSubject(subjectIndex)
     Assert.Single(query)
@@ -61,7 +61,7 @@ let ``Can query with object to tripletable`` () =
     let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithObject(objdIndex)
     Assert.Single(query)
@@ -74,7 +74,7 @@ let ``Can query with subject object to tripletable`` () =
     let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objdIndex)
     Assert.Single(query)
@@ -87,8 +87,8 @@ let ``Can query with resources to larger tripletable`` () =
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
     let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
-    let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+    let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
     tripleTable.AddTriple(Triple)
     tripleTable.AddTriple(Triple2)
     let squery = tripleTable.GetTriplesWithSubject(subjectIndex)
@@ -106,6 +106,26 @@ let ``Can query with resources to larger tripletable`` () =
         .HaveLength(2, "There are two triples in the store with the same predicate") |> ignore
     
 
+[<Fact>]
+let ``Can get ObjectPredicate index after two triples`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
+            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2}
+            tripleTable.AddTriple(Subject1Obj1)
+            tripleTable.AddTriple(Subject2Obj2)
+            tripleTable.AddTriple(Subject1Subj2)
+    
+            let o1query = tripleTable.GetTriplesWithObject(objdIndex)
+            Assert.Single(o1query) |> ignore
+
     
 [<Fact>]
 let ``Can query with subject object to larger tripletable`` () =
@@ -114,8 +134,8 @@ let ``Can query with subject object to larger tripletable`` () =
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
     let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
-    let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex2}
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+    let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
     tripleTable.AddTriple(Triple)
     tripleTable.AddTriple(Triple2)
     let squery = tripleTable.GetTriplesWithSubject(subjectIndex)
@@ -137,7 +157,7 @@ let ``Can query with subject predicate when object is literal`` () =
     let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddResource(Ingress.LangLiteral("object", "en"))
-    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let squery = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
     Assert.Equal(1, Seq.length squery)
@@ -153,7 +173,7 @@ let ``Can query with predicate to tripletable`` () =
     let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; object = objdIndex}
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithPredicate(predIndex)
     Assert.Single(query)

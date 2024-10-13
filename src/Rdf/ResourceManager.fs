@@ -50,6 +50,6 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
         {
           TripleResource.subject = ResourceList.[int triple.subject]
           TripleResource.predicate = ResourceList.[int triple.predicate]
-          TripleResource.obj = ResourceList.[int triple.object]
+          TripleResource.obj = ResourceList.[int triple.obj]
         }
         

@@ -64,7 +64,7 @@ module Ingress =
     type Triple = {
             subject: ResourceId
             predicate: ResourceId
-            object: ResourceId
+            obj: ResourceId
         }
         
     [<Struct>]
@@ -72,7 +72,7 @@ module Ingress =
             tripleId: ResourceId
             subject: ResourceId
             predicate: ResourceId
-            object: ResourceId
+            obj: ResourceId
         }
     
     [<Struct>]
