@@ -1,0 +1,11 @@
+@prefix test2: <http://ns.test2id.org/test2#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix test2: <http://ns.test2id.org/test2#> .
+prefix asset: <http://example.com/asset#> 
+prefix example3: <http://example.com/example3#> 
+prefix data: <http://example.com/data#> 
+
+data:property[?node2] :-
+    data:property[?node1] ,
+    test2:hasTerminal[?node1, ?node2] .
+

@@ -174,7 +174,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var triple = ont.Triples.GetTriples().First();
         triple.subject.Should().BeGreaterOrEqualTo(0);
         triple.predicate.Should().BeGreaterOrEqualTo(0);
-        triple.@object.Should().BeGreaterOrEqualTo(0);
+        triple.obj.Should().BeGreaterOrEqualTo(0);
     }
 
     [Fact]
@@ -294,7 +294,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.Triples.TripleCount.Should().Be(3);
         var reifications = ont.GetTriplesWithPredicate(ont.GetResourceId(Ingress.Resource.NewIri(new IriReference(Namespaces.RdfReifies)))).ToList();
         reifications.Should().HaveCount(1);
-        var tripleId = reifications.First().@object;
+        var tripleId = reifications.First().obj;
         ont.GetReifiedTriplesWithId(tripleId).Should().HaveCount(1);
     }
 
@@ -339,7 +339,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var triplesWithName = ont.GetTriplesWithPredicate(name).ToList();
         triplesWithName.Should().HaveCount(1);
 
-        triplesWithKnows.First().@object.Should().Be(triplesWithName.First().subject);
+        triplesWithKnows.First().obj.Should().Be(triplesWithName.First().subject);
     }
     [Fact]
     public void TestAbbreviatedBlankNode()
@@ -357,7 +357,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var triplesWithName = ont.GetTriplesWithPredicate(name).ToList();
         triplesWithName.Should().HaveCount(3);
 
-        triplesWithKnows.First().@object.Should().Be(triplesWithName.Skip(1).First().subject);
+        triplesWithKnows.First().obj.Should().Be(triplesWithName.Skip(1).First().subject);
 
         var mbox = ont.GetResourceId(Ingress.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox")));
 
@@ -367,13 +367,13 @@ public class TestParser : IDisposable, IAsyncDisposable
 
         var eve = ont
             .GetTriplesWithPredicate(ont.GetResourceId(Ingress.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetResource(tr.@object).literal.Equals("Eve"));
+            .Where(tr => ont.GetResource(tr.obj).literal.Equals("Eve"));
         eve.Should().HaveCount(1);
 
 
         var alice = ont
             .GetTriplesWithPredicate(ont.GetResourceId(Ingress.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetResource(tr.@object).literal.Equals("Alice"));
+            .Where(tr => ont.GetResource(tr.obj).literal.Equals("Alice"));
         alice.Should().HaveCount(1);
 
 
@@ -405,7 +405,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """, _outputWriter);
         var alice = ont
             .GetTriplesWithPredicate(ont.GetResourceId(Ingress.Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetResource(tr.@object).literal.Equals("Alice"));
+            .Where(tr => ont.GetResource(tr.obj).literal.Equals("Alice"));
         alice.Should().HaveCount(1);
 
     }

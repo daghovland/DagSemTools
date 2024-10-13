@@ -39,8 +39,8 @@ module Stratifier =
         bodyRules |> Seq.except intentionalRelations |> Seq.distinct
   
     
-    (* Returns any rules containing negations of intensional properties. These relations make the program not semipositive *)
-    let NegativeIntenstionalProperties (rules : Rule list) =
+    (* Returns any rules containing negations of intentional properties. These relations make the program not semipositive *)
+    let NegativeIntentionalProperties (rules : Rule list) =
         let intentionalRelations =
                 rules
                 |> GetIntentionalRelations
@@ -55,7 +55,7 @@ module Stratifier =
           
     (* A datalog program is semi-positive if negations only occur onextensional relations (Relations that do not occur in the head of any rule) *)
     let IsSemiPositiveProgram (rules : Rule list) =
-        NegativeIntenstionalProperties rules |> Seq.isEmpty
+        NegativeIntentionalProperties rules |> Seq.isEmpty
   
     
     type RulePartitioner(num_concepts: int, rules: Rule list) =

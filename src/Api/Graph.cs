@@ -86,7 +86,7 @@ public class Graph : IGraph
     private Triple GetTriple(Ingress.Triple triple) =>
     new Triple(this.GetBlankNodeOrIriResource(triple.subject),
             GetIriResource(triple.predicate).Iri,
-            GetResource(triple.@object));
+            GetResource(triple.obj));
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>

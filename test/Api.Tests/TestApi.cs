@@ -73,6 +73,18 @@ public class TestApi(ITestOutputHelper output)
     }
 
     [Fact]
+    public void TestA()
+    {
+        var ontology = new FileInfo("TestData/test2.ttl");
+        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetTriplesWithObject(
+            new IriReference("http://example.com/data#property")).ToList();
+        resultsData.Should().HaveCount(1);
+        resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
+
+    }
+
+    [Fact]
     public void TestDatalog2()
     {
         var ontology = new FileInfo("TestData/test2.ttl");
@@ -81,6 +93,13 @@ public class TestApi(ITestOutputHelper output)
             new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
+
+        var datalogFile = new FileInfo("TestData/test2.datalog");
+        ont.LoadDatalog(datalogFile);
+
+        resultsData = ont.GetTriplesWithObject(
+            new IriReference("http://example.com/data#property")).ToList();
+        resultsData.Should().HaveCount(3);
 
     }
 

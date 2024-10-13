@@ -38,7 +38,7 @@ open Stratifier
                 |> Seq.collect (Seq.collect (GetMatchesForRule fact))
         
         member this.materialise() =
-            let negRules = NegativeIntenstionalProperties Rules
+            let negRules = NegativeIntentionalProperties Rules
             if not(negRules |> Seq.isEmpty) then
                 let exRuleString = negRules |> Seq.head |> RuleToString tripleStore
                 raise (new System.ArgumentException($"Program is not semi-positive, f.ex. rule {exRuleString}"))

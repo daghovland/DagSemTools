@@ -84,7 +84,7 @@ type QuadTable(quadList: Quad array,
                 if nextQuadCount > uint32(this.QuadList.Length) then
                         this.doubleQuadListSize()   
                 this.AddSubjectPredicateIndex(quad.subject, quad.predicate, this.QuadCount)
-                this.AddObjectPredicateIndex(quad.object, quad.predicate, this.QuadCount)
+                this.AddObjectPredicateIndex(quad.obj, quad.predicate, this.QuadCount)
                 this.AddPredicateIndex(quad.predicate, this.QuadCount)
                 this.AddTripleIdIndex(quad.tripleId, this.QuadCount)
                 this.QuadList.[int(this.QuadCount)] <- quad
@@ -116,6 +116,6 @@ type QuadTable(quadList: Quad array,
             
         member this.GetQuadsWithSubjectObject (subject: ResourceId, object: ResourceId) : Quad seq =
             this.GetQuadsWithSubject subject
-                |> Seq.where (fun triple ->  triple.object = object)
+                |> Seq.where (fun triple ->  triple.obj = object)
         
        

@@ -25,7 +25,7 @@ type Datastore(triples: TripleTable,
         this.Triples.AddTriple triple
     
     member this.AddReifiedTriple (triple: Triple, id: ResourceId) =
-        this.ReifiedTriples.AddQuad { tripleId = id; subject = triple.subject; predicate = triple.predicate; object = triple.object }
+        this.ReifiedTriples.AddQuad { tripleId = id; subject = triple.subject; predicate = triple.predicate; obj = triple.obj }
     
         
     member this.AddResource (resource: Resource) : ResourceId =

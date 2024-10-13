@@ -61,15 +61,15 @@ type TripleTable(tripleList: Triple array,
         existSubjectMap.[predicate] <- tripleIndex :: existSubjectPredicateList
         this.SubjectPredicateIndex.[subject] <- existSubjectMap
         
-    member this.AddObjectPredicateIndex (object: ResourceId, predicate: ResourceId, tripleIndex: TripleListIndex) =
-        let existObjectMap = match  (this.ObjectPredicateIndex.TryGetValue object) with 
+    member this.AddObjectPredicateIndex (obj: ResourceId, predicate: ResourceId, tripleIndex: TripleListIndex) =
+        let existObjectMap = match  (this.ObjectPredicateIndex.TryGetValue obj) with 
                                 |    true, objMap -> objMap
                                 |    false, _ -> new Dictionary<ResourceId, TripleListIndex list>()
         let existSubjectPredicateList = match (existObjectMap.TryGetValue predicate) with
                                         | true, objPredList -> objPredList
                                         | false, _ -> []
         existObjectMap.[predicate] <- tripleIndex :: existSubjectPredicateList
-        this.ObjectPredicateIndex.[object] <- existObjectMap
+        this.ObjectPredicateIndex.[obj] <- existObjectMap
             
     member this.AddTriple (triple : Ingress.Triple) =
             if this.ThreeKeysIndex.ContainsKey triple then
@@ -79,7 +79,7 @@ type TripleTable(tripleList: Triple array,
                 if nextTripleCount > uint32(TripleList.Length) then
                         this.doubleTripleListSize()   
                 this.AddSubjectPredicateIndex(triple.subject, triple.predicate, this.TripleCount)
-                this.AddObjectPredicateIndex(triple.object, triple.predicate, this.TripleCount)
+                this.AddObjectPredicateIndex(triple.obj, triple.predicate, this.TripleCount)
                 this.AddPredicateIndex(triple.predicate, this.TripleCount) 
                 TripleList.[int(this.TripleCount)] <- triple
                 this.ThreeKeysIndex.Add(triple, this.TripleCount) |> ignore
@@ -87,26 +87,34 @@ type TripleTable(tripleList: Triple array,
                 ()
             
         member this.GetTriplesWithSubject (subject: ResourceId) : Triple seq =
-            let subjectIndex = this.SubjectPredicateIndex.[subject]
-            subjectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetTripleListEntry e) 
+            match  (this.SubjectPredicateIndex.TryGetValue subject) with 
+                                |    true, subjMap -> subjMap |> Seq.collect (fun x -> x.Value) |> Seq.map this.GetTripleListEntry
+                                |    false, _ -> []
             
-            
-        member this.GetTriplesWithObject (object: ResourceId) : Triple seq =
-            let objectIndex = this.ObjectPredicateIndex.[object]
+        member this.GetTriplesWithObject (obj: ResourceId) : Triple seq =
+            let objectIndex = this.ObjectPredicateIndex.[obj]
             objectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetTripleListEntry e) 
             
         member this.GetTriplesWithPredicate (predicate: ResourceId) : Triple seq =
             this.PredicateIndex.[predicate] |> Seq.map (fun e -> this.GetTripleListEntry e) 
             
         member this.GetTriplesWithSubjectPredicate (subject: ResourceId, predicate: ResourceId) =
-            this.SubjectPredicateIndex.[subject].[predicate] |> Seq.map (fun e -> this.GetTripleListEntry e)
+            match  (this.SubjectPredicateIndex.TryGetValue subject) with 
+                                |    true, subjMap -> match subjMap.TryGetValue predicate with
+                                                        |    true, subjPredList -> subjPredList |> Seq.map (fun e -> this.GetTripleListEntry e)
+                                                        |    false, _ -> []
+                                |    false, _ -> []
             
             
-        member this.GetTriplesWithObjectPredicate (object: ResourceId, predicate: ResourceId) =
-            this.ObjectPredicateIndex.[object].[predicate] |> Seq.map (fun e -> this.GetTripleListEntry e)
+        member this.GetTriplesWithObjectPredicate (obj: ResourceId, predicate: ResourceId) =
+            match  (this.ObjectPredicateIndex.TryGetValue obj) with 
+                                |    true, objMap -> match objMap.TryGetValue predicate with
+                                                        |    true, objPredList -> objPredList |> Seq.map (fun e -> this.GetTripleListEntry e)
+                                                        |    false, _ -> []
+                                |    false, _ -> []
             
         member this.GetTriplesWithSubjectObject (subject: ResourceId, object: ResourceId) : Triple seq =
             this.GetTriplesWithSubject subject
-                |> Seq.where (fun triple ->  triple.object = object)
+                |> Seq.where (fun triple ->  triple.obj = object)
         
        
