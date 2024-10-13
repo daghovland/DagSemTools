@@ -81,9 +81,9 @@ public class TestApi(ITestOutputHelper output)
             new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
-        
+
     }
-    
+
     [Fact]
     public void TestDatalog2()
     {
@@ -93,7 +93,7 @@ public class TestApi(ITestOutputHelper output)
             new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
-        
+
         var datalogFile = new FileInfo("TestData/test2.datalog");
         ont.LoadDatalog(datalogFile);
 
