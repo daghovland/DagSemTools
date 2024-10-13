@@ -5,11 +5,11 @@ using IriTools;
 namespace DagSemTools.Datalog.Parser;
 
 /// <inheritdoc />
-public class RuleAtomVisitor : DatalogBaseVisitor<RuleAtom>
+internal class RuleAtomVisitor : DatalogBaseVisitor<RuleAtom>
 {
     internal TriplePatternVisitor TriplePatternVisitor { get; }
     /// <inheritdoc />
-    public RuleAtomVisitor(PredicateVisitor predicateVisitor)
+    internal RuleAtomVisitor(PredicateVisitor predicateVisitor)
     {
         TriplePatternVisitor = new TriplePatternVisitor(predicateVisitor);
     }

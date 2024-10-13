@@ -1,0 +1,9 @@
+
+prefix data: <http://example.com/data#> 
+
+data:Type3[?node2] :-
+    NOT data:Type2[?node1] .
+    
+data:Type2[?node2] :-
+    NOT data:TypeN[?node1] .
+

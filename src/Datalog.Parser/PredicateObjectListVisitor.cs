@@ -3,7 +3,7 @@ using DagSemTools.Rdf;
 namespace DagSemTools.Datalog.Parser;
 using static DatalogParser;
 
-public class PredicateObjectListVisitor : DatalogBaseVisitor<Func<uint, List<Ingress.Triple>>>
+internal class PredicateObjectListVisitor : DatalogBaseVisitor<Func<uint, List<Ingress.Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
 

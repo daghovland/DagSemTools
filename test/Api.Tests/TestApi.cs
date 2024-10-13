@@ -103,4 +103,28 @@ public class TestApi(ITestOutputHelper output)
 
     }
 
+    
+    
+    [Fact]
+    public void TestDatalogStratified()
+    {
+        var ontology = new FileInfo("TestData/test_stratified.ttl");
+        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetTriplesWithObject(
+            new IriReference("http://example.com/data#Type")).ToList();
+        resultsData.Should().HaveCount(1);
+        resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
+
+        resultsData = ont.GetTriplesWithObject(
+            new IriReference("http://example.com/data#Type3")).ToList();
+        resultsData.Should().HaveCount(0);
+        
+        var datalogFile = new FileInfo("TestData/test_stratified.datalog");
+        ont.LoadDatalog(datalogFile);
+
+        resultsData = ont.GetTriplesWithObject(
+            new IriReference("http://example.com/data#Tye3")).ToList();
+        resultsData.Should().HaveCount(1);
+
+    }
 }

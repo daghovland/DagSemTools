@@ -14,12 +14,12 @@ using DagSemTools.Datalog.Parser;
 using static DatalogParser;
 
 /// <inheritdoc />
-public class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
+internal class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
 {
     internal ResourceVisitor ResourceVisitor { get; }
 
     /// <inheritdoc />
-    public PredicateVisitor(ResourceVisitor resourceVisitor)
+    internal PredicateVisitor(ResourceVisitor resourceVisitor)
     {
         ResourceVisitor = resourceVisitor;
     }
