@@ -408,6 +408,61 @@ module Tests =
             }
             let isSemiPositive = Stratifier.IsSemiPositiveProgram [rule]
             Assert.False isSemiPositive
+    
+    (*              
+            [?s,:A,:o] :- [?s,:A,:o], [?s,:B,:o]
+            [?s,:B,:o] :- not [?s,:C,:o2]
+            First stratification should only include UnaryPredicate :B, :o
+     *)
+    [<Fact>]
+    let rec ``Stratifier outputs first partition`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndexA = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateA"))
+            let predIndexB = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateB"))
+            let predIndexC = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateC"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            
+            let headPatternA = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexA
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            let headPatternB = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexB
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            let positiveMatchA = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexA
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let positiveMatchB = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexB
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let negativeMatch = RuleAtom.NotTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexC
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             }
+            
+            let ruleA =  {Head =  headPatternA; Body = [ positiveMatchA; positiveMatchB ]
+            }
+            let ruleB = {Head =  headPatternB; Body = [ negativeMatch
+                                                       ]
+            }
+            let partitioner  = Stratifier.RulePartitioner [ruleA; ruleB]
+            let init_queue = partitioner.GetReadyElementsQueue()
+            init_queue.Should().HaveLength(1)
+            let first_partition = partitioner.get_rule_partition()
+            first_partition.Should().Contain(ruleB).And.HaveLength(1)
+    
             
     [<Fact>]
     let ``Can get matches on complex rule with negative atom`` () =

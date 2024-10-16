@@ -26,6 +26,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <InternalsVisibleTo Include="DagSemTools.Datalog.Tests" />
+    </ItemGroup>
+    
+    <ItemGroup>
         <Compile Include="Library.fs"/>
         <Compile Include="Stratifier.fs" />
         <Compile Include="Reasoner.fs" />

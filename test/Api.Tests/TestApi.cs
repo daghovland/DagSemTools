@@ -103,8 +103,8 @@ public class TestApi(ITestOutputHelper output)
 
     }
 
-    
-    
+
+
     [Fact]
     public void TestDatalogStratified()
     {
@@ -118,12 +118,12 @@ public class TestApi(ITestOutputHelper output)
         resultsData = ont.GetTriplesWithObject(
             new IriReference("http://example.com/data#Type3")).ToList();
         resultsData.Should().HaveCount(0);
-        
+
         var datalogFile = new FileInfo("TestData/test_stratified.datalog");
         ont.LoadDatalog(datalogFile);
 
         resultsData = ont.GetTriplesWithObject(
-            new IriReference("http://example.com/data#Tye3")).ToList();
+            new IriReference("http://example.com/data#Type3")).ToList();
         resultsData.Should().HaveCount(1);
 
     }
