@@ -412,6 +412,9 @@ module Tests =
     (*              
             [?s,:A,:o] :- [?s,:A,:o], [?s,:B,:o]
             [?s,:B,:o] :- not [?s,:C,:o2]
+            :A predecessors 2, successors A
+            :B predecessors 1, successors A
+            :C predecessors 0, successors B
             First stratification should only include UnaryPredicate :B, :o
      *)
     [<Fact>]
@@ -458,6 +461,12 @@ module Tests =
                                                        ]
             }
             let partitioner  = Stratifier.RulePartitioner [ruleA; ruleB]
+            let ordered_relations = partitioner.GetOrderedRelations()
+            ordered_relations.Should().HaveLength(3)
+            ordered_relations |> Seq.head |> fst |> should().Be("A")
+            
+            
+            
             let init_queue = partitioner.GetReadyElementsQueue()
             init_queue.Should().HaveLength(1)
             let first_partition = partitioner.get_rule_partition()
