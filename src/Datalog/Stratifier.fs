@@ -50,7 +50,8 @@ module Stratifier =
         Relation : Relation
         mutable Successors : RelationEdge list
         mutable num_predecessors : int
-        mutable uses_negative_edge : bool
+        mutable uses_intensional_negative_edge : bool
+        mutable intensional : bool
     }
     let GetTriplePatternRelation (triple : TriplePattern) : Relation =
             match triple.Predicate with
@@ -114,29 +115,30 @@ module Stratifier =
         let relations = GetRelations rules |> Seq.toArray
         let relationMap = relations |> Array.mapi (fun i r -> r, i) |> Map.ofArray
         
+        (* This is called by the constructor code to initialize the topological sorting of relations *)
         let updateRelation (_ordered : OrderedRelation array) (headRelationNo : int) (atom : RuleAtom) =
+                _ordered.[int headRelationNo].intensional <- true
                 match atom with
                 | NotTriple t ->
                     let atomRelation = t |> GetTriplePatternRelation
                     let atomRelationNo = relationMap.[atomRelation]
                     _ordered.[int atomRelationNo].Successors <- NegativeRelationEdge headRelationNo :: _ordered.[int atomRelationNo].Successors
                     _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1
-                    _ordered.[int atomRelationNo].uses_negative_edge <- true
+                    
                 | PositiveTriple t ->
                     let atomRelation = t |> GetTriplePatternRelation
                     let atomRelationNo = relationMap.[atomRelation]
                     _ordered.[int atomRelationNo].Successors <- PositiveRelationEdge headRelationNo :: _ordered.[int atomRelationNo].Successors
                     _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1
         
+        (* This is only run once on initialization to set up the data structure for topologial sorting of relations *)
         let mutable ordered_relations = 
-            let _ordered = relations |> Array.map (fun r -> {Relation = r; Successors = []; num_predecessors = 0; uses_negative_edge = false})
+            let _ordered = relations |> Array.map (fun r -> {Relation = r; Successors = []; num_predecessors = 0; uses_intensional_negative_edge = false; intensional = false })
             rules |> Seq.iter (fun rule ->
                                         let headRelation = rule.Head |> GetTriplePatternRelation
                                         let headRelationNo = relationMap.[headRelation]
-                                        let mutable headRelationEntry = _ordered.[int headRelationNo]
                                         rule.Body
                                            |> Seq.iter (updateRelation _ordered headRelationNo)
-                                        _ordered.[int headRelationNo] <- headRelationEntry
                                 )
             _ordered
         
@@ -156,24 +158,29 @@ module Stratifier =
             and all elements marked for next stratifications must be moved into the queue for the current stratification *)    
         member this.reset_stratification =
             for i in 0 .. (Array.length ordered_relations - 1) do
-                ordered_relations.[i].uses_negative_edge <- false 
+                ordered_relations.[i].uses_intensional_negative_edge <- false
             while next_elements_queue.Count > 0 do
                 ready_elements_queue.Enqueue(next_elements_queue.Dequeue())
             
             
         (* Updates the successor of a relation, and if the relation is ready to be output, it is added to the queue *)
-        member this.update_successor (successor : RelationEdge) =
+        member this.update_successor (removed_relation_id : int) (successor : RelationEdge) =
             let relation_id = 
                 match successor with
                 | PositiveRelationEdge relation_id ->
                     relation_id
                 | NegativeRelationEdge relation_id ->
-                    ordered_relations.[int relation_id].uses_negative_edge <- true
+                    let removed_relation = ordered_relations.[int removed_relation_id]
+                    if removed_relation.intensional then
+                        ordered_relations.[int relation_id].uses_intensional_negative_edge <- true
                     relation_id
-            let relation = ordered_relations.[int relation_id]
-            ordered_relations.[int relation_id].num_predecessors <- ordered_relations.[int relation_id].num_predecessors - 1
-            if relation.num_predecessors = 0 then
-                if relation.uses_negative_edge then
+            let old_relation = ordered_relations.[int relation_id]
+            let new_predecessors = old_relation.num_predecessors - 1
+            printfn "Updating relation %d: num_predecessors from %d to %d" relation_id old_relation.num_predecessors new_predecessors
+            ordered_relations.[int relation_id] <- { old_relation with num_predecessors = new_predecessors }
+            printfn "Updated relation %d: num_predecessors  %d" relation_id ordered_relations.[int relation_id].num_predecessors
+            if ordered_relations.[int relation_id].num_predecessors = 0 then
+                if ordered_relations.[int relation_id].uses_intensional_negative_edge then
                     next_elements_queue.Enqueue(relation_id)
                 else
                     ready_elements_queue.Enqueue(relation_id)
@@ -184,7 +191,6 @@ module Stratifier =
             a cycle or depend on an element in a cycle *)
         member this.get_rule_partition() : Rule seq  =
             let mutable ordered_rules = Seq.empty
-            this.reset_stratification
             while ready_elements_queue.Count > 0 do
                 let relation_id = ready_elements_queue.Dequeue()
                 let relation = relations.[int relation_id]
@@ -193,15 +199,17 @@ module Stratifier =
                                         (rule.Head |> GetTriplePatternRelation) = relation
                                         )
                 ordered_rules <- Seq.append relation_rules ordered_rules
-                ordered_relations.[int relation_id].Successors |> Seq.iter (this.update_successor)
+                ordered_relations.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
+                ordered_relations.[int relation_id].intensional <- false
             Seq.distinct ordered_rules
         
         (* Order the rules topologically based on dependency. Used for stratification *)
         member this.orderRules  : Rule seq seq =
-            let mutable stratification = [this.get_rule_partition()]
-            while n_unordered > 0 do
-                //TODO: Check for cycle with negative, break a cycle
+            let mutable stratification = []
+            while ready_elements_queue.Count > 0 do
                 stratification <- stratification @ [this.get_rule_partition()]
+                this.reset_stratification
+                //TODO: Check for cycle with negative, break a cycle
             stratification
             
             
