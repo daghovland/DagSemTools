@@ -52,6 +52,7 @@ module Stratifier =
         mutable num_predecessors : int
         mutable uses_intensional_negative_edge : bool
         mutable intensional : bool
+        mutable visited: bool
     }
     let GetTriplePatternRelation (triple : TriplePattern) : Relation =
             match triple.Predicate with
@@ -106,10 +107,6 @@ module Stratifier =
     let IsSemiPositiveProgram (rules : Rule list) =
         NegativeIntentionalProperties rules |> Seq.isEmpty
   
-    type Edge =
-        | PositiveEdge
-        | NegativeEdge
-    
     type RulePartitioner(rules: Rule list) =
         
         let relations = GetRelations rules |> Seq.toArray
@@ -133,7 +130,7 @@ module Stratifier =
         
         (* This is only run once on initialization to set up the data structure for topologial sorting of relations *)
         let mutable ordered_relations = 
-            let _ordered = relations |> Array.map (fun r -> {Relation = r; Successors = []; num_predecessors = 0; uses_intensional_negative_edge = false; intensional = false })
+            let _ordered = relations |> Array.map (fun r -> {Relation = r; Successors = []; num_predecessors = 0; uses_intensional_negative_edge = false; intensional = false ; visited = false })
             rules |> Seq.iter (fun rule ->
                                         let headRelation = rule.Head |> GetTriplePatternRelation
                                         let headRelationNo = relationMap.[headRelation]
@@ -150,6 +147,29 @@ module Stratifier =
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
         let mutable next_elements_queue = Queue<int>()
         let mutable n_unordered = Array.length ordered_relations - ready_elements_queue.Count
+        
+        member this.cycle_finder (visited : int seq) (current : int) : int seq option =
+            let current_element = ordered_relations.[current]
+            if (visited |> Seq.contains current) then
+                visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.append [current] |> Some
+            else if current_element.visited then None
+            else
+                // TODO: Enable this optimisation when the cycle finder is working
+                // ordered_relations.[current].visited <- true
+                current_element.Successors |> Seq.choose
+                                                    (fun edge ->
+                                                        match edge with
+                                                        | PositiveRelationEdge relation_id -> 
+                                                            (this.cycle_finder (Seq.append visited [current]) relation_id)
+                                                        | NegativeRelationEdge relation_id ->
+                                                            if (this.cycle_finder (Seq.append visited [current]) relation_id |> Option.isSome) then
+                                                                // TODO: Output cycle
+                                                                failwith "Datalog program contains a cycle with negation and is not stratifiable!"
+                                                            else
+                                                                None
+                                                    )
+                                            |> Seq.tryHead
+            
             
         member this.GetReadyElementsQueue() = ready_elements_queue    
         member this.GetOrderedRelations() = ordered_relations
@@ -159,6 +179,7 @@ module Stratifier =
         member this.reset_stratification =
             for i in 0 .. (Array.length ordered_relations - 1) do
                 ordered_relations.[i].uses_intensional_negative_edge <- false
+                ordered_relations.[i].visited <- false
             while next_elements_queue.Count > 0 do
                 ready_elements_queue.Enqueue(next_elements_queue.Dequeue())
             
@@ -170,17 +191,15 @@ module Stratifier =
                 | PositiveRelationEdge relation_id ->
                     relation_id
                 | NegativeRelationEdge relation_id ->
-                    let removed_relation = ordered_relations.[int removed_relation_id]
+                    let removed_relation = ordered_relations.[removed_relation_id]
                     if removed_relation.intensional then
-                        ordered_relations.[int relation_id].uses_intensional_negative_edge <- true
+                        ordered_relations.[relation_id].uses_intensional_negative_edge <- true
                     relation_id
-            let old_relation = ordered_relations.[int relation_id]
+            let old_relation = ordered_relations.[relation_id]
             let new_predecessors = old_relation.num_predecessors - 1
-            printfn "Updating relation %d: num_predecessors from %d to %d" relation_id old_relation.num_predecessors new_predecessors
-            ordered_relations.[int relation_id] <- { old_relation with num_predecessors = new_predecessors }
-            printfn "Updated relation %d: num_predecessors  %d" relation_id ordered_relations.[int relation_id].num_predecessors
-            if ordered_relations.[int relation_id].num_predecessors = 0 then
-                if ordered_relations.[int relation_id].uses_intensional_negative_edge then
+            ordered_relations.[relation_id] <- { old_relation with num_predecessors = new_predecessors }
+            if ordered_relations.[relation_id].num_predecessors = 0 then
+                if ordered_relations.[relation_id].uses_intensional_negative_edge then
                     next_elements_queue.Enqueue(relation_id)
                 else
                     ready_elements_queue.Enqueue(relation_id)
@@ -203,15 +222,41 @@ module Stratifier =
                 ordered_relations.[int relation_id].intensional <- false
             Seq.distinct ordered_rules
         
-        (* Order the rules topologically based on dependency. Used for stratification *)
+        
+        (* Only called when topological sorting stops, so there is a cycle
+            Finds one cycle, if that contains a negative edge, reports error, otherwise,
+            puts that cycle on the queue for the next stratification *)
+        member this.handle_cycle()  =
+            match ordered_relations |> Array.tryFindIndex (fun concept -> concept.num_predecessors > 0) with
+            | None -> failwith "Datalog pre-processing failed: No cycle found even if topological sort stopped. This is probably a bug."
+            | Some cycle_index ->
+                match this.cycle_finder [] cycle_index with
+                | None -> failwith "Datalog pre-processing failed: No cycle found even if topological sort stopped. This is probably a bug."
+                | Some cycle -> cycle |> (Seq.iter ready_elements_queue.Enqueue)
+            
+        (*  Catches some errors in stratification, to avoid a wrong stratification being returned
+            TODO: Remove when stratification is stable and tests cover all corners
+        *)
+        member this.is_stratified (stratification: Rule seq seq) =
+            ready_elements_queue.Count = 0
+            && next_elements_queue.Count = 0
+            && (stratification |> Seq.sumBy Seq.length) = rules.Length
+            && ordered_relations |> Array.forall (fun relation -> relation.num_predecessors = 0
+                                                                    && relation.intensional = false)
+        
+        (* Order the rules topologically based on dependency. Used for stratification
+            Each Rule seq in the outermost seq is a partition, and these partitions must be handled sequentially during materialization *)
         member this.orderRules  : Rule seq seq =
             let mutable stratification = []
+            if ready_elements_queue.Count = 0 then
+                    this.handle_cycle()
             while ready_elements_queue.Count > 0 do
                 stratification <- stratification @ [this.get_rule_partition()]
                 this.reset_stratification
-                //TODO: Check for cycle with negative, break a cycle
+                if ready_elements_queue.Count = 0 then
+                    this.handle_cycle()
+                    
+            if not (this.is_stratified stratification) then
+                failwith "Datalog program preprocessing failed! This is a bug, please report"
             stratification
             
-            
-        
-        
