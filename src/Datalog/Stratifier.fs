@@ -49,7 +49,7 @@ module Stratifier =
     type OrderedRelation = {
         Relation : Relation
         mutable Successors : RelationEdge list
-        mutable num_predecessors : int
+        mutable num_predecessors : uint
         mutable uses_intensional_negative_edge : bool
         mutable intensional : bool
         mutable visited: bool
@@ -120,17 +120,23 @@ module Stratifier =
                     let atomRelation = t |> GetTriplePatternRelation
                     let atomRelationNo = relationMap.[atomRelation]
                     _ordered.[int atomRelationNo].Successors <- NegativeRelationEdge headRelationNo :: _ordered.[int atomRelationNo].Successors
-                    _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1
+                    _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
                     
                 | PositiveTriple t ->
                     let atomRelation = t |> GetTriplePatternRelation
                     let atomRelationNo = relationMap.[atomRelation]
                     _ordered.[int atomRelationNo].Successors <- PositiveRelationEdge headRelationNo :: _ordered.[int atomRelationNo].Successors
-                    _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1
+                    _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
         
         (* This is only run once on initialization to set up the data structure for topologial sorting of relations *)
         let mutable ordered_relations = 
-            let _ordered = relations |> Array.map (fun r -> {Relation = r; Successors = []; num_predecessors = 0; uses_intensional_negative_edge = false; intensional = false ; visited = false })
+            let _ordered = relations |> Array.map (fun r -> {Relation = r
+                                                             Successors = []
+                                                             num_predecessors = 0u
+                                                             uses_intensional_negative_edge = false
+                                                             intensional = false
+                                                             visited = false
+                                                             })
             rules |> Seq.iter (fun rule ->
                                         let headRelation = rule.Head |> GetTriplePatternRelation
                                         let headRelationNo = relationMap.[headRelation]
@@ -141,7 +147,7 @@ module Stratifier =
         
         (* The queue contains all relations that are not dependent on any relations (that have not already been output) *)
         let mutable ready_elements_queue =
-            Queue<int>(ordered_relations |> Array.filter (fun concept -> concept.num_predecessors = 0)
+            Queue<int>(ordered_relations |> Array.filter (fun concept -> concept.num_predecessors = 0u)
                     |> Array.map (fun concept -> relationMap.[concept.Relation]))
             
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
@@ -196,9 +202,10 @@ module Stratifier =
                         ordered_relations.[relation_id].uses_intensional_negative_edge <- true
                     relation_id
             let old_relation = ordered_relations.[relation_id]
-            let new_predecessors = old_relation.num_predecessors - 1
+            if old_relation.num_predecessors < 1u then failwith "Datalog program preprocessing failed. This is a bug, please report that topological ordering failed, num_predecessors < 1"
+            let new_predecessors = old_relation.num_predecessors - 1u
             ordered_relations.[relation_id] <- { old_relation with num_predecessors = new_predecessors }
-            if ordered_relations.[relation_id].num_predecessors = 0 then
+            if ordered_relations.[relation_id].num_predecessors = 0u then
                 if ordered_relations.[relation_id].uses_intensional_negative_edge then
                     next_elements_queue.Enqueue(relation_id)
                 else
@@ -212,27 +219,53 @@ module Stratifier =
             let mutable ordered_rules = Seq.empty
             while ready_elements_queue.Count > 0 do
                 let relation_id = ready_elements_queue.Dequeue()
-                let relation = relations.[int relation_id]
-                let relation_rules = rules
-                                    |> List.filter (fun rule ->
-                                        (rule.Head |> GetTriplePatternRelation) = relation
-                                        )
-                ordered_rules <- Seq.append relation_rules ordered_rules
-                ordered_relations.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
-                ordered_relations.[int relation_id].intensional <- false
+                let relation = relations.[relation_id]
+                if ordered_relations.[relation_id].intensional then
+                    let relation_rules = rules
+                                        |> List.filter (fun rule ->
+                                            (rule.Head |> GetTriplePatternRelation) = relation
+                                            )
+                    ordered_rules <- Seq.append relation_rules ordered_rules
+                    ordered_relations.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
+                    ordered_relations.[int relation_id].intensional <- false
             Seq.distinct ordered_rules
         
+        (* Checks whether a rule is completely covered by a cycle (given the already output relations, which are treated as extensional/edb
+            In other words, whether all elements of the body are in the cycle, or are extensional*)
+        member this.RuleIsCoveredByCycle cycle rule =
+                rule.Body |> Seq.forall (fun atom ->
+                    let atomRelation = atom|> GetRuleAtomRelation
+                    ordered_relations.[relationMap.[atomRelation]].intensional = false
+                    || (cycle |> Seq.exists (MatchRelations atomRelation))
+                    )
         
         (* Only called when topological sorting stops, so there is a cycle
             Finds one cycle, if that contains a negative edge, reports error, otherwise,
-            puts that cycle on the queue for the next stratification *)
+            checks whether the first relation in the cycle is ready to be output, and if so, outputs it
+            An example of where it is not ready, is if it depends on another cycle, which needs to be output first. 
+            
+            The proof that these cycles / strongly connected components always exist is in the Alice book
+         *)
         member this.handle_cycle()  =
-            match ordered_relations |> Array.tryFindIndex (fun concept -> concept.num_predecessors > 0) with
-            | None -> failwith "Datalog pre-processing failed: No cycle found even if topological sort stopped. This is probably a bug."
-            | Some cycle_index ->
-                match this.cycle_finder [] cycle_index with
-                | None -> failwith "Datalog pre-processing failed: No cycle found even if topological sort stopped. This is probably a bug."
-                | Some cycle -> cycle |> (Seq.iter ready_elements_queue.Enqueue)
+            match (ordered_relations
+                  |> Array.filter (fun relation -> relation.num_predecessors > 0u)
+                  |> Array.map (fun relation -> relationMap.[relation.Relation])
+                  |> Array.choose (this.cycle_finder [])
+                  |> Array.filter (fun cycle ->
+                            let cycle_element = cycle |> Seq.head
+                            let rules = rules
+                                        |> List.filter (fun rule ->
+                                            (rule.Head |> GetTriplePatternRelation) = relations.[cycle_element]
+                                            )
+                            rules |> List.forall (this.RuleIsCoveredByCycle (cycle |> Seq.map (fun id -> relations.[id])))
+                            )
+                            
+                  |> Seq.tryHead)
+            with
+            | Some cycle ->
+                  cycle |> Seq.distinct |>(Seq.iter ready_elements_queue.Enqueue)
+            | None -> failwith "Datalog program preprocessing failed. This is a bug, please report"
+                
             
         (*  Catches some errors in stratification, to avoid a wrong stratification being returned
             TODO: Remove when stratification is stable and tests cover all corners
@@ -241,9 +274,13 @@ module Stratifier =
             ready_elements_queue.Count = 0
             && next_elements_queue.Count = 0
             && (stratification |> Seq.sumBy Seq.length) = rules.Length
-            && ordered_relations |> Array.forall (fun relation -> relation.num_predecessors = 0
+            && ordered_relations |> Array.forall (fun relation -> relation.num_predecessors = 0u
                                                                     && relation.intensional = false)
-        
+
+        (* Used in the while loop in orderRules to test whether stratification is finished *)
+        member this.topological_sort_finished() =
+            ordered_relations |> Array.forall (fun relation -> relation.num_predecessors = 0u)
+                
         (* Order the rules topologically based on dependency. Used for stratification
             Each Rule seq in the outermost seq is a partition, and these partitions must be handled sequentially during materialization *)
         member this.orderRules  : Rule seq seq =
@@ -253,7 +290,7 @@ module Stratifier =
             while ready_elements_queue.Count > 0 do
                 stratification <- stratification @ [this.get_rule_partition()]
                 this.reset_stratification
-                if ready_elements_queue.Count = 0 then
+                if ready_elements_queue.Count = 0  && (not (this.topological_sort_finished ()))  then
                     this.handle_cycle()
                     
             if not (this.is_stratified stratification) then
