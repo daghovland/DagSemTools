@@ -8,7 +8,7 @@
     <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.Turtle.Parser</PackageId>
+        <PackageId>AlcTableau.Turtle</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For parsing Rdf-1.2 Turtle</Description>
@@ -21,51 +21,36 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-      
-      <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
 		<PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
-        <PackageReference Include="FSharp.Core" Version="8.0.401" />
+        <PackageReference Include="FSharp.Core" Version="8.0.400" />
     </ItemGroup>
     <ItemGroup>
-        <Antlr4 Include="grammars\TurtleDoc.g4">
+        <None Remove="grammars\Turtle.g4" />
+        <Antlr4 Include="grammars\Turtle.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
-        <None Update="grammars\TurtleResource.g4">
-            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
         <None Update="grammars\TurtleTokens.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         
     </ItemGroup>
-
-    <!-- Use project references if BuildingProject is true -->
-    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
-        <ProjectReference Include="..\Parser\Parser.csproj" />
+    <ItemGroup>
+        <ProjectReference Include="..\ManchesterAntlr\ManchesterAntlr.csproj" />
+        <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
     </ItemGroup>
-    
-    <!-- Use NuGet package references if BuildingProject is not true -->
-    <ItemGroup Condition="'$(Configuration)' == 'Release'">
-        <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
-        <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />
-    </ItemGroup>
-    
     <ItemGroup>
       <Folder Include="grammars\" />
-      <Folder Include="grammars\gen\" />
-    </ItemGroup>
+    </ItemGroup>  
 
-            <ItemGroup>
-              <Content Include="README.md">
-                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-                <Pack>true</Pack>
-                <PackagePath>README.md</PackagePath>
-              </Content>
-        </ItemGroup>
+        <ItemGroup>
+        <None Update="README.md">
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </None>
+    </ItemGroup>
 
 </Project>

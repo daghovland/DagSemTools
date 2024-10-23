@@ -7,7 +7,7 @@
         <TargetFramework>net8.0</TargetFramework>
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Datalog</PackageId>
         <Version>0.2.0</Version>
         <Authors>Dag Hovland</Authors>
