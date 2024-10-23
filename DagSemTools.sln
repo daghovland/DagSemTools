@@ -1,23 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 #
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AlcTest", "test\AlcTest\AlcTest.fsproj", "{81E44777-BDE2-4741-A0AA-15C4162BF549}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rdf", "src\Rdf\Rdf.fsproj", "{833D8620-E7DE-45B9-AB30-9B943A4F3997}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{BF9EFAC5-4B46-4499-B2D1-A9276991495C}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Datalog", "src\Datalog\Datalog.fsproj", "{F27E2851-BDBE-4EB4-8798-754EC665B4AE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManchesterAntlr.Unit.Tests", "test\ManchesterAntlr.Unit.Tests\ManchesterAntlr.Unit.Tests.csproj", "{7C1CB214-5330-4DFA-9657-120DE7D9D255}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Reasoner.Integration.Tests", "test\Reasoner.Integration.Tests\Reasoner.Integration.Tests.fsproj", "{71138595-AFD2-4A10-8E1E-60418043BBA9}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datalog.Parser", "src\Datalog.Parser\Datalog.Parser.csproj", "{59E4114C-6383-4D8E-ABFE-62DE62403AA8}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{150881EB-B2AE-4E27-80B8-68FC9688D9BE}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AlcTableau", "src\AlcTableau\AlcTableau.fsproj", "{22694FCA-F5DB-4C7A-98A4-90D2450B9E56}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleParser.Unit.Tests", "test\TurtleParser.Unit.Tests\TurtleParser.Unit.Tests.csproj", "{115AD1FD-FA5A-4F06-ADD3-9D44D5049262}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rdf", "src\Rdf\Rdf.fsproj", "{833D8620-E7DE-45B9-AB30-9B943A4F3997}"
-EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rdf.Unit.Tests", "test\Rdf.Unit.Tests\Rdf.Unit.Tests.fsproj", "{7670A563-EADA-48FC-A3F4-BF71C8431491}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Manchester", "src\Manchester\Manchester.fsproj", "{9A57F365-0660-4830-8CE9-8C011A715D7B}"
 EndProject
@@ -31,13 +23,21 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "src\Parser\Parser
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtils", "test\TestUtils\TestUtils.csproj", "{4436F2C8-1175-454A-979F-37D4A69F887A}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Datalog.Test", "test\Datalog.Test\Datalog.Test.fsproj", "{5DFE9837-6300-4134-B2A3-C13F46A9D1C2}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleParser.Unit.Tests", "test\TurtleParser.Unit.Tests\TurtleParser.Unit.Tests.csproj", "{115AD1FD-FA5A-4F06-ADD3-9D44D5049262}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Datalog", "src\Datalog\Datalog.fsproj", "{F27E2851-BDBE-4EB4-8798-754EC665B4AE}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Datalog.Test", "test\Datalog.Test\Datalog.Test.fsproj", "{5DFE9837-6300-4134-B2A3-C13F46A9D1C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api.Tests", "test\Api.Tests\Api.Tests.csproj", "{7B5A1802-D3F5-44B0-B8EF-D4ABACDC1EAA}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Datalog.Parser", "src\Datalog.Parser\Datalog.Parser.csproj", "{59E4114C-6383-4D8E-ABFE-62DE62403AA8}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rdf.Unit.Tests", "test\Rdf.Unit.Tests\Rdf.Unit.Tests.fsproj", "{7670A563-EADA-48FC-A3F4-BF71C8431491}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "AlcTest", "test\AlcTest\AlcTest.fsproj", "{81E44777-BDE2-4741-A0AA-15C4162BF549}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{BF9EFAC5-4B46-4499-B2D1-A9276991495C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManchesterAntlr.Unit.Tests", "test\ManchesterAntlr.Unit.Tests\ManchesterAntlr.Unit.Tests.csproj", "{7C1CB214-5330-4DFA-9657-120DE7D9D255}"
+EndProject
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Reasoner.Integration.Tests", "test\Reasoner.Integration.Tests\Reasoner.Integration.Tests.fsproj", "{71138595-AFD2-4A10-8E1E-60418043BBA9}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DatalogParser.Unit.Tests", "test\DatalogParser.Unit.Tests\DatalogParser.Unit.Tests.csproj", "{D14EB398-4DCC-494E-BCFA-72FB85F5E5B1}"
 EndProject

@@ -22,7 +22,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         
-        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     
@@ -43,13 +43,13 @@
         </None>
     </ItemGroup>
     <!-- Use project references if BuildingProject is true -->
-    <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
+    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
         <ProjectReference Include="..\Parser\Parser.csproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
     </ItemGroup>
     <!-- Use NuGet package references if BuildingProject is not true -->
-    <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
         <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />
         <PackageReference Include="DagSemTools.Datalog" Version="0.2.0" />

@@ -6,7 +6,7 @@
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
-        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
@@ -57,7 +57,7 @@
     </ItemGroup>
 
     <!-- Use project references for local development -->
-    <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
+    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
     <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
       <ProjectReference Include="..\..\src\Manchester.Parser\Manchester.Parser.csproj" />
       <ProjectReference Include="..\..\src\Manchester\Manchester.fsproj" />
@@ -65,7 +65,7 @@
 
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
-    <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+    <ItemGroup Condition="'$(Configuration)' == 'Release'">
         <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Manchester.Parser" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Manchester" Version="0.1.0" />

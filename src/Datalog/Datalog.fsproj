@@ -21,7 +21,7 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 

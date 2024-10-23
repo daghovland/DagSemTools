@@ -82,3 +82,6 @@ src/Datalog/bin/
 src/Datalog.Parser/bin/
 src/*/bin/
 src/*/obj/
+test/*/bin/
+test/*/obj/
+
