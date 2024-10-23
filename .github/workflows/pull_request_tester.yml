@@ -41,8 +41,8 @@ jobs:
         )
         for project in "${projects[@]}"; do
             echo "Building and packing project: $project"
-            dotnet build --configuration Release ./src/$project/$project.*sproj
-            dotnet pack --configuration Release --output localNugetPackages ./src/$project/$project.*sproj
+            dotnet build  ./src/$project/$project.*sproj
+            dotnet pack  --output localNugetPackages ./src/$project/$project.*sproj
         done
 
     - name: Run tests
