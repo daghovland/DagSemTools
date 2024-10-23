@@ -77,3 +77,8 @@ src/OwlApp/obj
 test/NugetTest/bin
 test/NugetTest/obj
 
+localNugetPackages/*
+src/Datalog/bin/
+src/Datalog.Parser/bin/
+src/*/bin/
+src/*/obj/
