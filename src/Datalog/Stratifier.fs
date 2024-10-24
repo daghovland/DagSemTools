@@ -53,6 +53,7 @@ module Stratifier =
         mutable uses_intensional_negative_edge : bool
         mutable intensional : bool
         mutable visited: bool
+        mutable output: bool
     }
     let GetTriplePatternRelation (triple : TriplePattern) : Relation =
             match triple.Predicate with
@@ -136,6 +137,7 @@ module Stratifier =
                                                              uses_intensional_negative_edge = false
                                                              intensional = false
                                                              visited = false
+                                                             output = false
                                                              })
             rules |> Seq.iter (fun rule ->
                                         let headRelation = rule.Head |> GetTriplePatternRelation
@@ -157,7 +159,7 @@ module Stratifier =
         member this.cycle_finder (visited : int seq) (current : int) : int seq option =
             let current_element = ordered_relations.[current]
             if (visited |> Seq.contains current) then
-                visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.append [current] |> Some
+                visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.distinct  |> Some
             else if current_element.visited then None
             else
                 // TODO: Enable this optimisation when the cycle finder is working
@@ -190,7 +192,7 @@ module Stratifier =
                 ready_elements_queue.Enqueue(next_elements_queue.Dequeue())
             
             
-        (* Updates the successor of a relation, and if the relation is ready to be output, it is added to the queue *)
+        (* Updates a successor of a relation, and if the relation is ready to be output, it is added to the queue *)
         member this.update_successor (removed_relation_id : int) (successor : RelationEdge) =
             let relation_id = 
                 match successor with
@@ -205,7 +207,8 @@ module Stratifier =
             if old_relation.num_predecessors < 1u then failwith "Datalog program preprocessing failed. This is a bug, please report that topological ordering failed, num_predecessors < 1"
             let new_predecessors = old_relation.num_predecessors - 1u
             ordered_relations.[relation_id] <- { old_relation with num_predecessors = new_predecessors }
-            if ordered_relations.[relation_id].num_predecessors = 0u then
+            if ordered_relations.[relation_id].num_predecessors = 0u && not ordered_relations.[relation_id].output then
+                ordered_relations.[relation_id].output <- true
                 if ordered_relations.[relation_id].uses_intensional_negative_edge then
                     next_elements_queue.Enqueue(relation_id)
                 else
@@ -219,14 +222,14 @@ module Stratifier =
             let mutable ordered_rules = Seq.empty
             while ready_elements_queue.Count > 0 do
                 let relation_id = ready_elements_queue.Dequeue()
-                let relation = relations.[relation_id]
+                let relation = relations.[relation_id]    
+                ordered_relations.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
                 if ordered_relations.[relation_id].intensional then
                     let relation_rules = rules
                                         |> List.filter (fun rule ->
                                             (rule.Head |> GetTriplePatternRelation) = relation
                                             )
                     ordered_rules <- Seq.append relation_rules ordered_rules
-                    ordered_relations.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
                     ordered_relations.[int relation_id].intensional <- false
             Seq.distinct ordered_rules
         
@@ -263,7 +266,10 @@ module Stratifier =
                   |> Seq.tryHead)
             with
             | Some cycle ->
-                  cycle |> Seq.distinct |>(Seq.iter ready_elements_queue.Enqueue)
+                  cycle |> Seq.distinct |>(Seq.iter (fun rel ->
+                      ordered_relations.[rel].output <- true
+                      ready_elements_queue.Enqueue rel)
+                  )
             | None -> failwith "Datalog program preprocessing failed. This is a bug, please report"
                 
             

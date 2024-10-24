@@ -47,7 +47,7 @@ module Tests =
                              }
         
         let rule = {Head =  triplepattern; Body = [triplepattern2]}
-        let prog = DatalogProgram ([rule], tripleTable)
+        let prog = Reasoner.DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Single(rules)
         
@@ -75,7 +75,7 @@ module Tests =
                              }
         
         let rule = {Head =  triplepattern; Body = [triplepattern2]}
-        let prog = DatalogProgram ([rule], tripleTable)
+        let prog = Reasoner.DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Empty(rules)
         
@@ -216,7 +216,7 @@ module Tests =
                              }
             let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
                                                                      ]}
-            let prog = DatalogProgram([rule], tripleTable)
+            let prog = Reasoner.DatalogProgram([rule], tripleTable)
             let triple = Subject1Obj1
             for rules in prog.GetRulesForFact triple do
                 for subs in evaluatePositive tripleTable.Triples rules do
@@ -253,7 +253,7 @@ module Tests =
                              }
             let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
                                                                      ]}
-            let prog = DatalogProgram([rule], tripleTable)
+            let prog = Reasoner.DatalogProgram([rule], tripleTable)
             let triple = Subject1Obj1
             for rules in prog.GetRulesForFact triple do
                 for subs in evaluatePattern tripleTable.Triples rules.Match.Match rules.Substitution do
@@ -289,8 +289,7 @@ module Tests =
             
             let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
                                                                      ]}
-            let prog = DatalogProgram([rule], tripleTable)
-            prog.materialise()
+            Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3) |> List.ofSeq
             Assert.Equal(2, matches.Length)
           
@@ -362,8 +361,7 @@ module Tests =
             
             let rule =  {Head =  headPattern; Body = [ positiveMatch1 ; positiveMatch2
                                                                      ]}
-            let prog = DatalogProgram([rule], tripleTable)
-            prog.materialise()
+            Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex) |> List.ofSeq
             Assert.Equal(2, matches.Length)
 
@@ -445,7 +443,7 @@ module Tests =
             let partitioner  = Stratifier.RulePartitioner [rule]
             let cycles = partitioner.cycle_finder [] 0
             cycles.Should().BeSome() |> ignore
-            cycles.Value.Should().HaveLength(2).And.Contain(0) |> ignore
+            cycles.Value.Should().HaveLength(1).And.Contain(0) |> ignore
             
     
     
@@ -657,8 +655,7 @@ module Tests =
                                                        negativeMatch
                                                        ]
             }
-            let prog = DatalogProgram([rule], tripleTable)
-            prog.materialise()
+            Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3)
             Assert.Single matches
           
@@ -742,13 +739,12 @@ module Tests =
         let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
         let rule =  {Head =  ConstantTriplePattern Triple2; Body = [RuleAtom.PositiveTriple(ConstantTriplePattern Triple)]}
-        let prog = DatalogProgram ([rule], tripleTable)
         let tripleAnswersBefore = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
         Assert.Equal(1, tripleAnswersBefore |> Seq.length)
         let triples2Answers = tripleAnswersBefore |> Seq.filter (fun tr -> tr = Triple2)
         Assert.Equal(0, triples2Answers |> Seq.length)
         
-        prog.materialise()
+        Reasoner.evaluate ([rule], tripleTable)
         
         Assert.Equal(2u, tripleTable.Triples.TripleCount)
         let tripleAnswers2 = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
