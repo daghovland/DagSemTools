@@ -34,6 +34,8 @@
         <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Turtle.Parser" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
+        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+        <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
     </ItemGroup>
     
     <ItemGroup>
