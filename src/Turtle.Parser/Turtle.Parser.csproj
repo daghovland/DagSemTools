@@ -44,13 +44,13 @@
     </ItemGroup>
 
     <!-- Use project references if BuildingProject is true -->
-    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\Parser\Parser.csproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
     </ItemGroup>
     
     <!-- Use NuGet package references if BuildingProject is not true -->
-    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />
     </ItemGroup>

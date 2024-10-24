@@ -27,7 +27,7 @@
     </PropertyGroup>
 
     <!-- Use project references when developing locally  -->
-    <ItemGroup Condition="'$(Configuration)' == 'Debug'">
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
       <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
       <ProjectReference Include="..\Datalog\Datalog.fsproj" />
       <ProjectReference Include="..\Rdf\Rdf.fsproj" />
@@ -35,7 +35,7 @@
     </ItemGroup>
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
-    <ItemGroup Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Datalog" Version="0.2.0" />
         <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.2.0" />
