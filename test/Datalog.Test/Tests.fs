@@ -47,7 +47,7 @@ module Tests =
                              }
         
         let rule = {Head =  triplepattern; Body = [triplepattern2]}
-        let prog = DatalogProgram ([rule], tripleTable)
+        let prog = Reasoner.DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Single(rules)
         
@@ -75,7 +75,7 @@ module Tests =
                              }
         
         let rule = {Head =  triplepattern; Body = [triplepattern2]}
-        let prog = DatalogProgram ([rule], tripleTable)
+        let prog = Reasoner.DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Empty(rules)
         
@@ -216,7 +216,7 @@ module Tests =
                              }
             let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
                                                                      ]}
-            let prog = DatalogProgram([rule], tripleTable)
+            let prog = Reasoner.DatalogProgram([rule], tripleTable)
             let triple = Subject1Obj1
             for rules in prog.GetRulesForFact triple do
                 for subs in evaluatePositive tripleTable.Triples rules do
@@ -253,7 +253,7 @@ module Tests =
                              }
             let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
                                                                      ]}
-            let prog = DatalogProgram([rule], tripleTable)
+            let prog = Reasoner.DatalogProgram([rule], tripleTable)
             let triple = Subject1Obj1
             for rules in prog.GetRulesForFact triple do
                 for subs in evaluatePattern tripleTable.Triples rules.Match.Match rules.Substitution do
@@ -289,8 +289,7 @@ module Tests =
             
             let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
                                                                      ]}
-            let prog = DatalogProgram([rule], tripleTable)
-            prog.materialise()
+            Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3) |> List.ofSeq
             Assert.Equal(2, matches.Length)
           
@@ -362,14 +361,13 @@ module Tests =
             
             let rule =  {Head =  headPattern; Body = [ positiveMatch1 ; positiveMatch2
                                                                      ]}
-            let prog = DatalogProgram([rule], tripleTable)
-            prog.materialise()
+            Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex) |> List.ofSeq
             Assert.Equal(2, matches.Length)
 
-              
+    
     [<Fact>]
-    let ``Non-semipositive programs are rejected`` () =
+    let ``Semipositive programs with implicitly unary relations are rejected`` () =
             let tripleTable = Rdf.Datastore(60u)
             let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
             let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
@@ -406,8 +404,217 @@ module Tests =
                                                        negativeMatch
                                                        ]
             }
+            let partitioner  = Stratifier.RulePartitioner [rule]
+            let ordered_relations = partitioner.GetOrderedRelations()
+            ordered_relations.Should().HaveLength(3) |> ignore
+            let init_queue = partitioner.GetReadyElementsQueue()
+            init_queue.Should().HaveLength(2) |> ignore
+            let first_partition = partitioner.get_rule_partition()
+            first_partition.Should().Contain(rule).And.HaveLength(1) |> ignore
+            
+            let isSemiPositive = Stratifier.IsSemiPositiveProgram [rule]
+            Assert.True isSemiPositive
+    
+    
+    
+    (* Tests the simplest cyclic program
+        [?s,:A,:o] :- [?s,:A,:o] .
+    *)
+    [<Fact>]
+    let ``Simple cyclic programs are detected by cycle-detector`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            let positiveMatch = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            
+            let rule =  {Head =  headPattern; Body = [ positiveMatch ] }
+            let partitioner  = Stratifier.RulePartitioner [rule]
+            let cycles = partitioner.cycle_finder [] 0
+            cycles.Should().BeSome() |> ignore
+            cycles.Value.Should().HaveLength(1).And.Contain(0) |> ignore
+            
+    
+    
+    (* Tests the simplest cyclic program
+        [?s,:A,:o] :- [?s,:A,:o] .
+    *)
+    [<Fact>]
+    let ``Simple cyclic programs are detected`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            let positiveMatch = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            
+            let rule =  {Head =  headPattern; Body = [ positiveMatch ] }
+            let partitioner  = Stratifier.RulePartitioner [rule]
+            let orderedRules = partitioner.orderRules
+            orderedRules.Should().HaveLength(1) |> ignore
+            let firstPartition = orderedRules |> Seq.head
+            firstPartition.Should().Contain(rule) |> ignore
+            
+    
+    (* Tests the simplest cyclic program
+        [?s,:A,:o] :- not [?s,:A,:o] .
+    *)        
+    [<Fact>]
+    let ``Simplest non-stratifiable program is rejected`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let negativeMatch = RuleAtom.NotTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let rule =  {Head =  headPattern; Body = [ negativeMatch
+                                                       ]
+            }
+            let partitioner  = Stratifier.RulePartitioner [rule]
+            (fun () -> partitioner.orderRules).Should().Throw<Exception,_>() |> ignore
+              
+    [<Fact>]
+    let ``Non-semipositive programs are rejected`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
+            tripleTable.AddTriple(Subject1Obj1)
+            tripleTable.AddTriple(Subject2Obj1)
+            tripleTable.AddTriple(Subject2Obj2)
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             }
+            let positiveMatch = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let negativeMatch = RuleAtom.NotTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             }
+            
+            let rule =  {Head =  headPattern; Body = [ positiveMatch
+                                                       negativeMatch
+                                                       ]
+            }
+            let partitioner  = Stratifier.RulePartitioner [rule]
+            let ordered_relations = partitioner.GetOrderedRelations()
+            ordered_relations.Should().HaveLength(2) |> ignore
+            let init_queue = partitioner.GetReadyElementsQueue()
+            init_queue.Should().HaveLength(1) |> ignore
+            let first_partition = partitioner.get_rule_partition()
+            first_partition.Should().HaveLength(0) |> ignore
+            
             let isSemiPositive = Stratifier.IsSemiPositiveProgram [rule]
             Assert.False isSemiPositive
+    
+    (*              
+            [?s,:A,:o] :- [?s,:A,:o], [?s,:B,:o]
+            [?s,:B,:o] :- not [?s,:C,:o2]
+            :A predecessors 2, successors A
+            :B predecessors 1, successors A
+            :C predecessors 0, successors B
+            First stratification should only include UnaryPredicate :C, :o2
+            
+            ?s 1u 4u
+     *)
+    [<Fact>]
+    let rec ``Stratifier outputs first partition`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndexA = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateA"))
+            let predIndexB = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateB"))
+            let predIndexC = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateC"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            
+            let headPatternA = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexA
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            let headPatternB = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexB
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            let positiveMatchA = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexA
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let positiveMatchB = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexB
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            let negativeMatch = RuleAtom.NotTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexC
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             }
+            
+            let ruleA =  {Head =  headPatternA; Body = [ positiveMatchA; positiveMatchB ]
+            }
+            let ruleB = {Head =  headPatternB; Body = [ negativeMatch
+                                                       ]
+            }
+            let partitioner  = Stratifier.RulePartitioner [ruleA; ruleB]
+            let ordered_relations = partitioner.GetOrderedRelations()
+            ordered_relations.Should().HaveLength(3) |> ignore
+            
+            let init_queue = partitioner.GetReadyElementsQueue()
+            init_queue.Should().HaveLength(1) |> ignore
+            let first_partition = partitioner.get_rule_partition()
+            first_partition.Should().Contain(ruleB).And.HaveLength(1)
+    
             
     [<Fact>]
     let ``Can get matches on complex rule with negative atom`` () =
@@ -448,8 +655,7 @@ module Tests =
                                                        negativeMatch
                                                        ]
             }
-            let prog = DatalogProgram([rule], tripleTable)
-            prog.materialise()
+            Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3)
             Assert.Single matches
           
@@ -533,13 +739,12 @@ module Tests =
         let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
         let rule =  {Head =  ConstantTriplePattern Triple2; Body = [RuleAtom.PositiveTriple(ConstantTriplePattern Triple)]}
-        let prog = DatalogProgram ([rule], tripleTable)
         let tripleAnswersBefore = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
         Assert.Equal(1, tripleAnswersBefore |> Seq.length)
         let triples2Answers = tripleAnswersBefore |> Seq.filter (fun tr -> tr = Triple2)
         Assert.Equal(0, triples2Answers |> Seq.length)
         
-        prog.materialise()
+        Reasoner.evaluate ([rule], tripleTable)
         
         Assert.Equal(2u, tripleTable.Triples.TripleCount)
         let tripleAnswers2 = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)

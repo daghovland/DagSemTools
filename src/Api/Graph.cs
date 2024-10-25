@@ -28,8 +28,7 @@ public class Graph : IGraph
     {
         var rules = Datalog.Parser.Parser.ParseFile(datalog, System.Console.Error,
             Triples ?? throw new InvalidOperationException());
-        var datalogProgram = new DatalogProgram(ListModule.OfSeq(rules), Triples);
-        datalogProgram.materialise();
+        Reasoner.evaluate(ListModule.OfSeq(rules), Triples);
     }
 
 

@@ -8,6 +8,7 @@
 
 using DagSemTools;
 using DagSemTools.AlcTableau;
+using DagSemTools.Manchester.Parser;
 using DagSemTools.Parser;
 using Microsoft.FSharp.Collections;
 using TestUtils;

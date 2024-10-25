@@ -7,7 +7,7 @@
     <OutputType>Library</OutputType>
     <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Turtle.Parser</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
@@ -22,7 +22,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-      <Configurations>Debug;Release;LocalDevelopment</Configurations>
+      
       <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 	<ItemGroup>
@@ -44,13 +44,13 @@
     </ItemGroup>
 
     <!-- Use project references if BuildingProject is true -->
-    <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\Parser\Parser.csproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
     </ItemGroup>
     
     <!-- Use NuGet package references if BuildingProject is not true -->
-    <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />
     </ItemGroup>

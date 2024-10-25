@@ -10,8 +10,8 @@ namespace DagSemTools.Datalog
 open DagSemTools.Rdf
 open Datalog
 open Stratifier
-
-
+    
+module Reasoner =
 
     type DatalogProgram (Rules: Rule list, tripleStore : Datastore) =
         let mutable Rules = Rules
@@ -37,13 +37,21 @@ open Stratifier
                 |> Seq.distinct
                 |> Seq.collect (Seq.collect (GetMatchesForRule fact))
         
-        member this.materialise() =
-            let negRules = NegativeIntentionalProperties Rules
-            if not(negRules |> Seq.isEmpty) then
-                let exRuleString = negRules |> Seq.head |> RuleToString tripleStore
-                raise (new System.ArgumentException($"Program is not semi-positive, f.ex. rule {exRuleString}"))
-            for triple in tripleStore.Triples.GetTriples() do
-                for rules in this.GetRulesForFact triple do
-                    for subs in evaluate tripleStore.Triples rules  do
-                        let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head
-                        tripleStore.AddTriple newTriple
+        (* 
+            The semi-naive materialisation algorithm. Assumes a non-cyclic ruleset
+            Usually called from the evaluate function, which will stratify the ruleset
+        *)
+        member this.materialiseNaive() =
+                for triple in tripleStore.Triples.GetTriples() do
+                    for rules in this.GetRulesForFact triple do
+                        for subs in evaluate tripleStore.Triples rules  do
+                            let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head
+                            tripleStore.AddTriple newTriple
+
+
+    let evaluate (rules: Rule list, triplestore: Datastore) =
+            let stratifier = RulePartitioner rules
+            let stratification = stratifier.orderRules
+            for partition in stratification do
+                let program = DatalogProgram(Rules = Seq.toList partition, tripleStore = triplestore)
+                program.materialiseNaive()

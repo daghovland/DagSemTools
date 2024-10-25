@@ -6,7 +6,7 @@
         <OutputType>Library</OutputType>
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.AlcTableau</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
@@ -20,7 +20,7 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        
         <Platforms>AnyCPU</Platforms>
         
     </PropertyGroup>

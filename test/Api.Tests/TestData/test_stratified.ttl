@@ -1,0 +1,4 @@
+prefix data: <http://example.com/data#> 
+
+
+data:Node a data:Type.

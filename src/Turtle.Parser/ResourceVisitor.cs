@@ -18,12 +18,12 @@ using System.Collections.Generic;
 using IriTools;
 using static TurtleDocParser;
 
-public class ResourceVisitor : TurtleDocBaseVisitor<uint>
+internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
 {
     private StringVisitor _stringVisitor = new();
     private IriGrammarVisitor _iriGrammarVisitor;
     internal PredicateObjectListVisitor _predicateObjectListVisitor { get; private init; }
-    public Datastore Datastore { get; init; }
+    internal Datastore Datastore { get; init; }
     public ResourceVisitor(Datastore datastore, IriGrammarVisitor iriGrammarVisitor)
     {
         Datastore = datastore;

@@ -7,7 +7,8 @@
 
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
-    <Configurations>Debug;Release;LocalDevelopment</Configurations>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 
@@ -18,12 +19,17 @@
         <Content Include="TestData\pizza.man.owl">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
+    
     </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="FluentAssertions" Version="6.12.1" />
+    <PackageReference Include="FSharp.Core" Version="8.0.401" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
+    <PackageReference Include="IriTools" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -32,20 +38,24 @@
 
 
   <!-- Use project references for local development -->
-  <ItemGroup Condition="'$(Configuration)' == 'LocalDevelopment'">
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\..\src\Manchester.Parser\Manchester.Parser.csproj" />
+    <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
+    <ProjectReference Include="..\..\src\Parser\Parser.csproj" />
     </ItemGroup>
 
   <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
-  <ItemGroup Condition="'$(Configuration)' != 'LocalDevelopment'">
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
-    <PackageReference Include="DagSemTools.Manchester.Parser" Version="0.1.0" />
+    <PackageReference Include="DagSemTools.Manchester.Parser" Version="0.2.0" />
+    <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
+    <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />
   </ItemGroup>
   
   <ItemGroup>
-        <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
-    </ItemGroup>
+        <ProjectReference Include="..\..\src\TestUtils\TestUtils.csproj" />
+  </ItemGroup>
 
 
     <ItemGroup>
@@ -59,5 +69,6 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
+
 
 </Project>

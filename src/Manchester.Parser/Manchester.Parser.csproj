@@ -5,9 +5,32 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <Configurations>Debug;Release;LocalDevelopment</Configurations>
+      <OutputType>Library</OutputType>
+      <PackageReadMeFile>README.md</PackageReadMeFile>
+      <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+      <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+      <PackageId>DagSemTools.Manchester.Parser</PackageId>
+      <Version>0.2.0</Version>
+      <Authors>Dag Hovland</Authors>
+      <Description>For parsing Manchester Owl</Description>
+      <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
+      <PublishRepositoryUrl>true</PublishRepositoryUrl>
+      <RepositoryType>git</RepositoryType>
+
+      <GenerateDocumentationFile>true</GenerateDocumentationFile>
+      <EmbedUntrackedSources>true</EmbedUntrackedSources>
+      <IncludeSource>true</IncludeSource>
+      <IncludeSymbols>true</IncludeSymbols>
+      <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
+
+  <ItemGroup>
+    <InternalsVisibleTo Include="ManchesterAntlr.Unit.Tests" />
+    <InternalsVisibleTo Include="Reasoner.Integration.Tests" />
+  </ItemGroup>
+
   <ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
 		<PackageReference Include="Antlr4BuildTasks" Version="10.7" />
@@ -37,5 +60,13 @@
         <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\Parser\Parser.csproj" />
     </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>true</Pack>
+      <PackagePath>README.md</PackagePath>
+    </Content>
+  </ItemGroup>
       
 </Project>

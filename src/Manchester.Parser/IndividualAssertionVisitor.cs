@@ -14,10 +14,10 @@ using DagSemTools.AlcTableau;
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-public class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, ALC.ABoxAssertion>>>
+internal class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, ALC.ABoxAssertion>>>
 {
     public ConceptVisitor ConceptVisitor { get; init; }
-    public ABoxAssertionVisitor ABoxAssertionVisitor { get; init; }
+    internal ABoxAssertionVisitor ABoxAssertionVisitor { get; init; }
     public IndividualAssertionVisitor(ConceptVisitor conceptVisitor)
     {
         ConceptVisitor = conceptVisitor;

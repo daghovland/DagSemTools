@@ -2,7 +2,7 @@ using DagSemTools.Rdf;
 
 namespace DagSemTools.Turtle.Parser;
 
-public class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List<Ingress.Triple>>>
+internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List<Ingress.Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
 

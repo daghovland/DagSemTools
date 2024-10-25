@@ -11,7 +11,7 @@ using DagSemTools.AlcTableau;
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-public class ClassAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<ALC.Concept, ALC.TBoxAxiom>>>
+internal class ClassAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<ALC.Concept, ALC.TBoxAxiom>>>
 {
     public ConceptVisitor ConceptVisitor { get; init; }
     public ClassAssertionVisitor(ConceptVisitor conceptVisitor)

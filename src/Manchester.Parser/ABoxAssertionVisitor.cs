@@ -11,7 +11,7 @@ using IriTools;
 
 namespace DagSemTools.Manchester.Parser;
 
-public class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<IriReference, ALC.ABoxAssertion>>
+internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<IriReference, ALC.ABoxAssertion>>
 {
     public ConceptVisitor ConceptVisitor { get; init; }
     public ABoxAssertionVisitor(ConceptVisitor conceptVisitor)

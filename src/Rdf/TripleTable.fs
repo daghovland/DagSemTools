@@ -92,11 +92,14 @@ type TripleTable(tripleList: Triple array,
                                 |    false, _ -> []
             
         member this.GetTriplesWithObject (obj: ResourceId) : Triple seq =
-            let objectIndex = this.ObjectPredicateIndex.[obj]
-            objectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetTripleListEntry e) 
+            match (this.ObjectPredicateIndex.TryGetValue obj) with
+                                |    true, objectIndex -> objectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetTripleListEntry e)
+                                |    false, _ -> []
             
         member this.GetTriplesWithPredicate (predicate: ResourceId) : Triple seq =
-            this.PredicateIndex.[predicate] |> Seq.map (fun e -> this.GetTripleListEntry e) 
+            match (this.PredicateIndex.TryGetValue predicate) with
+                | true, predMap -> predMap |> Seq.map (fun e -> this.GetTripleListEntry e)
+                | false, _ -> []
             
         member this.GetTriplesWithSubjectPredicate (subject: ResourceId, predicate: ResourceId) =
             match  (this.SubjectPredicateIndex.TryGetValue subject) with 

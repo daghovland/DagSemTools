@@ -20,13 +20,13 @@ using System.Collections.Generic;
 using IriTools;
 using static ManchesterParser;
 
-public class ManchesterVisitor : ManchesterBaseVisitor<ALC.OntologyDocument>
+internal class ManchesterVisitor : ManchesterBaseVisitor<ALC.OntologyDocument>
 {
     private ConceptVisitor? _conceptVisitor;
     private FrameVisitor? _frameVisitor;
     private IVisitorErrorListener _errorListener;
 
-    public ManchesterVisitor(IVisitorErrorListener errorListener)
+    internal ManchesterVisitor(IVisitorErrorListener errorListener)
     {
         _errorListener = errorListener;
     }

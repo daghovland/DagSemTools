@@ -35,11 +35,9 @@ annotatedObject : rdfobject annotation ;
 
 
 verb: 
-    predicate #predicateVerb 
-    | RDF_TYPE_ABBR #rdfTypeAbbrVerb
+    predicate #PredicateVerb 
+    | 'a' #RdfTypeAbbrVerb
     ;
-
-RDF_TYPE_ABBR : 'a' ;
 
 subject: iri | blankNode | collection | reifiedTriple;
 
@@ -70,13 +68,13 @@ numericLiteral: INTEGER #integerLiteral
     | DOUBLE #doubleLiteral
     ;
 
-booleanLiteral: 'true' #trueBooleanLiteral
-    | 'false' #falseBooleanLiteral
+booleanLiteral: 'true' #TrueBooleanLiteral
+    | 'false' #FalseBooleanLiteral
     ;
 
-rdfLiteral: stringLiteral #plainStringLiteral
-    | stringLiteral LANG_DIR #langLiteral
-    | stringLiteral '^^' iri? #typedLiteral
+rdfLiteral: stringLiteral #PlainStringLiteral
+    | stringLiteral LANG_DIR #LangLiteral
+    | stringLiteral '^^' iri? #TypedLiteral
     ;
     
 

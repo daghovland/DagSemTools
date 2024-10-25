@@ -7,7 +7,7 @@
         <OutputType>Library</OutputType>
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-        <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Parser</PackageId>
         <Version>0.2.0</Version>
         <Authors>Dag Hovland</Authors>
@@ -21,7 +21,7 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        <Configurations>Debug;Release;LocalDevelopment</Configurations>
+        
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 

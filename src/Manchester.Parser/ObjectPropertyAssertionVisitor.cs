@@ -14,9 +14,9 @@ using DagSemTools.AlcTableau;
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-public class ObjectPropertyAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, ALC.TBoxAxiom>>>
+internal class ObjectPropertyAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, ALC.TBoxAxiom>>>
 {
-    public ConceptVisitor ConceptVisitor { get; init; }
+    internal ConceptVisitor ConceptVisitor { get; init; }
     public ObjectPropertyAssertionVisitor(ConceptVisitor conceptVisitor)
     {
         ConceptVisitor = conceptVisitor;

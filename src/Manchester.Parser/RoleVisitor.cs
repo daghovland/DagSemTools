@@ -14,11 +14,11 @@ using IriTools;
 
 namespace DagSemTools.Manchester.Parser;
 
-public class RoleVisitor : ManchesterBaseVisitor<ALC.Role>
+internal class RoleVisitor : ManchesterBaseVisitor<ALC.Role>
 {
     private IriGrammarVisitor _iriGrammarVisitor;
     private IVisitorErrorListener _errorListener;
-    public RoleVisitor(IriGrammarVisitor iriGrammarVisitor, IVisitorErrorListener errorListener)
+    internal RoleVisitor(IriGrammarVisitor iriGrammarVisitor, IVisitorErrorListener errorListener)
     {
         _iriGrammarVisitor = iriGrammarVisitor;
         _errorListener = errorListener;
