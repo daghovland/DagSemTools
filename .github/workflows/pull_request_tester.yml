@@ -46,7 +46,7 @@ jobs:
             dotnet pack --configuration Release --output localNugetPackages ./src/$project/$project.*sproj
         done
 
-    - name: Build test projects
+    - name: Build and run test projects
       run: |
         for project in test/*; do
             echo "Building test project: $project"
