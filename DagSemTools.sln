@@ -21,7 +21,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Api", "src\Api\Api.csproj",
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Parser", "src\Parser\Parser.csproj", "{239B0667-6901-46D2-AE73-79905B991201}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtils", "test\TestUtils\TestUtils.csproj", "{4436F2C8-1175-454A-979F-37D4A69F887A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TestUtils", "src\TestUtils\TestUtils.csproj", "{4436F2C8-1175-454A-979F-37D4A69F887A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TurtleParser.Unit.Tests", "test\TurtleParser.Unit.Tests\TurtleParser.Unit.Tests.csproj", "{115AD1FD-FA5A-4F06-ADD3-9D44D5049262}"
 	ProjectSection(ProjectDependencies) = postProject
