@@ -45,9 +45,24 @@ jobs:
             dotnet pack --configuration Release  --output localNugetPackages ./src/$project/$project.*sproj
         done
 
+    - name: Build test projects
+      run: |
+        test_projects=(
+          "TestUtils"
+          "ManchesterAntlr.Unit.Tests"
+          "Datalog.Test"
+          "DatalogParser.Unit.Tests"
+          "Rdf.Unit.Tests"
+          "Reasoner.Integration.Tests"
+          "TurtleParser.Unit.Tests"
+        )
+        for project in "${test_projects[@]}"; do
+            echo "Building test project: $project"
+            dotnet build --configuration Release ./test/$project/$project.*sproj
+        done
+
     - name: Run tests
       run: |
-        dotnet build --configuration Release ./DagSemTools.sln
         dotnet test ./DagSemTools.sln 
       
     - name: Run nuget package tests

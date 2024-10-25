@@ -36,10 +36,8 @@ annotatedObject : rdfobject annotation ;
 
 verb: 
     predicate #PredicateVerb 
-    | RDF_TYPE_ABBR #RdfTypeAbbrVerb
+    | 'a' #RdfTypeAbbrVerb
     ;
-
-RDF_TYPE_ABBR : 'a' ;
 
 subject: iri | blankNode | collection | reifiedTriple;
 

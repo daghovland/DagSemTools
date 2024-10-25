@@ -3,8 +3,11 @@
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
+        <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        <Platforms>AnyCPU</Platforms>
+        <OutputType>Library</OutputType>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <IsTestProject>true</IsTestProject>
     </PropertyGroup>
 
     <ItemGroup>
