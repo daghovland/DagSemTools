@@ -28,37 +28,18 @@ jobs:
     - name: Build projects
       run: | 
         mkdir localNugetPackages
-        projects=(
-          "Rdf"
-          "AlcTableau"
-          "Parser"
-          "Turtle.Parser"
-          "Datalog"
-          "Datalog.Parser"
-          "Manchester"
-          "Manchester.Parser"
-          "Api"
-        )
-        for project in "${projects[@]}"; do
+        for project in src/*; do
             echo "Building and packing project: $project"
-            dotnet build --configuration Release ./src/$project/$project.*sproj
-            dotnet pack --configuration Release  --output localNugetPackages ./src/$project/$project.*sproj
+            dotnet build --configuration Release $project/
+            dotnet pack --configuration Release  --output localNugetPackages $project/
         done
 
     - name: Build test projects
       run: |
-        test_projects=(
-          "TestUtils"
-          "ManchesterAntlr.Unit.Tests"
-          "Datalog.Test"
-          "DatalogParser.Unit.Tests"
-          "Rdf.Unit.Tests"
-          "Reasoner.Integration.Tests"
-          "TurtleParser.Unit.Tests"
-        )
-        for project in "${test_projects[@]}"; do
+        for project in test/*; do
             echo "Building test project: $project"
-            dotnet build --configuration Release ./test/$project/$project.*sproj
+            dotnet build --configuration Release $project
+            dotnet test --configuration Release $project
         done
 
     - name: Run tests

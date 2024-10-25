@@ -28,9 +28,12 @@
         </PackageReference>
         <PackageReference Update="FSharp.Core" Version="8.0.401" />
         <PackageReference Include="IriTools" Version="2.2.0" />
-        
-            <PackageReference Include="xunit.abstractions" Version="2.0.3" />
-        
+        <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+    </ItemGroup>
+
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\TestUtils\TestUtils.csproj" />
     </ItemGroup>
 
     <!-- Use project references if BuildingProject is true -->

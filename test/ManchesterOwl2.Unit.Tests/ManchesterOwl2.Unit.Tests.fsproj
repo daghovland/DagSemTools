@@ -37,9 +37,26 @@
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\..\AlcTableau.fsproj" />
-        <ProjectReference Include="..\..\Manchester\Manchester.fsproj" />
+        <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\..\src\Manchester\Manchester.fsproj" />
     </ItemGroup>
+
+
+    <!-- Use project references for local development -->
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
+        <ProjectReference Include="..\..\src\Manchester\Manchester.fsproj" />
+    </ItemGroup>
+    <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.Manchester" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\..\src\TestUtils\TestUtils.csproj" />
+    </ItemGroup>
+
 
 
 </Project>
