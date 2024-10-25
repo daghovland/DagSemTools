@@ -68,7 +68,7 @@
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Manchester.Parser" Version="0.2.0" />
-        <PackageReference Include="DagSemTools.Manchester" Version="0.2.0" />
+        <PackageReference Include="DagSemTools.Manchester" Version="0.1.0" />
     </ItemGroup>
     
     
