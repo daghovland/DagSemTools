@@ -10,7 +10,7 @@ using DagSemTools.AlcTableau;
 
 namespace DagSemTools.Manchester.Parser;
 
-public class FacetVisitor : ManchesterBaseVisitor<DataRange.facet>
+internal class FacetVisitor : ManchesterBaseVisitor<DataRange.facet>
 {
     public override DataRange.facet VisitFacetLength(ManchesterParser.FacetLengthContext context) => DataRange.facet.Length;
     public override DataRange.facet VisitFacetMinLength(ManchesterParser.FacetMinLengthContext context) => DataRange.facet.MinLength;

@@ -15,7 +15,7 @@ using IriTools;
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-public class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
+internal class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
 {
     public IriGrammarVisitor IriGrammarVisitor { get; init; }
     private RoleVisitor _roleVisitor;

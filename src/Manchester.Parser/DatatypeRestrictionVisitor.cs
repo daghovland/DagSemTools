@@ -11,7 +11,7 @@ using DagSemTools.AlcTableau;
 
 namespace DagSemTools.Manchester.Parser;
 
-public class DatatypeRestrictionVisitor : ManchesterBaseVisitor<System.Tuple<DataRange.facet, string>>
+internal class DatatypeRestrictionVisitor : ManchesterBaseVisitor<System.Tuple<DataRange.facet, string>>
 {
     private FacetVisitor _facetVisitor = new FacetVisitor();
     public override Tuple<DataRange.facet, string> VisitDatatype_restriction(ManchesterParser.Datatype_restrictionContext context)

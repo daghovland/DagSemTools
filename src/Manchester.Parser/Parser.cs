@@ -16,7 +16,7 @@ using DagSemTools.AlcTableau;
 
 namespace DagSemTools.Manchester.Parser;
 
-public static class Parser
+internal static class Parser
 {
     public static ALC.OntologyDocument ParseFile(string filename, TextWriter errorOutput)
     {

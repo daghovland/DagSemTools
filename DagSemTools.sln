@@ -52,6 +52,9 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{BF9EFAC5-4B46-4499-B2D1-A9276991495C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManchesterAntlr.Unit.Tests", "test\ManchesterAntlr.Unit.Tests\ManchesterAntlr.Unit.Tests.csproj", "{7C1CB214-5330-4DFA-9657-120DE7D9D255}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9A57F365-0660-4830-8CE9-8C011A715D7B} = {9A57F365-0660-4830-8CE9-8C011A715D7B}
+	EndProjectSection
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Reasoner.Integration.Tests", "test\Reasoner.Integration.Tests\Reasoner.Integration.Tests.fsproj", "{71138595-AFD2-4A10-8E1E-60418043BBA9}"
 EndProject

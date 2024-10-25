@@ -46,7 +46,9 @@ jobs:
         done
 
     - name: Run tests
-      run: dotnet test ./DagSemTools.sln 
+      run: |
+        dotnet build --configuration Release ./DagSemTools.sln
+        dotnet test ./DagSemTools.sln 
       
     - name: Run nuget package tests
       run: dotnet test test/NugetTest/NugetTest.sln

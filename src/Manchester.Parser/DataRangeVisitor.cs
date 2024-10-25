@@ -14,11 +14,11 @@ using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.ManchesterAntlr;
 
-public class DataRangeVisitor : ManchesterBaseVisitor<DataRange.Datarange>
+internal class DataRangeVisitor : ManchesterBaseVisitor<DataRange.Datarange>
 {
     DatatypeRestrictionVisitor _datatypeRestrictionVisitor = new DatatypeRestrictionVisitor();
     readonly IVisitorErrorListener _errorListener;
-    public IriGrammarVisitor IriGrammarVisitor { get; init; }
+    internal IriGrammarVisitor IriGrammarVisitor { get; init; }
     public DataRangeVisitor(IVisitorErrorListener errorListener)
     {
         IriGrammarVisitor = new IriGrammarVisitor(errorListener);

@@ -14,7 +14,7 @@ using System.Collections.Generic;
 using IriTools;
 using static ManchesterParser;
 
-public class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
+internal class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
 {
     private readonly Dictionary<string, IriReference> _prefixes;
     public readonly IVisitorErrorListener ErrorListener;
