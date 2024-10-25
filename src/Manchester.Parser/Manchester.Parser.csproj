@@ -60,15 +60,13 @@
         <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\Parser\Parser.csproj" />
     </ItemGroup>
-      <ItemGroup>
-        <Content Include="README.md">
-          <Pack>true</Pack>
-          <PackagePath>README.md</PackagePath>
-        </Content>
-        <None Update="README.md">
-          <Pack>true</Pack>
-          <PackagePath>README.md</PackagePath>
-        </None>
-      </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="README.md">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <Pack>true</Pack>
+      <PackagePath>README.md</PackagePath>
+    </Content>
+  </ItemGroup>
       
 </Project>

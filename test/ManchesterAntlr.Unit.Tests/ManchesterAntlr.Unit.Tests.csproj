@@ -19,9 +19,7 @@
         <Content Include="TestData\pizza.man.owl">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-    <ItemGroup>
-      <None Remove="README.md" />
-    </ItemGroup>
+    
     </ItemGroup>
 
   <ItemGroup>
@@ -29,6 +27,9 @@
     <PackageReference Include="FSharp.Core" Version="8.0.401" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
     <PackageReference Include="xunit" Version="2.9.2" />
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
+    <PackageReference Include="IriTools" Version="2.2.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -48,11 +49,11 @@
     <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
     <PackageReference Include="DagSemTools.Manchester.Parser" Version="0.2.0" />
     <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
-    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-    <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
+    
   </ItemGroup>
   
   <ItemGroup>
+        <ProjectReference Include="..\..\src\Parser\Parser.csproj" />
         <ProjectReference Include="..\TestUtils\TestUtils.csproj" />
     </ItemGroup>
 
@@ -69,12 +70,5 @@
       </None>
     </ItemGroup>
 
-  <ItemGroup>
-    <Content Include="README.md">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      <Pack>true</Pack>
-      <PackagePath>README.md</PackagePath>
-    </Content>
-  </ItemGroup>
 
 </Project>
