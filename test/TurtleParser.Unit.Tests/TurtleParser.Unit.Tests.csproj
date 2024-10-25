@@ -19,6 +19,9 @@
         </PackageReference>
         <PackageReference Include="FluentAssertions" Version="6.12.1" />
         <PackageReference Include="IriTools" Version="2.2.0" />
+        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+        <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
+        <PackageReference Include="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
 
 
@@ -34,8 +37,6 @@
         <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Turtle.Parser" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
-        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-        <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
     </ItemGroup>
     
     <ItemGroup>
