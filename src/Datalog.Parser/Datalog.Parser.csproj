@@ -12,7 +12,7 @@
         <Version>0.2.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For parsing Datalog</Description>
-        <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
+        <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
@@ -42,13 +42,11 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
-    <!-- Use project references if BuildingProject is true -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\Parser\Parser.csproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
     </ItemGroup>
-    <!-- Use NuGet package references if BuildingProject is not true -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
         <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />

@@ -12,7 +12,7 @@
         <Version>0.2.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>Common parser library for AlcTableau</Description>
-        <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
+        <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
