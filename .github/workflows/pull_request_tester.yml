@@ -34,6 +34,7 @@ jobs:
           "Parser"
           "Turtle.Parser"
           "Datalog"
+          "DL2Datalog"
           "Datalog.Parser"
           "Manchester"
           "Manchester.Parser"

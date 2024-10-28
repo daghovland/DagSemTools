@@ -96,11 +96,41 @@ module ALC =
                     
                 | _ -> invalidArg "obj" "Cannot compare Concept with other types."
         
+    let rec GetConceptNames (concept: Concept) : IriReference list =
+        match concept with
+        | ConceptName iri -> [iri]
+        | Disjunction (left, right) -> GetConceptNames left @ GetConceptNames right
+        | Conjunction (left, right) -> GetConceptNames left @ GetConceptNames right
+        | Negation concept -> GetConceptNames concept
+        | Existential (_, concept) -> GetConceptNames concept
+        | Universal (_, concept) -> GetConceptNames concept
+        | Top -> []
+        | Bottom -> []
         
+    let rec GetConcepts (concept: Concept) : Concept list =
+        (match concept with
+        | ConceptName _ -> []
+        | Disjunction (left, right) -> GetConcepts left @ GetConcepts right
+        | Conjunction (left, right) -> GetConcepts left @ GetConcepts right
+        | Negation concept -> GetConcepts concept
+        | Existential (_, concept) -> GetConcepts concept
+        | Universal (_, concept) -> GetConcepts concept
+        | Top -> []
+        | Bottom -> []) @ [concept]
     type TBoxAxiom =
         | Inclusion of Sub: Concept * Sup: Concept
         | Equivalence of Left: Concept * Right: Concept
+    
+    let GetAxiomConcepts (axiom: TBoxAxiom) : Concept list =
+        match axiom with
+        | Inclusion (sub, sup) -> GetConcepts sub @ GetConcepts sup
+        | Equivalence (left, right) -> GetConcepts left @ GetConcepts right
         
+        
+    let GetAxiomConceptNames (axiom: TBoxAxiom) : IriReference list =
+        match axiom with
+        | Inclusion (sub, sup) -> GetConceptNames sub @ GetConceptNames sup
+        | Equivalence (left, right) -> GetConceptNames left @ GetConceptNames right
     type TBox = TBoxAxiom list
     
     type ABoxAssertion =
@@ -138,6 +168,7 @@ module ALC =
         member x.TryGetPrefixName() =
             match x with
             | PrefixDefinition (name, iri) -> (name, iri)
+            
     type OntologyDocument =
         | Ontology of prefixDeclaration list * ontologyVersion * knowledgeBase
     type OntologyDocument with
