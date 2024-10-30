@@ -11,7 +11,7 @@
         <PackageId>DagSemTools.DL2Datalog</PackageId>
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
-        <Description>For translating description logic axioms corresponding to OWL2RL into Datalog rules</Description>
+        <Description>An unfinished project for translating description logic axioms corresponding into Datalog rules</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools/</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>

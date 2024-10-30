@@ -43,6 +43,14 @@
         <PackageReference Update="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
 
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
+    </ItemGroup>
+
+
     <ItemGroup>
         <None Update="README.md">
             <Pack>true</Pack>

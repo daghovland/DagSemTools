@@ -117,6 +117,18 @@ module ALC =
         | Universal (_, concept) -> GetConcepts concept
         | Top -> []
         | Bottom -> []) @ [concept]
+    let rec GetExistentials (concept: Concept) : (Role * Concept) list =
+        (match concept with
+        | ConceptName _ -> []
+        | Disjunction (left, right) -> GetExistentials left @ GetExistentials right
+        | Conjunction (left, right) -> GetExistentials left @ GetExistentials right
+        | Negation concept -> GetExistentials concept
+        | Existential (role, inner) -> GetExistentials inner @ [(role, inner)]
+        | Universal (_, concept) -> GetExistentials concept
+        | Top -> []
+        | Bottom -> [])
+    
+    
     type TBoxAxiom =
         | Inclusion of Sub: Concept * Sup: Concept
         | Equivalence of Left: Concept * Right: Concept
@@ -125,6 +137,10 @@ module ALC =
         match axiom with
         | Inclusion (sub, sup) -> GetConcepts sub @ GetConcepts sup
         | Equivalence (left, right) -> GetConcepts left @ GetConcepts right
+    let GetAxiomExistentials (axiom: TBoxAxiom)  =
+        match axiom with
+        | Inclusion (sub, sup) -> GetExistentials sub @ GetExistentials sup
+        | Equivalence (left, right) -> GetExistentials left @ GetExistentials right
         
         
     let GetAxiomConceptNames (axiom: TBoxAxiom) : IriReference list =

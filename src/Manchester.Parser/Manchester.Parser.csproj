@@ -57,9 +57,15 @@
         </Antlr4>
 	</ItemGroup>
       <ItemGroup>
-        <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
-        <ProjectReference Include="..\Parser\Parser.csproj" />
     </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
+    <ProjectReference Include="..\Parser\Parser.csproj" />
+  </ItemGroup>
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
+    <PackageReference Include="DagSemTools.Parser" Version="0.1.0" />
+  </ItemGroup>
 
   <ItemGroup>
     <Content Include="README.md">

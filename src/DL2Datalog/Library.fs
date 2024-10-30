@@ -16,46 +16,107 @@ open DagSemTools.Rdf.Ingress
 open IriTools
 open Microsoft.FSharp.Quotations
 
+(* This is an attempt at implementing the algorithm on p. 195 of "An introduction to description logic" *)
 module Translator =
     
     (* X_conceptName (s) :- conceptName(s) *)
     let CreateDLConceptRule (resourceManager : ResourceManager) (conceptName : IriReference)  : Rule =
+        let rdfTypeResource = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri (IriReference Namespaces.RdfType) )))
         {Rule.Head = {
                       Subject = ResourceOrVariable.Variable "s"
-                      Predicate = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri (IriReference Namespaces.RdfType) )))
-                      Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedConcept conceptName )))
+                      Predicate = rdfTypeResource
+                      Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedConceptName conceptName )))
                       }
          Rule.Body = [
                       (RuleAtom.PositiveTriple {
                         Subject = ResourceOrVariable.Variable "s"
-                        Predicate = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri (IriReference Namespaces.RdfType) )))
+                        Predicate = rdfTypeResource
                         Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri conceptName )))
                         })
                       ]
             }
+        
+    (* X_conceptName (s) :- X_conceptName2(s) *)
+    let CreateAxiomRule (resourceManager : ResourceManager) (axiom : TBoxAxiom)  : Rule =
+        let rdfTypeResource = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri (IriReference Namespaces.RdfType) )))
+        match axiom with
+        | Inclusion (subConcept, superConcept) ->
+            let subConceptName = match subConcept with
+                                    | ConceptName conceptName -> conceptName
+                                    | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
+            let conceptName2 = match superConcept with
+                                | ConceptName conceptName -> conceptName
+                                | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
+            {Rule.Head = {
+                          Subject = ResourceOrVariable.Variable "s"
+                          Predicate = rdfTypeResource
+                          Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedConceptName conceptName2 )))
+                          }
+             Rule.Body = [
+                          (RuleAtom.PositiveTriple {
+                            Subject = ResourceOrVariable.Variable "s"
+                            Predicate = rdfTypeResource
+                            Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedConceptName subConceptName )))
+                            })
+                          ]
+        }   
+    
     (* X_(role some conceptName) (s) :- role some conceptName (s)  *)
-    let CreateDLExistentialRule (resourceManager : ResourceManager) (role: IriReference) (conceptName : IriReference)  : Rule =
-        {Rule.Head = {
-                      Subject = ResourceOrVariable.Variable "s"
-                      Predicate = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri (IriReference Namespaces.RdfType) )))
-                      Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedExistential (role, conceptName) )))
-                      }
-         Rule.Body = [
-                      (RuleAtom.PositiveTriple {
-                        Subject = ResourceOrVariable.Variable "s"
-                        Predicate = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri (IriReference Namespaces.RdfType) )))
-                        Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri conceptName )))
-                        })
-                      ]
-            }
-    
-    
-    
-    (* This is an implementation of the algorithm on p. 195 of "An introduction to description logic" *)
+    let CreateDLExistentialRule (resourceManager : ResourceManager) (role: Role) (concept : Concept)  : Rule =
+        let rdfTypeResource = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri (IriReference Namespaces.RdfType) )))
+        let conceptName = match concept with
+                          | ConceptName conceptName -> conceptName
+                          | _ -> failwith "Existential constraints with complex concepts are not supported. Sorry"
+        match role with
+            | Role.Iri roleIri ->
+                {Rule.Head = {
+                              Subject = ResourceOrVariable.Variable "s"
+                              Predicate = rdfTypeResource
+                              Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedExistential (roleIri, conceptName) )))
+                              }
+                 Rule.Body = [
+                              (RuleAtom.PositiveTriple {
+                                Subject = ResourceOrVariable.Variable "t"
+                                Predicate = rdfTypeResource
+                                Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri conceptName)))
+                                })
+                              (RuleAtom.PositiveTriple {
+                                Subject = ResourceOrVariable.Variable "s"
+                                Predicate = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri roleIri )))
+                                Object = ResourceOrVariable.Variable "t"
+                                })
+                              ]
+                }
+            | Role.Inverse roleIri ->
+                {Rule.Head = {
+                              Subject = ResourceOrVariable.Variable "s"
+                              Predicate = rdfTypeResource
+                              Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedExistential (roleIri, conceptName) )))
+                              }
+                 Rule.Body = [
+                              (RuleAtom.PositiveTriple {
+                                Subject = ResourceOrVariable.Variable "t"
+                                Predicate = rdfTypeResource
+                                Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri conceptName )))
+                                })
+                              (RuleAtom.PositiveTriple {
+                                Subject = ResourceOrVariable.Variable "t"
+                                Predicate = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri roleIri )))
+                                Object = ResourceOrVariable.Variable "s"
+                                })
+                              ]
+                }
+                
     let Tbox2Rules (tbox : TBox) (resourceManager : ResourceManager) : Rule seq =
-        tbox
-        |> Seq.collect (GetAxiomConceptNames)
-        |> Seq.map (CreateDLConceptRule resourceManager)
+        let conceptNameAxioms = tbox
+                                |> Seq.collect (GetAxiomConceptNames)
+                                |> Seq.map (CreateDLConceptRule resourceManager)
+        let existentialAxioms = tbox
+                                |> Seq.collect (GetAxiomExistentials)
+                                |> Seq.map (fun (role, concept) -> CreateDLExistentialRule resourceManager role concept)
+        let inclusionAxioms = tbox
+                                |> Seq.collect (CreateAxiomRule resourceManager)
+        Seq.append conceptNameAxioms existentialAxioms
         
     
     let Ontology2Rules (resourceManager : ResourceManager) (ontologyDoc : OntologyDocument) : Rule seq =
