@@ -36,30 +36,46 @@ module Translator =
                       ]
             }
         
-    (* X_conceptName (s) :- X_conceptName2(s) *)
-    let CreateAxiomRule (resourceManager : ResourceManager) (axiom : TBoxAxiom)  : Rule =
+    let CreateInclusionRule (resourceManager : ResourceManager) subConceptName superConceptName =
         let rdfTypeResource = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.Iri (IriReference Namespaces.RdfType) )))
+        {
+         Rule.Head = {
+                              Subject = ResourceOrVariable.Variable "s"
+                              Predicate = rdfTypeResource
+                              Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedConceptName superConceptName )))
+                              }
+         Rule.Body = [
+                              (RuleAtom.PositiveTriple {
+                                Subject = ResourceOrVariable.Variable "s"
+                                Predicate = rdfTypeResource
+                                Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedConceptName subConceptName )))
+                                })
+                              ]
+        }   
+        
+    (* X_conceptName (s) :- X_conceptName2(s) *)
+    let CreateAxiomRule (resourceManager : ResourceManager) (axiom : TBoxAxiom)  : Rule seq =
         match axiom with
         | Inclusion (subConcept, superConcept) ->
             let subConceptName = match subConcept with
                                     | ConceptName conceptName -> conceptName
                                     | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
-            let conceptName2 = match superConcept with
-                                | ConceptName conceptName -> conceptName
-                                | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
-            {Rule.Head = {
-                          Subject = ResourceOrVariable.Variable "s"
-                          Predicate = rdfTypeResource
-                          Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedConceptName conceptName2 )))
-                          }
-             Rule.Body = [
-                          (RuleAtom.PositiveTriple {
-                            Subject = ResourceOrVariable.Variable "s"
-                            Predicate = rdfTypeResource
-                            Object = (ResourceOrVariable.Resource ( resourceManager.AddResource (Resource.DLTranslatedConceptName subConceptName )))
-                            })
-                          ]
-        }   
+            let superConceptName = match superConcept with
+                                    | ConceptName conceptName -> conceptName
+                                    | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
+            [CreateInclusionRule resourceManager subConceptName superConceptName]
+        | Equivalence (subConcept, superConcept) ->
+            let subConceptName = match subConcept with
+                                    | ConceptName conceptName -> conceptName
+                                    | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
+            let superConceptName = match superConcept with
+                                    | ConceptName conceptName -> conceptName
+                                    | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
+            [
+             CreateInclusionRule resourceManager subConceptName superConceptName
+             CreateInclusionRule resourceManager superConceptName subConceptName
+            ]
+    
     
     (* X_(role some conceptName) (s) :- role some conceptName (s)  *)
     let CreateDLExistentialRule (resourceManager : ResourceManager) (role: Role) (concept : Concept)  : Rule =
@@ -116,7 +132,7 @@ module Translator =
                                 |> Seq.map (fun (role, concept) -> CreateDLExistentialRule resourceManager role concept)
         let inclusionAxioms = tbox
                                 |> Seq.collect (CreateAxiomRule resourceManager)
-        Seq.append conceptNameAxioms existentialAxioms
+        Seq.append inclusionAxioms (Seq.append conceptNameAxioms existentialAxioms)
         
     
     let Ontology2Rules (resourceManager : ResourceManager) (ontologyDoc : OntologyDocument) : Rule seq =

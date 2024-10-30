@@ -30,10 +30,9 @@ let ``Simplest owl axiom to datalog`` () =
     let kb = ([subclass_assertion], [])
     let ontology = OntologyDocument.Ontology ([], ontologyVersion, kb)
     let dlprog =  Translator.Ontology2Rules tripleTable.Resources ontology
-    
-    
+   
     let query = tripleTable.GetTriplesWithObject(objdIndex2)
     query.Should().BeEmpty() |> ignore
     DagSemTools.Datalog.Reasoner.evaluate (dlprog |> Seq.toList, tripleTable)
-    let query2 = tripleTable.GetTriplesWithSubject(objdIndex2)
+    let query2 = tripleTable.GetTriplesWithObject(objdIndex2)
     query2.Should().NotBeEmpty()
