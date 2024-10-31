@@ -52,25 +52,22 @@ module Translator =
                                 })
                               ]
         }   
-        
+    
+    let GetConceptName (concept : Concept) =
+        match concept with
+        | ConceptName conceptName -> conceptName
+        | _ -> failwith "Inclusion with complex concepts are not supported when translating DL to Datalog. Sorry"
+    
     (* X_conceptName (s) :- X_conceptName2(s) *)
     let CreateAxiomRule (resourceManager : ResourceManager) (axiom : TBoxAxiom)  : Rule seq =
         match axiom with
         | Inclusion (subConcept, superConcept) ->
-            let subConceptName = match subConcept with
-                                    | ConceptName conceptName -> conceptName
-                                    | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
-            let superConceptName = match superConcept with
-                                    | ConceptName conceptName -> conceptName
-                                    | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
-            [CreateInclusionRule resourceManager subConceptName superConceptName]
+            let subConceptName = GetConceptName subConcept
+            let superConceptName = GetConceptName superConcept
+            [CreateInclusionRule resourceManager subConceptName superConceptName ]
         | Equivalence (subConcept, superConcept) ->
-            let subConceptName = match subConcept with
-                                    | ConceptName conceptName -> conceptName
-                                    | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
-            let superConceptName = match superConcept with
-                                    | ConceptName conceptName -> conceptName
-                                    | _ -> failwith "Inclusion with complex concepts are not supported. Sorry"
+            let subConceptName = GetConceptName subConcept
+            let superConceptName = GetConceptName superConcept
             [
              CreateInclusionRule resourceManager subConceptName superConceptName
              CreateInclusionRule resourceManager superConceptName subConceptName
