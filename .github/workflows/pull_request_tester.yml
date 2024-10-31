@@ -29,11 +29,12 @@ jobs:
       run: | 
         mkdir localNugetPackages
         projects=(
-          "Rdf"
           "AlcTableau"
+          "Rdf"
           "Parser"
           "Turtle.Parser"
           "Datalog"
+          "DL2Datalog"
           "Datalog.Parser"
           "Manchester"
           "Manchester.Parser"

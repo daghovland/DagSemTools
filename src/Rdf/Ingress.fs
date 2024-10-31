@@ -12,7 +12,8 @@
 namespace DagSemTools.Rdf
 
 open System
-open System.Resources
+open DagSemTools.AlcTableau
+open DagSemTools.AlcTableau.ALC
 open IriTools
 
 module Ingress =
@@ -37,6 +38,8 @@ module Ingress =
         | DateLiteral of literalDate: DateOnly
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
+        | DLTranslatedConceptName of concept: IriReference
+        | DLTranslatedExistential of role: IriReference * filler: IriReference
             override this.ToString() =
                 match this with
                 | Iri iri -> $"<(%A{iri})>"
@@ -56,6 +59,8 @@ module Ingress =
                 | DateLiteral literalDate -> $"DateLiteral(%A{literalDate})"
                 | LangLiteral (lang, langliteral) -> $"%s{lang}@%s{langliteral})"
                 | TypedLiteral (typeIri, typedLiteral) -> $"%s{typedLiteral}^^%A{typeIri}"
+                | DLTranslatedConceptName concept -> $"Internal Representation for DL reasoning of (%A{concept})"
+                | DLTranslatedExistential (role, filler) -> $"Internal Representation for DL reasoning of (%A{role} some %A{filler})"
                 
     type TripleListIndex = uint
     type QuadListIndex = uint

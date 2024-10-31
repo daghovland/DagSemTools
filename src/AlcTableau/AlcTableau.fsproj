@@ -11,7 +11,7 @@
         <Version>0.1.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For acyclic ALC ontologies</Description>
-        <RepositoryUrl>https://github.com/daghovland/AlcTableau/</RepositoryUrl>
+        <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
 
