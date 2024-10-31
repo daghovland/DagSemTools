@@ -26,9 +26,12 @@
 
     <ItemGroup>
         <Compile Include="Library.fs"/>
-        <Content Include="README.md" />
     </ItemGroup>
 
+
+    <ItemGroup>
+        <None Include="README.md" />
+    </ItemGroup>
 
     <ItemGroup>
         <None Update="README.md">
@@ -36,7 +39,7 @@
             <PackagePath>README.md</PackagePath>
         </None>
     </ItemGroup>
-
+    
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
