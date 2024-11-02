@@ -43,8 +43,11 @@ module Namespaces =
     let RdfRest = Rdf + "rest";
 
     [<Literal>]
-    let RdfReifies = Rdf + "reifies";
-
+    let RdfReifies = Rdf + "reifies"
+    
+    [<Literal>]
+    let OwlSameAs = Owl + "sameAs";
+    
     [<Literal>]
     let XsdString = Xsd + "string";
     [<Literal>]

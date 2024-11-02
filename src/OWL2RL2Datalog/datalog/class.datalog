@@ -1,0 +1,3 @@
+[?x, a, ?c2] :- [?c1, rdfs:subClassOf, ?c2], [?x, a, ?c1] .
+[?x, a, ?c2] :- [?c1, owl:equivalentClass, ?c2], [?x, a, ?c1] .
+[?x, a, ?c1] :- [?c1, owl:equivalentClass, ?c2], [?x, a, ?c2] .

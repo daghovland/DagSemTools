@@ -21,7 +21,7 @@ tripleAtom :
     ;
 typeAtom: predicate LSQPAREN term RSQPAREN  ; 
 
-predicate : iri ;
+predicate : iri | variable;
 
 term : iri | literal | variable ;
 

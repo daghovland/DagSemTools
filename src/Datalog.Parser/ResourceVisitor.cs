@@ -41,7 +41,8 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
     /// <returns></returns>
     public override uint VisitIri(IriContext ctxt)
     {
-        var iri = _iriGrammarVisitor.VisitIri(ctxt) ?? throw new System.Exception("IRI is null");
+        var iri = _iriGrammarVisitor.VisitIri(ctxt) 
+                  ?? throw new System.Exception($"IRI {ctxt.GetText()} is null");
         return GetIriId(iri);
     }
 
