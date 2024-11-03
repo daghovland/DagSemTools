@@ -31,6 +31,7 @@
     
     <ItemGroup>
         <Compile Include="Library.fs"/>
+        <Compile Include="PredicateGrounder.fs" />
         <Compile Include="Stratifier.fs" />
         <Compile Include="Reasoner.fs" />
         <Content Include="README.md">

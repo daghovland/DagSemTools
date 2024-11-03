@@ -26,7 +26,7 @@ type ResourceOrWildcard =
 
 [<StructuralComparison>]
 [<StructuralEquality>]
-type TriplePattern = 
+type TriplePattern =
     {Subject: ResourceOrVariable; Predicate: ResourceOrVariable; Object: ResourceOrVariable}
 
 [<StructuralComparison>]
@@ -56,14 +56,21 @@ type PartialRuleMatch =
 
 module Datalog =
 
+    let VariableToString (v : string) : string = $"?{v}"
+    
+    let ResourceToString (tripleTable: Datastore) (r : Ingress.ResourceId) : string =
+        (tripleTable.GetResource r).ToString()
+    
     let ResourceOrVariableToString (tripleTable : Datastore) (res : ResourceOrVariable) : string =
         match res with
         | ResourceOrVariable.Resource r -> (tripleTable.GetResource r).ToString()
-        | Variable v -> $"?{v}"
+        | Variable v -> VariableToString v
     
 
-    let TriplePatternToString (tripleTable : Datastore) (triplePatter : TriplePattern) : string =
-        $"[{ResourceOrVariableToString tripleTable triplePatter.Subject}, {ResourceOrVariableToString tripleTable triplePatter.Predicate}, {ResourceOrVariableToString tripleTable triplePatter.Object} ]"
+    let TriplePatternToString (tripleTable : Datastore) (triplePattern : TriplePattern) : string =
+        $"[{ResourceOrVariableToString tripleTable triplePattern.Subject},
+        {ResourceOrVariableToString tripleTable triplePattern.Predicate},
+        {ResourceOrVariableToString tripleTable triplePattern.Object} ]"
     
     
     let ResourceAtom (tripleTable : Datastore) (ruleAtom : RuleAtom) : string =

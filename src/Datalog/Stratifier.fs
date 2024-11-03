@@ -1,10 +1,22 @@
+(*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*)
+
+
 namespace DagSemTools.Datalog
 
 open System.Collections.Generic
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Datalog.Datalog
 
-
+(* 
+    The Stratifier module intends to create a stratification of a datalog program, such that negation can be supported
+    The algorithm is meant to follow the one from the chapters on negation in  Abiteboul, Hull, Vianu: "Foundations of Databases" (1995)
+ *)
 module Stratifier =
 
     (*
@@ -29,6 +41,7 @@ module Stratifier =
         | UnaryPredicate (res, obj) -> match triple.Predicate, triple.Object with
                                         | ResourceOrVariable.Resource res', ResourceOrVariable.Resource obj' -> res = res' && obj = obj'
                                         | _ -> false
+        
     let MatchRelations (rel1) (rel2) : bool =
         match rel1, rel2 with
         | BinaryPredicate res1, BinaryPredicate res2 -> res1 = res2
@@ -57,7 +70,7 @@ module Stratifier =
     }
     let GetTriplePatternRelation (triple : TriplePattern) : Relation =
             match triple.Predicate with
-                                        | ResourceOrVariable.Variable _ -> failwith "The predicate/relation in a datalog rule head cannot be a variable. "
+                                        | ResourceOrVariable.Variable _ -> failwith "Variables in the predicate position are not supported by the core reasoner. This is probably a bug in the preproessor"
                                         | ResourceOrVariable.Resource res -> match triple.Object with
                                                                                     | ResourceOrVariable.Variable _ -> (BinaryPredicate res)
                                                                                     | ResourceOrVariable.Resource obj -> (UnaryPredicate (res, obj))
@@ -113,21 +126,19 @@ module Stratifier =
         let relations = GetRelations rules |> Seq.toArray
         let relationMap = relations |> Array.mapi (fun i r -> r, i) |> Map.ofArray
         
-        (* This is called by the constructor code to initialize the topological sorting of relations *)
-        let updateRelation (_ordered : OrderedRelation array) (headRelationNo : int) (atom : RuleAtom) =
+        let updateAtom (_ordered : OrderedRelation array) relationEdgeType (headRelationNo : int) (t : TriplePattern) =
+            let atomRelation = t |> GetTriplePatternRelation
+            let atomRelationNo = relationMap.[atomRelation]
+            _ordered.[int atomRelationNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int atomRelationNo].Successors
+            _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
+        
+        let updateRelation (_ordered : OrderedRelation array) (headRelationNo : int) (ruleBodyAtom : RuleAtom) =
                 _ordered.[int headRelationNo].intensional <- true
-                match atom with
+                match ruleBodyAtom with
                 | NotTriple t ->
-                    let atomRelation = t |> GetTriplePatternRelation
-                    let atomRelationNo = relationMap.[atomRelation]
-                    _ordered.[int atomRelationNo].Successors <- NegativeRelationEdge headRelationNo :: _ordered.[int atomRelationNo].Successors
-                    _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
-                    
+                    updateAtom _ordered NegativeRelationEdge headRelationNo t
                 | PositiveTriple t ->
-                    let atomRelation = t |> GetTriplePatternRelation
-                    let atomRelationNo = relationMap.[atomRelation]
-                    _ordered.[int atomRelationNo].Successors <- PositiveRelationEdge headRelationNo :: _ordered.[int atomRelationNo].Successors
-                    _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
+                    updateAtom _ordered PositiveRelationEdge headRelationNo t
         
         (* This is only run once on initialization to set up the data structure for topologial sorting of relations *)
         let mutable ordered_relations = 
@@ -242,7 +253,8 @@ module Stratifier =
                     || (cycle |> Seq.exists (MatchRelations atomRelation))
                     )
         
-        (* Only called when topological sorting stops, so there is a cycle
+        (* 
+            Only called when topological sorting stops, so there is a cycle
             Finds one cycle, if that contains a negative edge, reports error, otherwise,
             checks whether the first relation in the cycle is ready to be output, and if so, outputs it
             An example of where it is not ready, is if it depends on another cycle, which needs to be output first. 
