@@ -1,5 +1,6 @@
 namespace DagSemTools.Rdf
 
+open DagSemTools.Rdf.Ingress
 open Ingress
 
 open System
@@ -21,6 +22,12 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
     
     member val ResourceMap = resourceMap with get, set
     
+    member this.GetIriResourceIds() =
+        this.ResourceMap
+            |> Seq.choose (fun res ->
+            match res.Key with
+            | Iri _ -> Some res.Value
+            | _ -> None)
     new(init_rdf_size : uint) =
         let init_resources = max 10 (int init_rdf_size / 10)
         let init_triples = max 10 (int init_rdf_size / 60)

@@ -27,28 +27,31 @@ module PredicateGrounder =
         | NotTriple triple -> getTriplePredicate triple    
     let getPredicatesInUse (rules: Rule seq, triplestore: Datastore) =
         let headPredicates = rules |> Seq.choose (fun rule -> getTriplePredicate rule.Head)
-        let dataPredicates = triplestore.Triples.GetPredicates()
+        let dataPredicates = triplestore.Resources.GetIriResourceIds()
         Seq. concat [headPredicates; dataPredicates] |> Seq.distinct
 
-    let instantiateTripleWithPredicate (triple : TriplePattern) (variableName : ResourceOrVariable) (predicate : Ingress.ResourceId) =
-        match triple.Predicate with
-        | _variableName when _variableName = variableName -> {triple with Predicate = ResourceOrVariable.Resource predicate}
-        | _ -> triple
+    let instantiateTripleWithVariableMapping (triple : TriplePattern) (variableName : ResourceOrVariable) (predicate : Ingress.ResourceId) : TriplePattern =
+        let tripleList =
+            [triple.Subject; triple.Predicate; triple.Object]
+            |> List.map (fun res -> 
+            match res with
+                    | _variableName when _variableName = variableName -> ResourceOrVariable.Resource predicate
+                    | _ -> res)
+        {Subject = tripleList.[0]; Predicate = tripleList.[1]; Object = tripleList.[2]}
         
-    let instantiateRuleWithPredicate (predicate: Ingress.ResourceId, rule: Rule, variableName) =
+    let instantiateRuleWithVariableMapping (predicate: Ingress.ResourceId, rule: Rule, variableName) =
         let newHead = {rule.Head with Predicate = ResourceOrVariable.Resource predicate}
         let newBody = rule.Body |> List.map (
             fun atom ->
                 match atom with
-                | PositiveTriple triple -> PositiveTriple (instantiateTripleWithPredicate triple variableName predicate)
-                | RuleAtom.NotTriple triple -> NotTriple (instantiateTripleWithPredicate triple variableName predicate)
+                | PositiveTriple triple -> PositiveTriple (instantiateTripleWithVariableMapping triple variableName predicate)
+                | RuleAtom.NotTriple triple -> NotTriple (instantiateTripleWithVariableMapping triple variableName predicate)
                 )
         {rule with Head = newHead; Body = newBody}
     
-    
     let multiplyRuleHeadWithPredicates (predicates: Ingress.ResourceId seq) (rule: Rule) =
         match rule.Head.Predicate with
-        | Variable s -> predicates |> Seq.map (fun p -> instantiateRuleWithPredicate(p, rule, Variable s))
+        | Variable s -> predicates |> Seq.map (fun p -> instantiateRuleWithVariableMapping(p, rule, Variable s))
         | ResourceOrVariable.Resource _ -> [rule]
 
     let getTripleRelationVariable (triple : TriplePattern) =
@@ -64,9 +67,13 @@ module PredicateGrounder =
             )
     
     let getGroundPredicateRules (rule: Rule) (predicates: Ingress.ResourceId seq) (relationVariableName: string) : Rule seq =
-        predicates |> Seq.map (fun pred -> instantiateRuleWithPredicate(pred, rule, Variable relationVariableName))
+        predicates |> Seq.map (fun pred -> instantiateRuleWithVariableMapping(pred, rule, Variable relationVariableName))
     
-    (* This assumes that the head has already a ground relation *)
+    (* 
+        This assumes that the head has already a ground relation
+        Currently not used, since attempting to make the reasoner handle variables in the body 
+        in the stratification properly.
+     *)
     let multiplyRuleBodyWithPredicates (predicates: Ingress.ResourceId seq) (rule: Rule) : Rule seq =
         let relationVariables = getBodyRelationVariables rule
         if relationVariables |> Seq.isEmpty then
@@ -79,4 +86,3 @@ module PredicateGrounder =
     let groundRulePredicates (rules: Rule list, triplestore: Datastore) =
         let predicatesInUse = getPredicatesInUse(rules, triplestore)
         rules |> Seq.collect (multiplyRuleHeadWithPredicates predicatesInUse)
-              |> Seq.collect (multiplyRuleBodyWithPredicates predicatesInUse)

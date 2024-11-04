@@ -28,6 +28,7 @@ module Stratifier =
     [<StructuralEquality>]
     [<StructuralComparison>]
     type Relation =
+        | AllVariables
         | BinaryPredicate of ResourceId
         | UnaryPredicate of predicate : ResourceId * obj : ResourceId 
     
@@ -35,6 +36,7 @@ module Stratifier =
     (* A relation matches a triple if the predicate matches a binary relation or if both predicate and object matches a unary relation *)
     let MatchTripleRelation (triple : TriplePattern) (relation : Relation)  : bool =
         match relation with
+        | AllVariables -> true
         | BinaryPredicate res -> match triple.Predicate with
                                     | ResourceOrVariable.Resource res' -> res = res'
                                     | _ -> false
@@ -44,6 +46,8 @@ module Stratifier =
         
     let MatchRelations (rel1) (rel2) : bool =
         match rel1, rel2 with
+        | AllVariables, _ -> true
+        | _, AllVariables -> true
         | BinaryPredicate res1, BinaryPredicate res2 -> res1 = res2
         | UnaryPredicate (res1, obj1), UnaryPredicate (res2, obj2) -> res1 = res2 && obj1 = obj2
         | UnaryPredicate (res1p, res1o), BinaryPredicate res2 -> res1p = res2
@@ -70,7 +74,7 @@ module Stratifier =
     }
     let GetTriplePatternRelation (triple : TriplePattern) : Relation =
             match triple.Predicate with
-                                        | ResourceOrVariable.Variable _ -> failwith "Variables in the predicate position are not supported by the core reasoner. This is probably a bug in the preproessor"
+                                        | ResourceOrVariable.Variable _ -> AllVariables
                                         | ResourceOrVariable.Resource res -> match triple.Object with
                                                                                     | ResourceOrVariable.Variable _ -> (BinaryPredicate res)
                                                                                     | ResourceOrVariable.Resource obj -> (UnaryPredicate (res, obj))
@@ -126,11 +130,26 @@ module Stratifier =
         let relations = GetRelations rules |> Seq.toArray
         let relationMap = relations |> Array.mapi (fun i r -> r, i) |> Map.ofArray
         
+        (* 
+            This is the core of a topoogical sorting of the relations.
+            Based on the algorithm in Knuths Art of Computer Programming, chapter 2
+            
+            The treatment of the "wildcard" triplepattern AllVariables is my addition
+            I have not proved this addition correct
+        *)
         let updateAtom (_ordered : OrderedRelation array) relationEdgeType (headRelationNo : int) (t : TriplePattern) =
             let atomRelation = t |> GetTriplePatternRelation
-            let atomRelationNo = relationMap.[atomRelation]
-            _ordered.[int atomRelationNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int atomRelationNo].Successors
-            _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
+            match atomRelation with
+            | AllVariables ->
+                let numRelations = Array.length _ordered
+                if _ordered.[int headRelationNo].num_predecessors < (uint numRelations) then
+                    for i in 0 .. (numRelations - 1) do
+                            _ordered.[i].Successors <- relationEdgeType headRelationNo :: _ordered.[i].Successors
+                            _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
+            | _ ->
+                let atomRelationNo = relationMap.[atomRelation]
+                _ordered.[int atomRelationNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int atomRelationNo].Successors
+                _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
         
         let updateRelation (_ordered : OrderedRelation array) (headRelationNo : int) (ruleBodyAtom : RuleAtom) =
                 _ordered.[int headRelationNo].intensional <- true
