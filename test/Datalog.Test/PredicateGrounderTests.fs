@@ -109,19 +109,20 @@ module PredicateGrounderTests =
             let rule = {Head =  triplepattern; Body = [triplepattern2]}
             
             let groundRules = PredicateGrounder.groundRulePredicates ([rule], tripleTable)
-            groundRules.Should().HaveLength(1) |> ignore
-            let groundRule = groundRules |> Seq.head
+            groundRules.Should().HaveLength(4) |> ignore
+            let predGroundRules = groundRules |> Seq.filter (fun r -> r.Head.Predicate = ResourceOrVariable.Resource predIndex)
+            predGroundRules.Should().HaveLength(1) |> ignore
+            let groundRule = predGroundRules |> Seq.head
             groundRule.Head.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
             groundRule.Body.Should().HaveLength(1) |> ignore
             let pred = groundRule.Body.[0] |> PredicateGrounder.getAtomPredicate |> Option.get
             pred.Should().Be(predIndex)
             
        [<Fact>]
-        let ``Multiplier removes rules from program`` () =
+        let ``Grounding adds rules from program`` () =
             let tripleTable = Datastore(60u)
             
             let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
             let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
             let triplepattern =  {
@@ -136,7 +137,7 @@ module PredicateGrounderTests =
             let rule = {Head =  triplepattern; Body = [triplepattern2]}
             
             let groundRules = PredicateGrounder.groundRulePredicates ([rule], tripleTable)
-            groundRules.Should().HaveLength(0) |> ignore
+            groundRules.Should().HaveLength(3) |> ignore
             
             
         [<Fact>]
@@ -188,4 +189,4 @@ module PredicateGrounderTests =
             let rule = {Head =  triplepattern; Body = [triplepattern2]}
             
             let predicates = PredicateGrounder.getPredicatesInUse ([rule], tripleTable)
-            predicates.Should().HaveLength(1) |> ignore
+            predicates.Should().HaveLength(4) |> ignore

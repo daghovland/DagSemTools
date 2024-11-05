@@ -82,14 +82,11 @@ let ``Equality axioms are handled`` () =
     let objectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
     let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
     let sameAsIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
-    let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
     let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
     
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objectIndex}
     tripleTable.AddTriple(Triple)
-    let SameAsTriple = {Ingress.Triple.subject = predIndex; predicate = sameAsIndex; obj = predIndex2}
-    tripleTable.AddTriple(SameAsTriple)
     
     let oquery1 = tripleTable.GetTriplesWithObject(objectIndex)
     oquery1.Should().HaveLength(1) |> ignore
@@ -124,6 +121,55 @@ let ``Equality axioms are handled`` () =
     let query2 = tripleTable.GetTriplesWithObject(objectIndex)
     query2.Should().HaveLength(2) |> ignore
 
+
+[<Fact>]
+let ``Grounding + Stratifying starts ok`` () =
+    // Arrange
+    let tripleTable = new Datastore(100u)
+    
+    let objectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+    let sameAsIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
+    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
+    
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objectIndex}
+    tripleTable.AddTriple(Triple)
+    
+    let oquery1 = tripleTable.GetTriplesWithObject(objectIndex)
+    oquery1.Should().HaveLength(1) |> ignore
+    let predQuery1 = tripleTable.GetTriplesWithPredicate(predIndex2)
+    predQuery1.Should().HaveLength(0) |> ignore
+    
+    let sameAsRule2 : Rule = {
+        Head = {
+            Subject = Variable "s"
+            Predicate = Variable "p2"
+            Object = Variable "o" 
+        }
+        Body = [
+            PositiveTriple {
+                Subject = Variable "p"
+                Predicate = ResourceOrVariable.Resource sameAsIndex
+                Object = Variable "p2"
+            }
+            PositiveTriple {
+                Subject = Variable "s"
+                Predicate = Variable "p"
+                Object = Variable "o"
+            }
+        ] 
+    }
+    // Act
+    let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates([sameAsRule2], tripleTable) |> Seq.toList
+    let stratifier = Stratifier.RulePartitioner rules_with_iri_predicates
+    let relationInfos = stratifier.GetOrderedRelations()
+    
+    //Assert
+    let predRelsInfo = relationInfos.[(int) predIndex]
+    predRelsInfo.num_predecessors.Should().Be((uint) 10) |> ignore
+    predRelsInfo.Successors.Should().HaveLength(5) |> ignore
+    
 [<Fact>]
 let ``Equality axioms can be grounded`` () =
     // Arrange

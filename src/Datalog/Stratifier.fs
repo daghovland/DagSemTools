@@ -79,11 +79,13 @@ module Stratifier =
                                                                                     | ResourceOrVariable.Variable _ -> (BinaryPredicate res)
                                                                                     | ResourceOrVariable.Resource obj -> (UnaryPredicate (res, obj))
     
-    let GetRuleAtomRelation (atom : RuleAtom) : Relation =
+    let GetRuleAtomRelation (atom : RuleAtom) : Relation option =
         let triple = match atom with
                         | PositiveTriple t -> t
                         | NotTriple t -> t
-        GetTriplePatternRelation triple                        
+        match GetTriplePatternRelation triple with
+        | AllVariables -> None
+        | r -> Some r
                  
     (* The intensional relations (properties) are those that occur in the head of at least one rule *)       
     let GetIntentionalRelations (rules : Rule list)  =
@@ -96,7 +98,7 @@ module Stratifier =
         let intentionalRelations = GetIntentionalRelations rules
         let bodyRules = rules
                             |> Seq.collect (fun rule ->
-                                rule.Body |> Seq.map GetRuleAtomRelation
+                                rule.Body |> Seq.choose GetRuleAtomRelation
                                 )
         bodyRules |> Seq.except intentionalRelations |> Seq.distinct
   
@@ -104,7 +106,7 @@ module Stratifier =
         let intentionalRelations = GetIntentionalRelations rules
         let bodyRules = rules
                             |> Seq.collect (fun rule ->
-                                rule.Body |> Seq.map GetRuleAtomRelation
+                                rule.Body |> Seq.choose GetRuleAtomRelation
                                 )
         Seq.concat [intentionalRelations ; bodyRules] |> Seq.distinct
     
@@ -139,18 +141,18 @@ module Stratifier =
         *)
         let updateAtom (_ordered : OrderedRelation array) relationEdgeType (headRelationNo : int) (t : TriplePattern) =
             let atomRelation = t |> GetTriplePatternRelation
-            match atomRelation with
-            | AllVariables ->
-                let numRelations = Array.length _ordered
-                if _ordered.[int headRelationNo].num_predecessors < (uint numRelations) then
-                    for i in 0 .. (numRelations - 1) do
-                            _ordered.[i].Successors <- relationEdgeType headRelationNo :: _ordered.[i].Successors
-                            _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
-            | _ ->
-                let atomRelationNo = relationMap.[atomRelation]
-                _ordered.[int atomRelationNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int atomRelationNo].Successors
-                _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
-        
+            let numRelations = Array.length _ordered
+            if _ordered.[int headRelationNo].num_predecessors < (uint numRelations) then
+                match atomRelation with
+                | AllVariables ->
+                        _ordered.[int headRelationNo].num_predecessors <- numRelations |> uint
+                        for i in 0 .. (numRelations - 1) do
+                                _ordered.[i].Successors <- relationEdgeType headRelationNo :: _ordered.[i].Successors
+                | _ ->
+                    let atomRelationNo = relationMap.[atomRelation]
+                    _ordered.[int atomRelationNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int atomRelationNo].Successors
+                    _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
+            
         let updateRelation (_ordered : OrderedRelation array) (headRelationNo : int) (ruleBodyAtom : RuleAtom) =
                 _ordered.[int headRelationNo].intensional <- true
                 match ruleBodyAtom with
@@ -185,6 +187,7 @@ module Stratifier =
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
         let mutable next_elements_queue = Queue<int>()
         let mutable n_unordered = Array.length ordered_relations - ready_elements_queue.Count
+        
         
         member this.cycle_finder (visited : int seq) (current : int) : int seq option =
             let current_element = ordered_relations.[current]
@@ -234,16 +237,17 @@ module Stratifier =
                         ordered_relations.[relation_id].uses_intensional_negative_edge <- true
                     relation_id
             let old_relation = ordered_relations.[relation_id]
-            if old_relation.num_predecessors < 1u then failwith "Datalog program preprocessing failed. This is a bug, please report that topological ordering failed, num_predecessors < 1"
-            let new_predecessors = old_relation.num_predecessors - 1u
-            ordered_relations.[relation_id] <- { old_relation with num_predecessors = new_predecessors }
-            if ordered_relations.[relation_id].num_predecessors = 0u && not ordered_relations.[relation_id].output then
-                ordered_relations.[relation_id].output <- true
-                if ordered_relations.[relation_id].uses_intensional_negative_edge then
-                    next_elements_queue.Enqueue(relation_id)
-                else
-                    ready_elements_queue.Enqueue(relation_id)
-            
+            if not old_relation.output then        
+                if old_relation.num_predecessors < 1u then failwith "Datalog program preprocessing failed. This is a bug, please report that topological ordering failed, num_predecessors < 1"
+                let new_predecessors = old_relation.num_predecessors - 1u
+                ordered_relations.[relation_id] <- { old_relation with num_predecessors = new_predecessors }
+                if ordered_relations.[relation_id].num_predecessors = 0u && not ordered_relations.[relation_id].output then
+                    ordered_relations.[relation_id].output <- true
+                    if ordered_relations.[relation_id].uses_intensional_negative_edge then
+                        next_elements_queue.Enqueue(relation_id)
+                    else
+                        ready_elements_queue.Enqueue(relation_id)
+                
             
         (* Gets all rules that are not part of a cycle. This will become a partition of the stratification
             After this is run, the remaining elements in "ordered" contain at least one cycle, and all elements are either in
@@ -267,11 +271,11 @@ module Stratifier =
             In other words, whether all elements of the body are in the cycle, or are extensional*)
         member this.RuleIsCoveredByCycle cycle rule =
                 rule.Body |> Seq.forall (fun atom ->
-                    let atomRelation = atom|> GetRuleAtomRelation
-                    ordered_relations.[relationMap.[atomRelation]].intensional = false
-                    || (cycle |> Seq.exists (MatchRelations atomRelation))
+                    match atom|> GetRuleAtomRelation with
+                    | None -> true
+                    | Some atomRelation ->  ordered_relations.[relationMap.[atomRelation]].intensional = false
+                                            || (cycle |> Seq.exists (MatchRelations atomRelation))
                     )
-        
         (* 
             Only called when topological sorting stops, so there is a cycle
             Finds one cycle, if that contains a negative edge, reports error, otherwise,
