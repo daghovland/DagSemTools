@@ -28,7 +28,7 @@ module Stratifier =
     [<StructuralEquality>]
     [<StructuralComparison>]
     type Relation =
-        | AllVariables
+        | AllRelations
         | BinaryPredicate of ResourceId
         | UnaryPredicate of predicate : ResourceId * obj : ResourceId 
     
@@ -36,7 +36,7 @@ module Stratifier =
     (* A relation matches a triple if the predicate matches a binary relation or if both predicate and object matches a unary relation *)
     let MatchTripleRelation (triple : TriplePattern) (relation : Relation)  : bool =
         match relation with
-        | AllVariables -> true
+        | AllRelations -> true
         | BinaryPredicate res -> match triple.Predicate with
                                     | ResourceOrVariable.Resource res' -> res = res'
                                     | _ -> false
@@ -46,8 +46,8 @@ module Stratifier =
         
     let MatchRelations (rel1) (rel2) : bool =
         match rel1, rel2 with
-        | AllVariables, _ -> true
-        | _, AllVariables -> true
+        | AllRelations, _ -> true
+        | _, AllRelations -> true
         | BinaryPredicate res1, BinaryPredicate res2 -> res1 = res2
         | UnaryPredicate (res1, obj1), UnaryPredicate (res2, obj2) -> res1 = res2 && obj1 = obj2
         | UnaryPredicate (res1p, res1o), BinaryPredicate res2 -> res1p = res2
@@ -74,7 +74,7 @@ module Stratifier =
     }
     let GetTriplePatternRelation (triple : TriplePattern) : Relation =
             match triple.Predicate with
-                                        | ResourceOrVariable.Variable _ -> AllVariables
+                                        | ResourceOrVariable.Variable _ -> AllRelations
                                         | ResourceOrVariable.Resource res -> match triple.Object with
                                                                                     | ResourceOrVariable.Variable _ -> (BinaryPredicate res)
                                                                                     | ResourceOrVariable.Resource obj -> (UnaryPredicate (res, obj))
@@ -84,31 +84,35 @@ module Stratifier =
                         | PositiveTriple t -> t
                         | NotTriple t -> t
         match GetTriplePatternRelation triple with
-        | AllVariables -> None
+        | AllRelations -> None
         | r -> Some r
                  
+    let bodyRules rules = rules
+                                |> Seq.collect (fun rule ->
+                                    rule.Body |> Seq.choose GetRuleAtomRelation
+                                    )
+    let headRules rules = rules
+                            |> Seq.map (fun rule -> rule.Head |> GetTriplePatternRelation)
+                            
+                
     (* The intensional relations (properties) are those that occur in the head of at least one rule *)       
     let GetIntentionalRelations (rules : Rule list)  =
-        rules
-        |> Seq.map (fun rule -> rule.Head |> GetTriplePatternRelation)
-        |> Seq.distinct
+        let rulesRelations =
+            headRules rules
+        if rulesRelations |> Seq.exists (fun r -> r = AllRelations) then
+            Seq.concat [rulesRelations ; bodyRules rules ] |> Seq.distinct
+        else
+            rulesRelations
     
     (* The extensional relations (properties) are those that only occur in the body of rules *)       
     let GetExtentionalRelations (rules : Rule list)  =
-        let intentionalRelations = GetIntentionalRelations rules
-        let bodyRules = rules
-                            |> Seq.collect (fun rule ->
-                                rule.Body |> Seq.choose GetRuleAtomRelation
-                                )
-        bodyRules |> Seq.except intentionalRelations |> Seq.distinct
+        if rules |> Seq.exists (fun rule -> rule.Head |> GetTriplePatternRelation = AllRelations) then
+            Seq.empty
+        else
+            bodyRules rules |> Seq.except (headRules rules) |> Seq.distinct
   
     let GetRelations (rules : Rule list) =
-        let intentionalRelations = GetIntentionalRelations rules
-        let bodyRules = rules
-                            |> Seq.collect (fun rule ->
-                                rule.Body |> Seq.choose GetRuleAtomRelation
-                                )
-        Seq.concat [intentionalRelations ; bodyRules] |> Seq.distinct
+        Seq.concat [headRules rules ; bodyRules rules] |> Seq.distinct
     
     (* Returns any rules containing negations of intentional properties. These relations make the program not semipositive *)
     let NegativeIntentionalProperties (rules : Rule list) =
@@ -144,7 +148,7 @@ module Stratifier =
             let numRelations = Array.length _ordered
             if _ordered.[int headRelationNo].num_predecessors < (uint numRelations) then
                 match atomRelation with
-                | AllVariables ->
+                | AllRelations ->
                         _ordered.[int headRelationNo].num_predecessors <- numRelations |> uint
                         for i in 0 .. (numRelations - 1) do
                                 _ordered.[i].Successors <- relationEdgeType headRelationNo :: _ordered.[i].Successors
@@ -286,7 +290,8 @@ module Stratifier =
          *)
         member this.handle_cycle()  =
             match (ordered_relations
-                  |> Array.filter (fun relation -> relation.num_predecessors > 0u)
+                  |> Array.filter (fun relation -> relation.num_predecessors > 0u
+                                                    && relation.output = false)
                   |> Array.map (fun relation -> relationMap.[relation.Relation])
                   |> Array.choose (this.cycle_finder [])
                   |> Array.filter (fun cycle ->
