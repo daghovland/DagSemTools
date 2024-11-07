@@ -286,9 +286,15 @@ let ``Equality RL reasoning works`` () =
     tripleTable.AddTriple(contentTriple)
     let query = tripleTable.GetTriplesWithObject(objIndex)
     query.Should().HaveLength(1) |> ignore
+    let query1a = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex)
+    query1a.Should().HaveLength(0) |> ignore
+    
     let rlProgram = Reasoner.enableEqualityReasoning tripleTable [] errorOutput
     DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithObject(objIndex)
     query2.Should().HaveLength(2) |> ignore
     let query3 = tripleTable.GetTriplesWithPredicate(predIndex)
-    query3.Should().HaveLength(2) |> ignore
+    query3.Should().HaveLength(1) |> ignore
+    let query1b = tripleTable.GetTriplesWithSubjectObject(subjectIndex2, objIndex)
+    query1b.Should().HaveLength(1) |> ignore
+    

@@ -442,8 +442,9 @@ module Tests =
             let rule =  {Head =  headPattern; Body = [ positiveMatch ] }
             let partitioner  = Stratifier.RulePartitioner [rule]
             let cycles = partitioner.cycle_finder [] 0
-            cycles.Should().BeSome() |> ignore
-            cycles.Value.Should().HaveLength(1).And.Contain(0) |> ignore
+            cycles.Should().HaveLength(1) |> ignore
+            let cycle = cycles |> Seq.head
+            cycle.Should().HaveLength(1).And.Contain(0) |> ignore
             
     
     

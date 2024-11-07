@@ -201,28 +201,27 @@ module Stratifier =
         let mutable next_elements_queue = Queue<int>()
         let mutable n_unordered = Array.length ordered_relations - ready_elements_queue.Count
         
-        
-        member this.cycle_finder (visited : int seq) (current : int) : int seq option =
+        (* Called when the topological sorting cannot proceed, hence assuming the existence of a cycle *)
+        member this.cycle_finder (visited : int seq) (current : int) : int seq seq =
             let current_element = ordered_relations.[current]
             if (visited |> Seq.contains current) then
-                visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.distinct  |> Some
-            else if current_element.visited then None
+                visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.distinct |> Seq.singleton
+            else if current_element.visited then Seq.empty
             else
                 // TODO: Enable this optimisation when the cycle finder is working
                 // ordered_relations.[current].visited <- true
-                current_element.Successors |> Seq.choose
+                current_element.Successors |> Seq.collect
                                                     (fun edge ->
                                                         match edge with
                                                         | PositiveRelationEdge relation_id -> 
                                                             (this.cycle_finder (Seq.append visited [current]) relation_id)
                                                         | NegativeRelationEdge relation_id ->
-                                                            if (this.cycle_finder (Seq.append visited [current]) relation_id |> Option.isSome) then
+                                                            if (this.cycle_finder (Seq.append visited [current]) relation_id |> Seq.isEmpty |> not) then
                                                                 // TODO: Output cycle
                                                                 failwith "Datalog program contains a cycle with negation and is not stratifiable!"
                                                             else
-                                                                None
+                                                                Seq.empty
                                                     )
-                                            |> Seq.tryHead
             
             
         member this.GetReadyElementsQueue() = ready_elements_queue    
@@ -297,12 +296,12 @@ module Stratifier =
             The proof that these cycles / strongly connected components always exist is in the Alice book
          *)
         member this.handle_cycle()  =
-            match (ordered_relations
+            let cycles = (ordered_relations
                   |> Array.filter (fun relation -> relation.num_predecessors > 0u
                                                     && relation.output = false)
                   |> Array.map (fun relation -> relationMap.[relation.Relation])
-                  |> Array.choose (this.cycle_finder [])
-                  |> Array.filter (fun cycle ->
+                  |> Seq.collect (this.cycle_finder [])
+                  |> Seq.filter (fun cycle ->
                             let cycle_element = cycle |> Seq.head
                             let rules = rules
                                         |> List.filter (fun rule ->
@@ -311,15 +310,13 @@ module Stratifier =
                             rules |> List.forall (this.RuleIsCoveredByCycle (cycle |> Seq.map (fun id -> relations.[id])))
                             )
                             
-                  |> Seq.tryHead)
-            with
-            | Some cycle ->
+                  )
+            cycles |> Seq.iter (fun cycle ->
                   cycle |> Seq.distinct |>(Seq.iter (fun rel ->
                       if not ordered_relations.[rel].output then 
                         ordered_relations.[rel].output <- true
                         ready_elements_queue.Enqueue rel)
-                  )
-            | None -> failwith "Datalog program preprocessing failed. This is a bug, please report"
+                  ))
                 
             
         (*  Catches some errors in stratification, to avoid a wrong stratification being returned
@@ -328,8 +325,8 @@ module Stratifier =
         member this.is_stratified (stratification: Rule seq seq) =
             ready_elements_queue.Count = 0
             && next_elements_queue.Count = 0
-            && (stratification |> Seq.sumBy Seq.length) = rules.Length
-            && ordered_relations |> Array.forall (fun relation -> relation.intensional = false)
+            && (stratification |> Seq.sumBy Seq.length) >= rules.Length
+            // && ordered_relations |> Array.forall (fun relation -> relation.intensional = false)
 
         (* Used in the while loop in orderRules to test whether stratification is finished *)
         member this.topological_sort_finished() =
@@ -348,6 +345,6 @@ module Stratifier =
                     this.handle_cycle()
                     
             if not (this.is_stratified stratification) then
-                 failwith "Datalog program preprocessing failed! This is a bug, please report"
+                 failwith "Datalog program preprocessing created wrong stratification! This is a bug, please report"
             stratification
             
