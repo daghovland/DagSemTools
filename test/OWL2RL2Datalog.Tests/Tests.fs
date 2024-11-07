@@ -1,6 +1,7 @@
 module Tests
 
 open System
+open DagSemTools.Datalog.Reasoner
 open DagSemTools.Rdf
 open DagSemTools.Datalog
 open DagSemTools.Rdf.Ingress
@@ -51,10 +52,10 @@ let ``Predicate variables are ordered`` () =
     stratification.Should().HaveLength(1) |> ignore
 
 [<Fact>]
-let ``Predicate variables are handled`` () =
+let ``Unsafe rules are rejected`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
-    
+    let program : DatalogProgram = new DatalogProgram([], tripleTable)
     let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
     let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference ("http://example.com/predicate")))
     let objextIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
@@ -67,12 +68,43 @@ let ``Predicate variables are handled`` () =
             Object = ResourceOrVariable.Resource objextIndex
         }
     let rule : Rule = {Head = triplePattern "s1"; Body = [PositiveTriple (triplePattern "s2")]}
+    let evaluatorFunction = fun () -> DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
+    Assert.Throws<ArgumentException>(evaluatorFunction) |> ignore
+    
+
+[<Fact>]
+let ``Predicate variables are handled`` () =
+    let tripleTable = new Datastore(100u)
+    let errorOutput = new System.IO.StringWriter()
+    
+    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference ("http://example.com/predicate")))
+    let objextIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+    let objextIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+    let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
+    tripleTable.AddTriple(Triple)
+    let headPattern : TriplePattern  =
+        {
+            Subject = ResourceOrVariable.Resource subjectIndex
+            Predicate = ResourceOrVariable.Variable "p"
+            Object = ResourceOrVariable.Resource objextIndex2
+        }
+    let bodyPattern : TriplePattern  =
+        {
+            Subject = ResourceOrVariable.Resource subjectIndex
+            Predicate = ResourceOrVariable.Variable "p"
+            Object = ResourceOrVariable.Resource objextIndex
+        }
+    let rule : Rule = {Head = headPattern; Body = [PositiveTriple (bodyPattern)]}
+    
+    let query1 = tripleTable.GetTriplesWithObject(objextIndex2)
+    query1.Should().HaveLength(0) |> ignore
+    
     DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
-    let query2 = tripleTable.GetTriplesWithObject(objextIndex)
+    let query2 = tripleTable.GetTriplesWithObject(objextIndex2)
     query2.Should().HaveLength(1) |> ignore
     let query3 = tripleTable.GetTriplesWithPredicate(predIndex)
-    query3.Should().HaveLength(1) |> ignore
-
+    query3.Should().HaveLength(2) |> ignore
     
 [<Fact>]
 let ``Equality axioms are handled`` () =
@@ -87,6 +119,8 @@ let ``Equality axioms are handled`` () =
     
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objectIndex}
     tripleTable.AddTriple(Triple)
+    let SameAsTriple = {Ingress.Triple.subject = predIndex; predicate = sameAsIndex; obj = predIndex2}
+    tripleTable.AddTriple(SameAsTriple)
     
     let oquery1 = tripleTable.GetTriplesWithObject(objectIndex)
     oquery1.Should().HaveLength(1) |> ignore

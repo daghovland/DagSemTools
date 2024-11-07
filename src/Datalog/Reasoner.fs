@@ -14,7 +14,12 @@ open Stratifier
 module Reasoner =
 
     type DatalogProgram (Rules: Rule list, tripleStore : Datastore) =
-        let mutable Rules = Rules
+        let mutable Rules = 
+            if Rules |> List.exists (not << isSafeRule) then
+                raise (new System.ArgumentException("One or more rules are not safe"))
+            else
+                Rules
+                
         let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
                             Rules
                                 |> List.map GetPartialMatches
@@ -41,7 +46,7 @@ module Reasoner =
             The semi-naive materialisation algorithm. Assumes a non-cyclic ruleset
             Usually called from the evaluate function, which will stratify the ruleset
         *)
-        member this.materialiseNaive() =
+        member internal this.materialiseNaive() =
                 for triple in tripleStore.Triples.GetTriples() do
                     for rules in this.GetRulesForFact triple do
                         for subs in evaluate tripleStore.Triples rules  do

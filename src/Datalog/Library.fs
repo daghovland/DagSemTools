@@ -117,13 +117,19 @@ module Datalog =
                                                         | _ -> None
                                 )
         let variablesInHead = [rule.Head.Subject; rule.Head.Predicate; rule.Head.Object]
+                                |> Seq.choose (fun r -> match r with
+                                                        | Variable v -> Some (Variable v)
+                                                        | _ -> None
+                                )
         variablesInHead |> Seq.forall (fun v -> variablesInBody |> Seq.exists (fun b -> b = v))
         
         
     let ApplySubstitutionResource (sub : Substitution) (res : ResourceOrVariable) : ResourceId =
         match res with
         | ResourceOrVariable.Resource r -> r
-        | Variable v -> sub[v]
+        | Variable v -> match sub.TryGetValue v with
+                        | true, r -> r
+                        | false, _ -> failwith "Head of rule not fully instantiated. Invalid datalog rule"
     let ApplySubstitutionTriple sub (triple : TriplePattern) : Triple =
         {
          Ingress.subject = ApplySubstitutionResource sub triple.Subject
