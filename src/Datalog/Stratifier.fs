@@ -79,40 +79,41 @@ module Stratifier =
                                                                                     | ResourceOrVariable.Variable _ -> (BinaryPredicate res)
                                                                                     | ResourceOrVariable.Resource obj -> (UnaryPredicate (res, obj))
     
-    let GetRuleAtomRelation (atom : RuleAtom) : Relation option =
+    let GetRuleAtomRelation (atom : RuleAtom) : Relation =
         let triple = match atom with
                         | PositiveTriple t -> t
                         | NotTriple t -> t
-        match GetTriplePatternRelation triple with
-        | AllRelations -> None
-        | r -> Some r
+        GetTriplePatternRelation triple
+        // match GetTriplePatternRelation triple with
+        // | AllRelations -> None
+        // | r -> Some r
                  
-    let bodyRules rules = rules
+    let GetBodyRelations rules = rules
                                 |> Seq.collect (fun rule ->
-                                    rule.Body |> Seq.choose GetRuleAtomRelation
+                                    rule.Body |> Seq.map GetRuleAtomRelation
                                     )
-    let headRules rules = rules
-                            |> Seq.map (fun rule -> rule.Head |> GetTriplePatternRelation)
+    let GetHeadRelations rules = rules
+                                |> Seq.map (fun rule -> rule.Head |> GetTriplePatternRelation)
                             
                 
     (* The intensional relations (properties) are those that occur in the head of at least one rule *)       
     let GetIntentionalRelations (rules : Rule list)  =
-        let rulesRelations =
-            headRules rules
-        if rulesRelations |> Seq.exists (fun r -> r = AllRelations) then
-            Seq.concat [rulesRelations ; bodyRules rules ] |> Seq.distinct
+        let headRelations =
+            GetHeadRelations rules
+        if headRelations |> Seq.exists (fun r -> r = AllRelations) then
+            Seq.concat [headRelations ; GetBodyRelations rules ] |> Seq.distinct
         else
-            rulesRelations
+            headRelations
     
     (* The extensional relations (properties) are those that only occur in the body of rules *)       
     let GetExtentionalRelations (rules : Rule list)  =
         if rules |> Seq.exists (fun rule -> rule.Head |> GetTriplePatternRelation = AllRelations) then
             Seq.empty
         else
-            bodyRules rules |> Seq.except (headRules rules) |> Seq.distinct
+            GetBodyRelations rules |> Seq.except (GetHeadRelations rules) |> Seq.distinct
   
     let GetRelations (rules : Rule list) =
-        Seq.concat [headRules rules ; bodyRules rules] |> Seq.distinct
+        Seq.concat [GetHeadRelations rules ; GetBodyRelations rules] |> Seq.distinct
     
     (* Returns any rules containing negations of intentional properties. These relations make the program not semipositive *)
     let NegativeIntentionalProperties (rules : Rule list) =
@@ -131,6 +132,7 @@ module Stratifier =
     let IsSemiPositiveProgram (rules : Rule list) =
         NegativeIntentionalProperties rules |> Seq.isEmpty
   
+    (* The RulePartitioner creates a stratification of the program if it is stratifiable, and otherwise fails *)
     type RulePartitioner(rules: Rule list) =
         
         let relations = GetRelations rules |> Seq.toArray
@@ -140,23 +142,30 @@ module Stratifier =
             This is the core of a topoogical sorting of the relations.
             Based on the algorithm in Knuths Art of Computer Programming, chapter 2
             
-            The treatment of the "wildcard" triplepattern AllVariables is my addition
+            The treatment of the "wildcard" triplepattern (ternary relation?) AllVariables is my addition
             I have not proved this addition correct
-        *)
-        let updateAtom (_ordered : OrderedRelation array) relationEdgeType (headRelationNo : int) (t : TriplePattern) =
-            let atomRelation = t |> GetTriplePatternRelation
-            let numRelations = Array.length _ordered
-            if _ordered.[int headRelationNo].num_predecessors < (uint numRelations) then
-                match atomRelation with
-                | AllRelations ->
-                        _ordered.[int headRelationNo].num_predecessors <- numRelations |> uint
-                        for i in 0 .. (numRelations - 1) do
-                                _ordered.[i].Successors <- relationEdgeType headRelationNo :: _ordered.[i].Successors
-                | _ ->
-                    let atomRelationNo = relationMap.[atomRelation]
-                    _ordered.[int atomRelationNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int atomRelationNo].Successors
-                    _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
             
+            This method is called whenever a relation is removed from the queue of relations ready for ouput
+            
+        *)
+        let updateAtom (_ordered : OrderedRelation array) relationEdgeType (headRelationNo : int) (bodyTriplePattern : TriplePattern) =
+            let atomRelation = bodyTriplePattern |> GetTriplePatternRelation
+            let numRelations = Array.length _ordered
+            let atomRelationNo = relationMap.[atomRelation]
+            _ordered.[int atomRelationNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int atomRelationNo].Successors
+            _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
+            
+        (* Adds a dependency to and from the wildcard-relation *)
+        let updateWildcardRelation (_ordered: OrderedRelation array) =
+            match relationMap.TryGetValue AllRelations with
+            | false, _ -> ()
+            | true, wildcardRelationNo ->
+                for i in 0 .. (Array.length _ordered - 1) do
+                    if i <> wildcardRelationNo then
+                        _ordered.[i].Successors <- PositiveRelationEdge wildcardRelationNo :: _ordered.[i].Successors
+                        _ordered.[wildcardRelationNo].num_predecessors <- _ordered.[wildcardRelationNo].num_predecessors + 1u
+            _ordered
+                    
         let updateRelation (_ordered : OrderedRelation array) (headRelationNo : int) (ruleBodyAtom : RuleAtom) =
                 _ordered.[int headRelationNo].intensional <- true
                 match ruleBodyAtom with
@@ -181,7 +190,7 @@ module Stratifier =
                                         rule.Body
                                            |> Seq.iter (updateRelation _ordered headRelationNo)
                                 )
-            _ordered
+            updateWildcardRelation _ordered
         
         (* The queue contains all relations that are not dependent on any relations (that have not already been output) *)
         let mutable ready_elements_queue =
@@ -275,11 +284,10 @@ module Stratifier =
             In other words, whether all elements of the body are in the cycle, or are extensional*)
         member this.RuleIsCoveredByCycle cycle rule =
                 rule.Body |> Seq.forall (fun atom ->
-                    match atom|> GetRuleAtomRelation with
-                    | None -> true
-                    | Some atomRelation ->  ordered_relations.[relationMap.[atomRelation]].intensional = false
+                                            let atomRelation = atom|> GetRuleAtomRelation 
+                                            ordered_relations.[relationMap.[atomRelation]].intensional = false
                                             || (cycle |> Seq.exists (MatchRelations atomRelation))
-                    )
+                                        )
         (* 
             Only called when topological sorting stops, so there is a cycle
             Finds one cycle, if that contains a negative edge, reports error, otherwise,
@@ -307,8 +315,9 @@ module Stratifier =
             with
             | Some cycle ->
                   cycle |> Seq.distinct |>(Seq.iter (fun rel ->
-                      ordered_relations.[rel].output <- true
-                      ready_elements_queue.Enqueue rel)
+                      if not ordered_relations.[rel].output then 
+                        ordered_relations.[rel].output <- true
+                        ready_elements_queue.Enqueue rel)
                   )
             | None -> failwith "Datalog program preprocessing failed. This is a bug, please report"
                 
@@ -320,12 +329,11 @@ module Stratifier =
             ready_elements_queue.Count = 0
             && next_elements_queue.Count = 0
             && (stratification |> Seq.sumBy Seq.length) = rules.Length
-            && ordered_relations |> Array.forall (fun relation -> relation.num_predecessors = 0u
-                                                                    && relation.intensional = false)
+            && ordered_relations |> Array.forall (fun relation -> relation.intensional = false)
 
         (* Used in the while loop in orderRules to test whether stratification is finished *)
         member this.topological_sort_finished() =
-            ordered_relations |> Array.forall (fun relation -> relation.num_predecessors = 0u)
+            ordered_relations |> Array.forall (fun relation -> relation.output || relation.num_predecessors = 0u)
                 
         (* Order the rules topologically based on dependency. Used for stratification
             Each Rule seq in the outermost seq is a partition, and these partitions must be handled sequentially during materialization *)
@@ -340,6 +348,6 @@ module Stratifier =
                     this.handle_cycle()
                     
             if not (this.is_stratified stratification) then
-                failwith "Datalog program preprocessing failed! This is a bug, please report"
+                 failwith "Datalog program preprocessing failed! This is a bug, please report"
             stratification
             

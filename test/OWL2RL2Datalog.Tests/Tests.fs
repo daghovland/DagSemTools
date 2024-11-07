@@ -167,8 +167,8 @@ let ``Grounding + Stratifying starts ok`` () =
     
     //Assert
     let predRelsInfo = relationInfos.[(int) predIndex]
-    predRelsInfo.num_predecessors.Should().Be((uint) 10) |> ignore
-    predRelsInfo.Successors.Should().HaveLength(5) |> ignore
+    predRelsInfo.num_predecessors.Should().Be((uint) 2) |> ignore
+    predRelsInfo.Successors.Should().HaveLength(1) |> ignore
     
 [<Fact>]
 let ``Equality axioms can be grounded`` () =
