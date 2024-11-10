@@ -65,7 +65,7 @@ public class IriGrammarVisitor : DatalogBaseVisitor<IriReference>
         var uriString = ctxt.ABSOLUTEIRIREF().GetText()[1..^1];
         return new IriReference(uriString);
     }
-    
+
     /// <summary>
     /// Visits the abbreviation 'a' for rdf:type
     /// </summary>
@@ -73,8 +73,8 @@ public class IriGrammarVisitor : DatalogBaseVisitor<IriReference>
     /// <returns></returns>
     public override IriReference VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context) =>
         new IriReference(Namespaces.RdfType);
-        
-    
+
+
     /// <summary>
     /// Visits a prefixed IRI, f.ex. ex:A or rdfs:label
     /// This is the PNAME_LN rule in the SPARQL grammars

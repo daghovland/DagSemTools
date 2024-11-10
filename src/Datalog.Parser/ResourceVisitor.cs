@@ -46,7 +46,7 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
         return GetIriId(iri);
     }
 
-    
+
     /// <summary>
     /// Visits an iri
     /// </summary>
@@ -58,7 +58,7 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
                   ?? throw new System.Exception($"IRI {ctxt.GetText()} is null");
         return GetIriId(iri);
     }
-    
+
     public override uint VisitIntegerLiteral(IntegerLiteralContext context)
     {
         int literal = int.Parse(context.INTEGER().GetText());

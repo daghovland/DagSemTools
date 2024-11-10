@@ -30,8 +30,8 @@ internal class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
         var resource = ResourceVisitor.Visit(context);
         return ResourceOrVariable.NewResource(resource);
     }
-    
-    
+
+
     /// <summary>
     /// Visits the abbreviation 'a' for rdf:type
     /// </summary>
@@ -40,7 +40,7 @@ internal class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
     public override ResourceOrVariable VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context) =>
         ResourceOrVariable.NewResource(ResourceVisitor.Visit(context));
 
-    
+
     /// <inheritdoc />
     public override ResourceOrVariable VisitRdfobject(DatalogParser.RdfobjectContext context)
     {

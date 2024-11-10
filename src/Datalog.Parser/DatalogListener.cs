@@ -101,13 +101,13 @@ internal class DatalogListener : DatalogBaseListener
                 .Select(b => _ruleAtomVisitor.Visit(b));
         DatalogProgram = DatalogProgram.Append(new Rule(headAtom, ListModule.OfSeq(body)));
     }
-    
+
     public override void ExitFact(DatalogParser.FactContext context)
-        {
-            var headCtxt = context.head();
-            var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt);
-    
-            DatalogProgram = DatalogProgram.Append(new Rule(headAtom, ListModule.Empty<RuleAtom>()));
-        }
+    {
+        var headCtxt = context.head();
+        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt);
+
+        DatalogProgram = DatalogProgram.Append(new Rule(headAtom, ListModule.Empty<RuleAtom>()));
+    }
 
 }

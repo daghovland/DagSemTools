@@ -28,7 +28,7 @@ public class TestParser
     }
 
 
-    
+
     public IEnumerable<Rule> TestProgramFile(FileInfo datalog)
     {
         var datastore = new Datastore(1000);
@@ -95,7 +95,7 @@ public class TestParser
         //Arrange
         var datastore = new Datastore(1000);
         var fInfo = File.ReadAllText("TestData/prefixes.datalog");
-        
+
         //Act
         var ont = DagSemTools.Datalog.Parser.Parser.ParseString(fInfo, _outputWriter, datastore).ToList();
 
@@ -108,7 +108,7 @@ public class TestParser
         ruleAtom.IsPositiveTriple.Should().BeTrue();
         var ruleTriplePattern = ((RuleAtom.PositiveTriple)ruleAtom).Item;
         ruleTriplePattern.Subject.Should().Be(ResourceOrVariable.NewVariable("?s"));
-        
+
         var predicateResource = ResourceOrVariable
             .NewResource(datastore.AddResource(Ingress.Resource
                 .NewIri(new IriReference("https://example.com/data#predicate2"))));
@@ -118,7 +118,7 @@ public class TestParser
             .NewResource(datastore.AddResource(Ingress.Resource
                 .NewIri(new IriReference("https://example.com/data3#obj"))));
         ruleTriplePattern.Object.Should().Be(objectResource);
-        
+
         ruleAtom.Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
             ResourceOrVariable.NewVariable("?s"),
             predicateResource,
@@ -153,9 +153,9 @@ public class TestParser
         parsedDatalogRule.Head.Predicate.Should().Be(expectedHead.Predicate);
         parsedDatalogRule.Head.Object.Should().Be(expectedHead.Object);
         parsedDatalogRule.Head.Should().Be(expectedHead);
-                
+
     }
-    
+
     [Fact]
     public void TestTypeAtom2()
     {
@@ -184,7 +184,7 @@ public class TestParser
                 .NewResource(datastore.GetResourceId(Ingress.Resource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }
-    
-    
+
+
 
 }
