@@ -23,16 +23,14 @@ let ``Subclass RL reasoning works`` () =
     let objIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
     let contentTriple = {Ingress.Triple.subject = subjectIndex; predicate = rdfTypeIndex; obj = objIndex}
     tripleTable.AddTriple(contentTriple)
+    let subClassTriple = {Triple.subject = objIndex; predicate = subClassIndex; obj = objIndex2}
+    tripleTable.AddTriple(subClassTriple)
+    let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex)
+    query.Should().HaveLength(1) |> ignore
     let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query.Should().HaveLength(0) |> ignore
     
-    let subClassRule : Rule = {
-        Head = {Subject = ResourceOrVariable.Resource objIndex; Predicate = ResourceOrVariable.Resource subClassIndex; Object = ResourceOrVariable.Resource objIndex2}
-        Body = [
-            PositiveTriple {Subject = ResourceOrVariable.Resource subjectIndex; Predicate = ResourceOrVariable.Resource rdfTypeIndex; Object = ResourceOrVariable.Resource objIndex}
-        ]
-    }
-    let rlProgram = Reasoner.enableOwlReasoning tripleTable [subClassRule] errorOutput
+    let rlProgram = Reasoner.enableOwlReasoning tripleTable [] errorOutput
     DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query2.Should().HaveLength(1) |> ignore

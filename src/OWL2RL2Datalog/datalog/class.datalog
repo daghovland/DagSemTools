@@ -1,4 +1,10 @@
 [owl:Thing, a, owl:Class].
+[owl:Nothing, a, owl:Class].
 [?x, a, ?c2] :- [?c1, rdfs:subClassOf, ?c2], [?x, a, ?c1] .
 [?x, a, ?c2] :- [?c1, owl:equivalentClass, ?c2], [?x, a, ?c1] .
 [?x, a, ?c1] :- [?c1, owl:equivalentClass, ?c2], [?x, a, ?c2] .
+
+[?u, a, ?x] :- [?x, owl:someValuesFrom, ?y], [?x, owl:onProperty, ?p], [?u, ?p, ?v], [?v, rdf:type, ?y] .
+[?u, a, ?x]:- [?x, owl:someValuesFrom, owl:Thing], [?x, owl:onProperty, ?p], [?u, ?p, ?v] .
+
+[?v, a, ?y] :- [?x, owl:allValuesFrom, ?y], [?x, owl:onProperty, ?p], [?u, rdf:type, ?x], [?u, ?p, ?v] .   
