@@ -92,22 +92,37 @@ public class TestParser
     [Fact]
     public void TestPrefixes()
     {
-
+        //Arrange
         var datastore = new Datastore(1000);
         var fInfo = File.ReadAllText("TestData/prefixes.datalog");
+        
+        //Act
         var ont = DagSemTools.Datalog.Parser.Parser.ParseString(fInfo, _outputWriter, datastore).ToList();
 
+        //Assert
         ont.Should().NotBeNull();
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(1);
-        ont.First().Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
+        var ruleAtom = ont.First().Body.First();
+        ruleAtom.Should().NotBeNull();
+        ruleAtom.IsPositiveTriple.Should().BeTrue();
+        var ruleTriplePattern = ((RuleAtom.PositiveTriple)ruleAtom).Item;
+        ruleTriplePattern.Subject.Should().Be(ResourceOrVariable.NewVariable("?s"));
+        
+        var predicateResource = ResourceOrVariable
+            .NewResource(datastore.AddResource(Ingress.Resource
+                .NewIri(new IriReference("https://example.com/data#predicate2"))));
+        ruleTriplePattern.Predicate.Should().Be(predicateResource);
+
+        var objectResource = ResourceOrVariable
+            .NewResource(datastore.AddResource(Ingress.Resource
+                .NewIri(new IriReference("https://example.com/data3#obj"))));
+        ruleTriplePattern.Object.Should().Be(objectResource);
+        
+        ruleAtom.Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
             ResourceOrVariable.NewVariable("?s"),
-            ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Ingress.Resource
-                    .NewIri(new IriReference("https://example.com/data#predicate2")))),
-            ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Ingress.Resource
-                    .NewIri(new IriReference("https://example.com/data3#obj")))))));
+            predicateResource,
+            objectResource)));
     }
 
     [Fact]
@@ -134,7 +149,9 @@ public class TestParser
             ResourceOrVariable.NewVariable("?c"));
         expectedHead.Should().NotBeNull();
         parsedDatalogRule.Head.Should().NotBeNull();
-        
+        parsedDatalogRule.Head.Subject.Should().Be(expectedHead.Subject);
+        parsedDatalogRule.Head.Predicate.Should().Be(expectedHead.Predicate);
+        parsedDatalogRule.Head.Object.Should().Be(expectedHead.Object);
         parsedDatalogRule.Head.Should().Be(expectedHead);
                 
     }

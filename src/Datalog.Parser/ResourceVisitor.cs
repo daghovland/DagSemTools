@@ -41,11 +41,24 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
     /// <returns></returns>
     public override uint VisitIri(IriContext ctxt)
     {
-        var iri = _iriGrammarVisitor.VisitIri(ctxt)
+        var iri = _iriGrammarVisitor.Visit(ctxt)
                   ?? throw new System.Exception($"IRI {ctxt.GetText()} is null");
         return GetIriId(iri);
     }
 
+    
+    /// <summary>
+    /// Visits an iri
+    /// </summary>
+    /// <param name="ctxt"></param>
+    /// <returns></returns>
+    public override uint VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext ctxt)
+    {
+        var iri = _iriGrammarVisitor.Visit(ctxt)
+                  ?? throw new System.Exception($"IRI {ctxt.GetText()} is null");
+        return GetIriId(iri);
+    }
+    
     public override uint VisitIntegerLiteral(IntegerLiteralContext context)
     {
         int literal = int.Parse(context.INTEGER().GetText());
@@ -123,18 +136,6 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
         var tripleId = Datastore.NewAnonymousBlankNode();
         Datastore.AddReifiedTriple(triple, tripleId);
         return tripleId;
-    }
-
-
-    /// <summary>
-    /// Visits the abbreviation 'a' for rdf:type
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public override uint VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context)
-    {
-        var iri = new IriReference(Namespaces.RdfType);
-        return GetIriId(iri);
     }
 
     public override uint VisitBlankNodePropertyList(BlankNodePropertyListContext context)

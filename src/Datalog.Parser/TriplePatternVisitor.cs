@@ -23,10 +23,13 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<TriplePattern>
         var predicate = context.relation();
         var @object = context.term(1);
 
+        var predicateResource = _predicateVisitor.Visit(predicate);
+        var subjectResource = _predicateVisitor.Visit(subject);
+        var objectResource = _predicateVisitor.Visit(@object);
         return new TriplePattern(
-            _predicateVisitor.Visit(subject),
-            _predicateVisitor.Visit(predicate),
-            _predicateVisitor.Visit(@object)
+            subjectResource,
+            predicateResource,
+            objectResource
         );
     }
 

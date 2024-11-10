@@ -25,18 +25,26 @@ internal class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
     }
 
     /// <inheritdoc />
-    public override ResourceOrVariable VisitIri(DatalogParser.IriContext context)
+    public override ResourceOrVariable VisitPredicateVerb(DatalogParser.PredicateVerbContext context)
     {
-        var resource = ResourceVisitor.VisitIri(context);
+        var resource = ResourceVisitor.Visit(context);
         return ResourceOrVariable.NewResource(resource);
     }
+    
+    
+    /// <summary>
+    /// Visits the abbreviation 'a' for rdf:type
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public override ResourceOrVariable VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context) =>
+        ResourceOrVariable.NewResource(ResourceVisitor.Visit(context));
 
+    
     /// <inheritdoc />
-    public override ResourceOrVariable VisitLiteral(DatalogParser.LiteralContext context)
+    public override ResourceOrVariable VisitRdfobject(DatalogParser.RdfobjectContext context)
     {
-        var iriContext = new LiteralContext(context, context.invokingState);
-
-        return ResourceOrVariable.NewResource(ResourceVisitor.VisitLiteral(iriContext));
+        return ResourceOrVariable.NewResource(ResourceVisitor.Visit(context));
     }
 
     /// <inheritdoc />

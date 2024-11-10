@@ -294,6 +294,50 @@ module Tests =
             Assert.Equal(2, matches.Length)
           
 
+    
+    
+    [<Fact>]
+    let ``Can use subclassing as a rule`` () =
+            //Arrange
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let rdfTypeIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.RdfType)));
+            let subClassOfIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference(Namespaces.RdfsSubClassOf)));
+            let subClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subClass"));
+            let superClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/superClass"));
+            let typeTriple = {Triple.subject = subjectIndex; predicate = rdfTypeIndex; obj = subClassIndex}
+            tripleTable.AddTriple(typeTriple)
+            let subClassTriple = {Triple.subject = subClassIndex; predicate = subClassOfIndex; obj = superClassIndex}
+            tripleTable.AddTriple(subClassTriple)
+            
+            let matchesBefore = tripleTable.GetTriplesWithSubjectObject(subjectIndex, superClassIndex) |> List.ofSeq
+            Assert.Equal(0, matchesBefore.Length)
+          
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "?x"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource rdfTypeIndex
+                             TriplePattern.Object = ResourceOrVariable.Variable "?super"
+                             }
+            let subClassTypeAtom = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "?x"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource rdfTypeIndex
+                             TriplePattern.Object = ResourceOrVariable.Variable "?sub"
+                             }
+            let isSubClassOfAtom = RuleAtom.PositiveTriple {
+                                    TriplePattern.Subject = ResourceOrVariable.Variable "?sub"
+                                    TriplePattern.Predicate = ResourceOrVariable.Resource subClassOfIndex
+                                    TriplePattern.Object = ResourceOrVariable.Variable "?super" 
+                                    }
+            let rule =  {Head =  headPattern; Body = [ subClassTypeAtom; isSubClassOfAtom ]}
+            
+            //Act
+            Reasoner.evaluate([rule], tripleTable)
+            
+            //Assert
+            let matches = tripleTable.GetTriplesWithSubjectObject(subjectIndex, superClassIndex) |> List.ofSeq
+            Assert.Equal(1, matches.Length)
+          
+    
     [<Fact>]
     let ``Can evaluate pattern with evaluate function`` () =
             let tripleTable = Rdf.Datastore(60u)
