@@ -55,7 +55,8 @@ type PartialRuleMatch =
 
 
 module Datalog =
-
+    let emptySubstitution : Substitution = Map.empty
+    let isFact (rule) = rule.Body |> List.isEmpty
     let VariableToString (v : string) : string = $"?{v}"
     
     let ResourceToString (tripleTable: Datastore) (r : Ingress.ResourceId) : string =
