@@ -1,4 +1,4 @@
-module Tests
+module TestEqualityAxioms
 
 open System
 open DagSemTools.Datalog.Reasoner

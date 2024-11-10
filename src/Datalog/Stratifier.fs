@@ -270,13 +270,13 @@ module Stratifier =
                 let relation_id = ready_elements_queue.Dequeue()
                 let relation = relations.[relation_id]    
                 ordered_relations.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
-                if ordered_relations.[relation_id].intensional then
-                    let relation_rules = rules
+                // if ordered_relations.[relation_id].intensional then
+                let relation_rules = rules
                                         |> List.filter (fun rule ->
                                             (rule.Head |> GetTriplePatternRelation) = relation
                                             )
-                    ordered_rules <- Seq.append relation_rules ordered_rules
-                    ordered_relations.[int relation_id].intensional <- false
+                ordered_rules <- Seq.append relation_rules ordered_rules
+                ordered_relations.[int relation_id].intensional <- false
             Seq.distinct ordered_rules
         
         (* Checks whether a rule is completely covered by a cycle (given the already output relations, which are treated as extensional/edb

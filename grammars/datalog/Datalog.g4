@@ -3,7 +3,10 @@ import TurtleResource;
 
 datalogProgram : (directive | rule)* EOF ;
 
-rule : head ':-' body PERIOD ;
+rule : 
+    head ':-' body PERIOD #properRule
+    | head PERIOD #fact
+    ;
 
 head : positiveRuleAtom ;
 

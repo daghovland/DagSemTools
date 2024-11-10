@@ -446,6 +446,28 @@ module Tests =
             let cycle = cycles |> Seq.head
             cycle.Should().HaveLength(1).And.Contain(0) |> ignore
             
+    (* Tests a program with a single fact *)
+    [<Fact>]
+    let ``Simple fact program works`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            
+            let query1 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
+            query1.Should().HaveLength(0) |> ignore
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Resource subjIndex
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            
+            let rule =  {Head =  headPattern; Body = [  ] }
+            DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
+            let query2 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
+            query2.Should().HaveLength(1) |> ignore
     
     
     (* Tests the simplest cyclic program

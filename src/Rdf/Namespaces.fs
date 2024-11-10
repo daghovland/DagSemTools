@@ -46,6 +46,9 @@ module Namespaces =
     let RdfReifies = Rdf + "reifies"
     
     [<Literal>]
+    let RdfsSubClassOf = Rdfs + "subClassOf";
+    
+    [<Literal>]
     let OwlSameAs = Owl + "sameAs";
     
     [<Literal>]

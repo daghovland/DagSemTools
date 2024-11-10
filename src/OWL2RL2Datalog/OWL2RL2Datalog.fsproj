@@ -31,8 +31,16 @@
           <Pack>true</Pack> 
           <PackagePath>datalog\equality.datalog</PackagePath>
         </Content>
-        <Content Include="datalog\class.datalog" />
-        <Content Include="datalog\property.datalog" />
+        <Content Include="datalog\class.datalog" >
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+            <PackagePath>datalog\class.datalog</PackagePath>
+        </Content>
+        <Content Include="datalog\property.datalog" >
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+            <PackagePath>datalog\property.datalog</PackagePath>
+        </Content>
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>

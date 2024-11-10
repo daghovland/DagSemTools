@@ -9,7 +9,8 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tests.fs"/>
+        <Compile Include="TestEqualityAxioms.fs" />
+        <Compile Include="TestClassAxioms.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
