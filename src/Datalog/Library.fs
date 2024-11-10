@@ -7,6 +7,7 @@
 *)
 namespace DagSemTools.Datalog
 
+open System
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 
@@ -107,23 +108,32 @@ module Datalog =
         headString
         
     (* Safe rules are those where the head only has variable that are in the body *)
-    let isSafeRule (rule) : bool =
+    let GetUnsafeHeadVariables (rule) =
         let variablesInBody = rule.Body
                                 |> Seq.collect (fun atom -> match atom with
                                                             | PositiveTriple t -> [t.Subject; t.Predicate; t.Object]
                                                             | NotTriple t -> [t.Subject; t.Predicate; t.Object]
                                 )
                                 |> Seq.choose (fun r -> match r with
-                                                        | Variable v -> Some (Variable v)
+                                                        | Variable v -> Some (v)
                                                         | _ -> None
                                 )
         let variablesInHead = [rule.Head.Subject; rule.Head.Predicate; rule.Head.Object]
                                 |> Seq.choose (fun r -> match r with
-                                                        | Variable v -> Some (Variable v)
+                                                        | Variable v -> Some (v)
                                                         | _ -> None
                                 )
-        variablesInHead |> Seq.forall (fun v -> variablesInBody |> Seq.exists (fun b -> b = v))
+        variablesInHead
+                    |> Seq.filter (fun v -> variablesInBody
+                                                |> Seq.forall (fun b -> b <> v))
         
+    let isSafeRule (rule) =
+        let unsafeHeadVariables = GetUnsafeHeadVariables rule
+        if unsafeHeadVariables |> Seq.isEmpty then
+            true
+        else
+            let unsafeVarsString = String.concat ", " unsafeHeadVariables
+            raise (new ArgumentException($"Unsafe variables {unsafeVarsString} in rule: {rule.ToString()}"))
         
     let ApplySubstitutionResource (sub : Substitution) (res : ResourceOrVariable) : ResourceId =
         match res with

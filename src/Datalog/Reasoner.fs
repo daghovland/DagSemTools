@@ -22,8 +22,10 @@ module Reasoner =
             if unsafeRules |> Seq.isEmpty then
                 Rules
             else
-                
-                raise (new System.ArgumentException("These rules are not safe: " + String.Join(", ", unsafeRules |> Seq.map (fun rule -> rule.ToString()))))
+                let unsafeRuleStrings = unsafeRules
+                                                |> Seq.map (fun rule -> rule.ToString())
+                                                
+                raise (new System.ArgumentException("These rules are not safe: " + String.concat "" unsafeRuleStrings))
                 
         let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
                             Rules

@@ -60,6 +60,10 @@
       <None Update="TestData\prefixes.datalog">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
+
+        <None Update="TestData\properties.datalog">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
 </Project>

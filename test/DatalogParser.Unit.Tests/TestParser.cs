@@ -28,6 +28,7 @@ public class TestParser
     }
 
 
+    
     public IEnumerable<Rule> TestProgramFile(FileInfo datalog)
     {
         var datastore = new Datastore(1000);
@@ -110,6 +111,35 @@ public class TestParser
     }
 
     [Fact]
+    public void TestRuleWithAllVariables()
+    {
+        var datastore = new Datastore(1000);
+        var fInfo = File.ReadAllText("TestData/properties.datalog");
+        var ont = DagSemTools.Datalog.Parser.Parser.ParseString(fInfo, _outputWriter, datastore).ToList();
+
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+        var parsedDatalogRule = ont.First();
+        parsedDatalogRule.Body.Count().Should().Be(2);
+        parsedDatalogRule.Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
+            ResourceOrVariable.NewVariable("?x"),
+            ResourceOrVariable.NewVariable("?p"),
+            ResourceOrVariable.NewVariable("?y"))));
+        var rdfTypeResource = ResourceOrVariable
+            .NewResource(datastore.AddResource(Ingress.Resource
+                .NewIri(new IriReference(Namespaces.RdfType))));
+        TriplePattern expectedHead = new TriplePattern(
+            ResourceOrVariable.NewVariable("?x"),
+            rdfTypeResource,
+            ResourceOrVariable.NewVariable("?c"));
+        expectedHead.Should().NotBeNull();
+        parsedDatalogRule.Head.Should().NotBeNull();
+        
+        parsedDatalogRule.Head.Should().Be(expectedHead);
+                
+    }
+    
+    [Fact]
     public void TestTypeAtom2()
     {
         var fInfo = File.ReadAllText("TestData/typeatom2.datalog");
@@ -137,5 +167,7 @@ public class TestParser
                 .NewResource(datastore.GetResourceId(Ingress.Resource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }
+    
+    
 
 }

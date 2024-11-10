@@ -11,4 +11,8 @@ module Reasoner =
         let eqRules = Parser.ParseFile ("datalog/equality.datalog", errorOutput, tripleTable)
         let classRules = Parser.ParseFile ("datalog/class.datalog", errorOutput, tripleTable)
         let propertyRules = Parser.ParseFile ("datalog/property.datalog", errorOutput, tripleTable)
-        Seq.concat [program; eqRules; classRules; propertyRules]  
+        Seq.concat [//program
+                    //eqRules
+                    //classRules
+                    propertyRules
+                    ]  
