@@ -4,8 +4,8 @@ import TurtleResource;
 datalogProgram : (directive | rule)* EOF ;
 
 rule : 
-    head ':-' body PERIOD #properRule
-    | head PERIOD #fact
+    head ':-' body PERIOD #ProperRule
+    | head PERIOD #Fact
     ;
 
 head : positiveRuleAtom ;

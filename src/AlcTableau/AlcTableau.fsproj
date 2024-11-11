@@ -8,7 +8,7 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.AlcTableau</PackageId>
-        <Version>0.1.0</Version>
+        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For acyclic ALC ontologies</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>

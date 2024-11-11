@@ -7,4 +7,6 @@
 [?u, a, ?x] :- [?x, owl:someValuesFrom, ?y], [?x, owl:onProperty, ?p], [?u, ?p, ?v], [?v, rdf:type, ?y] .
 [?u, a, ?x]:- [?x, owl:someValuesFrom, owl:Thing], [?x, owl:onProperty, ?p], [?u, ?p, ?v] .
 
-[?v, a, ?y] :- [?x, owl:allValuesFrom, ?y], [?x, owl:onProperty, ?p], [?u, rdf:type, ?x], [?u, ?p, ?v] .   
+[?v, a, ?y] :- [?x, owl:allValuesFrom, ?y], [?x, owl:onProperty, ?p], [?u, rdf:type, ?x], [?u, ?p, ?v] .
+
+[?u, ?p, ?y] :- [?x, owl:hasValue, ?y], [?x, owl:onProperty, ?p], [?u, rdf:type, ?x] .     

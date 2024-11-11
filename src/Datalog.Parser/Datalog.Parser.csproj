@@ -9,7 +9,7 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Datalog.Parser</PackageId>
-        <Version>0.2.0</Version>
+        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For parsing Datalog</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
@@ -49,9 +49,9 @@
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
-        <PackageReference Include="DagSemTools.Parser" Version="0.2.0" />
-        <PackageReference Include="DagSemTools.Datalog" Version="0.2.0" />
+        <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Parser" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
     </ItemGroup>
 
     <ItemGroup>

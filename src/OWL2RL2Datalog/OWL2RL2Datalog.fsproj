@@ -9,7 +9,7 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.OWL2RL2Datalog</PackageId>
-        <Version>0.1.0</Version>
+        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For RL reasoning over DagSemTools.Datalog</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
@@ -26,20 +26,20 @@
 
     <ItemGroup>
         <Compile Include="Library.fs"/>
-        <Content Include="datalog\equality.datalog">
+        <Content Include="datalog/equality.datalog">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
           <Pack>true</Pack> 
-          <PackagePath>datalog\equality.datalog</PackagePath>
+          <PackagePath>datalog/equality.datalog</PackagePath>
         </Content>
-        <Content Include="datalog\class.datalog" >
+        <Content Include="datalog/class.datalog" >
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Pack>true</Pack>
-            <PackagePath>datalog\class.datalog</PackagePath>
+            <PackagePath>datalog/class.datalog</PackagePath>
         </Content>
-        <Content Include="datalog\property.datalog" >
+        <Content Include="datalog/property.datalog" >
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
             <Pack>true</Pack>
-            <PackagePath>datalog\property.datalog</PackagePath>
+            <PackagePath>datalog/property.datalog</PackagePath>
         </Content>
         <Content Include="README.md">
             <Pack>true</Pack>
@@ -58,8 +58,8 @@
         <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Datalog" Version="0.1.0" />
-        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0" />
     </ItemGroup>
 
     <ItemGroup>

@@ -9,7 +9,7 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.DL2Datalog</PackageId>
-        <Version>0.1.0</Version>
+        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>An unfinished project for translating description logic axioms corresponding into Datalog rules</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools/</RepositoryUrl>
@@ -45,8 +45,8 @@
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
-        <PackageReference Include="DagSemTools.Datalog" Version="0.2.0" />
+        <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="8.0.401" />
