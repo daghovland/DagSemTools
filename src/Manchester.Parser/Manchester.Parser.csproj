@@ -10,7 +10,7 @@
       <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
       <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
       <PackageId>DagSemTools.Manchester.Parser</PackageId>
-      <Version>0.2.0</Version>
+      <Version>0.3.0</Version>
       <Authors>Dag Hovland</Authors>
       <Description>For parsing Manchester Owl</Description>
       <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
@@ -33,8 +33,9 @@
 
   <ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-		<PackageReference Include="Antlr4BuildTasks" Version="10.7" />
+		<PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
     <PackageReference Include="FSharp.Core" Version="8.0.401" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
 	</ItemGroup>
 	<ItemGroup>
         <Antlr4 Include="grammars/IriGrammar.g4">
@@ -63,8 +64,8 @@
     <ProjectReference Include="..\Parser\Parser.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <PackageReference Include="DagSemTools.AlcTableau" Version="0.1.0" />
-    <PackageReference Include="DagSemTools.Parser" Version="0.1.0" />
+    <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />
+    <PackageReference Include="DagSemTools.Parser" Version="0.3.0" />
   </ItemGroup>
 
   <ItemGroup>

@@ -28,10 +28,10 @@ internal class IriGrammarVisitor : ManchesterBaseVisitor<IriReference>
     private void AddDefaultPrefixes()
     {
 
-        _prefixes.TryAdd("rdf", new IriReference("https://www.w3.org/1999/02/22-rdf-syntax-ns#"));
-        _prefixes.TryAdd("rdfs", new IriReference("https://www.w3.org/2000/01/rdf-schema#"));
-        _prefixes.TryAdd("xsd", new IriReference("https://www.w3.org/2001/XMLSchema#"));
-        _prefixes.TryAdd("owl", new IriReference("https://www.w3.org/2002/07/owl#"));
+        _prefixes.TryAdd("rdf", new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+        _prefixes.TryAdd("rdfs", new IriReference("http://www.w3.org/2000/01/rdf-schema#"));
+        _prefixes.TryAdd("xsd", new IriReference("http://www.w3.org/2001/XMLSchema#"));
+        _prefixes.TryAdd("owl", new IriReference("http://www.w3.org/2002/07/owl#"));
     }
 
     public IriGrammarVisitor(Dictionary<string, IriReference> prefixes, IVisitorErrorListener errorListener)

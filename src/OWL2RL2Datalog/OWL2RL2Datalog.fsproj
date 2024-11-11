@@ -1,15 +1,17 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+
     <PropertyGroup>
-        <OutputType>Library</OutputType>
         <TargetFramework>net8.0</TargetFramework>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <Nullable>enable</Nullable>
+        <OutputType>Library</OutputType>
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.Manchester</PackageId>
+        <PackageId>DagSemTools.OWL2RL2Datalog</PackageId>
         <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
-        <Description>For outputing Manchester Owl</Description>
+        <Description>For RL reasoning over DagSemTools.Datalog</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -20,32 +22,32 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
 
-        <Platforms>AnyCPU</Platforms>
-
-        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
+
     <ItemGroup>
-        <Compile Include="Printer.fs" />
+        <Compile Include="Library.fs"/>
+        <EmbeddedResource Include="datalog/equality.datalog"/>
+        <EmbeddedResource Include="datalog/class.datalog"/>
+        <EmbeddedResource Include="datalog/property.datalog"/>
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
     </ItemGroup>
-    <ItemGroup>
-        <PackageReference Update="FSharp.Core" Version="8.0.401" />
-        <PackageReference Include="IriTools" Version="2.2.0" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
-    </ItemGroup>
-    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />
-    </ItemGroup>
+
 
     <ItemGroup>
+        <PackageReference Include="Faqt" Version="4.2.1" />
+        <PackageReference Update="FSharp.Core" Version="8.0.401" />
     </ItemGroup>
-    <ItemGroup>
-      <None Include="README.md" />
+    
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <ProjectReference Include="..\Datalog\Datalog.fsproj" />
+        <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0" />
     </ItemGroup>
 
     <ItemGroup>

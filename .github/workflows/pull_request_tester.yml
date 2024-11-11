@@ -36,6 +36,7 @@ jobs:
           "Datalog"
           "DL2Datalog"
           "Datalog.Parser"
+          "OWL2RL2Datalog"
           "Manchester"
           "Manchester.Parser"
           "Api"

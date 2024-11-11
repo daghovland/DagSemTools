@@ -7,6 +7,7 @@
 *)
 namespace DagSemTools.Datalog
 
+open System
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 
@@ -26,7 +27,7 @@ type ResourceOrWildcard =
 
 [<StructuralComparison>]
 [<StructuralEquality>]
-type TriplePattern = 
+type TriplePattern =
     {Subject: ResourceOrVariable; Predicate: ResourceOrVariable; Object: ResourceOrVariable}
 
 [<StructuralComparison>]
@@ -55,15 +56,23 @@ type PartialRuleMatch =
 
 
 module Datalog =
-
+    let emptySubstitution : Substitution = Map.empty
+    let isFact (rule) = rule.Body |> List.isEmpty
+    let VariableToString (v : string) : string = $"?{v}"
+    
+    let ResourceToString (tripleTable: Datastore) (r : Ingress.ResourceId) : string =
+        (tripleTable.GetResource r).ToString()
+    
     let ResourceOrVariableToString (tripleTable : Datastore) (res : ResourceOrVariable) : string =
         match res with
         | ResourceOrVariable.Resource r -> (tripleTable.GetResource r).ToString()
-        | Variable v -> $"?{v}"
+        | Variable v -> VariableToString v
     
 
-    let TriplePatternToString (tripleTable : Datastore) (triplePatter : TriplePattern) : string =
-        $"[{ResourceOrVariableToString tripleTable triplePatter.Subject}, {ResourceOrVariableToString tripleTable triplePatter.Predicate}, {ResourceOrVariableToString tripleTable triplePatter.Object} ]"
+    let TriplePatternToString (tripleTable : Datastore) (triplePattern : TriplePattern) : string =
+        $"[{ResourceOrVariableToString tripleTable triplePattern.Subject},
+        {ResourceOrVariableToString tripleTable triplePattern.Predicate},
+        {ResourceOrVariableToString tripleTable triplePattern.Object} ]"
     
     
     let ResourceAtom (tripleTable : Datastore) (ruleAtom : RuleAtom) : string =
@@ -99,24 +108,39 @@ module Datalog =
         headString
         
     (* Safe rules are those where the head only has variable that are in the body *)
-    let isSafeRule (rule) : bool =
+    let GetUnsafeHeadVariables (rule) =
         let variablesInBody = rule.Body
                                 |> Seq.collect (fun atom -> match atom with
                                                             | PositiveTriple t -> [t.Subject; t.Predicate; t.Object]
                                                             | NotTriple t -> [t.Subject; t.Predicate; t.Object]
                                 )
                                 |> Seq.choose (fun r -> match r with
-                                                        | Variable v -> Some (Variable v)
+                                                        | Variable v -> Some (v)
                                                         | _ -> None
                                 )
         let variablesInHead = [rule.Head.Subject; rule.Head.Predicate; rule.Head.Object]
-        variablesInHead |> Seq.forall (fun v -> variablesInBody |> Seq.exists (fun b -> b = v))
+                                |> Seq.choose (fun r -> match r with
+                                                        | Variable v -> Some (v)
+                                                        | _ -> None
+                                )
+        variablesInHead
+                    |> Seq.filter (fun v -> variablesInBody
+                                                |> Seq.forall (fun b -> b <> v))
         
+    let isSafeRule (rule) =
+        let unsafeHeadVariables = GetUnsafeHeadVariables rule
+        if unsafeHeadVariables |> Seq.isEmpty then
+            true
+        else
+            let unsafeVarsString = String.concat ", " unsafeHeadVariables
+            raise (new ArgumentException($"Unsafe variables {unsafeVarsString} in rule: {rule.ToString()}"))
         
     let ApplySubstitutionResource (sub : Substitution) (res : ResourceOrVariable) : ResourceId =
         match res with
         | ResourceOrVariable.Resource r -> r
-        | Variable v -> sub[v]
+        | Variable v -> match sub.TryGetValue v with
+                        | true, r -> r
+                        | false, _ -> failwith "Head of rule not fully instantiated. Invalid datalog rule"
     let ApplySubstitutionTriple sub (triple : TriplePattern) : Triple =
         {
          Ingress.subject = ApplySubstitutionResource sub triple.Subject

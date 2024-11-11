@@ -2,7 +2,7 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-
+        <PackageId>DagSemTools.Datalog.Test</PackageId>
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
@@ -12,15 +12,16 @@
 
     <ItemGroup>
         <Compile Include="Tests.fs"/>
+        <Compile Include="PredicateGrounderTests.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Include="Faqt" Version="4.2.1" />
         <PackageReference Include="IriTools" Version="2.2.0" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.6.0"/>
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
         <PackageReference Include="xunit" Version="2.9.2" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.4.5">
+        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -39,8 +40,8 @@
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Datalog" Version="0.2.0" />
-        <PackageReference Include="DagSemTools.Rdf" Version="0.1.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
     </ItemGroup>
     
     <ItemGroup>

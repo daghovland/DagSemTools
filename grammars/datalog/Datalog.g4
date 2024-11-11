@@ -3,7 +3,10 @@ import TurtleResource;
 
 datalogProgram : (directive | rule)* EOF ;
 
-rule : head ':-' body PERIOD ;
+rule : 
+    head ':-' body PERIOD #ProperRule
+    | head PERIOD #Fact
+    ;
 
 head : positiveRuleAtom ;
 
@@ -16,14 +19,15 @@ ruleAtom : 'NOT' positiveRuleAtom #NegativeRuleAtom
 positiveRuleAtom : tripleAtom | typeAtom  ;
 
 tripleAtom :
-    LSQPAREN term COMMA predicate COMMA term RSQPAREN
-    | predicate LSQPAREN term COMMA term RSQPAREN
+    LSQPAREN term COMMA relation COMMA term RSQPAREN
+    | relation LSQPAREN term COMMA term RSQPAREN
     ;
-typeAtom: predicate LSQPAREN term RSQPAREN  ; 
+typeAtom: relation LSQPAREN term RSQPAREN
+    ; 
 
-predicate : iri ;
+relation : variable | verb ;
 
-term : iri | literal | variable ;
+term : rdfobject | variable ;
 
 variable : '?' (PN_CHARS_BASE | PN_PREFIX);
  

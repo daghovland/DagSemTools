@@ -38,10 +38,10 @@ internal class DatalogListener : DatalogBaseListener
     private static Dictionary<string, IriReference> DefaultPrefixes()
     {
         var prefixes = new Dictionary<string, IriReference>();
-        prefixes.TryAdd("rdf", new IriReference("https://www.w3.org/1999/02/22-rdf-syntax-ns#"));
-        prefixes.TryAdd("rdfs", new IriReference("https://www.w3.org/2000/01/rdf-schema#"));
-        prefixes.TryAdd("xsd", new IriReference("https://www.w3.org/2001/XMLSchema#"));
-        prefixes.TryAdd("owl", new IriReference("https://www.w3.org/2002/07/owl#"));
+        prefixes.TryAdd("rdf", new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#"));
+        prefixes.TryAdd("rdfs", new IriReference("http://www.w3.org/2000/01/rdf-schema#"));
+        prefixes.TryAdd("xsd", new IriReference("http://www.w3.org/2001/XMLSchema#"));
+        prefixes.TryAdd("owl", new IriReference("http://www.w3.org/2002/07/owl#"));
         return prefixes;
     }
 
@@ -91,7 +91,7 @@ internal class DatalogListener : DatalogBaseListener
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
 
-    public override void ExitRule(DatalogParser.RuleContext context)
+    public override void ExitProperRule(DatalogParser.ProperRuleContext context)
     {
         var headCtxt = context.head();
         var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt);
@@ -100,6 +100,14 @@ internal class DatalogListener : DatalogBaseListener
             context.body().ruleAtom()
                 .Select(b => _ruleAtomVisitor.Visit(b));
         DatalogProgram = DatalogProgram.Append(new Rule(headAtom, ListModule.OfSeq(body)));
+    }
+
+    public override void ExitFact(DatalogParser.FactContext context)
+    {
+        var headCtxt = context.head();
+        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt);
+
+        DatalogProgram = DatalogProgram.Append(new Rule(headAtom, ListModule.Empty<RuleAtom>()));
     }
 
 }

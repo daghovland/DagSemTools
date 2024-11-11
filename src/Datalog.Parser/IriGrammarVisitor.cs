@@ -67,6 +67,15 @@ public class IriGrammarVisitor : DatalogBaseVisitor<IriReference>
     }
 
     /// <summary>
+    /// Visits the abbreviation 'a' for rdf:type
+    /// </summary>
+    /// <param name="context"></param>
+    /// <returns></returns>
+    public override IriReference VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context) =>
+        new IriReference(Namespaces.RdfType);
+
+
+    /// <summary>
     /// Visits a prefixed IRI, f.ex. ex:A or rdfs:label
     /// This is the PNAME_LN rule in the SPARQL grammars
     /// </summary>

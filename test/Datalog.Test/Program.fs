@@ -1,1 +1,2 @@
-module Program = let [<EntryPoint>] main _ = 0
+namespace DagSemTools.Datalog.Tests
+    module Program = let [<EntryPoint>] main _ = 0

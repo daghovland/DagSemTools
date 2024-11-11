@@ -1,6 +1,6 @@
 prefix ex: <https://example.com/data#>
-@prefix ex2: <https://example.com/data2#>
-@prefix ex3: <https://example.com/data3#>
+@prefix ex2: <https://example.com/data2#> .
+@prefix ex3: <https://example.com/data3#> .
 
 [?s, <https://example.com/data#predicate>, ex2:obj] :- 
     [?s, <https://example.com/data#predicate2>, ex3:obj].

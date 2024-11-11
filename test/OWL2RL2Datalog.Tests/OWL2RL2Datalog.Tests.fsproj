@@ -2,24 +2,26 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-
+        <PackageId>DagSemTools.OWL2RL2Dtalog.Tests</PackageId>
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
-        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tests.fs"/>
+        <Compile Include="TestEqualityAxioms.fs" />
+        <Compile Include="TestClassAxioms.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Faqt" Version="4.2.1" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
         <PackageReference Include="xunit" Version="2.9.2" />
-        <PackageReference Include="xunit.abstractions" Version="2.0.3" />
         <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="6.0.2">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -28,11 +30,14 @@
 
     <!-- Use project references for local development -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <ProjectReference Include="..\..\src\Datalog.Parser\Datalog.Parser.csproj" />
+        <ProjectReference Include="..\..\src\OWL2RL2Datalog\OWL2RL2Datalog.fsproj" />
         <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
     </ItemGroup>
-    
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.OWL2RL2Datalog" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
     </ItemGroup>
 

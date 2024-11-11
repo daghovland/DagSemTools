@@ -14,7 +14,19 @@ open Stratifier
 module Reasoner =
 
     type DatalogProgram (Rules: Rule list, tripleStore : Datastore) =
-        let mutable Rules = Rules
+        
+        let GetUnsafeRules (rules : Rule seq) =
+            rules |> Seq.filter (not << isSafeRule)
+        let mutable Rules =
+            let unsafeRules = GetUnsafeRules Rules
+            if unsafeRules |> Seq.isEmpty then
+                Rules
+            else
+                let unsafeRuleStrings = unsafeRules
+                                                |> Seq.map (fun rule -> rule.ToString())
+                                                
+                raise (new System.ArgumentException("These rules are not safe: " + String.concat "" unsafeRuleStrings))
+                
         let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
                             Rules
                                 |> List.map GetPartialMatches
@@ -37,19 +49,27 @@ module Reasoner =
                 |> Seq.distinct
                 |> Seq.collect (Seq.collect (GetMatchesForRule fact))
         
+        
+        member this.GetFacts() =
+            Rules
+                |> Seq.filter isFact
+                |> Seq.map (fun rule -> rule.Head)
+                |> Seq.map (ApplySubstitutionTriple emptySubstitution)
+        
         (* 
             The semi-naive materialisation algorithm. Assumes a non-cyclic ruleset
             Usually called from the evaluate function, which will stratify the ruleset
         *)
-        member this.materialiseNaive() =
+        member internal this.materialiseNaive() =
+                this.GetFacts() |> Seq.iter tripleStore.AddTriple
                 for triple in tripleStore.Triples.GetTriples() do
                     for rules in this.GetRulesForFact triple do
                         for subs in evaluate tripleStore.Triples rules  do
                             let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head
                             tripleStore.AddTriple newTriple
 
-
     let evaluate (rules: Rule list, triplestore: Datastore) =
+            // let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates(rules, triplestore) |> Seq.toList
             let stratifier = RulePartitioner rules
             let stratification = stratifier.orderRules
             for partition in stratification do

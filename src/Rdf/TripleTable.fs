@@ -101,6 +101,8 @@ type TripleTable(tripleList: Triple array,
                 | true, predMap -> predMap |> Seq.map (fun e -> this.GetTripleListEntry e)
                 | false, _ -> []
             
+        member this.GetPredicates() : ResourceId seq =
+            this.PredicateIndex.Keys 
         member this.GetTriplesWithSubjectPredicate (subject: ResourceId, predicate: ResourceId) =
             match  (this.SubjectPredicateIndex.TryGetValue subject) with 
                                 |    true, subjMap -> match subjMap.TryGetValue predicate with

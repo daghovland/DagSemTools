@@ -59,4 +59,11 @@ public interface IGraph
     /// <exception cref="InvalidOperationException"></exception>
     public void LoadDatalog(FileInfo datalog);
 
+    /// <summary>
+    /// Enables OWL 2 RL Reasoning
+    /// https://www.w3.org/TR/owl2-profiles/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules
+    /// Note that this adds new triples to the datastore
+    /// </summary>
+    public void EnableOwlReasoning();
+
 }

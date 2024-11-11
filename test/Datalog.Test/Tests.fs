@@ -5,7 +5,7 @@
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
     Contact: hovlanddag@gmail.com
 *)
-namespace AlcTableau.Datalog.Tests
+namespace DagSemTools.Datalog.Tests
 
 open System
 open DagSemTools.Datalog.Datalog
@@ -294,6 +294,50 @@ module Tests =
             Assert.Equal(2, matches.Length)
           
 
+    
+    
+    [<Fact>]
+    let ``Can use subclassing as a rule`` () =
+            //Arrange
+            let tripleTable = Rdf.Datastore(60u)
+            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let rdfTypeIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.RdfType)));
+            let subClassOfIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference(Namespaces.RdfsSubClassOf)));
+            let subClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subClass"));
+            let superClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/superClass"));
+            let typeTriple = {Triple.subject = subjectIndex; predicate = rdfTypeIndex; obj = subClassIndex}
+            tripleTable.AddTriple(typeTriple)
+            let subClassTriple = {Triple.subject = subClassIndex; predicate = subClassOfIndex; obj = superClassIndex}
+            tripleTable.AddTriple(subClassTriple)
+            
+            let matchesBefore = tripleTable.GetTriplesWithSubjectObject(subjectIndex, superClassIndex) |> List.ofSeq
+            Assert.Equal(0, matchesBefore.Length)
+          
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "?x"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource rdfTypeIndex
+                             TriplePattern.Object = ResourceOrVariable.Variable "?super"
+                             }
+            let subClassTypeAtom = RuleAtom.PositiveTriple {
+                             TriplePattern.Subject = ResourceOrVariable.Variable "?x"
+                             TriplePattern.Predicate = ResourceOrVariable.Resource rdfTypeIndex
+                             TriplePattern.Object = ResourceOrVariable.Variable "?sub"
+                             }
+            let isSubClassOfAtom = RuleAtom.PositiveTriple {
+                                    TriplePattern.Subject = ResourceOrVariable.Variable "?sub"
+                                    TriplePattern.Predicate = ResourceOrVariable.Resource subClassOfIndex
+                                    TriplePattern.Object = ResourceOrVariable.Variable "?super" 
+                                    }
+            let rule =  {Head =  headPattern; Body = [ subClassTypeAtom; isSubClassOfAtom ]}
+            
+            //Act
+            Reasoner.evaluate([rule], tripleTable)
+            
+            //Assert
+            let matches = tripleTable.GetTriplesWithSubjectObject(subjectIndex, superClassIndex) |> List.ofSeq
+            Assert.Equal(1, matches.Length)
+          
+    
     [<Fact>]
     let ``Can evaluate pattern with evaluate function`` () =
             let tripleTable = Rdf.Datastore(60u)
@@ -442,9 +486,32 @@ module Tests =
             let rule =  {Head =  headPattern; Body = [ positiveMatch ] }
             let partitioner  = Stratifier.RulePartitioner [rule]
             let cycles = partitioner.cycle_finder [] 0
-            cycles.Should().BeSome() |> ignore
-            cycles.Value.Should().HaveLength(1).And.Contain(0) |> ignore
+            cycles.Should().HaveLength(1) |> ignore
+            let cycle = cycles |> Seq.head
+            cycle.Should().HaveLength(1).And.Contain(0) |> ignore
             
+    (* Tests a program with a single fact *)
+    [<Fact>]
+    let ``Simple fact program works`` () =
+            let tripleTable = Rdf.Datastore(60u)
+            let subjIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            
+            let query1 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
+            query1.Should().HaveLength(0) |> ignore
+            
+            let headPattern = {
+                             TriplePattern.Subject = ResourceOrVariable.Resource subjIndex
+                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
+                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             }
+            
+            
+            let rule =  {Head =  headPattern; Body = [  ] }
+            DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
+            let query2 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
+            query2.Should().HaveLength(1) |> ignore
     
     
     (* Tests the simplest cyclic program
