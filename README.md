@@ -1,7 +1,7 @@
 # Dag's Semantic Technology Tools
-A collection of tools for using Rdf, Owl and semantic technology in dotnet. 
+A very incomplete collection of tools for using Rdf, Owl and semantic technology in dotnet. 
 
-Currently it only includes a Turtle parser, OWL Manchester syntax parser. A reasoner for acyclic alc ontologies (imported from Manchester)  and semi-positive datalog programs (over the imported Turtle)
+Currently it includes a Turtle parser, OWL Manchester syntax parser, a datalog engine over rdf, and a reasoner for acyclic ALC ontologies (imported from Manchester) and stratifiable datalog programs (over the imported Turtle)
 Sparql is not supported, but single triple-pattern queries over the data are possible.
 
 ## Supported language
@@ -9,7 +9,7 @@ Sparql is not supported, but single triple-pattern queries over the data are pos
 
 * Rdf-1.2 Turtle
 
-* Semi-positive datalog over Rdf. Only triples (and restricted negation) is allowed, no other functions.
+* Stratifiable datalog over Rdf. Only triples (and restricted negation) is allowed, no other functions.
 
 ## Usage
 See examples in [test/NugetTest](test/NugetTest)
