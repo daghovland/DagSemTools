@@ -33,8 +33,6 @@ open DagSemTools.Rdf.Ingress
     type Datatype = Iri
     type Class = Iri
     
-    
-    
     type AnnotationValue =
         Individual of Individual
         | Literal of Resource
