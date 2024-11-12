@@ -11,7 +11,7 @@
     Dotnet representation of OWL 2, as specified in https://www.w3.org/TR/2012/REC-owl2-syntax-20121211
 *)
 
-module OwlOntology.Owl
+module OwlOntology.Axioms
 
 open System
 open DagSemTools.Rdf
@@ -147,36 +147,4 @@ open DagSemTools.Rdf.Ingress
         | HasKey of Annotation list * ClassExpression * ObjectPropertyExpression list * DataProperty list
         | Assertion of Assertion    
         | AnnotationAxiom of AnnotationAxiom
-    
-    type directlyImportsDocument = Iri
-    
-    type Ontology = directlyImportsDocument list * Annotation list * Axiom list
-    
-    type ontologyVersion =
-        | UnNamedOntology
-        | NamedOntology of OntologyIri: IriReference
-        | VersionedOntology of OntologyIri: IriReference * OntologyVersionIri: IriReference
-
-    type ontologyVersion with
-        member x.TryGetOntologyVersionIri() =
-            match x with
-            | NamedOntology iri -> null
-            | VersionedOntology (_, iri) -> iri
-            | _ -> null
-        member x.TryGetOntologyIri() =
-            match x with
-            | NamedOntology iri -> iri
-            | VersionedOntology (iri, _) -> iri
-            | _ -> null
-            
-    type prefixDeclaration =
-        | PrefixDefinition of PrefixName: string * PrefixIri: IriReference
-    type prefixDeclaration with
-        member x.TryGetPrefixName() =
-            match x with
-            | PrefixDefinition (name, iri) -> (name, iri)
-            
-    type OntologyDocument =  prefixDeclaration list * ontologyVersion * Ontology
-    
-            
     

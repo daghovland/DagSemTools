@@ -31,7 +31,8 @@
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
-        <Compile Include="Owl.fs" />
+        <Compile Include="Axioms.fs" />
+        <Compile Include="Ontology.fs" />
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="IriTools" Version="2.2.0" />
