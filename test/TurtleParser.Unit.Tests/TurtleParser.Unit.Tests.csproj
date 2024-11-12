@@ -18,11 +18,11 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="FluentAssertions" Version="6.12.1" />
+        <PackageReference Include="FluentAssertions" Version="6.12.2" />
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
         <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
-        <PackageReference Include="FSharp.Core" Version="8.0.401" />
+        <PackageReference Include="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
 
