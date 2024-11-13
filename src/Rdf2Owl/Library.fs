@@ -1,5 +1,8 @@
-﻿namespace Rdf2Owl
+﻿namespace DagSemTools.Rdf2Owl
 
-module Say =
-    let hello name =
-        printfn "Hello %s" name
+open DagSemTools.Rdf
+open OwlOntology
+
+module Translator =
+    let extractOntology (tripleTable : TripleTable) (resources : ResourceManager) =
+        OwlOntology.Ontology.Ontology ([], Ontology.UnNamedOntology, [], [])

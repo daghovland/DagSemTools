@@ -8,11 +8,40 @@
 namespace DagSemTools.Rdf2Owl.Tests
 
 open System
-open Xunit
 open DagSemTools.Rdf
+open Xunit
+open DagSemTools.Resource
+open IriTools
+open DagSemTools.Rdf.Ingress
+open Faqt
 
 module Tests =
     
     [<Fact>]
-    let ``My test`` () =
-        let triples = TripleTable
+    let ``Subclass Axiom can be parsed from triples`` () =
+        //Arrange
+        let tripleTable = TripleTable(100u)
+        let resources = ResourceManager(100u)
+        let subjectResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/subject"))
+        let rdfTypeResource = resources.AddResource(Resource.Iri(new IriReference (Namespaces.RdfType)))
+        let subclassResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/subclass"))
+        let typeTriple : Triple = { subject = subjectResource
+                                    predicate = rdfTypeResource
+                                    obj = subclassResource }
+        tripleTable.AddTriple typeTriple
+        let subClassOfRelation = resources.AddResource(Resource.Iri(new IriReference (Namespaces.RdfsSubClassOf)))
+        let superclassResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/superclass"))
+        let subClassTriple : Triple = { subject = subclassResource
+                                        predicate = subClassOfRelation
+                                        obj = superclassResource }
+        tripleTable.AddTriple subClassTriple
+        
+        //Act
+        let ontology : OwlOntology.Ontology.Ontology = DagSemTools.Rdf2Owl.Translator.extractOntology tripleTable resources
+        
+        //Assert
+        let subClass : OwlOntology.Axioms.ClassExpression = OwlOntology.Axioms.ClassName (OwlOntology.Axioms.Iri.FullIri (new IriReference "http://example.com/subclass"))
+        let superClass : OwlOntology.Axioms.ClassExpression = OwlOntology.Axioms.ClassName (OwlOntology.Axioms.Iri.FullIri (new IriReference "http://example.com/superclass"))
+        let expectedAxioms = OwlOntology.Axioms.ClassAxiom ( OwlOntology.Axioms.SubClassOf ([], subClass, superClass) )
+        ontology.Axioms.Should().Be([expectedAxioms])
+        
