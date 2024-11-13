@@ -1,12 +1,8 @@
 namespace DagSemTools.Rdf
 
 open DagSemTools.Rdf.Ingress
-open Ingress
-
-open System
+open DagSemTools.Resource
 open System.Collections.Generic
-
-
 
 type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
                  resourceList: Resource array,
@@ -51,7 +47,7 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
             nextResourceIndex - 1u
         
     member this.NewAnonymousBlankNode() =
-        this.AddResource(Ingress.Resource.AnonymousBlankNode this.ResourceCount);
+        this.AddResource(Resource.AnonymousBlankNode this.ResourceCount);
 
     member this.GetResourceTriple(triple: Triple) =
         {

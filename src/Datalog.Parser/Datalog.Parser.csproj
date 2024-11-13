@@ -29,7 +29,7 @@
     <ItemGroup>
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
         <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
-        <PackageReference Include="FSharp.Core" Version="8.0.401" />
+        <PackageReference Include="FSharp.Core" Version="8.0.403" />
         <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
     </ItemGroup>
     <ItemGroup>

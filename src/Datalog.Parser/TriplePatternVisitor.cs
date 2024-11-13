@@ -39,7 +39,7 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<TriplePattern>
         var subject = context.term();
         var predicate = ResourceOrVariable
             .NewResource(_predicateVisitor.ResourceVisitor.Datastore
-                .AddResource(Rdf.Ingress.Resource
+                .AddResource(Resource.Resource
                     .NewIri(new IriReference(Rdf.Namespaces.RdfType))));
         var @class = context.relation();
 

@@ -18,11 +18,11 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="FluentAssertions" Version="6.12.1" />
+        <PackageReference Include="FluentAssertions" Version="6.12.2" />
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
         <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
-        <PackageReference Include="FSharp.Core" Version="8.0.401" />
+        <PackageReference Include="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
 
@@ -31,6 +31,7 @@
         <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
         <ProjectReference Include="..\..\src\Turtle.Parser\Turtle.Parser.csproj" />
         <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
+        <ProjectReference Include="..\..\src\Resource\Resource.fsproj" />
     </ItemGroup>
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
@@ -38,6 +39,7 @@
         <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Turtle.Parser" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Resource" Version="0.3.0" />
     </ItemGroup>
     
     <ItemGroup>

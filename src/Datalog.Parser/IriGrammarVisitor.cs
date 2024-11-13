@@ -9,6 +9,7 @@
 using System.Globalization;
 using Microsoft.FSharp.Collections;
 using DagSemTools.Rdf;
+using DagSemTools.Resource;
 
 namespace DagSemTools.Datalog.Parser;
 using System.Collections.Generic;
@@ -44,12 +45,12 @@ public class IriGrammarVisitor : DatalogBaseVisitor<IriReference>
     /// Returns a list of prefix declarations.
     /// </summary>
     /// <returns></returns>
-    public FSharpList<Ingress.prefixDeclaration> CreatePrefixList()
+    public FSharpList<prefixDeclaration> CreatePrefixList()
     {
-        var prefixList = new List<Ingress.prefixDeclaration>();
+        var prefixList = new List<prefixDeclaration>();
         foreach (var kvp in _prefixes)
         {
-            var prefix = Ingress.prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
+            var prefix = prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
             prefixList.Add(prefix);
         }
         return ListModule.OfSeq(prefixList);

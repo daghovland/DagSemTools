@@ -43,8 +43,16 @@
 
     <ItemGroup>
       <PackageReference Include="IriTools" Version="2.2.0" />
-      <PackageReference Update="FSharp.Core" Version="8.0.401" />
+      <PackageReference Update="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
+
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <ProjectReference Include="..\Resource\Resource.fsproj" />
+    </ItemGroup>
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.Resource" Version="0.3.0" />
+    </ItemGroup>
+
 
     <ItemGroup>
         <None Update="README.md">

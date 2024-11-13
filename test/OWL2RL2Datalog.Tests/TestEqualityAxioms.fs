@@ -6,8 +6,8 @@ open DagSemTools.Rdf
 open DagSemTools.Datalog
 open DagSemTools.Rdf.Ingress
 open DagSemTools.OWL2RL2Datalog
+open DagSemTools
 open IriTools
-open Microsoft.FSharp.Quotations
 open Xunit
 open Faqt
 
@@ -16,9 +16,9 @@ let ``Equality RL adds equality axioms`` () =
     // Arrange
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
-    let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
+    let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
+    let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = subjectIndex2}
     tripleTable.AddTriple(Triple)
     
@@ -40,9 +40,9 @@ let ``Predicate variables are ordered`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
     
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference ("http://example.com/predicate")))
-    let objextIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference ("http://example.com/predicate")))
+    let objextIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
     tripleTable.AddTriple(Triple)
     let triplePattern varName : TriplePattern =
@@ -61,9 +61,9 @@ let ``Unsafe rules are rejected`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
     let program : DatalogProgram = new DatalogProgram([], tripleTable)
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference ("http://example.com/predicate")))
-    let objextIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference ("http://example.com/predicate")))
+    let objextIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
     tripleTable.AddTriple(Triple)
     let triplePattern varName : TriplePattern =
@@ -82,10 +82,10 @@ let ``Predicate variables are handled`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
     
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference ("http://example.com/predicate")))
-    let objextIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let objextIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+    let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference ("http://example.com/predicate")))
+    let objextIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+    let objextIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
     tripleTable.AddTriple(Triple)
     let headPattern : TriplePattern  =
@@ -116,11 +116,11 @@ let ``Equality axioms are handled`` () =
     // Arrange
     let tripleTable = new Datastore(100u)
     
-    let objectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let sameAsIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
-    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-    let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
+    let objectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+    let sameAsIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
+    let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let predIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate2"))
     
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objectIndex}
     tripleTable.AddTriple(Triple)
@@ -166,11 +166,11 @@ let ``Grounding + Stratifying starts ok`` () =
     // Arrange
     let tripleTable = new Datastore(100u)
     
-    let objectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let sameAsIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
-    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-    let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
+    let objectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+    let sameAsIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
+    let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let predIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate2"))
     
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objectIndex}
     tripleTable.AddTriple(Triple)
@@ -214,11 +214,11 @@ let ``Equality axioms can be grounded`` () =
     // Arrange
     let tripleTable = new Datastore(100u)
     
-    let objectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let sameAsIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
-    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-    let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
+    let objectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+    let sameAsIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
+    let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let predIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate2"))
     
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objectIndex}
     tripleTable.AddTriple(Triple)
@@ -280,11 +280,11 @@ let ``Equality RL reasoning works`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
     
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let sameAsIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
-    let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-    let objIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
+    let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+    let sameAsIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference (Namespaces.OwlSameAs)))
+    let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+    let objIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+    let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
     let SameAsTriple = {Ingress.Triple.subject = subjectIndex; predicate = sameAsIndex; obj = subjectIndex2}
     let contentTriple = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objIndex}
     tripleTable.AddTriple(SameAsTriple)

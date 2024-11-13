@@ -8,6 +8,7 @@
 
 using Antlr4.Runtime.Misc;
 using DagSemTools.AlcTableau;
+using DagSemTools.Resource;
 using Microsoft.FSharp.Collections;
 using TestUtils;
 using Xunit.Abstractions;
@@ -43,7 +44,7 @@ public class TestParser
 
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
 
-        prefixes.ToList().Should().Contain(ALC.prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
+        prefixes.ToList().Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
 
         var ontologyIri = versionedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
@@ -103,7 +104,7 @@ public class TestParser
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
 
         var prefixDeclarations = prefixes.ToList();
-        prefixDeclarations.Should().Contain(ALC.prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
+        prefixDeclarations.Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
 
         var ontologyIri = versionedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
