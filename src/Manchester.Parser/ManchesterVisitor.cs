@@ -12,6 +12,7 @@ using DagSemTools.Parser;
 using DagSemTools.Manchester.Parser;
 using Microsoft.FSharp.Collections;
 using DagSemTools.AlcTableau;
+using DagSemTools.Resource;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
@@ -87,12 +88,12 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<ALC.OntologyDocument>
             System.Tuple.Create(ListModule.OfSeq(knowledgeBase.Item1), ListModule.OfSeq(knowledgeBase.Item2))
         );
     }
-    private FSharpList<ALC.prefixDeclaration> CreatePrefixList()
+    private FSharpList<prefixDeclaration> CreatePrefixList()
     {
-        var prefixList = new List<ALC.prefixDeclaration>();
+        var prefixList = new List<prefixDeclaration>();
         foreach (var kvp in _prefixes)
         {
-            var prefix = ALC.prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
+            var prefix = prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
             prefixList.Add(prefix);
         }
         return ListModule.OfSeq(prefixList);

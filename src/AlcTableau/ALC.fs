@@ -10,6 +10,7 @@ namespace DagSemTools.AlcTableau
 
 open System
 open IriTools
+open DagSemTools.Resource
 
 module ALC =
     
@@ -177,13 +178,6 @@ module ALC =
             | NamedOntology iri -> iri
             | VersionedOntology (iri, _) -> iri
             | _ -> null
-            
-    type prefixDeclaration =
-        | PrefixDefinition of PrefixName: string * PrefixIri: IriReference
-    type prefixDeclaration with
-        member x.TryGetPrefixName() =
-            match x with
-            | PrefixDefinition (name, iri) -> (name, iri)
             
     type OntologyDocument =
         | Ontology of prefixDeclaration list * ontologyVersion * knowledgeBase
