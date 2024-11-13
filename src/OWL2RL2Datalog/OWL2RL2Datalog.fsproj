@@ -38,7 +38,7 @@
 
     <ItemGroup>
         <PackageReference Include="Faqt" Version="4.2.1" />
-        <PackageReference Update="FSharp.Core" Version="8.0.401" />
+        <PackageReference Update="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
     
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">

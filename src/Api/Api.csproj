@@ -45,7 +45,7 @@
     </ItemGroup>
     
     <ItemGroup>
-        <PackageReference Include="FSharp.Core" Version="8.0.401" />
+        <PackageReference Include="FSharp.Core" Version="8.0.403" />
         <PackageReference Include="IriTools" Version="2.2.0" />
     </ItemGroup>    
     <ItemGroup>
