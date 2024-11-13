@@ -14,11 +14,6 @@ open DagSemTools.Resource
 
 module ALC =
     
-    type Iri = 
-    | FullIri of IriReference
-    | AbbreviatedIri of string
-    | PrefixedIri of PrefixName : string * LocalName : string
-
     type Role =
         | Iri of IriReference
         | Inverse of IriReference
