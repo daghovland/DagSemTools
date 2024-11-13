@@ -29,6 +29,7 @@ jobs:
       run: | 
         mkdir localNugetPackages
         projects=(
+          "Resource"
           "AlcTableau"
           "Rdf"
           "Parser"
