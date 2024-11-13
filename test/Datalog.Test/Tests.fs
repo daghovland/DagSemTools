@@ -16,7 +16,7 @@ open Ingress
 open DagSemTools.Datalog
 open DagSemTools
 open Faqt
-open DagSemTools.Rdf.Ingress
+
 open DagSemTools.Datalog
 open Faqt
 
@@ -27,10 +27,10 @@ module Tests =
     let ``Datalog program fetches rule`` () =
         let tripleTable = Datastore(60u)
         
-        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-        let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+        let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+        let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
         let triplepattern =  {
                              TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
@@ -54,11 +54,11 @@ module Tests =
     let ``Datalog program does not fetch when no matching rule`` () =
         let tripleTable = Rdf.Datastore(60u)
         
-        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-        let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-        let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+        let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+        let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
+        let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
         let triplepattern = {
                              TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
@@ -92,9 +92,9 @@ module Tests =
     let ``Wildcard triple patterns with one variable are correctly generated`` () =
         let tripleTable = Rdf.Datastore(60u)
         
-        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+        let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
         let triplepattern = {TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
@@ -116,9 +116,9 @@ module Tests =
     let ``Wildcard triple patterns with no variables are correctly generated`` () =
         let tripleTable = Rdf.Datastore(60u)
         
-        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+        let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
         let triplepattern = {TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                              TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
@@ -130,9 +130,9 @@ module Tests =
         let tripleTable = Rdf.Datastore(60u)
         Assert.Equal(0u, tripleTable.Resources.ResourceCount)
         Assert.Equal(0u, tripleTable.Triples.TripleCount)
-        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+        let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
         tripleTable.AddTriple(Triple)
         Assert.Equal(3u, tripleTable.Resources.ResourceCount)
@@ -141,7 +141,7 @@ module Tests =
         let mappedTriple = allTriples |> Seq.head
         Assert.Equal(Triple, mappedTriple)
         
-        let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+        let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
         let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
         let rule =  {Head =  ConstantTriplePattern Triple2; Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple)]}
@@ -159,9 +159,9 @@ module Tests =
             let tripleTable = Rdf.Datastore(60u)
             Assert.Equal(0u, tripleTable.Resources.ResourceCount)
             Assert.Equal(0u, tripleTable.Triples.TripleCount)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
             let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             tripleTable.AddTriple(Triple)
             Assert.Equal(3u, tripleTable.Resources.ResourceCount)
@@ -169,10 +169,10 @@ module Tests =
             let mappedTriple = tripleTable.Triples.GetTriples() |> Seq.head
             Assert.Equal(Triple, mappedTriple)
             
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
             let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
             
-            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
             let Triple3 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex3}
             
             
@@ -190,12 +190,12 @@ module Tests =
     [<Fact>]
     let ``Can evaluate rules positively`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
@@ -227,12 +227,12 @@ module Tests =
     [<Fact>]
     let ``Can evaluate pattern`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
@@ -262,12 +262,12 @@ module Tests =
     [<Fact>]
     let ``Can get matches on complex rule that matches two triples`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
@@ -300,11 +300,11 @@ module Tests =
     let ``Can use subclassing as a rule`` () =
             //Arrange
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let rdfTypeIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.RdfType)));
-            let subClassOfIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference(Namespaces.RdfsSubClassOf)));
-            let subClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subClass"));
-            let superClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/superClass"));
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let rdfTypeIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference (Namespaces.RdfType)));
+            let subClassOfIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference(Namespaces.RdfsSubClassOf)));
+            let subClassIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subClass"));
+            let superClassIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/superClass"));
             let typeTriple = {Triple.subject = subjectIndex; predicate = rdfTypeIndex; obj = subClassIndex}
             tripleTable.AddTriple(typeTriple)
             let subClassTriple = {Triple.subject = subClassIndex; predicate = subClassOfIndex; obj = superClassIndex}
@@ -341,12 +341,12 @@ module Tests =
     [<Fact>]
     let ``Can evaluate pattern with evaluate function`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let predIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate2"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
@@ -371,13 +371,13 @@ module Tests =
     [<Fact>]
     let ``Can get matches on recursive rule that matches two triples`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let predIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate2"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
@@ -413,12 +413,12 @@ module Tests =
     [<Fact>]
     let ``Semipositive programs with implicitly unary relations are rejected`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
@@ -467,9 +467,9 @@ module Tests =
     [<Fact>]
     let ``Simple cyclic programs are detected by cycle-detector`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
             
             let headPattern = {
                              TriplePattern.Subject = ResourceOrVariable.Variable "s"
@@ -494,9 +494,9 @@ module Tests =
     [<Fact>]
     let ``Simple fact program works`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let subjIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
             
             let query1 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
             query1.Should().HaveLength(0) |> ignore
@@ -520,8 +520,8 @@ module Tests =
     [<Fact>]
     let ``Simple cyclic programs are detected`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
             
             
             let headPattern = {
@@ -550,8 +550,8 @@ module Tests =
     [<Fact>]
     let ``Simplest non-stratifiable program is rejected`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
             
             let headPattern = {
                              TriplePattern.Subject = ResourceOrVariable.Variable "s"
@@ -574,12 +574,12 @@ module Tests =
     [<Fact>]
     let ``Non-semipositive programs are rejected`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
@@ -633,12 +633,12 @@ module Tests =
     [<Fact>]
     let rec ``Stratifier outputs first partition`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let predIndexA = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateA"))
-            let predIndexB = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateB"))
-            let predIndexC = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicateC"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let predIndexA = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicateA"))
+            let predIndexB = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicateB"))
+            let predIndexC = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicateC"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
             
             let headPatternA = {
                              TriplePattern.Subject = ResourceOrVariable.Variable "s"
@@ -686,13 +686,13 @@ module Tests =
     [<Fact>]
     let ``Can get matches on complex rule with negative atom`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-            let predIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate2"))
-            let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-            let objdIndex3 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object3"))
+            let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+            let predIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate2"))
+            let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
+            let objdIndex3 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object3"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
@@ -792,9 +792,9 @@ module Tests =
         let tripleTable = Rdf.Datastore(60u)
         Assert.Equal(0u, tripleTable.Resources.ResourceCount)
         Assert.Equal(0u, tripleTable.Triples.TripleCount)
-        let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-        let predIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/predicate"))
-        let objdIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
+        let subjectIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/subject"))
+        let predIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/predicate"))
+        let objdIndex = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
         tripleTable.AddTriple(Triple)
         Assert.Equal(3u, tripleTable.Resources.ResourceCount)
@@ -802,7 +802,7 @@ module Tests =
         let mappedTriple = tripleTable.Triples.GetTriples() |> Seq.head
         Assert.Equal(Triple, mappedTriple)
         
-        let objdIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+        let objdIndex2 = tripleTable.AddResource(Resource.Resource.Iri(new IriReference "http://example.com/object2"))
         let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
         let rule =  {Head =  ConstantTriplePattern Triple2; Body = [RuleAtom.PositiveTriple(ConstantTriplePattern Triple)]}

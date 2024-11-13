@@ -12,9 +12,8 @@ namespace DagSemTools.DL2Datalog
 open DagSemTools.AlcTableau.ALC
 open DagSemTools.Datalog
 open DagSemTools.Rdf
-open DagSemTools.Rdf.Ingress
+open DagSemTools
 open IriTools
-open Microsoft.FSharp.Quotations
 
 (* This is an attempt at implementing the algorithm on p. 195 of "An introduction to description logic" *)
 module Translator =

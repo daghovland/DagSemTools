@@ -1,9 +1,8 @@
 namespace DagSemTools.Rdf
-open Ingress
 
+open Ingress
 open System
-open DagSemTools.Rdf.Ingress
-open System.Collections.Generic
+open DagSemTools.Resource
 
 type Datastore(triples: TripleTable,
                reifiedTriples: QuadTable,

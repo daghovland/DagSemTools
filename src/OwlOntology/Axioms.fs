@@ -14,9 +14,8 @@
 module OwlOntology.Axioms
 
 open System
-open DagSemTools.Rdf
+open DagSemTools.Resource
 open IriTools
-open DagSemTools.Rdf.Ingress
 
     type Iri = 
         | FullIri of IriReference

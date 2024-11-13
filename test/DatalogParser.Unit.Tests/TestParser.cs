@@ -1,4 +1,4 @@
-using DagSemTools;
+using DagSemTools.Resource;
 using DagSemTools.Datalog;
 using DagSemTools.Rdf;
 using FluentAssertions;
@@ -110,12 +110,12 @@ public class TestParser
         ruleTriplePattern.Subject.Should().Be(ResourceOrVariable.NewVariable("?s"));
 
         var predicateResource = ResourceOrVariable
-            .NewResource(datastore.AddResource(Ingress.Resource
+            .NewResource(datastore.AddResource(Resource
                 .NewIri(new IriReference("https://example.com/data#predicate2"))));
         ruleTriplePattern.Predicate.Should().Be(predicateResource);
 
         var objectResource = ResourceOrVariable
-            .NewResource(datastore.AddResource(Ingress.Resource
+            .NewResource(datastore.AddResource(Resource
                 .NewIri(new IriReference("https://example.com/data3#obj"))));
         ruleTriplePattern.Object.Should().Be(objectResource);
 
@@ -141,7 +141,7 @@ public class TestParser
             ResourceOrVariable.NewVariable("?p"),
             ResourceOrVariable.NewVariable("?y"))));
         var rdfTypeResource = ResourceOrVariable
-            .NewResource(datastore.AddResource(Ingress.Resource
+            .NewResource(datastore.AddResource(Resource
                 .NewIri(new IriReference(Namespaces.RdfType))));
         TriplePattern expectedHead = new TriplePattern(
             ResourceOrVariable.NewVariable("?x"),
@@ -169,19 +169,19 @@ public class TestParser
         ont.First().Head.Should().Be(new TriplePattern(
             ResourceOrVariable.NewVariable("?new_node"),
             ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Ingress.Resource
+                .NewResource(datastore.GetResourceId(Resource
                     .NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
             ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Ingress.Resource
+                .NewResource(datastore.GetResourceId(Resource
                     .NewIri(new IriReference("https://example.com/data#type"))))));
 
         ont.First().Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
             ResourceOrVariable.NewVariable("?node"),
             ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Ingress.Resource
+                .NewResource(datastore.GetResourceId(Resource
                     .NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
             ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Ingress.Resource
+                .NewResource(datastore.GetResourceId(Resource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }
 
