@@ -32,6 +32,8 @@ jobs:
           "Resource"
           "AlcTableau"
           "Rdf"
+          "OwlOntology"
+          "Rdf2Owl"
           "Parser"
           "Turtle.Parser"
           "Datalog"
