@@ -33,9 +33,9 @@ open IriTools
     type Class = Iri
     
     type AnnotationValue =
-        Individual of Individual
-        | Literal of Resource
-        | Iri of Iri
+        IndividualAnnotation of Individual
+        | LiteralAnnotation of Resource
+        | IriAnnotation of Iri
         
     type Annotation = AnnotationProperty * AnnotationValue
         
@@ -64,7 +64,7 @@ open IriTools
     
        
     type ClassExpression =
-        Class of Class
+        ClassName of Class
         | ObjectUnionOf of ClassExpression list
         | ObjectIntersectionOf of ClassExpression list
         | ObjectComplementOf of ClassExpression
