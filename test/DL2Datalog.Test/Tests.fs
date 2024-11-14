@@ -3,6 +3,7 @@ module Tests
 open System
 open DagSemTools.AlcTableau.ALC
 open DagSemTools.Datalog
+open DagSemTools.Resource
 open Xunit
 open DagSemTools.DL2Datalog
 open DagSemTools.Rdf

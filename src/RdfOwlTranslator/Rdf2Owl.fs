@@ -1,6 +1,5 @@
 ﻿namespace DagSemTools.RdfOwlTranslator
 
-open System.Resources
 open DagSemTools.Rdf
 open DagSemTools.Resource
 open IriTools
@@ -26,8 +25,22 @@ module Rdf2Owl =
                             | Namespaces.RdfsSubClassOf -> Option.map2 createSubClassAxiom  (getResourceClass resource (triple.subject)) (getResourceClass resource (triple.obj))
                                                             |> Option.map Axioms.AxiomClassAxiom
                             | _ -> None)
-                                                   
+    let extractOntologyIri (tripleTable : TripleTable) (resources : ResourceManager) =
+        let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
+        let owlOntologyId = resources.AddResource(Resource.Iri(new IriReference(Namespaces.Owl)))
+        let ontologyTypeTriples = tripleTable.GetTriplesWithObjectPredicate(owlOntologyId, rdfTypeId)
+        if (ontologyTypeTriples |> Seq.length > 1) then
+            failwith "Multiple ontology IRIs provided in file!"
+        else
+            ontologyTypeTriples |> Seq.tryHead |> Option.bind (fun tr -> (getResourceIri resources tr.subject)) 
     
+    let extractOntologyName (tripleTable : TripleTable) (resources : ResourceManager)  =
+        match extractOntologyIri tripleTable resources with
+        | None -> Ontology.UnNamedOntology
+        | Some iri -> Ontology.NamedOntology iri
+        
+        
     let extractOntology (tripleTable : TripleTable) (resources : ResourceManager) =
+        let oName = extractOntologyName tripleTable resources
         let axioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)  |> Seq.toList
-        OwlOntology.Ontology.Ontology ([], Ontology.UnNamedOntology, [], axioms)
+        OwlOntology.Ontology.Ontology ([], oName, [], axioms)

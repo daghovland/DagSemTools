@@ -10,6 +10,7 @@
 using System.Globalization;
 using System.Security.Cryptography;
 using DagSemTools.Rdf;
+using DagSemTools.Resource;
 using DagSemTools.Turtle.Parser;
 
 namespace DagSemTools.Turtle.Parser;

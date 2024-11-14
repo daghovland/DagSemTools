@@ -6,7 +6,7 @@
     Contact: hovlanddag@gmail.com
 *)
 
-namespace DagSemTools.Rdf
+namespace DagSemTools.Resource
 open IriTools
 
 
@@ -50,6 +50,12 @@ module Namespaces =
     
     [<Literal>]
     let OwlSameAs = Owl + "sameAs";
+    [<Literal>]
+    let OwlOntology = Owl + "Ontology";
+    [<Literal>]
+    let OwlAnnotationProperty = Owl + "AnnotationProperty";
+    [<Literal>]
+    let OwlDatatypeProperty = Owl + "DatatypeProperty";
     
     [<Literal>]
     let XsdString = Xsd + "string";

@@ -26,6 +26,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="Namespaces.fs" />
         <Compile Include="Resource.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
