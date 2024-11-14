@@ -23,10 +23,12 @@
 
         <Platforms>AnyCPU</Platforms>
 
+        <RootNamespace>Rdf2Owl</RootNamespace>
+
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Library.fs"/>
+        <Compile Include="Rdf2Owl.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
