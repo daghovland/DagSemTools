@@ -7,6 +7,7 @@ open DagSemTools.Datalog
 open DagSemTools.Rdf.Ingress
 open DagSemTools.OWL2RL2Datalog
 open DagSemTools
+open DagSemTools.Resource
 open IriTools
 open Xunit
 open Faqt

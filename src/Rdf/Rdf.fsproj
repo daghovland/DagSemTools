@@ -24,7 +24,6 @@
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Namespaces.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>

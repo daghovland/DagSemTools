@@ -8,6 +8,7 @@
 
 using System.Globalization;
 using DagSemTools.Rdf;
+using DagSemTools.Resource;
 
 namespace DagSemTools.Datalog.Parser;
 
