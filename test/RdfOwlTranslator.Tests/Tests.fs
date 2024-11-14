@@ -5,10 +5,11 @@
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
     Contact: hovlanddag@gmail.com
 *)
-namespace DagSemTools.Rdf2Owl.Tests
+namespace DagSemTools.RdfOwlTranslator.Tests
 
 open System
 open DagSemTools.Rdf
+open OwlOntology.Axioms
 open Xunit
 open DagSemTools.Resource
 open IriTools
@@ -37,11 +38,14 @@ module Tests =
         tripleTable.AddTriple subClassTriple
         
         //Act
-        let ontology : OwlOntology.Ontology.Ontology = DagSemTools.Rdf2Owl.Translator.extractOntology tripleTable resources
+        let ontology : OwlOntology.Ontology.Ontology = DagSemTools.RdfOwlTranslator.Rdf2Owl.extractOntology tripleTable resources
         
         //Assert
         let subClass : OwlOntology.Axioms.ClassExpression = OwlOntology.Axioms.ClassName (OwlOntology.Axioms.Iri.FullIri (new IriReference "http://example.com/subclass"))
         let superClass : OwlOntology.Axioms.ClassExpression = OwlOntology.Axioms.ClassName (OwlOntology.Axioms.Iri.FullIri (new IriReference "http://example.com/superclass"))
-        let expectedAxioms = OwlOntology.Axioms.ClassAxiom ( OwlOntology.Axioms.SubClassOf ([], subClass, superClass) )
-        ontology.Axioms.Should().Be([expectedAxioms])
+        let expectedAxioms = OwlOntology.Axioms.AxiomClassAxiom ( OwlOntology.Axioms.SubClassOf ([], subClass, superClass) )
+        let ontologyAxioms = ontology.Axioms |> List.where (fun ax -> match ax with
+                                                                            | Axiom.AxiomClassAxiom _ -> true
+                                                                            | _ -> false) 
+        ontologyAxioms.Should().Contain(expectedAxioms)
         

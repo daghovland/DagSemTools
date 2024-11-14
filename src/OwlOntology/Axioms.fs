@@ -137,11 +137,11 @@ open IriTools
     
     type Axiom =
         Declaration of Declaration
-        | ClassAxiom of ClassAxiom
-        | ObjectPropertyAxiom of ObjectPropertyAxiom
-        | DataPropertyAxiom of DataPropertyAxiom
-        | DatatypeDefinition of Annotation list * Datatype * DataRange
-        | HasKey of Annotation list * ClassExpression * ObjectPropertyExpression list * DataProperty list
-        | Assertion of Assertion    
-        | AnnotationAxiom of AnnotationAxiom
+        | AxiomClassAxiom of ClassAxiom
+        | AxiomObjectPropertyAxiom of ObjectPropertyAxiom
+        | AxiomDataPropertyAxiom of DataPropertyAxiom
+        | AxiomDatatypeDefinition of Annotation list * Datatype * DataRange
+        | AxiomHasKey of Annotation list * ClassExpression * ObjectPropertyExpression list * DataProperty list
+        | AxiomAssertion of Assertion    
+        | AxiomAnnotationAxiom of AnnotationAxiom
     

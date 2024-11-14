@@ -6,6 +6,7 @@
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
+        <RootNamespace>Rdf2Owl.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
@@ -30,7 +31,7 @@
     
     <!-- Use project references for local development -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\..\src\Rdf2Owl\Rdf2Owl.fsproj" />
+        <ProjectReference Include="..\..\src\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
         <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
         <ProjectReference Include="..\..\src\OwlOntology\OwlOntology.fsproj" />
     </ItemGroup>

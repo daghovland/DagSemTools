@@ -62,9 +62,9 @@ Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "OwlOntology", "src\OwlOntol
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Resource", "src\Resource\Resource.fsproj", "{645D5AA5-620D-4D54-9F5D-C0708A4E81DC}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rdf2Owl", "src\Rdf2Owl\Rdf2Owl.fsproj", "{853371F1-88D6-44BE-9795-67D3CE13868B}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RdfOwlTranslator", "src\RdfOwlTranslator\RdfOwlTranslator.fsproj", "{853371F1-88D6-44BE-9795-67D3CE13868B}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rdf2Owl.Tests", "test\Rdf2Owl.Tests\Rdf2Owl.Tests.fsproj", "{5A83E62E-43B1-4F03-8714-BE048117994A}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "RdfOwlTranslator.Tests", "test\RdfOwlTranslator.Tests\RdfOwlTranslator.Tests.fsproj", "{5A83E62E-43B1-4F03-8714-BE048117994A}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
