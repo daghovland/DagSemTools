@@ -33,7 +33,7 @@ jobs:
           "AlcTableau"
           "Rdf"
           "OwlOntology"
-          "Rdf2Owl"
+          "RdfOwlTranslator"
           "Parser"
           "Turtle.Parser"
           "Datalog"

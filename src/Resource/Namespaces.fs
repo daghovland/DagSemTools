@@ -51,7 +51,13 @@ module Namespaces =
     [<Literal>]
     let OwlSameAs = Owl + "sameAs";
     [<Literal>]
-    let OwlOntology = Owl + "Ontology";
+    let OwlOntology = Owl + "Ontology"
+    [<Literal>]
+    let OwlImport = Owl + "imports";
+    [<Literal>]
+    let OwlVersionIri = Owl + "versionIri";
+    [<Literal>]
+    let OwlOntologyProperty = Owl + "OntologyProperty"
     [<Literal>]
     let OwlAnnotationProperty = Owl + "AnnotationProperty";
     [<Literal>]
