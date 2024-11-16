@@ -105,8 +105,17 @@ module Rdf2Owl =
     
     (* This is the set Decl from  the OWL2 specs, table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
     let getDeclarations (tripleTable : TripleTable) (resources) =
-        getBasicClassDeclarations tripleTable resources
+        Seq.concat [
+          getBasicClassDeclarations tripleTable resources
+          getBasicDatatypeDeclarations tripleTable resources
+          getBasicObjectPropertyDeclarations tripleTable resources
+          getBasicDatatypePropertyDeclarations tripleTable resources
+        ] |>
+        Seq.map (fun ent -> Axioms.AxiomDeclaration ([], ent))
+        
     let extractOntology (tripleTable : TripleTable) (resources : ResourceManager) =
         let (oName, imports) = extractOntologyName tripleTable resources
-        let axioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)  |> Seq.toList
+        let declarations = getDeclarations tripleTable resources
+        let tripleAxioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)
+        let axioms = [declarations ; tripleAxioms] |> Seq.concat |> Seq.toList
         Ontology.Ontology (imports, oName, [], axioms)

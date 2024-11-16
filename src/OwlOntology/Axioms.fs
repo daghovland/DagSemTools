@@ -132,10 +132,10 @@ open IriTools
         | AnnotationPropertyDeclaration of AnnotationProperty
         | NamedIndividualDeclaration of Individual
     
-    type Declaration = Declaration of Annotation list * Entity
+    type Declaration = Annotation list * Entity
     
     type Axiom =
-        Declaration of Declaration
+        AxiomDeclaration of Declaration
         | AxiomClassAxiom of ClassAxiom
         | AxiomObjectPropertyAxiom of ObjectPropertyAxiom
         | AxiomDataPropertyAxiom of DataPropertyAxiom
