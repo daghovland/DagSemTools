@@ -123,7 +123,6 @@ open IriTools
         | NegativeObjectPropertyAssertion of Annotation list * ObjectPropertyExpression * Individual * Individual
         | DataPropertyAssertion of Annotation list * DataProperty * Individual * Resource
         | NegativeDataPropertyAssertion of Annotation list * DataProperty * Individual * Resource
-        
     
     type Entity =
         | ClassDeclaration of Class
