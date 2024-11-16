@@ -46,7 +46,7 @@ open IriTools
         | AnnotationPropertyRange of Annotation list * AnnotationProperty * Iri
         
     type DataRange =
-        Datatype of Datatype
+        SimpleDataRange of Datatype
         | DataIntersectionOf of DataRange list
         | DataUnionOf of DataRange list
         | DataComplementOf of DataRange

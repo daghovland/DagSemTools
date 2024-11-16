@@ -65,6 +65,8 @@ module Namespaces =
     [<Literal>]
     let OwlDatatypeProperty = Owl + "DatatypeProperty";
     [<Literal>]
+    let OwlObjectProperty = Owl + "ObjectProperty";
+    [<Literal>]
     let OwlClass = Owl + "Class"
     [<Literal>]
     let OwlNamedIndividual = Owl + "NamedIndividual"
