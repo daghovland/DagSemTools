@@ -14,18 +14,26 @@ module Rdf2Owl =
             | Resource.Iri iri -> Some iri
             | _ -> None
     
-    let getResourceClass (resource : ResourceManager) (resourceId : Ingress.ResourceId) : OwlOntology.Axioms.Class option =
-        getResourceIri resource resourceId |> Option.map OwlOntology.Axioms.Class.FullIri 
+    let getResourceClass (resource : ResourceManager) (resourceId : Ingress.ResourceId) : Class option =
+        getResourceIri resource resourceId |> Option.map Class.FullIri 
     
     let createSubClassAxiom subclass superclass = 
-        OwlOntology.Axioms.ClassAxiom.SubClassOf ([], (Axioms.ClassName subclass), (Axioms.ClassName superclass))
+        ClassAxiom.SubClassOf ([], (ClassName subclass), (ClassName superclass))
     
+    (* Creates entities for use in declaration axioms  *)
     let createClassDeclaration (resource : ResourceManager) (tripleTable : TripleTable) (classId : Ingress.ResourceId) =
-        let classTriples = tripleTable.GetTriplesWithSubject(classId)
         let classIri = getResourceIri resource classId
-        Axioms.ClassName (Axioms.Class.FullIri classIri.Value)
-    
-    let extractAxiom (resource : ResourceManager)  (triple : Ingress.Triple) : OwlOntology.Axioms.Axiom option =
+        ClassDeclaration (Class.FullIri classIri.Value)
+    let createDatatypeDeclaration (resource : ResourceManager) (tripleTable : TripleTable) (typeId : Ingress.ResourceId)  =
+        let typeIri = getResourceIri resource typeId
+        DatatypeDeclaration (Axioms.Iri.FullIri typeIri.Value)
+    let createDatatypePropertyDeclaration (resource : ResourceManager) (tripleTable : TripleTable) (propertyId : Ingress.ResourceId)  =
+        let propertyIri = getResourceIri resource propertyId
+        DataPropertyDeclaration (Axioms.Iri.FullIri propertyIri.Value)
+    let createObjectPropertyDeclaration (resource : ResourceManager) (tripleTable : TripleTable) (propertyId : Ingress.ResourceId)  =
+        let propertyIri = getResourceIri resource propertyId
+        ObjectPropertyDeclaration (Axioms.Iri.FullIri propertyIri.Value)
+    let extractAxiom (resource : ResourceManager)  (triple : Ingress.Triple) : Axiom option =
         getResourceIri resource triple.predicate
         |> Option.map (_.ToString())
         |> Option.bind (fun (predicateIri) -> 
@@ -75,17 +83,29 @@ module Rdf2Owl =
             |> Seq.map (_.subject)
             |> Seq.map (createClassDeclaration resources tripleTable)
     
-    let getBasicDtatypeDeclarations (tripleTable : TripleTable) (resources : ResourceManager) =
+    let getBasicDatatypeDeclarations (tripleTable : TripleTable) (resources : ResourceManager) =
         let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
         let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfsDatatype)))
         tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
             |> Seq.map (_.subject)
-            |> Seq.map (createClassDeclaration resources tripleTable)
+            |> Seq.map (createDatatypeDeclaration resources tripleTable)
+    let getBasicDatatypePropertyDeclarations (tripleTable : TripleTable) (resources : ResourceManager) =
+        let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
+        let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlDatatypeProperty)))
+        tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
+            |> Seq.map (_.subject)
+            |> Seq.map (createDatatypePropertyDeclaration resources tripleTable)
+    let getBasicObjectPropertyDeclarations (tripleTable : TripleTable) (resources : ResourceManager) =
+        let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
+        let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlObjectProperty)))
+        tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
+            |> Seq.map (_.subject)
+            |> Seq.map (createObjectPropertyDeclaration resources tripleTable)
     
     
     (* This is the set Decl from  the OWL2 specs, table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
     let getDeclarations (tripleTable : TripleTable) (resources) =
-        getClassDeclarations tripleTable resources
+        getBasicClassDeclarations tripleTable resources
     let extractOntology (tripleTable : TripleTable) (resources : ResourceManager) =
         let (oName, imports) = extractOntologyName tripleTable resources
         let axioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)  |> Seq.toList
