@@ -47,6 +47,8 @@ module Namespaces =
     
     [<Literal>]
     let RdfsSubClassOf = Rdfs + "subClassOf";
+    [<Literal>]
+    let RdfsDatatype = Rdfs + "Datatype";
     
     [<Literal>]
     let OwlSameAs = Owl + "sameAs";
@@ -62,6 +64,10 @@ module Namespaces =
     let OwlAnnotationProperty = Owl + "AnnotationProperty";
     [<Literal>]
     let OwlDatatypeProperty = Owl + "DatatypeProperty";
+    [<Literal>]
+    let OwlClass = Owl + "Class"
+    [<Literal>]
+    let OwlNamedIndividual = Owl + "NamedIndividual"
     
     [<Literal>]
     let XsdString = Xsd + "string";

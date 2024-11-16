@@ -22,7 +22,8 @@ module Rdf2Owl =
     
     let createClassDeclaration (resource : ResourceManager) (tripleTable : TripleTable) (classId : Ingress.ResourceId) =
         let classTriples = tripleTable.GetTriplesWithSubject(classId)
-        Axioms.ClassDeclaration
+        let classIri = getResourceIri resource classId
+        Axioms.ClassName (Axioms.Class.FullIri classIri.Value)
     
     let extractAxiom (resource : ResourceManager)  (triple : Ingress.Triple) : OwlOntology.Axioms.Axiom option =
         getResourceIri resource triple.predicate
@@ -66,7 +67,25 @@ module Rdf2Owl =
                                         | None -> NamedOntology iri
                                         | Some versionIri -> VersionedOntology (iri, versionIri)
                         (version, imports)
-       
+    
+    let getBasicClassDeclarations (tripleTable : TripleTable) (resources : ResourceManager) =
+        let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
+        let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlClass)))
+        tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
+            |> Seq.map (_.subject)
+            |> Seq.map (createClassDeclaration resources tripleTable)
+    
+    let getBasicDtatypeDeclarations (tripleTable : TripleTable) (resources : ResourceManager) =
+        let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
+        let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfsDatatype)))
+        tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
+            |> Seq.map (_.subject)
+            |> Seq.map (createClassDeclaration resources tripleTable)
+    
+    
+    (* This is the set Decl from  the OWL2 specs, table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
+    let getDeclarations (tripleTable : TripleTable) (resources) =
+        getClassDeclarations tripleTable resources
     let extractOntology (tripleTable : TripleTable) (resources : ResourceManager) =
         let (oName, imports) = extractOntologyName tripleTable resources
         let axioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)  |> Seq.toList
