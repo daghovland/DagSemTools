@@ -23,7 +23,7 @@ open IriTools
         | PrefixedIri of PrefixName : string * LocalName : string
     
     type Individual =
-        | NamedIndividual of IriReference
+        | NamedIndividual of Iri
         | AnonymousIndividual of uint32
     
     type AnnotationProperty = Iri
