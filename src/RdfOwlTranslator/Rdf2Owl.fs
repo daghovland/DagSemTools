@@ -78,39 +78,54 @@ module Rdf2Owl =
                                         | Some versionIri -> VersionedOntology (iri, versionIri)
                         (version, imports)
     
+    let getTypeDeclarator entityTypeIri =
+        match entityTypeIri.ToString() with
+        | Namespaces.OwlDatatypeProperty -> DataPropertyDeclaration
+        | Namespaces.OwlObjectProperty -> ObjectPropertyDeclaration
+        | Namespaces.RdfsDatatype -> DatatypeDeclaration
+        | Namespaces.OwlClass -> ClassDeclaration
+        | Namespaces.OwlAnnotationProperty -> AnnotationPropertyDeclaration
+        | Namespaces.OwlNamedIndividual -> (fun indIri -> NamedIndividualDeclaration (NamedIndividual indIri))
+        | _ -> failwith $"BUG: no declaration for iri {entityTypeIri}"
+    
     (* This is for the set Decl from  the OWL2 specs, second part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
-    let getAxiomDeclarations (tripleTable : TripleTable) (resources : ResourceManager) (entityTypeIri) : Axiom seq =
+    let getAxiomDeclarations (tripleTable : TripleTable) (resources : ResourceManager) : Axiom seq =
         let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
         let owlAxiomId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAxiom)))
         let owlAnnPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
         let owlAnnSourceId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
         let owlAnnTargetId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
-        let owlClassId = resources.AddResource(Resource.Iri (entityTypeIri))
+        
         tripleTable.GetTriplesWithObjectPredicate(owlAxiomId, rdfTypeId)
                                     |> Seq.map (_.subject)
-                                    |> Seq.filter (fun ax -> tripleTable.Contains({subject= ax, predicate = owlAnnPropId, obj = rdfTypeId}))
+                                    |> Seq.filter (fun ax -> tripleTable.Contains({subject= ax; predicate = owlAnnPropId; obj = rdfTypeId}))
                                     |> Seq.collect (fun ax -> tripleTable.GetTriplesWithSubjectPredicate(ax, owlAnnSourceId)
                                                                 |> Seq.map _.obj
                                                                 |> Seq.map (fun source -> (ax, source) )
-                                                                |> Seq.collect (fun (ax, source) -> tripleTable.GetTriplesWithSubjectPredicate(ax, owlAnnTargetId) ))
-                                    |> Seq.map (createDeclaration resources typeDeclaration)
-    
+                                                                |> Seq.collect (fun (ax, source) ->
+                                                                    tripleTable.GetTriplesWithSubjectPredicate(ax, owlAnnTargetId)
+                                                                    |> Seq.map (_.obj)
+                                                                    |> Seq.choose (getResourceIri resources)
+                                                                    |> Seq.map getTypeDeclarator
+                                                                    |> Seq.map (fun decl -> (source, decl))))
+                                    |> Seq.map (fun (source, decl) -> AxiomDeclaration ([], createDeclaration resources decl source ))
     
     let getDeclarations (tripleTable : TripleTable) (resources) =
         [
-         (ClassDeclaration, Namespaces.OwlClass)
-         (DataPropertyDeclaration, Namespaces.OwlDatatypeProperty)
-         (ObjectPropertyDeclaration, Namespaces.OwlObjectProperty)
-         (DatatypeDeclaration, Namespaces.RdfsDatatype)
-         (AnnotationPropertyDeclaration, Namespaces.OwlAnnotationProperty)
-         ((fun indIri -> NamedIndividualDeclaration (NamedIndividual indIri)), Namespaces.OwlNamedIndividual)
+         Namespaces.OwlClass
+         Namespaces.OwlDatatypeProperty
+         Namespaces.OwlObjectProperty
+         Namespaces.RdfsDatatype
+         Namespaces.OwlAnnotationProperty
+         Namespaces.OwlNamedIndividual
          ]
+        |> Seq.map (fun typeIri -> (getTypeDeclarator typeIri, typeIri))
         |> Seq.collect (fun (typeInfo, typeIri) -> getBasicDeclarations tripleTable resources typeInfo (new IriReference(typeIri)))
         |> Seq.map (fun ent -> Axioms.AxiomDeclaration ([], ent))
         
-        let extractOntology (tripleTable : TripleTable) (resources : ResourceManager) =
-            let (oName, imports) = extractOntologyName tripleTable resources
-            let declarations = getDeclarations tripleTable resources
-            let tripleAxioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)
-            let axioms = [declarations ; tripleAxioms] |> Seq.concat |> Seq.toList
-            Ontology.Ontology (imports, oName, [], axioms)
+    let extractOntology (tripleTable : TripleTable) (resources : ResourceManager) =
+        let (oName, imports) = extractOntologyName tripleTable resources
+        let declarations = getDeclarations tripleTable resources
+        let tripleAxioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)
+        let axioms = [declarations ; tripleAxioms] |> Seq.concat |> Seq.toList
+        Ontology.Ontology (imports, oName, [], axioms)
