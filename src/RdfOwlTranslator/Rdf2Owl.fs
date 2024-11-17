@@ -81,6 +81,7 @@ module Rdf2Owl =
          (DataPropertyDeclaration, Namespaces.OwlDatatypeProperty)
          (ObjectPropertyDeclaration, Namespaces.OwlObjectProperty)
          (DatatypeDeclaration, Namespaces.RdfsDatatype)
+         (AnnotationPropertyDeclaration, Namespaces.OwlAnnotationProperty)
          ((fun indIri -> NamedIndividualDeclaration (NamedIndividual indIri)), Namespaces.OwlNamedIndividual)
          ]
         declarators
