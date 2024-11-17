@@ -18,6 +18,42 @@ open Faqt
 
 module Tests =
     
+    
+    [<Theory>]
+    [<InlineData(Namespaces.OwlClass)>]
+    [<InlineData(Namespaces.OwlDatatypeProperty)>]
+    [<InlineData(Namespaces.OwlObjectProperty)>]
+    [<InlineData(Namespaces.OwlAnnotationProperty)>]
+    [<InlineData(Namespaces.RdfsDatatype)>]
+    let ``Class declarations can be parsed from triples`` (typeIri: String ) =
+        //Arrange
+        let tripleTable = TripleTable(100u)
+        let resources = ResourceManager(100u)
+        let subjectResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/subject"))
+        let rdfTypeResource = resources.AddResource(Resource.Iri(new IriReference (Namespaces.RdfType)))
+        let owlclassResource = resources.AddResource(Resource.Iri(new IriReference (typeIri)))
+        let typeTriple : Triple = { subject = subjectResource
+                                    predicate = rdfTypeResource
+                                    obj = owlclassResource }
+        tripleTable.AddTriple typeTriple
+        let typeDeclaration = match typeIri with
+                                | Namespaces.OwlClass -> ClassDeclaration
+                                | Namespaces.OwlObjectProperty -> ObjectPropertyDeclaration
+                                | Namespaces.OwlDatatypeProperty -> DataPropertyDeclaration
+                                | Namespaces.OwlAnnotationProperty -> AnnotationPropertyDeclaration
+                                | Namespaces.RdfsDatatype -> DatatypeDeclaration
+                                | _ -> failwith $"Invalid inline data type {typeIri} given to test"
+        let expectedAxiom = AxiomDeclaration ([],  typeDeclaration (Iri.FullIri (new IriReference "http://example.com/subject"))) 
+        
+        //Act
+        let ontology : OwlOntology.Ontology.Ontology = DagSemTools.RdfOwlTranslator.Rdf2Owl.extractOntology tripleTable resources
+        
+        //Assert
+        let ontologyAxioms = ontology.Axioms 
+        ontologyAxioms.Should().Contain(expectedAxiom)
+        
+    
+    
     [<Fact>]
     let ``Subclass Axiom can be parsed from triples`` () =
         //Arrange
