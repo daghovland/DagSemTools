@@ -73,11 +73,21 @@ module Namespaces =
     [<Literal>]
     let OwlAxiom = Owl + "Axiom"
     [<Literal>]
+    let OwlAnnotation = Owl + "Annotation"
+    [<Literal>]
     let OwlAnnotatedSource = Owl + "annotatedSource"
     [<Literal>]
     let OwlAnnotatedProperty = Owl + "annotatedProperty"
     [<Literal>]
     let OwlAnnotatedTarget = Owl + "annotatedTarget"
+    [<Literal>]
+    let OwlAllDisjointClasses = Owl + "AllDisjointClasses"
+    [<Literal>]
+    let OwlAllDisjointProperties = Owl + "AllDisjointProperties"
+    [<Literal>]
+    let OwlAllDifferent = Owl + "AllDifferent"
+    [<Literal>]
+    let OwlNegativePropertyAssertion = Owl + "NegativePropertyAssertion"
     [<Literal>]
     let XsdString = Xsd + "string";
     [<Literal>]
