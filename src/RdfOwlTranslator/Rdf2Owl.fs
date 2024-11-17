@@ -148,5 +148,6 @@ module Rdf2Owl =
         let declarations = getDeclarations tripleTable resources
         let axiomDeclarations = getAxiomDeclarations tripleTable resources
         let tripleAxioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)
+        let RIND = getReificationBlankNodes tripleTable resources
         let axioms = [declarations ; tripleAxioms ; axiomDeclarations] |> Seq.concat |> Seq.toList
         Ontology.Ontology (imports, oName, [], axioms)
