@@ -13,3 +13,9 @@ Sparql is not supported, but single triple-pattern queries over the data are pos
 
 ## Usage
 See examples in [test/NugetTest](test/NugetTest)
+
+## Copyright
+Dag Hovland 2024. 
+
+# Gaza
+This software is written at a time when the people of Gaza are the victims of an horrible and very asymmetric warfare, perhaps even genocide. Users and contributors are encouraged to find ways to support the people of Gaza.
