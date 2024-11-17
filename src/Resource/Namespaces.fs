@@ -70,7 +70,14 @@ module Namespaces =
     let OwlClass = Owl + "Class"
     [<Literal>]
     let OwlNamedIndividual = Owl + "NamedIndividual"
-    
+    [<Literal>]
+    let OwlAxiom = Owl + "Axiom"
+    [<Literal>]
+    let OwlAnnotatedSource = Owl + "annotatedSource"
+    [<Literal>]
+    let OwlAnnotatedProperty = Owl + "annotatedProperty"
+    [<Literal>]
+    let OwlAnnotatedTarget = Owl + "annotatedTarget"
     [<Literal>]
     let XsdString = Xsd + "string";
     [<Literal>]
