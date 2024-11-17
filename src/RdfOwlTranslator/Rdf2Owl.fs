@@ -26,6 +26,26 @@ module Rdf2Owl =
         let resourceIri = getResourceIri resource resourceId
         declarationType (Axioms.Iri.FullIri resourceIri.Value)
     
+    (* This is the set RIND in Table 8 of https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
+    let getReificationBlankNodes (tripleTable : TripleTable) (resources : ResourceManager) =
+        let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
+        [
+            Namespaces.OwlAxiom
+            Namespaces.OwlAnnotation
+            Namespaces.OwlAllDisjointClasses
+            Namespaces.OwlAllDisjointProperties
+            Namespaces.OwlAllDifferent
+            Namespaces.OwlNegativePropertyAssertion
+        ]
+            |> Seq.map (fun iri -> resources.AddResource(Resource.Iri (new IriReference(iri))))
+            |> Seq.collect (fun typeId -> tripleTable.GetTriplesWithObjectPredicate(typeId, rdfTypeId)
+                                          |> Seq.map _.subject
+                                          |> Seq.choose (fun res -> match resources.GetResource(res) with
+                                                                         | AnonymousBlankNode _ -> Some res
+                                                                         | NamedBlankNode _ -> Some res
+                                                                         | _ -> None))
+   
+    
     (* This is for the set Decl from  the OWL2 specs, first part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
     let getBasicDeclarations (tripleTable : TripleTable) (resources : ResourceManager) (typeDeclaration : Iri -> Entity) (entityTypeIri)=
         let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
@@ -126,6 +146,7 @@ module Rdf2Owl =
     let extractOntology (tripleTable : TripleTable) (resources : ResourceManager) =
         let (oName, imports) = extractOntologyName tripleTable resources
         let declarations = getDeclarations tripleTable resources
+        let axiomDeclarations = getAxiomDeclarations tripleTable resources
         let tripleAxioms = tripleTable.GetTriples() |> Seq.choose (extractAxiom resources)
-        let axioms = [declarations ; tripleAxioms] |> Seq.concat |> Seq.toList
+        let axioms = [declarations ; tripleAxioms ; axiomDeclarations] |> Seq.concat |> Seq.toList
         Ontology.Ontology (imports, oName, [], axioms)
