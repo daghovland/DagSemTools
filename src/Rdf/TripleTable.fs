@@ -86,6 +86,8 @@ type TripleTable(tripleList: Triple array,
                 this.TripleCount <- nextTripleCount
                 ()
             
+        member this.Contains (triple : Triple) : bool =
+            this.ThreeKeysIndex.ContainsKey triple
         member this.GetTriplesWithSubject (subject: ResourceId) : Triple seq =
             match  (this.SubjectPredicateIndex.TryGetValue subject) with 
                                 |    true, subjMap -> subjMap |> Seq.collect (fun x -> x.Value) |> Seq.map this.GetTripleListEntry
