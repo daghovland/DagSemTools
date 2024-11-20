@@ -46,7 +46,8 @@ module Tests =
         let expectedAxiom = AxiomDeclaration ([],  typeDeclaration (Iri.FullIri (new IriReference "http://example.com/subject"))) 
         
         //Act
-        let ontology : OwlOntology.Ontology.Ontology = DagSemTools.RdfOwlTranslator.Rdf2Owl.extractOntology tripleTable resources
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
         
         //Assert
         let ontologyAxioms = ontology.Axioms 
@@ -99,7 +100,8 @@ module Tests =
         let expectedAxiom = AxiomDeclaration ([],  typeDeclaration (Iri.FullIri (new IriReference "http://example.com/subject"))) 
         
         //Act
-        let ontology : OwlOntology.Ontology.Ontology = DagSemTools.RdfOwlTranslator.Rdf2Owl.extractOntology tripleTable resources
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
         
         //Assert
         let ontologyAxioms = ontology.Axioms 
@@ -126,7 +128,8 @@ module Tests =
         tripleTable.AddTriple subClassTriple
         
         //Act
-        let ontology : OwlOntology.Ontology.Ontology = DagSemTools.RdfOwlTranslator.Rdf2Owl.extractOntology tripleTable resources
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
         
         //Assert
         let subClass : OwlOntology.Axioms.ClassExpression = OwlOntology.Axioms.ClassName (OwlOntology.Axioms.Iri.FullIri (new IriReference "http://example.com/subclass"))
