@@ -89,6 +89,8 @@ module Namespaces =
     [<Literal>]
     let OwlNegativePropertyAssertion = Owl + "NegativePropertyAssertion"
     [<Literal>]
+    let OwlObjectInverseOf = Owl + "ObjectInverseOf"
+    [<Literal>]
     let XsdString = Xsd + "string";
     [<Literal>]
     let XsdBoolean = Xsd + "boolean";

@@ -46,7 +46,7 @@ open IriTools
         | AnnotationPropertyRange of Annotation list * AnnotationProperty * Iri
         
     type DataRange =
-        SimpleDataRange of Datatype
+        NamedDataRange of Datatype
         | DataIntersectionOf of DataRange list
         | DataUnionOf of DataRange list
         | DataComplementOf of DataRange
@@ -54,7 +54,7 @@ open IriTools
         | DatatypeRestriction of Datatype * (DataProperty * Resource) list
         
     type ObjectPropertyExpression =
-        | ObjectProperty of IriReference
+        | NamedObjectProperty of ObjectProperty
         | InverseObjectProperty of ObjectPropertyExpression
         | ObjectPropertyChain of ObjectPropertyExpression list
         

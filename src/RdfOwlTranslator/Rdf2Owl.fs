@@ -23,31 +23,23 @@ type Rdf2Owl (triples : TripleTable,
     let owlAnnPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
     let owlAnnSourceId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
     let owlAnnTargetId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
+    let owlInvObjPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
         
     (* Section 3.2.1 of https://www.w3.org/TR/owl2-mapping-to-rdf/#Mapping_from_RDF_Graphs_to_the_Structural_Specification*)
-    
-    (* This is for the set Decl from  the OWL2 specs, second part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
-    let getAxiomDeclarations (axiomTypeIri : string) : ResourceId seq  =
-        let axiomTypeId = resources.AddResource(Resource.Iri (new IriReference(axiomTypeIri)))
-        let decl = Ingress.getTypeDeclarator axiomTypeIri
-        tripleTable.GetTriplesWithObjectPredicate(axiomTypeId, owlAnnTargetId) 
+   
+    (* This is for the set Decl from  the OWL2 specs, first part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
+    let getBasicDeclarations owlClassId=
+        tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
+            |> Seq.map (_.subject)
+   
+   (* This is for the set Decl from  the OWL2 specs, second part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
+    let getAxiomDeclarations owlClassId   =
+        tripleTable.GetTriplesWithObjectPredicate(owlClassId, owlAnnTargetId) 
                                     |> Seq.map (_.subject)
                                     |> Seq.filter (fun ax -> tripleTable.Contains({subject = ax; predicate = rdfTypeId; obj = owlAxiomId }) &&
                                                                  tripleTable.Contains({subject= ax; predicate = owlAnnPropId; obj = rdfTypeId}))
                                     |> Seq.collect (fun ax -> tripleTable.GetTriplesWithSubjectPredicate(ax, owlAnnSourceId)
                                                                 |> Seq.map (_.obj))
-                                    
-    
-    (* This is for the set Decl from  the OWL2 specs, first part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
-    let getBasicDeclarations (typeDeclaration : Iri -> Entity) (entityTypeIri)=
-        let owlClassId = resources.AddResource(Resource.Iri (entityTypeIri))
-        tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
-            |> Seq.map (_.subject)
-   
-    let getSimpleDeclarations (typeIri : string) : ResourceId seq=
-        let typeInfo = Ingress.getTypeDeclarator typeIri
-        (getBasicDeclarations typeInfo (new IriReference(typeIri)))
-        
     let getResourceIri (resourceId : Ingress.ResourceId) : IriReference option =
         match resources.GetResource(resourceId) with 
             | Resource.Iri iri -> Some iri
@@ -55,25 +47,56 @@ type Rdf2Owl (triples : TripleTable,
     
     (* This is run to initialize Decl(G), and then CE, OPE, DPE, DR and AP as in Tables 7 and section 3.2.1 in the specification
        Note that the silent ignoring of blank nodes is per specifiation *)
-    let getInitialDeclarations (typeIri : string) : Iri seq =
-        Seq.concat [getSimpleDeclarations typeIri; getAxiomDeclarations typeIri]
-        |> Seq.choose getResourceIri
-        |> Seq.map Iri.FullIri
-        
+    let getInitialDeclarations (typeIri : string)  =
+        let typeId = resources.AddResource(Resource.Iri (new IriReference(typeIri)))
+        Seq.concat [getBasicDeclarations typeId; getAxiomDeclarations typeId]
+        |> Seq.choose (fun id -> getResourceIri id |> Option.map Iri.FullIri 
+                                                |> Option.map (fun iri -> (id, iri)))
+                                                
     (* CE *)
     let mutable ClassExpressions : Map<ResourceId, ClassExpression> =
         getInitialDeclarations Namespaces.OwlClass
-        |> Seq.map (fun res -> (res, ClassName res))
+        |> Seq.map (fun (id, iri) ->  (id, ClassName iri))
         |> Map.ofSeq
-                    
+    
     (* DR *)
-    let mutable DataRanges = Map<ResourceId, DataRange>
+    let mutable DataRanges : Map<ResourceId, DataRange> =
+        getInitialDeclarations Namespaces.OwlClass
+        |> Seq.map (fun (id, iri) ->  (id, NamedDataRange iri))
+        |> Map.ofSeq
     (* OPE *)
-    let mutable ObjectPropertyExpressions = Map<ResourceId, ObjectPropertyExpression>
+    let mutable ObjectPropertyExpressions : Map<ResourceId, ObjectPropertyExpression> =
+        let mutable firstMap = getInitialDeclarations Namespaces.OwlClass
+                            |> Seq.map (fun (id, iri) ->  (id, NamedObjectProperty iri))
+        let secondMap = tripleTable.GetTriplesWithPredicate(owlInvObjPropId)
+                            |> Seq.choose (fun invTR -> getResourceIri(invTR.obj) |> Option.map (fun obj -> (invTR.subject, obj)))
+                            |> Seq.map (fun (subj, obj) -> (subj, ObjectPropertyExpression.InverseObjectProperty (NamedObjectProperty (FullIri obj)) ))
+        [firstMap ; secondMap] |> Seq.concat |> Map.ofSeq
     (* DPE *)
-    let mutable DstaPropertyExpressions = Map<ResourceId, DataProperty>
+    let mutable DataPropertyExpressions : Map<ResourceId, DataProperty> =
+        getInitialDeclarations Namespaces.OwlClass
+        |> Seq.map (fun (id, iri) ->  (id, iri))
+        |> Map.ofSeq
+        
     (* AP *)
-    let mutable AnnotationProperties = Map<ResourceId, AnnotationProperty>
+    let mutable AnnotationProperties : Map<ResourceId, AnnotationProperty> =
+        getInitialDeclarations Namespaces.OwlClass
+        |> Seq.map (fun (id, iri) ->  (id, iri))
+        |> Map.ofSeq
+    let mutable Individuals : Map<ResourceId, Individual> =
+        getInitialDeclarations Namespaces.OwlNamedIndividual
+        |> Seq.map (fun (id, iri) -> (id, NamedIndividual iri))
+        |> Map.ofSeq
+    
+    (* ANN *)
+    let mutable Annotations : Map<ResourceId, Annotation> =
+        AnnotationProperties
+        |> Map.toSeq
+        |> Seq.map (fun (annPropId, annProp) -> tripleTable.GetTriplesWithPredicate(annPropId)
+                                                |> Seq.map (fun annTr -> (annTr.subject, Ingress.createAnnotationValue Individuals annTr.obj (resources.GetResource(annTr.obj))))
+                                                |> Seq.map (fun (annotatedObj, annVal) -> (annotatedObj, (Annotation (annProp, annVal)) )))
+        |> Seq.concat
+        |> Map.ofSeq
     
     let getResourceClass (resourceId : Ingress.ResourceId) : Class option =
         getResourceIri resourceId |> Option.map Class.FullIri 
@@ -99,10 +122,7 @@ type Rdf2Owl (triples : TripleTable,
                                                                          | AnonymousBlankNode _ -> Some res
                                                                          | NamedBlankNode _ -> Some res
                                                                          | _ -> None))
-   
-    
-    
-    
+  
     let extractAxiom   (triple : Ingress.Triple) : Axiom option =
         getResourceIri triple.predicate
         |> Option.map (_.ToString())
@@ -148,11 +168,11 @@ type Rdf2Owl (triples : TripleTable,
      
     let getEntityDeclarations (es : Entity seq) : Axiom seq =
         es |> Seq.map (fun ent -> Axioms.AxiomDeclaration ([], ent))
+    
     member this.extractOntology  =
         let (oName, imports) = extractOntologyName 
-        let declarations = getDeclarations tripleTable resources
         let tripleAxioms = tripleTable.GetTriples() |> Seq.choose extractAxiom
         let RIND = getReificationBlankNodes 
-        let axioms = [tripleAxioms ; (declarations |> Map.values |> Seq.concat ) ] |> Seq.concat |> Seq.toList
+        let axioms = [tripleAxioms  ] |> Seq.concat |> Seq.toList
         Ontology.Ontology (imports, oName, [], axioms)
     
