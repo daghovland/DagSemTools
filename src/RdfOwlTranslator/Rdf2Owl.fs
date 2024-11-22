@@ -99,7 +99,8 @@ type Rdf2Owl (triples : TripleTable,
         |> Map.ofSeq
     
     let getResourceClass (resourceId : Ingress.ResourceId) : Class option =
-        getResourceIri resourceId |> Option.map Class.FullIri 
+        getResourceIri resourceId |> Option.map Class.FullIri
+        
     (* Creates entities for use in declaration axioms  *)
     let createDeclaration (declarationType) (resourceId : Ingress.ResourceId)  : Entity =
         let resourceIri = getResourceIri resourceId
@@ -123,13 +124,49 @@ type Rdf2Owl (triples : TripleTable,
                                                                          | NamedBlankNode _ -> Some res
                                                                          | _ -> None))
   
+    (* This is an implementation of section 3.2.5 in https://www.w3.org/TR/owl2-mapping-to-rdf/#Analyzing_Declarations *)
     let extractAxiom   (triple : Ingress.Triple) : Axiom option =
         getResourceIri triple.predicate
         |> Option.map (_.ToString())
         |> Option.bind (fun (predicateIri) -> 
                         match predicateIri with
-                            | Namespaces.RdfsSubClassOf -> Option.map2 Ingress.createSubClassAxiom  (getResourceClass (triple.subject)) (getResourceClass (triple.obj))
-                                                            |> Option.map Axioms.AxiomClassAxiom
+                            | Namespaces.RdfType -> getResourceIri(triple.obj)
+                                                    |> Option.map (_.ToString())
+                                                    |> Option.bind (fun classIri -> match classIri with
+                                                                                    | Namespaces.OwlClass -> getResourceIri (triple.subject)
+                                                                                                                |> Option.map FullIri
+                                                                                                                |> Option.map ClassDeclaration
+                                                                                                                |> Option.map (fun e -> Declaration ([],e))
+                                                                                                                |> Option.map AxiomDeclaration
+                                                                                    | Namespaces.RdfsDatatype -> getResourceIri (triple.subject)
+                                                                                                                    |> Option.map FullIri
+                                                                                                                    |> Option.map DatatypeDeclaration
+                                                                                                                    |> Option.map (fun e -> Declaration ([],e))
+                                                                                                                    |> Option.map AxiomDeclaration
+                                                                                    | Namespaces.OwlObjectProperty -> getResourceIri (triple.subject)
+                                                                                                                    |> Option.map FullIri
+                                                                                                                    |> Option.map ObjectPropertyDeclaration
+                                                                                                                    |> Option.map (fun e -> Declaration ([],e))
+                                                                                                                    |> Option.map AxiomDeclaration
+                                                                                    | Namespaces.OwlDatatypeProperty -> getResourceIri (triple.subject)
+                                                                                                                        |> Option.map FullIri
+                                                                                                                        |> Option.map DataPropertyDeclaration
+                                                                                                                        |> Option.map (fun e -> Declaration ([],e))
+                                                                                                                        |> Option.map AxiomDeclaration
+                                                                                    | Namespaces.OwlAnnotationProperty -> getResourceIri (triple.subject)
+                                                                                                                        |> Option.map FullIri
+                                                                                                                        |> Option.map AnnotationPropertyDeclaration
+                                                                                                                        |> Option.map (fun e -> Declaration ([],e))
+                                                                                                                        |> Option.map AxiomDeclaration
+                                                                                    | Namespaces.OwlNamedIndividual -> (match resources.GetResource(triple.subject) with
+                                                                                                                                | Iri i -> NamedIndividual (FullIri i)
+                                                                                                                                | AnonymousBlankNode bn -> AnonymousIndividual bn
+                                                                                                                                | _ -> failwith "Invalid individual ")
+                                                                                                                        |> NamedIndividualDeclaration |> (fun e -> Declaration ([],e)) |> AxiomDeclaration |> Some
+                                                                                    | _ -> None) 
+                            | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf ([], ClassExpressions.[triple.subject], ClassExpressions.[triple.obj])
+                                                           |> Axioms.AxiomClassAxiom
+                                                           |> Some
                             | _ -> None)
         
     
