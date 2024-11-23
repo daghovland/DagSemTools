@@ -24,6 +24,11 @@ type Rdf2Owl (triples : TripleTable,
     let owlAnnSourceId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
     let owlAnnTargetId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
     let owlInvObjPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
+    let subClassPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
+    let getResourceIri (resourceId : Ingress.ResourceId) : IriReference option =
+        match resources.GetResource(resourceId) with 
+            | Resource.Iri iri -> Some iri
+            | _ -> None
         
     (* Section 3.2.1 of https://www.w3.org/TR/owl2-mapping-to-rdf/#Mapping_from_RDF_Graphs_to_the_Structural_Specification*)
    
@@ -32,6 +37,14 @@ type Rdf2Owl (triples : TripleTable,
         tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
             |> Seq.map (_.subject)
    
+   (* This is not per specification, but as a user it seems weird not to assume that only classes are combined with subClassOf *)
+    let getSubClassClasses=
+        tripleTable.GetTriplesWithPredicate(subClassPropId)
+            |> Seq.map (fun tr -> [(tr.subject);(tr.obj)])
+            |> Seq.concat
+            |> Seq.choose (fun classId -> getResourceIri(classId) |> Option.map (fun classIri -> (classId, classIri)))
+    
+    
    (* This is for the set Decl from  the OWL2 specs, second part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
     let getAxiomDeclarations owlClassId   =
         tripleTable.GetTriplesWithObjectPredicate(owlClassId, owlAnnTargetId) 
@@ -40,10 +53,6 @@ type Rdf2Owl (triples : TripleTable,
                                                                  tripleTable.Contains({subject= ax; predicate = owlAnnPropId; obj = rdfTypeId}))
                                     |> Seq.collect (fun ax -> tripleTable.GetTriplesWithSubjectPredicate(ax, owlAnnSourceId)
                                                                 |> Seq.map (_.obj))
-    let getResourceIri (resourceId : Ingress.ResourceId) : IriReference option =
-        match resources.GetResource(resourceId) with 
-            | Resource.Iri iri -> Some iri
-            | _ -> None
     
     (* This is run to initialize Decl(G), and then CE, OPE, DPE, DR and AP as in Tables 7 and section 3.2.1 in the specification
        Note that the silent ignoring of blank nodes is per specifiation *)
@@ -55,9 +64,14 @@ type Rdf2Owl (triples : TripleTable,
                                                 
     (* CE *)
     let mutable ClassExpressions : Map<ResourceId, ClassExpression> =
-        getInitialDeclarations Namespaces.OwlClass
-        |> Seq.map (fun (id, iri) ->  (id, ClassName iri))
-        |> Map.ofSeq
+        let mutable specDeclarations = (getInitialDeclarations Namespaces.OwlClass) |> Seq.map (fun (id, iri) ->  (id, ClassName iri)) |> Map.ofSeq
+        getSubClassClasses
+        |> Seq.fold (fun specDecls (classId, classIri) ->
+            if not (specDecls.ContainsKey classId) then
+                specDecls.Add(classId, ClassName (Iri.FullIri classIri))
+            else
+                specDecls
+            ) specDeclarations
     
     (* DR *)
     let mutable DataRanges : Map<ResourceId, DataRange> =
@@ -124,6 +138,8 @@ type Rdf2Owl (triples : TripleTable,
                                                                          | NamedBlankNode _ -> Some res
                                                                          | _ -> None))
   
+    
+    
     (* This is an implementation of section 3.2.5 in https://www.w3.org/TR/owl2-mapping-to-rdf/#Analyzing_Declarations *)
     let extractAxiom   (triple : Ingress.Triple) : Axiom option =
         getResourceIri triple.predicate
