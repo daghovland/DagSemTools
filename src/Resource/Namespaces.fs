@@ -91,6 +91,8 @@ module Namespaces =
     [<Literal>]
     let OwlEquivalentClass = Owl + "equivalentClass"
     [<Literal>]
+    let OwlMembers = Owl + "members"
+    [<Literal>]
     let OwlEquivalentProperty = Owl + "equivalentProperty"
     [<Literal>]
     let OwlPropertyDisjointWith = Owl + "propertyDisjointWith"

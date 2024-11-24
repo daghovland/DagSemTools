@@ -20,11 +20,15 @@ type Rdf2Owl (triples : TripleTable,
     let versionPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlVersionIri)))
     let importsPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlImport)))
     let owlAxiomId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAxiom)))
+    let owlMembersId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMembers)))
     let owlAnnPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
     let owlAnnSourceId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
     let owlAnnTargetId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
     let owlInvObjPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
     let subClassPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
+    let rdfNilId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfNil)))
+    let rdfFirstId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfFirst)))
+    let rdfRestId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfRest)))
     let getResourceIri (resourceId : Ingress.ResourceId) : IriReference option =
         match resources.GetResource(resourceId) with 
             | Resource.Iri iri -> Some iri
@@ -114,7 +118,29 @@ type Rdf2Owl (triples : TripleTable,
     
     let getResourceClass (resourceId : Ingress.ResourceId) : Class option =
         getResourceIri resourceId |> Option.map Class.FullIri
-        
+
+    (* Extracts an RDF list. See Table 3 in https://www.w3.org/TR/owl2-mapping-to-rdf/
+        Assumes head is the head of some rdf list in the triple-table
+        The requirements in the specs includes non-circular lists, so blindly assumes this is true
+     *)
+    let rec _GetRdfListElements listId acc : ResourceId list =
+        if (listId = rdfNilId) then
+            acc
+        else
+            let head = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
+                        | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                        | [headElement] -> headElement.obj
+                        | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+            if (Seq.contains head acc) then
+                failwith $"Invalid list defined at {resources.GetResource(listId)}"
+            else
+                let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
+                            | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                            | [headElement] -> headElement.obj
+                            | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                _GetRdfListElements rest (head :: acc)     
+    let GetRdfListElements listId=
+        _GetRdfListElements listId []    
     (* Creates entities for use in declaration axioms  *)
     let createDeclaration (declarationType) (resourceId : Ingress.ResourceId)  : Entity =
         let resourceIri = getResourceIri resourceId
@@ -137,7 +163,7 @@ type Rdf2Owl (triples : TripleTable,
                                                                          | AnonymousBlankNode _ -> Some res
                                                                          | NamedBlankNode _ -> Some res
                                                                          | _ -> None))
-  
+   
     let tryGetDeclaration (declarationMap : Map<ResourceId, 'T>) resourceId =
         let resource = resources.GetResource(resourceId)
         match declarationMap.TryGetValue(resourceId) with
@@ -183,16 +209,23 @@ type Rdf2Owl (triples : TripleTable,
                                                                                                                                 | AnonymousBlankNode bn -> AnonymousIndividual bn
                                                                                                                                 | _ -> failwith "Invalid individual ")
                                                                                                                         |> NamedIndividualDeclaration |> (fun e -> Declaration ([],e)) |> AxiomDeclaration |> Some
+                                                                                    | Namespaces.OwlAllDisjointClasses -> (match tripleTable.GetTriplesWithSubjectPredicate(triple.subject, owlMembersId) |> Seq.toList with
+                                                                                                                           | [] -> None
+                                                                                                                           | [disjointList] ->  ClassAxiom.DisjointClasses ([], disjointList.obj |> GetRdfListElements |> List.map (tryGetDeclaration ClassExpressions))
+                                                                                                                                                    |> AxiomClassAxiom
+                                                                                                                                                    |> Some
+                                                                                                                           | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
                                                                                     | _ -> None) 
                             | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf ([], tryGetDeclaration ClassExpressions triple.subject, tryGetDeclaration ClassExpressions triple.obj)
-                                                           |> Axioms.AxiomClassAxiom
+                                                           |> AxiomClassAxiom
                                                            |> Some
                             | Namespaces.OwlEquivalentClass -> ClassAxiom.EquivalentClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
-                                                               |> Axioms.AxiomClassAxiom
+                                                               |> AxiomClassAxiom
                                                                |> Some
+                            | Namespaces.OwlDisjointWith -> ClassAxiom.DisjointClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
+                                                                |> AxiomClassAxiom
+                                                                |> Some
                             | Namespaces.OwlEquivalentClass -> ClassAxiom.EquivalentClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
-                                                                                                                              |> Axioms.AxiomClassAxiom
-                                                                                                                              |> Some | Namespaces.OwlEquivalentClass -> ClassAxiom.EquivalentClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
                                                                |> Axioms.AxiomClassAxiom
                                                                |> Some
                                                            
