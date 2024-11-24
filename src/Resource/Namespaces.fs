@@ -48,6 +48,8 @@ module Namespaces =
     [<Literal>]
     let RdfsSubClassOf = Rdfs + "subClassOf";
     [<Literal>]
+    let RdfsSubPropertyOf = Rdfs + "subPropertyOf";
+    [<Literal>]
     let RdfsDatatype = Rdfs + "Datatype";
     
     [<Literal>]
@@ -86,6 +88,20 @@ module Namespaces =
     let OwlAllDisjointProperties = Owl + "AllDisjointProperties"
     [<Literal>]
     let OwlAllDifferent = Owl + "AllDifferent"
+    [<Literal>]
+    let OwlEquivalentClass = Owl + "equivalentClass"
+    [<Literal>]
+    let OwlEquivalentProperty = Owl + "equivalentProperty"
+    [<Literal>]
+    let OwlPropertyDisjointWith = Owl + "propertyDisjointWith"
+    [<Literal>]
+    let OwlFunctionalProperty = Owl + "FunctionalProperty"
+    [<Literal>]
+    let OwlInverseFunctionalProperty = Owl + "InverseFunctionalProperty"
+    [<Literal>]
+    let OwlDisjointWith = Owl + "disjointWith"
+    [<Literal>]
+    let OwlDisjointUnionOf = Owl + "disjointUnionOf"
     [<Literal>]
     let OwlNegativePropertyAssertion = Owl + "NegativePropertyAssertion"
     [<Literal>]

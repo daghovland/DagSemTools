@@ -138,7 +138,11 @@ type Rdf2Owl (triples : TripleTable,
                                                                          | NamedBlankNode _ -> Some res
                                                                          | _ -> None))
   
-    
+    let tryGetDeclaration (declarationMap : Map<ResourceId, 'T>) resourceId =
+        let resource = resources.GetResource(resourceId)
+        match declarationMap.TryGetValue(resourceId) with
+        | false, _ -> failwith $"Invalid OWL ontology. The resource {resource} used as a class without declaration."
+        | true, decl -> decl
     
     (* This is an implementation of section 3.2.5 in https://www.w3.org/TR/owl2-mapping-to-rdf/#Analyzing_Declarations *)
     let extractAxiom   (triple : Ingress.Triple) : Axiom option =
@@ -180,9 +184,18 @@ type Rdf2Owl (triples : TripleTable,
                                                                                                                                 | _ -> failwith "Invalid individual ")
                                                                                                                         |> NamedIndividualDeclaration |> (fun e -> Declaration ([],e)) |> AxiomDeclaration |> Some
                                                                                     | _ -> None) 
-                            | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf ([], ClassExpressions.[triple.subject], ClassExpressions.[triple.obj])
+                            | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf ([], tryGetDeclaration ClassExpressions triple.subject, tryGetDeclaration ClassExpressions triple.obj)
                                                            |> Axioms.AxiomClassAxiom
                                                            |> Some
+                            | Namespaces.OwlEquivalentClass -> ClassAxiom.EquivalentClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
+                                                               |> Axioms.AxiomClassAxiom
+                                                               |> Some
+                            | Namespaces.OwlEquivalentClass -> ClassAxiom.EquivalentClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
+                                                                                                                              |> Axioms.AxiomClassAxiom
+                                                                                                                              |> Some | Namespaces.OwlEquivalentClass -> ClassAxiom.EquivalentClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
+                                                               |> Axioms.AxiomClassAxiom
+                                                               |> Some
+                                                           
                             | _ -> None)
         
     
