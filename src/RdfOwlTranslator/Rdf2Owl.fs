@@ -119,6 +119,12 @@ type Rdf2Owl (triples : TripleTable,
     let getResourceClass (resourceId : Ingress.ResourceId) : Class option =
         getResourceIri resourceId |> Option.map Class.FullIri
 
+    
+    let tryGetResourceClass resourceId =
+        match getResourceClass resourceId with
+        | Some c -> c
+        | None -> failwith $"Invalid resource {resourceId} used on class position"
+
     (* Extracts an RDF list. See Table 3 in https://www.w3.org/TR/owl2-mapping-to-rdf/
         Assumes head is the head of some rdf list in the triple-table
         The requirements in the specs includes non-circular lists, so blindly assumes this is true
@@ -225,7 +231,7 @@ type Rdf2Owl (triples : TripleTable,
                             | Namespaces.OwlDisjointWith -> ClassAxiom.DisjointClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
                                                                 |> AxiomClassAxiom
                                                                 |> Some
-                            | Namespaces.OwlEquivalentClass -> ClassAxiom.EquivalentClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
+                            | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion ([], tryGetResourceClass triple.subject, triple.obj |> GetRdfListElements |> List.map (tryGetDeclaration ClassExpressions))
                                                                |> Axioms.AxiomClassAxiom
                                                                |> Some
                                                            
