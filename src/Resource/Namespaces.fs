@@ -109,6 +109,8 @@ module Namespaces =
     [<Literal>]
     let OwlObjectInverseOf = Owl + "ObjectInverseOf"
     [<Literal>]
+    let OwlPropertyChainAxiom = Owl + "propertyChainAxiom"
+    [<Literal>]
     let XsdString = Xsd + "string";
     [<Literal>]
     let XsdBoolean = Xsd + "boolean";
