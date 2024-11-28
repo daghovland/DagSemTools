@@ -53,7 +53,7 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
             nextResourceIndex - 1u
         
     member this.CreateUnnamedAnonResource() =
-        let anonResourceCount = anonResourceCount + 1
+        anonResourceCount <- anonResourceCount + 1
         let newAnonResource = Resource.AnonymousBlankNode((uint) anonResourceCount)
         this.AddResource(newAnonResource)
     member this.GetOrCreateNamedAnonResource(name) =
