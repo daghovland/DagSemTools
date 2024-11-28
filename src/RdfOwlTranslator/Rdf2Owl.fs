@@ -167,13 +167,12 @@ type Rdf2Owl (triples : TripleTable,
                                           |> Seq.map _.subject
                                           |> Seq.choose (fun res -> match resources.GetResource(res) with
                                                                          | AnonymousBlankNode _ -> Some res
-                                                                         | NamedBlankNode _ -> Some res
                                                                          | _ -> None))
    
     let tryGetDeclaration (declarationMap : Map<ResourceId, 'T>) resourceId =
         let resource = resources.GetResource(resourceId)
         match declarationMap.TryGetValue(resourceId) with
-        | false, _ -> failwith $"Invalid OWL ontology. The resource {resource} used as a class without declaration."
+        | false, _ -> failwith $"Invalid OWL ontology. The resource {resource} used as a {declarationMap.Values.GetType()} without declaration."
         | true, decl -> decl
     
     (* This is an implementation of section 3.2.5 in https://www.w3.org/TR/owl2-mapping-to-rdf/#Analyzing_Declarations *)
@@ -236,7 +235,9 @@ type Rdf2Owl (triples : TripleTable,
                                                                 |> AxiomClassAxiom |> Some
                             | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion ([], tryGetResourceClass triple.subject, triple.obj |> GetRdfListElements |> List.map (tryGetDeclaration ClassExpressions))
                                                                |> Axioms.AxiomClassAxiom |> Some
-                            | Namespaces.RdfsSubPropertyOf -> SubObjectPropertyOf ([], triple.subject |> tryGetDeclaration ObjectPropertyExpressions |> SubObjectPropertyExpression, tryGetDeclaration ObjectPropertyExpressions triple.obj )
+                            | Namespaces.RdfsSubPropertyOf -> SubObjectPropertyOf ([],
+                                                                                   triple.subject |> tryGetDeclaration ObjectPropertyExpressions |> SubObjectPropertyExpression,
+                                                                                   tryGetDeclaration ObjectPropertyExpressions triple.obj )
                                                                 |> AxiomObjectPropertyAxiom |> Some
                             | Namespaces.OwlPropertyChainAxiom -> SubObjectPropertyOf([], triple.subject |> GetRdfListElements |> List.map (tryGetDeclaration ObjectPropertyExpressions) |> subPropertyExpression.PropertyExpressionChain, tryGetDeclaration ObjectPropertyExpressions triple.obj)
                                                                 |> AxiomObjectPropertyAxiom |> Some

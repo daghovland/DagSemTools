@@ -9,6 +9,8 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
                  resourceCount: uint) =
     
     let mutable ResourceList = resourceList
+    let mutable anonResourceCount = 0
+    let mutable anonResourceMap : Map<string, ResourceId> = Map.empty
     member val ResourceCount = resourceCount with get, set
     
     member this.GetResource (resourceId: ResourceId) =
@@ -16,6 +18,10 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
             invalidArg "resourceId" "Resource Id out of range"
         ResourceList.[int resourceId]
     
+    (* This should be called wheneer the context or file or RDF dataset that is loaded changes. Then blank node names will not overlap *)
+    member this.ResetBlankNodesMap() =
+        anonResourceMap <- Map.empty
+        
     member val ResourceMap = resourceMap with get, set
     
     member this.GetIriResourceIds() =
@@ -46,9 +52,20 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
             this.ResourceCount <- nextResourceIndex
             nextResourceIndex - 1u
         
-    member this.NewAnonymousBlankNode() =
-        this.AddResource(Resource.AnonymousBlankNode this.ResourceCount);
-
+    member this.CreateUnnamedAnonResource() =
+        let anonResourceCount = anonResourceCount + 1
+        let newAnonResource = Resource.AnonymousBlankNode((uint) anonResourceCount)
+        this.AddResource(newAnonResource)
+    member this.GetOrCreateNamedAnonResource(name) =
+        match anonResourceMap.TryGetValue(name) with
+        | false, _ ->
+                        let anonResource = this.CreateUnnamedAnonResource()
+                        anonResourceMap <- anonResourceMap.Add(name, anonResource)
+                        anonResource
+        | true, anonResource -> anonResource
+    
+    
+    
     member this.GetResourceTriple(triple: Triple) =
         {
           TripleResource.subject = ResourceList.[int triple.subject]

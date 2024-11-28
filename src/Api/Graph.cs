@@ -48,8 +48,6 @@ public class Graph : IGraph
                 return new IriResource(new IriReference(r.iri));
             case var r when r.IsAnonymousBlankNode:
                 return new BlankNodeResource($"{r.anon_blankNode}");
-            case var r when r.IsNamedBlankNode:
-                return new BlankNodeResource($"{r.blankNode}");
             default: throw new ArgumentException($"Resource {resource.ToString()} is not an Iri or a blank node"); ;
         }
     }
@@ -73,8 +71,6 @@ public class Graph : IGraph
                 return new IriResource(new IriReference(r.iri));
             case var r when r.IsAnonymousBlankNode:
                 return new BlankNodeResource($"{r.anon_blankNode}");
-            case var r when r.IsNamedBlankNode:
-                return new BlankNodeResource($"{r.blankNode}");
             case var r when r.IsLangLiteral:
                 return new LiteralResource(r.langliteral);
             case DagSemTools.Resource.Resource { IsDateLiteral: true } r:

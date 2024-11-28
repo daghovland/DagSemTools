@@ -15,7 +15,6 @@ open IriTools
     [<Struct>]
     type public Resource =
         public Iri of iri:  IriReference
-        | NamedBlankNode of blankNode: string
         | AnonymousBlankNode of anon_blankNode: uint32
         | LiteralString of literal: string
         | BooleanLiteral of literalBool: bool
@@ -34,7 +33,6 @@ open IriTools
             override this.ToString() =
                 match this with
                 | Iri iri -> $"<(%A{iri})>"
-                | NamedBlankNode blankNode -> $"_:(%s{blankNode})"
                 | AnonymousBlankNode anon_blankNode -> $"_:(%u{anon_blankNode})"
                 | LiteralString literal -> $"(%s{literal})"
                 | BooleanLiteral literalBool -> match literalBool with

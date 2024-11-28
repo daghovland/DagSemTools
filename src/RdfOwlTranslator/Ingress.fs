@@ -19,12 +19,10 @@ module Ingress =
         | true, individual -> match res with 
                                 | Iri i -> AnnotationValue.IndividualAnnotation (NamedIndividual (FullIri i))
                                 | AnonymousBlankNode bn -> AnnotationValue.IndividualAnnotation (Individual.AnonymousIndividual bn)
-                                | NamedBlankNode bn -> failwith "Annotations with named blank nodes is not implemented yet. Sorry"
                                 | _ -> failwith "Only IRIs and blank nodes are valid individuals. This is a bug"
         | false, _ -> match res with
                                 | Iri i -> AnnotationValue.IriAnnotation (FullIri i)
                                 | AnonymousBlankNode bn -> failwith "Annotations with blank nodes that are not individuals is not allowed"
-                                | NamedBlankNode bn -> failwith "Annotations with blank nodes that are not individuals is not allowed"
                                 | _ -> AnnotationValue.LiteralAnnotation res 
                                 
     

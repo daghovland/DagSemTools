@@ -38,7 +38,7 @@ type Datastore(triples: TripleTable,
     member this.GetResourceId (resource : Resource) =
         this.Resources.ResourceMap.[resource]
     member this.NewAnonymousBlankNode() =
-        this.Resources.NewAnonymousBlankNode()
+        this.Resources.CreateUnnamedAnonResource()
     member this.GetResourceTriple (triple: Triple) =
         this.Resources.GetResourceTriple triple
         
