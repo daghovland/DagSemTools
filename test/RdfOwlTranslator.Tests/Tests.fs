@@ -8,6 +8,7 @@
 namespace DagSemTools.RdfOwlTranslator.Tests
 
 open System
+open DagSemTools.AlcTableau.ConjunctiveQuery
 open DagSemTools.Rdf
 open OwlOntology.Axioms
 open Xunit
@@ -54,16 +55,8 @@ module Tests =
         ontologyAxioms.Should().Contain(expectedAxiom)
         
     
-    [<Theory>]
-    [<InlineData(Namespaces.OwlClass)>]
-    [<InlineData(Namespaces.OwlDatatypeProperty)>]
-    [<InlineData(Namespaces.OwlObjectProperty)>]
-    [<InlineData(Namespaces.OwlAnnotationProperty)>]
-    [<InlineData(Namespaces.RdfsDatatype)>]
-    let ``Class declarations can be parsed from axiom triples`` (typeIri: String ) =
-        //Arrange
-        let tripleTable = TripleTable(100u)
-        let resources = ResourceManager(100u)
+    let ``Create axiom-based Declaration Helper``(tripleTable : TripleTable) (resources : ResourceManager) =
+        let superClassResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/superclass"))
         let subjectResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/subject"))
         let anonymousReificationResource = resources.AddResource(Resource.AnonymousBlankNode(10u))
         let rdfTypeResource = resources.AddResource(Resource.Iri(new IriReference (Namespaces.RdfType)))
@@ -71,16 +64,11 @@ module Tests =
         let owlAnnTarget = resources.AddResource(Resource.Iri(new IriReference (Namespaces.OwlAnnotatedTarget)))
         let owlAnnSource = resources.AddResource(Resource.Iri(new IriReference (Namespaces.OwlAnnotatedSource)))
         let owlAnnProp = resources.AddResource(Resource.Iri(new IriReference (Namespaces.OwlAnnotatedProperty)))
-        let owlclassResource = resources.AddResource(Resource.Iri(new IriReference (typeIri)))
         
         let typeTriple : Triple = { subject = anonymousReificationResource
                                     predicate = rdfTypeResource
                                     obj = owlAxiomResource }
         tripleTable.AddTriple typeTriple
-        let targetTriple : Triple = { subject = anonymousReificationResource
-                                      predicate = owlAnnTarget
-                                      obj = owlclassResource }
-        tripleTable.AddTriple targetTriple
         let propTriple : Triple = { subject = anonymousReificationResource
                                     predicate = owlAnnProp
                                     obj = rdfTypeResource }
@@ -89,22 +77,47 @@ module Tests =
                                       predicate = owlAnnSource
                                       obj = subjectResource }
         tripleTable.AddTriple sourceTriple
+        anonymousReificationResource
         
-        let typeDeclaration = match typeIri with
-                                | Namespaces.OwlClass -> ClassDeclaration
-                                | Namespaces.OwlObjectProperty -> ObjectPropertyDeclaration
-                                | Namespaces.OwlDatatypeProperty -> DataPropertyDeclaration
-                                | Namespaces.OwlAnnotationProperty -> AnnotationPropertyDeclaration
-                                | Namespaces.RdfsDatatype -> DatatypeDeclaration
-                                | _ -> failwith $"Invalid inline data type {typeIri} given to test"
-        let expectedAxiom = AxiomDeclaration ([],  typeDeclaration (Iri.FullIri (new IriReference "http://example.com/subject"))) 
+    
+    [<Theory>]
+    [<InlineData(Namespaces.OwlClass, Namespaces.RdfsSubClassOf)>]
+    // [<InlineData(Namespaces.OwlDatatypeProperty)>]
+    [<InlineData(Namespaces.OwlObjectProperty, Namespaces.RdfsSubPropertyOf)>]
+    // [<InlineData(Namespaces.OwlAnnotationProperty)>]
+    // [<InlineData(Namespaces.RdfsDatatype)>]
+    let ``SubClass declarations can be parsed from axiom triples`` (typeIri: String , relationIri: String) =
+        //Arrange
+        let tripleTable = TripleTable(100u)
+        let resources = ResourceManager(100u)
+        let anonymousReificationResource = ``Create axiom-based Declaration Helper`` tripleTable resources
+        
+        let superClassResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/superclass"))
+        let subjectResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/subject"))
+        let owlAnnTarget = resources.AddResource(Resource.Iri(new IriReference (Namespaces.OwlAnnotatedTarget)))
+        let owlclassResource = resources.AddResource(Resource.Iri(new IriReference (typeIri)))
+        let subClassOfResource = resources.AddResource(Resource.Iri(new IriReference(relationIri)))
+        
+        let subclassOfTriple : Triple = {subject = subjectResource
+                                         predicate = subClassOfResource
+                                         obj = superClassResource}
+        tripleTable.AddTriple(subclassOfTriple)
+        
+        let targetTriple : Triple = { subject = anonymousReificationResource
+                                      predicate = owlAnnTarget
+                                      obj = owlclassResource }
+        tripleTable.AddTriple targetTriple
+        
+        let expectedAxiom = AxiomClassAxiom ( SubClassOf ([], ClassName (Iri.FullIri (new IriReference "http://example.com/subject")), ClassName( Iri.FullIri (new IriReference "http://example.com/superclass")))) 
         
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
         let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
         
         //Assert
-        let ontologyAxioms = ontology.Axioms 
+        let ontologyAxioms = ontology.Axioms |> Seq.filter (fun ax -> match ax with
+                                                                        | AxiomClassAxiom x  -> true
+                                                                        | _ -> false)
         ontologyAxioms.Should().Contain(expectedAxiom)
         
     

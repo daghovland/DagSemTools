@@ -221,6 +221,12 @@ type Rdf2Owl (triples : TripleTable,
                                                                                                                                                     |> AxiomClassAxiom
                                                                                                                                                     |> Some
                                                                                                                            | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
+                                                                                    | Namespaces.OwlAllDisjointProperties -> (match tripleTable.GetTriplesWithSubjectPredicate(triple.subject, owlMembersId) |> Seq.toList with
+                                                                                                                               | [] -> None
+                                                                                                                               | [disjointList] ->  DisjointObjectProperties ([Annotations.[triple.subject]], disjointList.obj |> GetRdfListElements |> List.map (tryGetDeclaration ObjectPropertyExpressions))
+                                                                                                                                                        |> AxiomObjectPropertyAxiom
+                                                                                                                                                        |> Some
+                                                                                                                               | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
                                                                                     | _ -> None) 
                             | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf ([], tryGetDeclaration ClassExpressions triple.subject, tryGetDeclaration ClassExpressions triple.obj)
                                                            |> AxiomClassAxiom |> Some
@@ -236,6 +242,12 @@ type Rdf2Owl (triples : TripleTable,
                                                                 |> AxiomObjectPropertyAxiom |> Some
                             | Namespaces.OwlEquivalentProperty -> EquivalentObjectProperties([], [tryGetDeclaration ObjectPropertyExpressions triple.subject; tryGetDeclaration ObjectPropertyExpressions triple.obj])
                                                                 |> AxiomObjectPropertyAxiom |> Some
+                            | Namespaces.OwlPropertyDisjointWith -> DisjointObjectProperties([], [tryGetDeclaration ObjectPropertyExpressions triple.subject; tryGetDeclaration ObjectPropertyExpressions triple.obj])
+                                                                    |> AxiomObjectPropertyAxiom |> Some
+                            | Namespaces.RdfsDomain -> ObjectPropertyDomain (tryGetDeclaration ObjectPropertyExpressions triple.subject, tryGetDeclaration ClassExpressions triple.obj )
+                                                        |> AxiomObjectPropertyAxiom |> Some
+                            | Namespaces.RdfsRange -> ObjectPropertyRange (tryGetDeclaration ObjectPropertyExpressions triple.subject, tryGetDeclaration ClassExpressions triple.obj )
+                                                        |> AxiomObjectPropertyAxiom |> Some
                             | _ -> None)
         
     
@@ -270,8 +282,6 @@ type Rdf2Owl (triples : TripleTable,
                                         | Some versionIri -> VersionedOntology (iri, versionIri)
                         (version, imports)
    
-    
-     
     let getEntityDeclarations (es : Entity seq) : Axiom seq =
         es |> Seq.map (fun ent -> Axioms.AxiomDeclaration ([], ent))
     

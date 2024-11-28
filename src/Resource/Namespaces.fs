@@ -51,6 +51,10 @@ module Namespaces =
     let RdfsSubPropertyOf = Rdfs + "subPropertyOf";
     [<Literal>]
     let RdfsDatatype = Rdfs + "Datatype";
+    [<Literal>]
+    let RdfsDomain = Rdfs + "domain";
+    [<Literal>]
+    let RdfsRange = Rdfs + "range";
     
     [<Literal>]
     let OwlSameAs = Owl + "sameAs";
