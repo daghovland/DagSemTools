@@ -79,12 +79,12 @@ type Rdf2Owl (triples : TripleTable,
     
     (* DR *)
     let mutable DataRanges : Map<ResourceId, DataRange> =
-        getInitialDeclarations Namespaces.OwlClass
+        getInitialDeclarations Namespaces.RdfsDatatype
         |> Seq.map (fun (id, iri) ->  (id, NamedDataRange iri))
         |> Map.ofSeq
     (* OPE *)
     let mutable ObjectPropertyExpressions : Map<ResourceId, ObjectPropertyExpression> =
-        let mutable firstMap = getInitialDeclarations Namespaces.OwlClass
+        let mutable firstMap = getInitialDeclarations Namespaces.OwlObjectProperty
                             |> Seq.map (fun (id, iri) ->  (id, NamedObjectProperty iri))
         let secondMap = tripleTable.GetTriplesWithPredicate(owlInvObjPropId)
                             |> Seq.choose (fun invTR -> getResourceIri(invTR.obj) |> Option.map (fun obj -> (invTR.subject, obj)))
@@ -92,13 +92,13 @@ type Rdf2Owl (triples : TripleTable,
         [firstMap ; secondMap] |> Seq.concat |> Map.ofSeq
     (* DPE *)
     let mutable DataPropertyExpressions : Map<ResourceId, DataProperty> =
-        getInitialDeclarations Namespaces.OwlClass
+        getInitialDeclarations Namespaces.OwlDatatypeProperty
         |> Seq.map (fun (id, iri) ->  (id, iri))
         |> Map.ofSeq
         
     (* AP *)
     let mutable AnnotationProperties : Map<ResourceId, AnnotationProperty> =
-        getInitialDeclarations Namespaces.OwlClass
+        getInitialDeclarations Namespaces.OwlAnnotationProperty
         |> Seq.map (fun (id, iri) ->  (id, iri))
         |> Map.ofSeq
     let mutable Individuals : Map<ResourceId, Individual> =

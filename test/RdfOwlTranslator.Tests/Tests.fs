@@ -58,7 +58,7 @@ module Tests =
     let ``Create axiom-based Declaration Helper`` (typeIri: string) =
         let tripleTable = TripleTable(100u)
         let resources = ResourceManager(100u)
-        let subjectResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/subject"))
+        let subjectResource = resources.AddResource(Resource.Iri(new IriReference $"{typeIri}_instance"))
         let anonymousReificationResource = resources.CreateUnnamedAnonResource()
         let rdfTypeResource = resources.AddResource(Resource.Iri(new IriReference (Namespaces.RdfType)))
         let owlAxiomResource = resources.AddResource(Resource.Iri(new IriReference (Namespaces.OwlAxiom)))
@@ -90,7 +90,8 @@ module Tests =
     [<Fact>]
     let ``SubClass declarations can be parsed from axiom triples``()  =
         //Arrange
-        let (tripleTable, resources, subjectResource) = ``Create axiom-based Declaration Helper`` Namespaces.OwlClass
+        let owlClassIri = Namespaces.OwlClass
+        let (tripleTable, resources, subjectResource) = ``Create axiom-based Declaration Helper`` owlClassIri
         let superClassResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/superclass"))
         let subClassOfResource = resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfsSubClassOf)))
         let subclassOfTriple : Triple = {subject = subjectResource
@@ -103,7 +104,7 @@ module Tests =
         let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
         
         //Assert
-        let expectedAxiom = AxiomClassAxiom ( SubClassOf ([], ClassName (Iri.FullIri (new IriReference "http://example.com/subject")), ClassName( Iri.FullIri (new IriReference "http://example.com/superclass")))) 
+        let expectedAxiom = AxiomClassAxiom ( SubClassOf ([], ClassName (Iri.FullIri (new IriReference $"{owlClassIri}_instance")), ClassName( Iri.FullIri (new IriReference "http://example.com/superclass")))) 
         let ontologyAxioms = ontology.Axioms |> Seq.filter (fun ax -> match ax with
                                                                         | AxiomClassAxiom x  -> true
                                                                         | _ -> false)
