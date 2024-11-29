@@ -10,7 +10,7 @@ namespace DagSemTools.RdfOwlTranslator.Tests
 open System
 open DagSemTools.AlcTableau.ConjunctiveQuery
 open DagSemTools.Rdf
-open OwlOntology.Axioms
+open DagSemTools.OwlOntology
 open Xunit
 open DagSemTools.Resource
 open IriTools
@@ -48,7 +48,7 @@ module Tests =
         
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
-        let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
+        let ontology : Ontology = translator.extractOntology
         
         //Assert
         let ontologyAxioms = ontology.Axioms 
@@ -101,7 +101,7 @@ module Tests =
         
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
-        let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
+        let ontology : Ontology = translator.extractOntology
         
         //Assert
         let expectedAxiom = AxiomClassAxiom ( SubClassOf ([], ClassName (Iri.FullIri (new IriReference $"{owlClassIri}_instance")), ClassName( Iri.FullIri (new IriReference "http://example.com/superclass")))) 
@@ -116,6 +116,13 @@ module Tests =
         let (tripleTable, resources, subjectResource) = ``Create axiom-based Declaration Helper`` Namespaces.OwlObjectProperty
         let superPropertyResource = resources.AddResource(Resource.Iri(new IriReference "http://example.com/superclass"))
         let subClassOfResource = resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfsSubPropertyOf)))
+        let rdfTypeResource = resources.AddResource(Resource.Iri(new IriReference (Namespaces.RdfType)))
+        let objectPropResource = resources.AddResource(Resource.Iri(new IriReference (Namespaces.OwlObjectProperty)))
+        let superPropertyDeclarationTriple : Triple = { subject = superPropertyResource
+                                                        predicate = rdfTypeResource
+                                                        obj = objectPropResource }
+        tripleTable.AddTriple(superPropertyDeclarationTriple)
+        
         let subclassOfTriple : Triple = {subject = subjectResource
                                          predicate = subClassOfResource
                                          obj = superPropertyResource}
@@ -123,11 +130,11 @@ module Tests =
         
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
-        let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
+        let ontology : Ontology = translator.extractOntology
         
         //Assert
         let expectedAxiom = AxiomObjectPropertyAxiom ( SubObjectPropertyOf ([],
-                                                                            SubObjectPropertyExpression (NamedObjectProperty (Iri.FullIri (new IriReference "http://example.com/subject"))),
+                                                                            SubObjectPropertyExpression (NamedObjectProperty (Iri.FullIri (new IriReference $"{Namespaces.OwlObjectProperty}_instance"))),
                                                                             NamedObjectProperty ( Iri.FullIri (new IriReference "http://example.com/superclass")))) 
         let ontologyAxioms = ontology.Axioms |> Seq.filter (fun ax -> match ax with
                                                                         | AxiomObjectPropertyAxiom x  -> true
@@ -156,12 +163,12 @@ module Tests =
         
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
-        let ontology : OwlOntology.Ontology.Ontology = translator.extractOntology
+        let ontology : Ontology = translator.extractOntology
         
         //Assert
-        let subClass : OwlOntology.Axioms.ClassExpression = OwlOntology.Axioms.ClassName (OwlOntology.Axioms.Iri.FullIri (new IriReference "http://example.com/subclass"))
-        let superClass : OwlOntology.Axioms.ClassExpression = OwlOntology.Axioms.ClassName (OwlOntology.Axioms.Iri.FullIri (new IriReference "http://example.com/superclass"))
-        let expectedAxioms = OwlOntology.Axioms.AxiomClassAxiom ( OwlOntology.Axioms.SubClassOf ([], subClass, superClass) )
+        let subClass : ClassExpression = ClassName (Iri.FullIri (new IriReference "http://example.com/subclass"))
+        let superClass : ClassExpression = ClassName (Iri.FullIri (new IriReference "http://example.com/superclass"))
+        let expectedAxioms =AxiomClassAxiom ( SubClassOf ([], subClass, superClass) )
         let ontologyAxioms = ontology.Axioms |> List.where (fun ax -> match ax with
                                                                             | Axiom.AxiomClassAxiom _ -> true
                                                                             | _ -> false) 

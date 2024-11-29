@@ -53,6 +53,10 @@
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </None>
+    </ItemGroup>    
+    <ItemGroup>
+      <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
+      <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
     </ItemGroup>
 
 </Project>

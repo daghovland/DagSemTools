@@ -1,13 +1,8 @@
 ﻿namespace DagSemTools.RdfOwlTranslator
 
-open System.Resources
-open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Resource
-open IriTools
-open OwlOntology
-open OwlOntology.Axioms
-open OwlOntology.Ontology
+open DagSemTools.OwlOntology
 
 module Ingress =
     

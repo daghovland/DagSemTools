@@ -11,9 +11,8 @@
     Dotnet representation of OWL 2, as specified in https://www.w3.org/TR/2012/REC-owl2-syntax-20121211
 *)
 
-module OwlOntology.Axioms
+namespace DagSemTools.OwlOntology
 
-open System
 open DagSemTools.Resource
 open IriTools
 

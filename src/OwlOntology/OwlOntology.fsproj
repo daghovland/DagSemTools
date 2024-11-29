@@ -31,6 +31,7 @@
         <Compile Include="Axioms.fs" />
         <Compile Include="Ontology.fs" />
     </ItemGroup>
+    
     <ItemGroup>
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
@@ -49,4 +50,9 @@
             <PackagePath>README.md</PackagePath>
         </None>
     </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="RdfOwlTranslator.Tests" />
+    </ItemGroup>
+
 </Project>

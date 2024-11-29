@@ -1,13 +1,10 @@
 namespace DagSemTools.RdfOwlTranslator
 
-open System.Resources
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Resource
+open DagSemTools.OwlOntology
 open IriTools
-open OwlOntology
-open OwlOntology.Axioms
-open OwlOntology.Ontology
 
 type Rdf2Owl (triples : TripleTable,
               resourceManager : ResourceManager) =
@@ -150,7 +147,7 @@ type Rdf2Owl (triples : TripleTable,
     (* Creates entities for use in declaration axioms  *)
     let createDeclaration (declarationType) (resourceId : Ingress.ResourceId)  : Entity =
         let resourceIri = getResourceIri resourceId
-        declarationType (Axioms.Iri.FullIri resourceIri.Value)
+        declarationType (Iri.FullIri resourceIri.Value)
     
     (* This is the set RIND in Table 8 of https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
     let getReificationBlankNodes =
@@ -234,7 +231,7 @@ type Rdf2Owl (triples : TripleTable,
                             | Namespaces.OwlDisjointWith -> ClassAxiom.DisjointClasses ([], [tryGetDeclaration ClassExpressions triple.subject; tryGetDeclaration ClassExpressions triple.obj])
                                                                 |> AxiomClassAxiom |> Some
                             | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion ([], tryGetResourceClass triple.subject, triple.obj |> GetRdfListElements |> List.map (tryGetDeclaration ClassExpressions))
-                                                               |> Axioms.AxiomClassAxiom |> Some
+                                                               |> AxiomClassAxiom |> Some
                             | Namespaces.RdfsSubPropertyOf -> SubObjectPropertyOf ([],
                                                                                    triple.subject |> tryGetDeclaration ObjectPropertyExpressions |> SubObjectPropertyExpression,
                                                                                    tryGetDeclaration ObjectPropertyExpressions triple.obj )
@@ -284,12 +281,12 @@ type Rdf2Owl (triples : TripleTable,
                         (version, imports)
    
     let getEntityDeclarations (es : Entity seq) : Axiom seq =
-        es |> Seq.map (fun ent -> Axioms.AxiomDeclaration ([], ent))
+        es |> Seq.map (fun ent -> AxiomDeclaration ([], ent))
     
     member this.extractOntology  =
         let (oName, imports) = extractOntologyName 
         let tripleAxioms = tripleTable.GetTriples() |> Seq.choose extractAxiom
         let RIND = getReificationBlankNodes 
         let axioms = [tripleAxioms  ] |> Seq.concat |> Seq.toList
-        Ontology.Ontology (imports, oName, [], axioms)
+        Ontology (imports, oName, [], axioms)
     

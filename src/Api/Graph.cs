@@ -19,7 +19,7 @@ public class Graph : IGraph
     private Datastore Triples { get; init; }
 
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
-
+    
     /// <summary>
     /// Loads and runs datalog rules from the file
     /// Note that this adds new triples to the datastore
@@ -135,4 +135,7 @@ public class Graph : IGraph
         _rules = DagSemTools.OWL2RL2Datalog.Reasoner.enableEqualityReasoning(Triples, _rules, Console.Error);
         Reasoner.evaluate(ListModule.Empty<Rule>(), Triples);
     }
+
+    Datastore IGraph.Datastore => Triples;
+
 }
