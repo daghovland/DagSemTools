@@ -69,6 +69,12 @@ module Namespaces =
     [<Literal>]
     let OwlAnnotationProperty = Owl + "AnnotationProperty";
     [<Literal>]
+    let OwlOnProperty = Owl + "onProperty";
+    [<Literal>]
+    let OwlOnProperties = Owl + "onProperties"
+    [<Literal>]
+    let OwlOnDataRange = Owl + "onDataRange"
+    [<Literal>]
     let OwlDatatypeProperty = Owl + "DatatypeProperty";
     [<Literal>]
     let OwlObjectProperty = Owl + "ObjectProperty";
@@ -115,6 +121,38 @@ module Namespaces =
     [<Literal>]
     let OwlPropertyChainAxiom = Owl + "propertyChainAxiom"
     [<Literal>]
+    let OwlRestriction = Owl + "Restriction"
+    [<Literal>]
+    let OwlIntersectionOf = Owl + "intersectionOf"
+    [<Literal>]
+    let OwlUnionOf = Owl + "unionOf"
+    [<Literal>]
+    let OwlComplementOf = Owl + "complementOf"
+    [<Literal>]
+    let OwlOneOf = Owl + "oneOf"
+    [<Literal>]
+    let OwlSomeValuesFrom = Owl + "someValuesFrom"
+    [<Literal>]
+    let OwlAllValuesFrom = Owl + "allValuesFrom"
+    [<Literal>]
+    let OwlHasValue = Owl + "hasValue"
+    [<Literal>]
+    let OwlMinQualifiedCardinality = Owl + "minQualifiedCardinality"
+    [<Literal>]
+    let OwlMaxQualifiedCardinality = Owl + "maxQualifiedCardinality"
+    [<Literal>]
+    let OwlQualifiedCardinality = Owl + "qualifiedCardinality"
+    [<Literal>]
+    let OwlCardinality = Owl + "cardinality"
+    [<Literal>]
+    let OwlMinCardinality = Owl + "minCardinality"
+    [<Literal>]
+    let OwlMaxCardinality = Owl + "maxCardinality"
+    [<Literal>]
+    let OwlOnClass = Owl + "onClass"
+    [<Literal>]
+    let OwlHasSelf = Owl + "hasSelf"
+    [<Literal>]
     let XsdString = Xsd + "string";
     [<Literal>]
     let XsdBoolean = Xsd + "boolean";
@@ -135,7 +173,9 @@ module Namespaces =
     [<Literal>]
     let XsdInt = Xsd + "int";
     [<Literal>]
-    let XsdInteger = Xsd + "integer";
+    let XsdInteger = Xsd + "integer"
+    [<Literal>]
+    let XsdNonNegativeInteger = Xsd + "nonNegativeInteger"
     [<Literal>]
     let XsdHexBinary = Xsd + "hexBinary";
     [<Literal>]

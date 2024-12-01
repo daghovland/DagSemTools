@@ -54,6 +54,7 @@ open IriTools
         
     type ObjectPropertyExpression =
         | NamedObjectProperty of ObjectProperty
+        | AnonymousObjectProperty of uint32
         | InverseObjectProperty of ObjectPropertyExpression
         | ObjectPropertyChain of ObjectPropertyExpression list
         

@@ -16,6 +16,8 @@ module Ingress =
     type QuadListIndex = uint
         
     [<Struct>]
+    [<StructuralEquality>]
+    [<NoComparison>]
     type Triple = {
             subject: ResourceId
             predicate: ResourceId
@@ -23,19 +25,36 @@ module Ingress =
         }
         
     [<Struct>]
+    [<StructuralEquality>]
+    [<NoComparison>]
     type Quad = {
             tripleId: ResourceId
             subject: ResourceId
             predicate: ResourceId
             obj: ResourceId
-        }
+        } with
+        override this.ToString() =
+            sprintf "%A: (%A, %A, %A)"
+                this.tripleId
+                this.subject 
+                this.predicate 
+                this.obj
+    
     
     [<Struct>]
+    [<StructuralEquality>]
+    [<NoComparison>]
     type TripleResource = {
             subject: Resource
             predicate: Resource
             obj: Resource
-    }
+    } with
+        override this.ToString() =
+            sprintf "(%A, %A, %A)" 
+                this.subject 
+                this.predicate 
+                this.obj
+    
     
       
     let doubleArraySize (originalArray: 'T array) : 'T array =
