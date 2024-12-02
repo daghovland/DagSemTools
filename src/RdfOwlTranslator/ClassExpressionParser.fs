@@ -156,22 +156,55 @@ type ClassExpressionParser (triples : TripleTable,
                       else
                           match (resources.GetResource propResourceId) with
                           | Resource.Iri iri -> NamedObjectProperty (FullIri iri)
-                          | Resource.AnonymousBlankNode bn -> AnonymousObjectProperty bn
+                          // | Resource.AnonymousBlankNode bn -> AnonymousObjectProperty bn
+                          | x -> failwith $"Invalid OWL Ontology: {x} used as an object property"
     
     (* This is called  when propResourceId can only be a class
        The function returns either the declared class, or if it is not already a datarange,
         a simple named declaration
         This is not completely per spec, but many ontologies around do not specify all properties *)
-    let tryGetObjectPropertyExpressions propResourceId =
-        match ObjectPropertyExpressions.TryGetValue propResourceId with
+    let tryGetClassExpressions propResourceId =
+        match ClassExpressions.TryGetValue propResourceId with
         | true, prop -> prop
-        | false, _ -> if ((DataPropertyExpressions.ContainsKey propResourceId) || (AnnotationProperties.ContainsKey propResourceId)) then 
-                            failwith $"Invalid OWL ontology: Property {resources.GetResource propResourceId} used both as object property and either data or annotation property"
+        | false, _ -> if ((DataRanges.ContainsKey propResourceId)) then 
+                            failwith $"Invalid OWL ontology: Property {resources.GetResource propResourceId} used both as a data range and a class"
                       else
-                          NamedObjectProperty (FullIri (tryGetResourceIri propResourceId))
-                          // TODO HANDLE BLANK NODE!
+                          match (resources.GetResource propResourceId) with
+                          | Resource.Iri iri -> ClassName (FullIri iri)
+                          | x -> failwith $"Invalid OWL Ontology: {x} used as an object property"
     
-                        
+    (* These are called whenever setting CE, OPE, DPE, DR and AP
+        These cannot be redefined, as this is an error *)
+    let trySetClassExpression x expression =
+        if ClassExpressions.ContainsKey x then
+            failwith $"Invalid ontology: class {resources.GetResource x} defined twice"
+        else
+            ClassExpressions <- ClassExpressions.Add(x, expression)
+    
+    let trySetObjectPropertyExpression x expression =
+        if ObjectPropertyExpressions.ContainsKey x then
+            failwith $"Invalid ontology: object property {resources.GetResource x} defined twice"
+        else
+            ObjectPropertyExpressions <- ObjectPropertyExpressions.Add(x, expression)
+    let trySetDataPropertyExpression x expression =
+        if DataPropertyExpressions.ContainsKey x then
+            failwith $"Invalid ontology: data property {resources.GetResource x} defined twice"
+        else
+            DataPropertyExpressions <- DataPropertyExpressions.Add(x, expression)
+    
+    let trySetDataRanges x expression =
+        if DataRanges.ContainsKey x then
+            failwith $"Invalid ontology: data range {resources.GetResource x} defined twice"
+        else
+            DataRanges <- DataRanges.Add(x, expression)
+        
+    
+    let trySetAnnotationProperties x expression =
+        if AnnotationProperties.ContainsKey x then
+            failwith $"Invalid ontology: annotation property {resources.GetResource x} defined twice"
+        else
+            AnnotationProperties <- AnnotationProperties.Add(x, expression)
+        
     let parseAnonymousClassExpressions() =
         let anonymousClassTriples = tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
                                             |> Seq.choose (fun tr -> match resources.GetResource(tr.subject) with
@@ -197,8 +230,11 @@ type ClassExpressionParser (triples : TripleTable,
         _:x owl:qualifiedCardinality NN_INT(n) .
         _:x owl:onProperty y .
         _:x owl:onClass z . and { OPE(y) ≠ ε and CE(z) ≠ ε }
+        
+        Sets CE(_:x) to ObjectExactCardinality( n OPE(y) CE(z) ) 
     *)
     let parseObjectQualifiedCardinality (restrictionTriples : Triple seq) =
+        let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnClassId) |> (_.obj)
         let n = match (restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlQualifiedCardinalityId) |> (_.obj) |> resources.GetResource) with
@@ -206,12 +242,12 @@ type ClassExpressionParser (triples : TripleTable,
                     | Resource.TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [XsdInt ; XsdInteger; XsdNonNegativeInteger] ) -> nn |> int                              
                     | x -> failwith $"Invalid OWL Qualified cardinality integer constraint {x}"
         let OPE_y = tryGetObjectPropertyExpressions y
-        let CE_z = ClassExpressions.[z]
+        let CE_z = tryGetClassExpressions z
         let restriction = ObjectExactCardinality(n, OPE_y, CE_z)
-        if ClassExpressions.ContainsKey z then
-            failwith $"Invalid ontology: class {resources.GetResource z} defined twice"
+        if ClassExpressions.ContainsKey x then
+            failwith $"Invalid ontology: class {resources.GetResource x} defined twice"
         else
-            ClassExpressions <- ClassExpressions.Add(z, restriction)
+            ClassExpressions <- ClassExpressions.Add(x, restriction)
                     
         
     let parseAnonymousRestrictions() =
