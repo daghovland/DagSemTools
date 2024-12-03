@@ -50,28 +50,6 @@ type Rdf2Owl (triples : TripleTable,
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used on class position"
 
-    (* Extracts an RDF list. See Table 3 in https://www.w3.org/TR/owl2-mapping-to-rdf/
-        Assumes head is the head of some rdf list in the triple-table
-        The requirements in the specs includes non-circular lists, so blindly assumes this is true
-     *)
-    let rec _GetRdfListElements listId acc : ResourceId list =
-        if (listId = rdfNilId) then
-            acc
-        else
-            let head = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
-                        | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                        | [headElement] -> headElement.obj
-                        | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-            if (Seq.contains head acc) then
-                failwith $"Invalid list defined at {resources.GetResource(listId)}"
-            else
-                let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
-                            | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                            | [headElement] -> headElement.obj
-                            | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                _GetRdfListElements rest (head :: acc)     
-    let GetRdfListElements listId=
-        _GetRdfListElements listId []    
     (* Creates entities for use in declaration axioms  *)
     let createDeclaration (declarationType) (resourceId : Ingress.ResourceId)  : Entity =
         let resourceIri = getResourceIri resourceId

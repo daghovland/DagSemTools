@@ -20,4 +20,8 @@ module Ingress =
                                 | AnonymousBlankNode bn -> failwith "Annotations with blank nodes that are not individuals is not allowed"
                                 | _ -> AnnotationValue.LiteralAnnotation res 
                                 
-    
+    let tryGetIndividual res = 
+        match res with
+        | Resource.Iri iri -> NamedIndividual (FullIri iri)
+        | Resource.AnonymousBlankNode bn -> AnonymousIndividual bn
+        | x -> failwith $"Invalid OWL Ontology: {x} attempted used as an individual. Only IRIs and blank nodes can be individuals"

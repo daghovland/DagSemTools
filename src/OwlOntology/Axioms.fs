@@ -73,15 +73,21 @@ open IriTools
         | ObjectAllValuesFrom of ObjectPropertyExpression * ClassExpression
         | ObjectHasValue of ObjectPropertyExpression * Individual
         | ObjectHasSelf of ObjectPropertyExpression
-        | ObjectMinCardinality of int * ObjectPropertyExpression * ClassExpression
-        | ObjectMaxCardinality of int * ObjectPropertyExpression * ClassExpression
-        | ObjectExactCardinality of int * ObjectPropertyExpression * ClassExpression
+        | ObjectMinQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
+        | ObjectMaxQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
+        | ObjectExactQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
+        | ObjectExactCardinality of int * ObjectPropertyExpression 
+        | ObjectMinCardinality of int * ObjectPropertyExpression
+        | ObjectMaxCardinality of int * ObjectPropertyExpression
         | DataSomeValuesFrom of DataProperty list * DataRange
         | DataAllValuesFrom of DataProperty list * DataRange
         | DataHasValue of DataProperty * Resource
-        | DataMinCardinality of int * DataProperty * DataRange list
-        | DataMaxCardinality of int * DataProperty * DataRange list
-        | DataExactCardinality of int * DataProperty * DataRange list
+        | DataMinQualifiedCardinality of int * DataProperty * DataRange
+        | DataMaxQualifiedCardinality of int * DataProperty * DataRange
+        | DataExactQualifiedCardinality of int * DataProperty * DataRange
+        | DataMinCardinality of int * DataProperty
+        | DataMaxCardinality of int * DataProperty
+        | DataExactCardinality of int * DataProperty
 
     type ObjectPropertyAxiom =
         | ObjectPropertyDomain of ObjectPropertyExpression * ClassExpression

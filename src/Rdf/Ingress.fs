@@ -63,6 +63,22 @@ module Ingress =
         Array.blit originalArray 0 newArray 0 originalArray.Length
         newArray    
     
+    (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
+    let tryGetNonNegativeIntegerLiteral res =
+        match res with
+                    | Resource.IntegerLiteral nn -> Some nn
+                    | Resource.TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [Namespaces.XsdInt ; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger] ) -> nn |> int |> Some                              
+                    | x -> None
+    
+    (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
+    let tryGetBoolLiteral res =
+        match res with
+                    | Resource.BooleanLiteral nn -> Some nn
+                    | Resource.TypedLiteral (tp, nn) when (tp.ToString() = Namespaces.XsdBoolean) -> Some (match nn with
+                                                                                                           | "true" -> true
+                                                                                                           | "false" -> false
+                                                                                                           | x -> failwith $"Invalid use of xsd:boolean on value {x}")
+                    | _ -> None
     
   
     

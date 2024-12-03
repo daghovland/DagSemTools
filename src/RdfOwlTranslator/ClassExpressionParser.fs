@@ -26,8 +26,19 @@ type ClassExpressionParser (triples : TripleTable,
     let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlClass)))
     let owlRestrictionId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlRestriction)))
     let owlOnPropertyId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnProperty)))
+    let owlSomeValueFromId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlSomeValuesFrom)))
+    let owlAllValuesFromId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAllValuesFrom)))
+    let owlHasValueId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlHasValue)))
+    let owlHasSelfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlHasSelf)))
     let owlOnClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnClass)))
+    
+    let owlOnDataRangeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnDataRange)))
     let owlQualifiedCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlQualifiedCardinality)))
+    let owlMaxQualifiedCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMaxQualifiedCardinality)))
+    let owlMinQualifiedCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMinQualifiedCardinality)))
+    let owlMaxCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMaxCardinality)))
+    let owlMinCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMinCardinality)))
+    let owlCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlCardinality)))
     let owlAxiomId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAxiom)))
     let owlMembersId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMembers)))
     let owlAnnPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
@@ -59,6 +70,31 @@ type ClassExpressionParser (triples : TripleTable,
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used on class position"
 
+    
+        (* Extracts an RDF list. See Table 3 in https://www.w3.org/TR/owl2-mapping-to-rdf/
+        Assumes head is the head of some rdf list in the triple-table
+        The requirements in the specs includes non-circular lists, so blindly assumes this is true
+     *)
+    let rec _GetRdfListElements listId acc : ResourceId list =
+        if (listId = rdfNilId) then
+            acc
+        else
+            let head = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
+                        | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                        | [headElement] -> headElement.obj
+                        | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+            if (Seq.contains head acc) then
+                failwith $"Invalid list defined at {resources.GetResource(listId)}"
+            else
+                let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
+                            | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                            | [headElement] -> headElement.obj
+                            | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                _GetRdfListElements rest (head :: acc)     
+    let GetRdfListElements listId=
+        _GetRdfListElements listId []    
+
+    
     
     (* Section 3.2.1 of https://www.w3.org/TR/owl2-mapping-to-rdf/#Mapping_from_RDF_Graphs_to_the_Structural_Specification*)
    
@@ -159,6 +195,35 @@ type ClassExpressionParser (triples : TripleTable,
                           // | Resource.AnonymousBlankNode bn -> AnonymousObjectProperty bn
                           | x -> failwith $"Invalid OWL Ontology: {x} used as an object property"
     
+    
+    (* This is called  when propResourceId can only be aa data property
+       The function returns either the declared object property, or if it is not already a object or annotaiton property,
+        a simple named declaration
+        This is not completely per spec, but many ontologies around do not specify all properties *)
+    let tryGetDataPropertyExpressions propResourceId =
+        match DataPropertyExpressions.TryGetValue propResourceId with
+        | true, prop -> prop
+        | false, _ -> if ((ObjectPropertyExpressions.ContainsKey propResourceId) || (AnnotationProperties.ContainsKey propResourceId)) then 
+                            failwith $"Invalid OWL ontology: Property {resources.GetResource propResourceId} used both as data property and either object or annotation property"
+                      else
+                          match (resources.GetResource propResourceId) with
+                          | Resource.Iri iri -> FullIri iri
+                          // | Resource.AnonymousBlankNode bn -> AnonymousObjectProperty bn
+                          | x -> failwith $"Invalid OWL Ontology: {x} used as an object property"
+   
+    
+    (* This is called  when propResourceId can only be an object or data property
+        and a delaration is needed
+        *)
+    let tryGetPropertyDeclaration propResourceId (objectDeclarer: ObjectPropertyExpression -> ClassExpression) (dataDeclarer: DataProperty -> ClassExpression) =
+        match (ObjectPropertyExpressions.TryGetValue propResourceId, DataPropertyExpressions.TryGetValue propResourceId) with
+        | ((true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property"
+        | ((true, expr), (false,_)) -> objectDeclarer expr 
+        | ((false, _), (true,expr)) -> dataDeclarer expr
+        | ((false, _), (false, _)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an object property or datatype property"
+    
+    
+    
     (* This is called  when propResourceId can only be a class
        The function returns either the declared class, or if it is not already a datarange,
         a simple named declaration
@@ -172,7 +237,13 @@ type ClassExpressionParser (triples : TripleTable,
                           match (resources.GetResource propResourceId) with
                           | Resource.Iri iri -> ClassName (FullIri iri)
                           | x -> failwith $"Invalid OWL Ontology: {x} used as an object property"
-    
+    (* This is called  when propResourceId can only be a data range
+        *)
+    let tryGetDataRange propResourceId =
+        match DataRanges.TryGetValue propResourceId with
+        | true, prop -> prop
+        | false, _ -> failwith $"Invalid OWL ontology: {resources.GetResource propResourceId} used  as a data range but not declared"
+                      
     (* These are called whenever setting CE, OPE, DPE, DR and AP
         These cannot be redefined, as this is an error *)
     let trySetClassExpression x expression =
@@ -204,7 +275,8 @@ type ClassExpressionParser (triples : TripleTable,
             failwith $"Invalid ontology: annotation property {resources.GetResource x} defined twice"
         else
             AnnotationProperties <- AnnotationProperties.Add(x, expression)
-        
+
+    (* First four rows of Table 13, Class Expressions in https://www.w3.org/TR/owl2-mapping-to-rdf/#Parsing_of_Axioms *)        
     let parseAnonymousClassExpressions() =
         let anonymousClassTriples = tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
                                             |> Seq.choose (fun tr -> match resources.GetResource(tr.subject) with
@@ -218,12 +290,183 @@ type ClassExpressionParser (triples : TripleTable,
                                                                                     )                                
         for classTriple in anonymousClassTriples do
             match (tryGetResourceIri classTriple.predicate).ToString()  with 
-                    | Namespaces.OwlIntersectionOf -> failwith "TODO: Owl Union not implemented yet"
-                    | Namespaces.OwlUnionOf -> failwith "TODO: Owl Union not implemented yet"
-                    | Namespaces.OwlComplementOf -> failwith "TODO: Owl Union not implemented yet"
-                    | Namespaces.OwlOneOf -> failwith "TODO: Owl Union not implemented yet"
+                    | OwlIntersectionOf ->
+                        let ys = GetRdfListElements classTriple.obj
+                        let yClassExpressions = ys |> List.map tryGetClassExpressions
+                        let x = classTriple.subject
+                        let classExpression = ObjectIntersectionOf yClassExpressions
+                        trySetClassExpression x classExpression
+                    | OwlUnionOf -> 
+                        let ys = GetRdfListElements classTriple.obj
+                        let yClassExpressions = ys |> List.map tryGetClassExpressions
+                        let x = classTriple.subject
+                        let classExpression = ObjectUnionOf yClassExpressions
+                        trySetClassExpression x classExpression
+                    | OwlComplementOf -> 
+                        let y = classTriple.obj
+                        let yClassExpression = tryGetClassExpressions y
+                        let x = classTriple.subject
+                        let classExpression = ObjectComplementOf yClassExpression
+                        trySetClassExpression x classExpression
+                    | OwlOneOf -> 
+                        let ys = GetRdfListElements classTriple.obj
+                        let ystars = ys
+                                     |> List.map resources.GetResource
+                                     |> List.map Ingress.tryGetIndividual
+                        let x = classTriple.subject
+                        let classExpression = ObjectOneOf ystars
+                        trySetClassExpression x classExpression
                     | x -> failwith $"Invalid OWL ontology: Unknown predicate {x} used in class expression."
     
+    (* Assumes the restrictionTriples is a set of triples describing an OWL cardinality constraint
+        Returns the integer in the constraint
+     *)
+    let tryGetQualificationCardinality (restrictionTriples : Triple seq) cardinalityId =
+        let n_opt = restrictionTriples
+                            |> Seq.find (fun tr -> tr.predicate = cardinalityId)
+                            |> (_.obj)
+                            |> resources.GetResource
+                            |> Ingress.tryGetNonNegativeIntegerLiteral
+        match n_opt with 
+                | Some nn -> nn                              
+                | None -> failwith $"Invalid OWL cardinality integer constraint"
+  
+    (* 
+        Assumes the set of triples is 
+         _:x rdf:type owl:Restriction .
+        _:x owl:onProperty y .
+        _:x owl:someValuesFrom z .
+        { *PE(y) ≠ ε and CE(z) ≠ ε }  
+            
+        Sets CE(_:x) to *SomeValuesFrom( *PE(y) CE(z) )
+        
+        Where * is O(bject) or D(ata)   
+    *)
+    let parseSomeValueFrom (restrictionTriples : Triple seq) =
+        let x = restrictionTriples |> Seq.head |> (_.subject)
+        let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
+        let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlSomeValueFromId) |> (_.obj)
+        let objectSomeValuesFromCreator yExpr = ObjectSomeValuesFrom(yExpr, tryGetClassExpressions z)
+        let dataSomeValuesFromCreator yExpr = DataSomeValuesFrom([yExpr], tryGetDataRange z)
+        let restriction = tryGetPropertyDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
+        trySetClassExpression x restriction
+
+    (* 
+        Assumes the set of triples is 
+        _:x rdf:type owl:Restriction .
+        _:x owl:onProperty y .
+        _:x owl:allValuesFrom z .
+        { OPE(y) ≠ ε and CE(z) ≠ ε } 
+            
+        Sets CE(_:x) to  ObjectAllValuesFrom( OPE(y) CE(z) )    
+    *)
+    let parseAllValuesFrom (restrictionTriples : Triple seq) =
+        let x = restrictionTriples |> Seq.head |> (_.subject)
+        let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
+        let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlAllValuesFromId) |> (_.obj)
+        let objectSomeValuesFromCreator yExpr = ObjectAllValuesFrom(yExpr, tryGetClassExpressions z)
+        let dataSomeValuesFromCreator yExpr = DataAllValuesFrom([yExpr], tryGetDataRange z)
+        let restriction = tryGetPropertyDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
+        trySetClassExpression x restriction
+    
+    (* 
+        Assumes the set of triples is 
+        _:x rdf:type owl:Restriction .
+        _:x owl:onProperty y .
+        _:x owl:hasValue *:z .
+        { *PE(y) ≠ ε }
+            
+        Sets CE(_:x) to  ObjectHasValue( *PE(y) *:z )  
+        where *PE is either OPE or DPE   
+    *)
+    let parseHasValue (restrictionTriples : Triple seq) =
+        let x = restrictionTriples |> Seq.head |> (_.subject)
+        let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
+        let z = restrictionTriples
+                |> Seq.find (fun tr -> tr.predicate = owlHasValueId)
+                |> (_.obj)
+                |> resources.GetResource
+        let objectHasValueCreator yExpr = ObjectHasValue(yExpr, Ingress.tryGetIndividual z)
+        let dataHasValueCreator yExpr = DataHasValue(yExpr, z)
+        let restriction = tryGetPropertyDeclaration y objectHasValueCreator dataHasValueCreator
+        trySetClassExpression x restriction
+        
+    (* 
+        Assumes the set of triples is 
+       _:x rdf:type owl:Restriction .
+        _:x owl:onProperty y .
+        _:x owl:hasSelf "true"^^xsd:boolean .
+        { OPE(y) ≠ ε } 
+            
+        Sets CE(_:x) to  ObjectHasSelf( OPE(y) )      
+    *)
+    let parseObjectHasSelf (restrictionTriples : Triple seq) =
+        let x = restrictionTriples |> Seq.head |> (_.subject)
+        let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
+        let has_self = restrictionTriples
+                       |> Seq.find (fun tr -> tr.predicate = owlHasSelfId)
+                       |> (_.obj)
+                       |> resources.GetResource
+                       |> Ingress.tryGetBoolLiteral
+                       |> Option.get
+        if has_self then
+            let OPE_y = tryGetObjectPropertyExpressions y
+            let restriction = ObjectHasSelf(OPE_y)
+            trySetClassExpression x restriction
+
+
+        (* 
+        Assumes the set of triples is an rdf representation of OwlMinQualifiedCardinality  on an object property like this:
+     _:x rdf:type owl:Restriction .
+    _:x <some cardinality iri> NN_INT(n) .
+    _:x owl:onProperty y .
+    _:x owl:onClass z .
+    { OPE(y) ≠ ε and CE(z) ≠ ε } 
+        
+        Sets CE(_:x) to SeomCardinality( n OPE(y) CE(z) )  
+    *)
+    let parseQualifiedCardinality
+        tryGetProperty tryGetObjectType qualifierPropertyId
+        (restrictionTriples : Triple seq) (cardinalityQualifierResourceId : ResourceId)  (cardinalityExpressionConstructor : (int * 'a *'b) -> ClassExpression) =
+        let x = restrictionTriples |> Seq.head |> (_.subject)
+        let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
+        let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = qualifierPropertyId) |> (_.obj)
+        let n = tryGetQualificationCardinality restrictionTriples cardinalityQualifierResourceId
+        let OPE_y = tryGetProperty y
+        let CE_z = tryGetObjectType z
+        let restriction = cardinalityExpressionConstructor(n, OPE_y, CE_z)
+        trySetClassExpression x restriction
+
+    let parseObjectQualifiedCardinality (restrictionTriples : Triple seq) (cardinalityQualifierResourceId : ResourceId) (cardinalityExpressionConstructor)  =
+        parseQualifiedCardinality tryGetObjectPropertyExpressions tryGetClassExpressions owlOnClassId restrictionTriples cardinalityQualifierResourceId cardinalityExpressionConstructor
+    let parseDataQualifiedCardinality (restrictionTriples : Triple seq) (cardinalityQualifierResourceId : ResourceId)  (cardinalityExpressionConstructor) =
+        parseQualifiedCardinality tryGetDataPropertyExpressions tryGetDataRange owlOnDataRangeId restrictionTriples cardinalityQualifierResourceId cardinalityExpressionConstructor
+                        
+    (* 
+        Assumes the set of triples is an rdf representation of OwlMinQualifiedCardinality  on an object property like this:
+     _:x rdf:type owl:Restriction .
+    _:x owl:minQualifiedCardinality NN_INT(n) .
+    _:x owl:onProperty y .
+    _:x owl:onClass z .
+    { OPE(y) ≠ ε and CE(z) ≠ ε } 
+        
+        Sets CE(_:x) to ObjectMinCardinality( n OPE(y) CE(z) )  
+    *)
+    let parseObjectMinQualifiedCardinality (restrictionTriples : Triple seq) =
+        parseObjectQualifiedCardinality restrictionTriples owlMinQualifiedCardinalityId ObjectMinQualifiedCardinality
+
+    (* 
+        Assumes the set of triples is an rdf representation of OwlMaxQualifiedCardinality  on an object property like this:
+     _:x rdf:type owl:Restriction .
+    _:x owl:maxQualifiedCardinality NN_INT(n) .
+    _:x owl:onProperty y .
+    _:x owl:onClass z .
+    { OPE(y) ≠ ε and CE(z) ≠ ε } 
+        
+        Sets CE(_:x) to ObjectMaxCardinality( n OPE(y) CE(z) )  
+    *)
+    let parseObjectMaxQualifiedCardinality (restrictionTriples : Triple seq) : unit =
+        parseObjectQualifiedCardinality restrictionTriples owlMaxQualifiedCardinalityId ObjectMaxQualifiedCardinality
     (* 
         Assumes the set of triples is an rdf representation of OwlQualifiedCardinality  on an object property like this:
         _:x rdf:type owl:Restriction .
@@ -233,23 +476,85 @@ type ClassExpressionParser (triples : TripleTable,
         
         Sets CE(_:x) to ObjectExactCardinality( n OPE(y) CE(z) ) 
     *)
-    let parseObjectQualifiedCardinality (restrictionTriples : Triple seq) =
+    let parseObjectExactQualifiedCardinality (restrictionTriples : Triple seq) =
+        parseObjectQualifiedCardinality restrictionTriples owlQualifiedCardinalityId ObjectExactQualifiedCardinality
+    
+    let parseObjectCardinality (restrictionTriples : Triple seq) cardinalityId cardinalityExpressionConstructor =
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
-        let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnClassId) |> (_.obj)
-        let n = match (restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlQualifiedCardinalityId) |> (_.obj) |> resources.GetResource) with
-                    | Resource.IntegerLiteral nn -> nn
-                    | Resource.TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [XsdInt ; XsdInteger; XsdNonNegativeInteger] ) -> nn |> int                              
-                    | x -> failwith $"Invalid OWL Qualified cardinality integer constraint {x}"
+        let n = tryGetQualificationCardinality restrictionTriples cardinalityId
         let OPE_y = tryGetObjectPropertyExpressions y
-        let CE_z = tryGetClassExpressions z
-        let restriction = ObjectExactCardinality(n, OPE_y, CE_z)
-        if ClassExpressions.ContainsKey x then
-            failwith $"Invalid ontology: class {resources.GetResource x} defined twice"
-        else
-            ClassExpressions <- ClassExpressions.Add(x, restriction)
-                    
+        let restriction = cardinalityExpressionConstructor(n, OPE_y)
+        trySetClassExpression x restriction
+    
+    let parseObjectMinCardinality (restrictionTriples : Triple seq) =
+        parseObjectCardinality restrictionTriples owlMinCardinalityId ObjectMinCardinality
+                
+    (* 
+        Assumes the set of triples is an rdf representation of OwlMinCardinality  on an object property like this:
+     _:x rdf:type owl:Restriction .
+    _:x owl:maxCardinality NN_INT(n) .
+    _:x owl:onProperty y .
+    { OPE(y) ≠ ε } 
         
+        Sets CE(_:x) to ObjectMaxCardinality( n OPE(y) )  
+    *)
+    let parseObjectMaxCardinality (restrictionTriples : Triple seq) =
+        parseObjectCardinality restrictionTriples owlMaxCardinalityId ObjectMaxCardinality
+                
+    (* 
+        Assumes the set of triples is an rdf representation of OwlMinCardinality  on an object property like this:
+     _:x rdf:type owl:Restriction .
+    _:x owl:cardinality NN_INT(n) .
+    _:x owl:onProperty y .
+    { OPE(y) ≠ ε } 
+        
+        Sets CE(_:x) to ObjectExactCardinality( n OPE(y) )  
+    *)
+    let parseObjectExactCardinality (restrictionTriples : Triple seq) =
+        parseObjectCardinality  restrictionTriples owlCardinalityId ObjectExactCardinality
+    
+    (* 
+        Assumes the set of triples is an rdf representation of OwlMinQualifiedCardinality  on an object property like this:
+     _:x rdf:type owl:Restriction .
+    _:x owl:minQualifiedCardinality NN_INT(n) .
+    _:x owl:onProperty y .
+    _:x owl:onDataRamge z .
+    { DPE(y) ≠ ε and DR(z) ≠ ε } 
+        
+        Sets CE(_:x) to DataMinCardinality( n DPE(y) CE(z) )  
+    *)
+    let parseDataMinQualifiedCardinality (restrictionTriples : Triple seq) =
+        parseDataQualifiedCardinality restrictionTriples owlMinQualifiedCardinalityId DataMinQualifiedCardinality
+
+    (* 
+        Assumes the set of triples is an rdf representation of OwlMaxQualifiedCardinality  on an object property like this:
+     _:x rdf:type owl:Restriction .
+    _:x owl:maxQualifiedCardinality NN_INT(n) .
+    _:x owl:onProperty y .
+    _:x owl:onDataRange z .
+    { DPE(y) ≠ ε and DR(z) ≠ ε } 
+        
+        Sets CE(_:x) to DataMaxCardinality( n EPE(y) DR(z) )  
+    *)
+    let parseDataMaxQualifiedCardinality (restrictionTriples : Triple seq) =
+        parseDataQualifiedCardinality restrictionTriples owlMaxQualifiedCardinalityId DataMaxQualifiedCardinality
+        
+    (* 
+        Assumes the set of triples is an rdf representation of OwlQualifiedCardinality  on an object property like this:
+     _:x rdf:type owl:Restriction .
+    _:x owl:qualifiedCardinality NN_INT(n) .
+    _:x owl:onProperty y .
+    _:x owl:onDataRange z .
+    { DPE(y) ≠ ε and DR(z) ≠ ε } 
+        
+        Sets CE(_:x) to DataMaxCardinality( n DPE(y) DR(z) )  
+    *)
+    let parseDataExactQualifiedCardinality (restrictionTriples : Triple seq) =
+        parseDataQualifiedCardinality restrictionTriples owlQualifiedCardinalityId DataExactQualifiedCardinality
+    
+    
+                
     let parseAnonymousRestrictions() =
         let anonymousClassTriples = tripleTable.GetTriplesWithObjectPredicate(owlRestrictionId, rdfTypeId)
                                             |> Seq.choose (fun tr -> match resources.GetResource(tr.subject) with
@@ -268,38 +573,33 @@ type ClassExpressionParser (triples : TripleTable,
                                 |> Seq.map resources.GetResourceTriple
                                 |> Seq.map (_.ToString()) |> String.concat "."
                                 
-            if predicates |> Seq.contains OwlMaxQualifiedCardinality then
-                    if predicates |> Seq.contains OwlOnDataRange then
-                        failwith $"TODO: DataMaxCardinality not implemented yet"
-                    else if predicates |> Seq.contains OwlOnClass then
-                        failwith $"TODO: ObjectMaxCardinality not implemented yet"
-                    else
-                        failwith "Invalid MaxQualifiedCardinality. Must specify class or data range"
-            else if predicates |> Seq.contains OwlMinQualifiedCardinality then
-                    failwith $"TODO: {triplesString} not implemented yet"
-            else if predicates |> Seq.contains OwlQualifiedCardinality then
-                    if predicates |> Seq.contains OwlOnDataRange then
-                        failwith $"TODO: DataMaxCardinality not implemented yet"
-                    else if predicates |> Seq.contains OwlOnClass then
-                        parseObjectQualifiedCardinality(restrictionTriples)
-                    else
-                        failwith "Invalid MaxQualifiedCardinality. Must specify class or data range"
-                    
-            else if predicates |> Seq.contains OwlMinCardinality then
-                    failwith $"TODO: {triplesString} not implemented yet"
-            else if predicates |> Seq.contains OwlMaxCardinality then
-                    failwith $"TODO: {triplesString} not implemented yet"
-            else if predicates |> Seq.contains OwlCardinality then
-                    failwith $"TODO: {triplesString} not implemented yet"
-            else if predicates |> Seq.contains OwlHasSelf then
-                    failwith $"TODO: {triplesString} not implemented yet"
-            else if predicates |> Seq.contains OwlHasValue then
-                    failwith $"TODO: {triplesString} not implemented yet"
-            else if predicates |> Seq.contains OwlOnProperties then
-                    failwith $"TODO: {triplesString} not implemented yet"
-            else if predicates |> Seq.contains OwlSomeValuesFrom then
-                    failwith $"TODO: {triplesString} not implemented yet"
+            if predicates |> Seq.contains OwlSomeValuesFrom then
+                parseSomeValueFrom restrictionTriples
             else if predicates |> Seq.contains OwlAllValuesFrom then
+                parseAllValuesFrom restrictionTriples
+            else if predicates |> Seq.contains OwlHasSelf then
+                parseObjectHasSelf restrictionTriples
+            else if predicates |> Seq.contains OwlOnClass then
+                if predicates |> Seq.contains OwlMaxQualifiedCardinality then
+                    parseObjectMaxQualifiedCardinality restrictionTriples
+                else if predicates |> Seq.contains OwlMinQualifiedCardinality then
+                    parseObjectMinQualifiedCardinality restrictionTriples
+                else if predicates |> Seq.contains OwlQualifiedCardinality then
+                    parseObjectExactQualifiedCardinality restrictionTriples
+            else if predicates |> Seq.contains OwlOnDataRange then
+                if predicates |> Seq.contains OwlMaxQualifiedCardinality then
+                    parseDataMaxQualifiedCardinality restrictionTriples
+                else if predicates |> Seq.contains OwlMinQualifiedCardinality then
+                    parseDataMinQualifiedCardinality restrictionTriples
+                else if predicates |> Seq.contains OwlQualifiedCardinality then
+                    parseDataExactQualifiedCardinality restrictionTriples
+            else if predicates |> Seq.contains OwlMinCardinality then
+                    parseObjectMinCardinality restrictionTriples
+            else if predicates |> Seq.contains OwlMaxCardinality then
+                    parseObjectMaxCardinality restrictionTriples
+            else if predicates |> Seq.contains OwlCardinality then
+                    parseObjectExactCardinality restrictionTriples
+            else if predicates |> Seq.contains OwlOnProperties then
                     failwith $"TODO: {triplesString} not implemented yet"
             else
                 failwith $"Invalid owl:Restriction on triples {triplesString}"

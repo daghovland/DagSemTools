@@ -35,6 +35,7 @@ public class TestApiOntology(ITestOutputHelper output)
         var ontologyFileInfo = new FileInfo("TestData/imf.owl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
 
     }
 }
