@@ -78,7 +78,7 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="TestData\collections.ttl">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       </None>
       <None Update="TestData\reified_triple.ttl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

@@ -315,10 +315,27 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ontology = File.ReadAllText("TestData/collections.ttl");
         var ont = TestOntology(ontology);
         ont.Triples.TripleCount.Should().Be(8);
-        ont.GetTriplesWithObject(ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfNil))))
+        var rdfNilId = ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfNil)));
+        ont.GetTriplesWithObject(rdfNilId)
             .Should().HaveCount(2);
         ont.GetTriplesWithPredicate(ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfFirst))))
             .Should().HaveCount(3);
+        var listRestId = ont.GetResourceId(Resource.NewIri((new IriReference(Namespaces.RdfRest))));
+        
+        var emptyListTriple = ont.GetTriplesWithSubject(
+            ont.GetResourceId(Resource.NewIri(new IriReference("http://example.org/foo/subject2")))).Single();
+        emptyListTriple.obj.Should().Be(rdfNilId);
+
+        var listTriple = ont.GetTriplesWithSubject(
+            ont.GetResourceId(Resource.NewIri(new IriReference("http://example.org/foo/subject1")))).Single();
+        var listHead = listTriple.obj;
+        var headTriples = ont.GetTriplesWithSubject(listHead);
+        headTriples.Should().HaveCount(2);
+        var secondListElement = ont.GetTriplesWithSubjectPredicate(listHead, listRestId).Single().obj;
+        var thirdListElement = ont.GetTriplesWithSubjectPredicate(secondListElement, listRestId).Single().obj;
+        var endListElement = ont.GetTriplesWithSubjectPredicate(thirdListElement, listRestId).Single().obj;
+        endListElement.Should().Be(rdfNilId);
+
     }
 
 

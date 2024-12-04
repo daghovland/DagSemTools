@@ -29,6 +29,18 @@ public class TestApiOntology(ITestOutputHelper output)
 
     }
     
+    
+    [Fact]
+    public void LoadInterection()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/intersection.owl.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+
+    }
+
+    
     [Fact]
     public void LoadImfOntologyWorks()
     {

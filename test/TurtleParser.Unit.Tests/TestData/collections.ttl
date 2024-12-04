@@ -1,7 +1,7 @@
 
 PREFIX : <http://example.org/foo/>
 # the object of this triple is the RDF collection blank node
-:subject :predicate ( :a :b :c ) .
+:subject1 :predicate ( :a :b :c ) .
 
 # an empty collection value - rdf:nil
-:subject :predicate2 () .
+:subject2 :predicate2 () .
