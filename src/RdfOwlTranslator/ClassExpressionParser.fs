@@ -86,7 +86,7 @@ type ClassExpressionParser (triples : TripleTable,
             if (Seq.contains head acc) then
                 failwith $"Invalid list defined at {resources.GetResource(listId)}"
             else
-                let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
+                let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfRestId) |> Seq.toList with
                             | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
                             | [headElement] -> headElement.obj
                             | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
@@ -236,7 +236,9 @@ type ClassExpressionParser (triples : TripleTable,
                       else
                           match (resources.GetResource propResourceId) with
                           | Resource.Iri iri -> ClassName (FullIri iri)
-                          | x -> failwith $"Invalid OWL Ontology: {x} used as an object property"
+                          | AnonymousBlankNode bn -> AnonymousClass bn
+                          | x -> failwith $"Invalid OWL Ontology: {x} used as a class"
+                          
     (* This is called  when propResourceId can only be a data range
         *)
     let tryGetDataRange propResourceId =
@@ -613,9 +615,9 @@ type ClassExpressionParser (triples : TripleTable,
         parseClassExpressions()
         new AxiomParser(tripleTable,
                         resources,
-                        ClassExpressions,
-                        DataRanges,
-                        ObjectPropertyExpressions,
-                        DataPropertyExpressions,
+                        tryGetClassExpressions,
+                        tryGetDataRange,
+                        tryGetObjectPropertyExpressions,
+                        tryGetDataPropertyExpressions,
                         AnnotationProperties,
                         Annotations)

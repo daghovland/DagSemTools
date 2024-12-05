@@ -65,6 +65,7 @@ open IriTools
        
     type ClassExpression =
         ClassName of Class
+        | AnonymousClass of uint32
         | ObjectUnionOf of ClassExpression list
         | ObjectIntersectionOf of ClassExpression list
         | ObjectComplementOf of ClassExpression
