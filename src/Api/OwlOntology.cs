@@ -25,7 +25,7 @@ public class OwlOntology
         var translator = new Rdf2Owl(datastore.Triples, datastore.Resources);
         _owlOntology = translator.extractOntology;
     }
-    
+
     /// <summary>
     /// Factory method for creating an owl ontology.
     /// </summary>

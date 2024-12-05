@@ -84,7 +84,7 @@ internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
     public override uint VisitNamedBlankNode(NamedBlankNodeContext context)
     {
         var blankNodeName = context.BLANK_NODE_LABEL().GetText();
-        return Datastore.Resources.GetOrCreateNamedAnonResource(blankNodeName); 
+        return Datastore.Resources.GetOrCreateNamedAnonResource(blankNodeName);
     }
 
     public override uint VisitAnonymousBlankNode(AnonymousBlankNodeContext context) => Datastore.NewAnonymousBlankNode();

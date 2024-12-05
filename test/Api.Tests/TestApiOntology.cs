@@ -8,7 +8,7 @@ public class TestApiOntology(ITestOutputHelper output)
 {
     TestUtils.TestOutputTextWriter outputWriter = new TestUtils.TestOutputTextWriter(output);
 
-    
+
     [Fact]
     public void LoadEmptyOntologyWorks()
     {
@@ -18,7 +18,7 @@ public class TestApiOntology(ITestOutputHelper output)
         ont.GetAxioms().Should().NotBeEmpty();
 
     }
-    
+
     [Fact]
     public void LoadSubClassFromRestriction()
     {
@@ -28,8 +28,8 @@ public class TestApiOntology(ITestOutputHelper output)
         ont.GetAxioms().Should().NotBeEmpty();
 
     }
-    
-    
+
+
     [Fact]
     public void LoadInterection()
     {
@@ -40,7 +40,7 @@ public class TestApiOntology(ITestOutputHelper output)
 
     }
 
-    
+
     [Fact]
     public void LoadImfOntologyWorks()
     {

@@ -65,7 +65,7 @@ public interface IGraph
     /// Note that this adds new triples to the datastore
     /// </summary>
     public void EnableOwlReasoning();
-    
+
     /// <summary>
     /// Gives access to the underlying F# Datastore structure
     /// This is not stable, and only provided for exceptional cases

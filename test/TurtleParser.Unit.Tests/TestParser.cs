@@ -321,7 +321,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.GetTriplesWithPredicate(ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfFirst))))
             .Should().HaveCount(3);
         var listRestId = ont.GetResourceId(Resource.NewIri((new IriReference(Namespaces.RdfRest))));
-        
+
         var emptyListTriple = ont.GetTriplesWithSubject(
             ont.GetResourceId(Resource.NewIri(new IriReference("http://example.org/foo/subject2")))).Single();
         emptyListTriple.obj.Should().Be(rdfNilId);
