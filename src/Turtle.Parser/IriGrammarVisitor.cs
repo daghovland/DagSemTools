@@ -9,7 +9,7 @@
 using System.Globalization;
 using Microsoft.FSharp.Collections;
 using DagSemTools.Rdf;
-using DagSemTools.Resource;
+using DagSemTools.Ingress;
 
 namespace DagSemTools.Turtle.Parser;
 using System.Collections.Generic;

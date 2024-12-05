@@ -103,7 +103,7 @@ internal class TurtleListener : TurtleDocBaseListener
                 context.blankNodePropertyList().predicateObjectList())(blankNode);
         var postTriples = context.predicateObjectList() switch
         {
-            null => new List<Ingress.Triple>(),
+            null => new List<Rdf.Ingress.Triple>(),
             var c => _resourceVisitor._predicateObjectListVisitor.Visit(c)(blankNode)
         };
         var triples = internalTriples.Concat(postTriples);

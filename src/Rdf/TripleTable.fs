@@ -133,3 +133,8 @@ type TripleTable(tripleList: Triple array,
                 |> Seq.where (fun triple ->  triple.obj = object)
         
        
+       member this.GetTriplesMentioning resource =
+           Seq.concat [this.GetTriplesWithSubject(resource)
+                       this.GetTriplesWithPredicate(resource)
+                       this.GetTriplesWithObject(resource)]
+           

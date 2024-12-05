@@ -1,8 +1,16 @@
-using DagSemTools.Rdf;
+/*
+ Copyright (C) 2024 Dag Hovland
+ This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+ Contact: hovlanddag@gmail.com
+*/
+
+using static DagSemTools.Rdf.Ingress;
 
 namespace DagSemTools.Turtle.Parser;
 
-internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List<Ingress.Triple>>>
+internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List<Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
 
@@ -16,7 +24,7 @@ internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Func<uint, List<Ingress.Triple>> VisitPredicateObjectList(
+    public override Func<uint, List<Triple>> VisitPredicateObjectList(
         TurtleDocParser.PredicateObjectListContext context) =>
         (node) =>
             context.verbObjectList()
@@ -29,19 +37,19 @@ internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List
     /// <param name="_reifierNodeId"></param>
     /// <param name="_triples"></param>
     /// <param name="_tripleIds"></param>
-    private struct AnnotationStatus(uint _reifierNodeId, IEnumerable<Ingress.Triple> _triples, IEnumerable<uint> _tripleIds)
+    private struct AnnotationStatus(uint _reifierNodeId, IEnumerable<Triple> _triples, IEnumerable<uint> _tripleIds)
     {
         internal uint reifierNodeId = _reifierNodeId;
-        internal IEnumerable<Ingress.Triple> triples = _triples;
+        internal IEnumerable<Triple> triples = _triples;
         internal IEnumerable<uint> tripleIds = _tripleIds;
     }
 
-    private void HandleAnnotation((TurtleDocParser.AnnotationContext? annot, Ingress.Triple triple) rdfobj)
+    private void HandleAnnotation((TurtleDocParser.AnnotationContext? annot, Triple triple) rdfobj)
     {
         if (rdfobj.annot != null && rdfobj.annot.children != null)
         {
             var reifications = rdfobj.annot.children
-                .Aggregate(seed: new AnnotationStatus(_resourceVisitor.Datastore.NewAnonymousBlankNode(), new List<Ingress.Triple>(), new List<uint>()),
+                .Aggregate(seed: new AnnotationStatus(_resourceVisitor.Datastore.NewAnonymousBlankNode(), new List<Triple>(), new List<uint>()),
                     func: (aggr, child) => child switch
                     {
                         TurtleDocParser.PredicateObjectListContext predobj => HandlePredicateObjectReification(predobj, aggr),
@@ -57,7 +65,7 @@ internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List
         var newTriples = VisitPredicateObjectList(predobj)(aggr.reifierNodeId);
         return new AnnotationStatus(aggr.reifierNodeId, aggr.triples.Concat(newTriples), aggr.tripleIds);
     }
-    private AnnotationStatus HandleReification(TurtleDocParser.ReifierContext reif, Ingress.Triple triple, AnnotationStatus aggr)
+    private AnnotationStatus HandleReification(TurtleDocParser.ReifierContext reif, Triple triple, AnnotationStatus aggr)
     {
         var reifier = _resourceVisitor.Visit(reif);
         return new AnnotationStatus(reifier, aggr.triples, aggr.tripleIds.Append(reifier));
@@ -69,14 +77,14 @@ internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Func<uint, List<Ingress.Triple>> VisitVerbObjectList(
+    public override Func<uint, List<Triple>> VisitVerbObjectList(
         TurtleDocParser.VerbObjectListContext context) =>
         (node) =>
         {
             var predicate = _resourceVisitor.Visit(context.verb());
             var tripes = context.annotatedObject()
                 .Select(rdfObj => (annot: rdfObj.annotation(), obj: _resourceVisitor.Visit(rdfObj.rdfobject())))
-                .Select(obj => (annot: obj.annot, triple: new Ingress.Triple(node, predicate, obj.obj)))
+                .Select(obj => (annot: obj.annot, triple: new Triple(node, predicate, obj.obj)))
                 .ToList();
             tripes
                 .ForEach(HandleAnnotation);

@@ -1,7 +1,7 @@
 namespace DagSemTools.Rdf
 
 open DagSemTools.Rdf.Ingress
-open DagSemTools.Resource
+open DagSemTools.Ingress
 open System.Collections.Generic
 
 type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,

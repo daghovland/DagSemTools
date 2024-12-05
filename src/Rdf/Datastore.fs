@@ -2,7 +2,7 @@ namespace DagSemTools.Rdf
 
 open Ingress
 open System
-open DagSemTools.Resource
+open DagSemTools.Ingress
 
 type Datastore(triples: TripleTable,
                reifiedTriples: QuadTable,
@@ -71,4 +71,8 @@ type Datastore(triples: TripleTable,
         this.ReifiedTriples.GetQuadsWithObject obj
     member this.GetReifiedTriplesWithSubjectPredicate(subject: ResourceId, predicate: ResourceId) : Quad seq =
         this.ReifiedTriples.GetQuadsWithSubjectPredicate (subject, predicate)
-
+    member this.GetResourceInfoForErrorMessage(subject: ResourceId) : string =
+           this.Triples.GetTriplesMentioning subject
+            |> Seq.map this.Resources.GetResourceTriple
+            |> Seq.map _.ToString()
+            |> String.concat ". "

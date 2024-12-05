@@ -7,8 +7,7 @@
 *)
 namespace DagSemTools.Rdf
 
-open IriTools
-open DagSemTools.Resource
+open DagSemTools.Ingress
 
 module Ingress =
     type ResourceId = uint32

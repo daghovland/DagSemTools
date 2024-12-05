@@ -6,7 +6,7 @@
     Contact: hovlanddag@gmail.com
 *)
 
-namespace DagSemTools.Resource
+namespace DagSemTools.Ingress
 open IriTools
 
 

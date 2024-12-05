@@ -2,9 +2,9 @@ namespace DagSemTools.RdfOwlTranslator
 
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
-open DagSemTools.Resource
+open DagSemTools.Ingress
 open DagSemTools.OwlOntology
-open DagSemTools.Resource.Namespaces
+open DagSemTools.Ingress.Namespaces
 open IriTools
 
 type Rdf2Owl (triples : TripleTable,

@@ -1,11 +1,17 @@
+(*
+ Copyright (C) 2024 Dag Hovland
+ This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+ This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+ You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+ Contact: hovlanddag@gmail.com
+*)
 namespace DagSemTools.RdfOwlTranslator
 
-open DagSemTools.AlcTableau.NNF
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
-open DagSemTools.Resource
+open DagSemTools.Ingress
+open DagSemTools.Ingress.Namespaces
 open DagSemTools.OwlOntology
-open DagSemTools.Resource.Namespaces
 open IriTools
 
 
@@ -28,6 +34,10 @@ type ClassExpressionParser (triples : TripleTable,
     let owlOnPropertyId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnProperty)))
     let owlSomeValueFromId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlSomeValuesFrom)))
     let owlAllValuesFromId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAllValuesFrom)))
+    let owlIntersectionOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlIntersectionOf)))
+    let owlUnionOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlUnionOf)))
+    let owlComplementOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlComplementOf)))
+    let owlOneOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOneOf)))
     let owlHasValueId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlHasValue)))
     let owlHasSelfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlHasSelf)))
     let owlOnClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnClass)))
@@ -55,7 +65,11 @@ type ClassExpressionParser (triples : TripleTable,
             | Resource.Iri iri -> Some iri
             | _ -> None
         
-    
+    let GetResourceInfoForErrorMessage(subject: ResourceId) : string =
+           tripleTable.GetTriplesMentioning subject
+            |> Seq.map resources.GetResourceTriple
+            |> Seq.map _.ToString()
+            |> String.concat ". \n"
     let getResourceClass (resourceId : Ingress.ResourceId) : Class option =
         getResourceIri resourceId |> Option.map Class.FullIri
 
@@ -217,10 +231,10 @@ type ClassExpressionParser (triples : TripleTable,
         *)
     let tryGetPropertyDeclaration propResourceId (objectDeclarer: ObjectPropertyExpression -> ClassExpression) (dataDeclarer: DataProperty -> ClassExpression) =
         match (ObjectPropertyExpressions.TryGetValue propResourceId, DataPropertyExpressions.TryGetValue propResourceId) with
-        | ((true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property"
+        | ((true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property: {GetResourceInfoForErrorMessage propResourceId}"
         | ((true, expr), (false,_)) -> objectDeclarer expr 
         | ((false, _), (true,expr)) -> dataDeclarer expr
-        | ((false, _), (false, _)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an object property or datatype property"
+        | ((false, _), (false, _)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an object property or datatype property: {GetResourceInfoForErrorMessage propResourceId}"
     
     
     
@@ -278,39 +292,40 @@ type ClassExpressionParser (triples : TripleTable,
         else
             AnnotationProperties <- AnnotationProperties.Add(x, expression)
 
-    (* First four rows of Table 13, Class Expressions in https://www.w3.org/TR/owl2-mapping-to-rdf/#Parsing_of_Axioms *)        
+    (* First four rows of Table 13, Class Expressions in https://www.w3.org/TR/owl2-mapping-to-rdf *)        
     let parseAnonymousClassExpressions() =
         let anonymousClassTriples = tripleTable.GetTriplesWithObjectPredicate(owlClassId, rdfTypeId)
                                             |> Seq.choose (fun tr -> match resources.GetResource(tr.subject) with
                                                                                     | AnonymousBlankNode x -> Some (tr.subject)
                                                                                     | _ -> None)
                                             |> Seq.map tripleTable.GetTriplesWithSubject
-                                            |> Seq.map (fun trs -> trs |> Seq.filter (fun triple -> triple.predicate <> rdfTypeId)
+                                            |> Seq.choose (fun trs -> trs |> Seq.filter (fun triple -> Seq.contains triple.predicate  [ owlIntersectionOfId; owlUnionOfId; owlComplementOfId; owlOneOfId])
                                                                         |> fun t -> match t |> Seq.toList with
-                                                                                    | [tr] -> tr
-                                                                                    | _ -> failwith $"Probably invalid or pointless construct in ontology: Anonymous class {resources.GetResource((trs |> Seq.head).subject)} without restriction"
+                                                                                    | [tr] -> Some tr
+                                                                                    | [] ->  None //TODO: Just warningfailwith $"Probably invalid or pointless construct in ontology: Anonymous class without expression : {GetResourceInfoForErrorMessage ((trs |> Seq.head).subject)} "
+                                                                                    | _ -> failwith $"Invalid owl ontology: Anonymous class expression defined multiple times: {GetResourceInfoForErrorMessage ((trs |> Seq.head).subject)} "
                                                                                     )                                
         for classTriple in anonymousClassTriples do
             match (tryGetResourceIri classTriple.predicate).ToString()  with 
-                    | OwlIntersectionOf ->
+                    | Namespaces.OwlIntersectionOf ->
                         let ys = GetRdfListElements classTriple.obj
                         let yClassExpressions = ys |> List.map tryGetClassExpressions
                         let x = classTriple.subject
                         let classExpression = ObjectIntersectionOf yClassExpressions
                         trySetClassExpression x classExpression
-                    | OwlUnionOf -> 
+                    | Namespaces.OwlUnionOf -> 
                         let ys = GetRdfListElements classTriple.obj
                         let yClassExpressions = ys |> List.map tryGetClassExpressions
                         let x = classTriple.subject
                         let classExpression = ObjectUnionOf yClassExpressions
                         trySetClassExpression x classExpression
-                    | OwlComplementOf -> 
+                    | Namespaces.OwlComplementOf -> 
                         let y = classTriple.obj
                         let yClassExpression = tryGetClassExpressions y
                         let x = classTriple.subject
                         let classExpression = ObjectComplementOf yClassExpression
                         trySetClassExpression x classExpression
-                    | OwlOneOf -> 
+                    | Namespaces.OwlOneOf -> 
                         let ys = GetRdfListElements classTriple.obj
                         let ystars = ys
                                      |> List.map resources.GetResource

@@ -13,7 +13,7 @@
 
 namespace DagSemTools.OwlOntology
 
-open DagSemTools.Resource
+open DagSemTools.Ingress
 open IriTools
 
     type Iri = 

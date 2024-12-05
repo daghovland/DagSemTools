@@ -44,7 +44,7 @@
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
-        <ProjectReference Include="..\Resource\Resource.fsproj" />
+        <ProjectReference Include="..\Ingress\Ingress.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />

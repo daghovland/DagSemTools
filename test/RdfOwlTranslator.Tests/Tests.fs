@@ -12,7 +12,7 @@ open DagSemTools.AlcTableau.ConjunctiveQuery
 open DagSemTools.Rdf
 open DagSemTools.OwlOntology
 open Xunit
-open DagSemTools.Resource
+open DagSemTools.Ingress
 open IriTools
 open DagSemTools.Rdf.Ingress
 open Faqt

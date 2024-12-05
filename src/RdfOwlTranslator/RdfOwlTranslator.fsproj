@@ -44,7 +44,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\Resource\Resource.fsproj" />
+        <ProjectReference Include="..\Ingress\Ingress.fsproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
         <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
     </ItemGroup>

@@ -23,6 +23,8 @@
 
         <Platforms>AnyCPU</Platforms>
 
+        <RootNamespace>Resource</RootNamespace>
+
     </PropertyGroup>
 
     <ItemGroup>

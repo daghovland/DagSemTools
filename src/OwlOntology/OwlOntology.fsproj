@@ -38,7 +38,7 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\Resource\Resource.fsproj" />
+        <ProjectReference Include="..\Ingress\Ingress.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Resource" Version="0.3.0" />

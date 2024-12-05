@@ -29,7 +29,7 @@ jobs:
       run: | 
         mkdir localNugetPackages
         projects=(
-          "Resource"
+          "Ingress"
           "AlcTableau"
           "Rdf"
           "OwlOntology"
@@ -51,7 +51,7 @@ jobs:
             dotnet pack --configuration Release --output localNugetPackages ./src/$project/$project.*sproj
         done
 
-    - name: Download external test projects
+    - name: Download external test file
       run: |
         curl -o test/Api.Tests/TestData/imf.owl http://ns.imfid.org/20240531/imf-ontology.owl.ttl
 

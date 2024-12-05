@@ -10,7 +10,7 @@ namespace DagSemTools.AlcTableau
 
 open System
 open IriTools
-open DagSemTools.Resource
+open DagSemTools.Ingress
 
 module ALC =
     

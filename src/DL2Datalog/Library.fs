@@ -13,7 +13,7 @@ open DagSemTools.AlcTableau.ALC
 open DagSemTools.Datalog
 open DagSemTools.Rdf
 open DagSemTools
-open DagSemTools.Resource
+open DagSemTools.Ingress
 open IriTools
 
 (* This is an attempt at implementing the algorithm on p. 195 of "An introduction to description logic" *)
