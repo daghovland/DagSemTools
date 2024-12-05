@@ -117,7 +117,7 @@ module Namespaces =
     [<Literal>]
     let OwlNegativePropertyAssertion = Owl + "NegativePropertyAssertion"
     [<Literal>]
-    let OwlObjectInverseOf = Owl + "ObjectInverseOf"
+    let OwlObjectInverseOf = Owl + "inverseOf"
     [<Literal>]
     let OwlPropertyChainAxiom = Owl + "propertyChainAxiom"
     [<Literal>]
