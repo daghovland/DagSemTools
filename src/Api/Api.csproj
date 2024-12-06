@@ -34,6 +34,8 @@
         <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
       <ProjectReference Include="..\Rdf\Rdf.fsproj" />
       <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
+        <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
+        <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
     </ItemGroup>
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
@@ -44,6 +46,7 @@
         <PackageReference Include="DagSemTools.OWL2RL2Datalog" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Turtle.Parser" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
     </ItemGroup>
     
     <ItemGroup>
@@ -56,9 +59,5 @@
             <PackagePath>README.md</PackagePath>
         </None>
     </ItemGroup>    
-    <ItemGroup>
-      <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
-      <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
-    </ItemGroup>
-
+    
 </Project>
