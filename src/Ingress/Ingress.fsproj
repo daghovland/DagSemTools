@@ -7,7 +7,7 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.Resource</PackageId>
+        <PackageId>DagSemTools.Ingress</PackageId>
         <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>Represenation of Literals, Prefixes, IRIs etc.</Description>

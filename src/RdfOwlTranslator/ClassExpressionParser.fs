@@ -393,8 +393,8 @@ type ClassExpressionParser (triples : TripleTable,
         _:x owl:hasValue *:z .
         { *PE(y) ≠ ε }
             
-        Sets CE(_:x) to  ObjectHasValue( *PE(y) *:z )  
-        where *PE is either OPE or DPE   
+        Sets CE(_:x) to  *HasValue( *PE(y) *:z )  
+        where *PE is either OPE or DPE and *HasValue is ObjectHasValue or DataHasValue   
     *)
     let parseHasValue (restrictionTriples : Triple seq) =
         let x = restrictionTriples |> Seq.head |> (_.subject)
@@ -594,6 +594,8 @@ type ClassExpressionParser (triples : TripleTable,
                 parseSomeValueFrom restrictionTriples
             else if predicates |> Seq.contains OwlAllValuesFrom then
                 parseAllValuesFrom restrictionTriples
+            else if predicates |> Seq.contains OwlHasValue then
+                parseHasValue restrictionTriples
             else if predicates |> Seq.contains OwlHasSelf then
                 parseObjectHasSelf restrictionTriples
             else if predicates |> Seq.contains OwlOnClass then
