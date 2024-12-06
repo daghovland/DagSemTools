@@ -7,7 +7,7 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.Rdf2Owl</PackageId>
+        <PackageId>DagSemTools.RdfOwlTranslator</PackageId>
         <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>Extracts axioms from Rdf into Owl Ontology</Description>
@@ -49,7 +49,7 @@
         <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Resource" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
         <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
     </ItemGroup>

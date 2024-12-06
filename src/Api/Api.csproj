@@ -31,6 +31,7 @@
       <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
       <ProjectReference Include="..\Datalog\Datalog.fsproj" />
         <ProjectReference Include="..\OWL2RL2Datalog\OWL2RL2Datalog.fsproj" />
+        <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
       <ProjectReference Include="..\Rdf\Rdf.fsproj" />
       <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
     </ItemGroup>
@@ -39,6 +40,7 @@
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="0.3.0" />
         <PackageReference Include="DagSemTools.OWL2RL2Datalog" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Turtle.Parser" Version="0.3.0" />
