@@ -7,6 +7,7 @@
 *)
 namespace DagSemTools.RdfOwlTranslator
 
+open DagSemTools.AlcTableau.DataRange
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Ingress
@@ -32,6 +33,7 @@ type ClassExpressionParser (triples : TripleTable,
     let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlClass)))
     let owlRestrictionId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlRestriction)))
     let owlOnPropertyId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnProperty)))
+    let owlOnPropertiesId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnProperties)))
     let owlSomeValueFromId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlSomeValuesFrom)))
     let owlAllValuesFromId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAllValuesFrom)))
     let owlIntersectionOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlIntersectionOf)))
@@ -184,15 +186,23 @@ type ClassExpressionParser (triples : TripleTable,
         |> Map.ofSeq
     
     (* ANN *)
-    let mutable Annotations : Map<ResourceId, Annotation> =
+    let mutable Annotations : Map<ResourceId, Annotation list> =
         AnnotationProperties
         |> Map.toSeq
         |> Seq.map (fun (annPropId, annProp) -> tripleTable.GetTriplesWithPredicate(annPropId)
                                                 |> Seq.map (fun annTr -> (annTr.subject, Ingress.createAnnotationValue Individuals annTr.obj (resources.GetResource(annTr.obj))))
                                                 |> Seq.map (fun (annotatedObj, annVal) -> (annotatedObj, (Annotation (annProp, annVal)) )))
-        |> Seq.concat
-        |> Map.ofSeq
-    
+                                                |> Seq.concat
+                                                |> Seq.fold (fun acc (key, annotation) ->
+                                                    match Map.tryFind key acc with
+                                                    | Some values -> Map.add key (annotation :: values) acc
+                                                    | None -> Map.add key [annotation] acc
+                                                ) Map.empty
+        
+    let getAnnotations resourceId =
+        match Annotations.TryFind resourceId with
+        | Some annotationList -> annotationList
+        | None -> []
     
     (* This is called  when propResourceId can only be an object property
        The function returns either the declared object property, or if it is not already a data or annotaiton property,
@@ -202,7 +212,7 @@ type ClassExpressionParser (triples : TripleTable,
         match ObjectPropertyExpressions.TryGetValue propResourceId with
         | true, prop -> prop
         | false, _ -> if ((DataPropertyExpressions.ContainsKey propResourceId) || (AnnotationProperties.ContainsKey propResourceId)) then 
-                            failwith $"Invalid OWL ontology: Property {resources.GetResource propResourceId} used both as object property and either data or annotation property"
+                            failwith $"Invalid OWL ontology: Property {resources.GetResource propResourceId} used both as object property and either data or annotation property: {GetResourceInfoForErrorMessage propResourceId}"
                       else
                           match (resources.GetResource propResourceId) with
                           | Resource.Iri iri -> NamedObjectProperty (FullIri iri)
@@ -236,6 +246,19 @@ type ClassExpressionParser (triples : TripleTable,
         | ((false, _), (true,expr)) -> dataDeclarer expr
         | ((false, _), (false, _)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an object property or datatype property: {GetResourceInfoForErrorMessage propResourceId}"
     
+    
+    (* This is called  when propResourceId can be an object-, data- or annotation-property
+        and a declaration axiom is needed
+        *)
+    let tryGetAnyPropertyAxiom propResourceId (objectDeclarer: ObjectPropertyExpression -> Axiom) (dataDeclarer: DataProperty -> Axiom) (annotationDeclarer : AnnotationProperty -> Axiom) =
+        match (ObjectPropertyExpressions.TryGetValue propResourceId, DataPropertyExpressions.TryGetValue propResourceId, AnnotationProperties.TryGetValue propResourceId) with
+        | ((true, _), (true, _), _) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property: {GetResourceInfoForErrorMessage propResourceId}"
+        | ((true, _), _, (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as annotation and object property: {GetResourceInfoForErrorMessage propResourceId}"
+        | (_, (true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and annotation property: {GetResourceInfoForErrorMessage propResourceId}"
+        | ((true, expr), (false,_), (false, _)) -> objectDeclarer expr 
+        | ((false, _), (true,expr), (false, _)) -> dataDeclarer expr
+        | ((false, _), (false,_), (true, expr)) -> annotationDeclarer expr
+        | ((false, _), (false, _), (false,_)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an annotation property, object property or datatype property: {GetResourceInfoForErrorMessage propResourceId}"
     
     
     (* This is called  when propResourceId can only be a class
@@ -373,9 +396,9 @@ type ClassExpressionParser (triples : TripleTable,
         _:x rdf:type owl:Restriction .
         _:x owl:onProperty y .
         _:x owl:allValuesFrom z .
-        { OPE(y) ≠ ε and CE(z) ≠ ε } 
+        { *PE(y) ≠ ε and CE/DR(z) ≠ ε } 
             
-        Sets CE(_:x) to  ObjectAllValuesFrom( OPE(y) CE(z) )    
+        Sets CE(_:x) to  *AllValuesFrom( *PE(y) CE(z) )    
     *)
     let parseAllValuesFrom (restrictionTriples : Triple seq) =
         let x = restrictionTriples |> Seq.head |> (_.subject)
@@ -385,6 +408,52 @@ type ClassExpressionParser (triples : TripleTable,
         let dataSomeValuesFromCreator yExpr = DataAllValuesFrom([yExpr], tryGetDataRange z)
         let restriction = tryGetPropertyDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
         trySetClassExpression x restriction
+    
+    
+    (* 
+        Assumes the set of triples is 
+        _:x rdf:type owl:Restriction .
+        _:x owl:onProperties T(SEQ y1 ... yn) .
+        _:x owl:XValuesFrom z .
+        { n ≥ 1, DPE(yi) ≠ ε for each 1 ≤ i ≤ n, and DR(z) ≠ ε }
+            
+        Sets CE(_:x) to   DataXValuesFrom( DPE(y1) ... DPE(yn) DR(z) ))
+        
+        WHre X is all or xome    
+    *)
+    let parseValuesFromProperties dataValuesFromConstructor (restrictionTriples : Triple seq) =
+        let x = restrictionTriples |> Seq.head |> (_.subject)
+        let ys = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertiesId) |> (_.obj)
+                    |> GetRdfListElements
+                     |> List.map tryGetDataPropertyExpressions
+        let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlAllValuesFromId) |> (_.obj)
+        let restriction = dataValuesFromConstructor(ys, tryGetDataRange z)
+        trySetClassExpression x restriction
+    
+    
+    
+    (* 
+        Assumes the set of triples is 
+        _:x rdf:type owl:Restriction .
+        _:x owl:onProperties T(SEQ y1 ... yn) .
+        _:x owl:allValuesFrom z .
+        { n ≥ 1, DPE(yi) ≠ ε for each 1 ≤ i ≤ n, and DR(z) ≠ ε }
+            
+        Sets CE(_:x) to   DataAllValuesFrom( DPE(y1) ... DPE(yn) DR(z) ))    
+    *)
+    let parseAllValuesFromProperties = parseValuesFromProperties DataAllValuesFrom
+    
+    
+    (* 
+        Assumes the set of triples is 
+        _:x rdf:type owl:Restriction .
+        _:x owl:onProperties T(SEQ y1 ... yn) .
+        _:x owl:someValueFrom z .
+        { n ≥ 1, DPE(yi) ≠ ε for each 1 ≤ i ≤ n, and DR(z) ≠ ε }
+            
+        Sets CE(_:x) to   DataAllValuesFrom( DPE(y1) ... DPE(yn) DR(z) ))    
+    *)
+    let parseSomeValueFromProperties = parseValuesFromProperties DataSomeValuesFrom
     
     (* 
         Assumes the set of triples is 
@@ -589,8 +658,13 @@ type ClassExpressionParser (triples : TripleTable,
             let triplesString = restrictionTriples
                                 |> Seq.map resources.GetResourceTriple
                                 |> Seq.map (_.ToString()) |> String.concat "."
-                                
-            if predicates |> Seq.contains OwlSomeValuesFrom then
+                
+            if predicates |> Seq.contains OwlOnProperties then
+                if predicates |> Seq.contains OwlSomeValuesFrom then
+                    parseSomeValueFromProperties restrictionTriples
+                else if predicates |> Seq.contains OwlAllValuesFrom then
+                    parseAllValuesFromProperties restrictionTriples
+            else if predicates |> Seq.contains OwlSomeValuesFrom then
                 parseSomeValueFrom restrictionTriples
             else if predicates |> Seq.contains OwlAllValuesFrom then
                 parseAllValuesFrom restrictionTriples
@@ -637,4 +711,5 @@ type ClassExpressionParser (triples : TripleTable,
                         tryGetObjectPropertyExpressions,
                         tryGetDataPropertyExpressions,
                         AnnotationProperties,
-                        Annotations)
+                        getAnnotations,
+                        tryGetAnyPropertyAxiom)
