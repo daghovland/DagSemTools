@@ -50,12 +50,20 @@ jobs:
             dotnet build --configuration Release ./src/$project/$project.*sproj
             dotnet pack --configuration Release --output localNugetPackages ./src/$project/$project.*sproj
         done
-
+    - name: Install Apache Jena
+      run: |
+            sudo apt-get update
+            sudo apt-get install -y default-jre-headless
+            wget https://dlcdn.apache.org/jena/binaries/apache-jena-5.2.0.tar.gz
+            tar -xzf apache-jena-5.2.0.tar.gz
+            export PATH=$PATH:$(pwd)/apache-jena-5.2.0/bin
+        
     - name: Download external test files
       run: |
         parallel ::: \
-        "curl -o test/Api.Tests/TestData/imf.owl http://ns.imfid.org/20240531/imf-ontology.owl.ttl" \
-        "curl -o test/Api.Tests/TestData/go.owl http://current.geneontology.org/ontology/go.owl"
+        "curl -o test/Api.Tests/TestData/imf.ttl http://ns.imfid.org/20240531/imf-ontology.owl.ttl" \
+        "curl -o test/Api.Tests/TestData/go.owl.xml http://current.geneontology.org/ontology/go.owl"
+        riot --output=TURTLE test/Api.Tests/TestData/go.owl.xml > test/Api.Tests/TestData/go.ttl
   
     - name: Build and run test projects
       run: |
