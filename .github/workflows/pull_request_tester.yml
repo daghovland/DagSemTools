@@ -51,10 +51,12 @@ jobs:
             dotnet pack --configuration Release --output localNugetPackages ./src/$project/$project.*sproj
         done
 
-    - name: Download external test file
+    - name: Download external test files
       run: |
-        curl -o test/Api.Tests/TestData/imf.owl http://ns.imfid.org/20240531/imf-ontology.owl.ttl
-
+        parallel ::: \
+        "curl -o test/Api.Tests/TestData/imf.owl http://ns.imfid.org/20240531/imf-ontology.owl.ttl" \
+        "curl -o test/Api.Tests/TestData/go.owl http://current.geneontology.org/ontology/go.owl"
+  
     - name: Build and run test projects
       run: |
         for project in test/*; do
