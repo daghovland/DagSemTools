@@ -3,7 +3,7 @@ using DagSemTools.Rdf;
 namespace DagSemTools.Datalog.Parser;
 using static DatalogParser;
 
-internal class PredicateObjectListVisitor : DatalogBaseVisitor<Func<uint, List<Ingress.Triple>>>
+internal class PredicateObjectListVisitor : DatalogBaseVisitor<Func<uint, List<Rdf.Ingress.Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
 
@@ -17,7 +17,7 @@ internal class PredicateObjectListVisitor : DatalogBaseVisitor<Func<uint, List<I
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Func<uint, List<Ingress.Triple>> VisitPredicateObjectList(
+    public override Func<uint, List<Rdf.Ingress.Triple>> VisitPredicateObjectList(
         PredicateObjectListContext context) =>
         (node) =>
             context.verbObjectList()
@@ -30,19 +30,19 @@ internal class PredicateObjectListVisitor : DatalogBaseVisitor<Func<uint, List<I
     /// <param name="_reifierNodeId"></param>
     /// <param name="_triples"></param>
     /// <param name="_tripleIds"></param>
-    private struct AnnotationStatus(uint _reifierNodeId, IEnumerable<Ingress.Triple> _triples, IEnumerable<uint> _tripleIds)
+    private struct AnnotationStatus(uint _reifierNodeId, IEnumerable<Rdf.Ingress.Triple> _triples, IEnumerable<uint> _tripleIds)
     {
         internal uint reifierNodeId = _reifierNodeId;
-        internal IEnumerable<Ingress.Triple> triples = _triples;
+        internal IEnumerable<Rdf.Ingress.Triple> triples = _triples;
         internal IEnumerable<uint> tripleIds = _tripleIds;
     }
 
-    private void HandleAnnotation((AnnotationContext? annot, Ingress.Triple triple) rdfobj)
+    private void HandleAnnotation((AnnotationContext? annot, Rdf.Ingress.Triple triple) rdfobj)
     {
         if (rdfobj.annot != null && rdfobj.annot.children != null)
         {
             var reifications = rdfobj.annot.children
-                .Aggregate(seed: new AnnotationStatus(_resourceVisitor.Datastore.NewAnonymousBlankNode(), new List<Ingress.Triple>(), new List<uint>()),
+                .Aggregate(seed: new AnnotationStatus(_resourceVisitor.Datastore.NewAnonymousBlankNode(), new List<Rdf.Ingress.Triple>(), new List<uint>()),
                     func: (aggr, child) => child switch
                     {
                         PredicateObjectListContext predobj => HandlePredicateObjectReification(predobj, aggr),
@@ -58,7 +58,7 @@ internal class PredicateObjectListVisitor : DatalogBaseVisitor<Func<uint, List<I
         var newTriples = VisitPredicateObjectList(predobj)(aggr.reifierNodeId);
         return new AnnotationStatus(aggr.reifierNodeId, aggr.triples.Concat(newTriples), aggr.tripleIds);
     }
-    private AnnotationStatus HandleReification(ReifierContext reif, Ingress.Triple triple, AnnotationStatus aggr)
+    private AnnotationStatus HandleReification(ReifierContext reif, Rdf.Ingress.Triple triple, AnnotationStatus aggr)
     {
         var reifier = _resourceVisitor.Visit(reif);
         return new AnnotationStatus(reifier, aggr.triples, aggr.tripleIds.Append(reifier));
@@ -70,14 +70,14 @@ internal class PredicateObjectListVisitor : DatalogBaseVisitor<Func<uint, List<I
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Func<uint, List<Ingress.Triple>> VisitVerbObjectList(
+    public override Func<uint, List<Rdf.Ingress.Triple>> VisitVerbObjectList(
         VerbObjectListContext context) =>
         (node) =>
         {
             var predicate = _resourceVisitor.Visit(context.verb());
             var tripes = context.annotatedObject()
                 .Select(rdfObj => (annot: rdfObj.annotation(), obj: _resourceVisitor.Visit(rdfObj.rdfobject())))
-                .Select(obj => (annot: obj.annot, triple: new Ingress.Triple(node, predicate, obj.obj)))
+                .Select(obj => (annot: obj.annot, triple: new Rdf.Ingress.Triple(node, predicate, obj.obj)))
                 .ToList();
             tripes
                 .ForEach(HandleAnnotation);

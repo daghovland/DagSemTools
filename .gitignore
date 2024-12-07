@@ -57,7 +57,7 @@ ManchesterAntlr/gen/
 /src/Rdf/bin/
 /test/Rdf.Unit.Tests/bin/
 /test/Rdf.Unit.Tests/obj/
-
+/test/Api.Tests/TestData/imf.owl
 .fake
 /.vscode/
 src/Api/bin

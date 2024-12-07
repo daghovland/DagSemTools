@@ -5,7 +5,7 @@
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
     Contact: hovlanddag@gmail.com
 *)
-namespace DagSemTools.Resource
+namespace DagSemTools.Ingress
 
 open System
 open IriTools
@@ -15,7 +15,6 @@ open IriTools
     [<Struct>]
     type public Resource =
         public Iri of iri:  IriReference
-        | NamedBlankNode of blankNode: string
         | AnonymousBlankNode of anon_blankNode: uint32
         | LiteralString of literal: string
         | BooleanLiteral of literalBool: bool
@@ -34,7 +33,6 @@ open IriTools
             override this.ToString() =
                 match this with
                 | Iri iri -> $"<(%A{iri})>"
-                | NamedBlankNode blankNode -> $"_:(%s{blankNode})"
                 | AnonymousBlankNode anon_blankNode -> $"_:(%u{anon_blankNode})"
                 | LiteralString literal -> $"(%s{literal})"
                 | BooleanLiteral literalBool -> match literalBool with

@@ -14,15 +14,12 @@
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
-
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
         <Platforms>AnyCPU</Platforms>
-
     </PropertyGroup>
 
     <ItemGroup>
@@ -34,23 +31,28 @@
         <Compile Include="Axioms.fs" />
         <Compile Include="Ontology.fs" />
     </ItemGroup>
+    
     <ItemGroup>
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\Resource\Resource.fsproj" />
+        <ProjectReference Include="..\Ingress\Ingress.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Resource" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
     </ItemGroup>
-
-
+    
     <ItemGroup>
         <None Update="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </None>
     </ItemGroup>
+
+    <ItemGroup>
+        <InternalsVisibleTo Include="RdfOwlTranslator.Tests" />
+    </ItemGroup>
+
 </Project>

@@ -12,7 +12,7 @@ using DagSemTools.Parser;
 using DagSemTools.Manchester.Parser;
 using Microsoft.FSharp.Collections;
 using DagSemTools.AlcTableau;
-using DagSemTools.Resource;
+using DagSemTools.Ingress;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;

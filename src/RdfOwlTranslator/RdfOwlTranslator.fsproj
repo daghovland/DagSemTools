@@ -7,10 +7,10 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.Resource</PackageId>
+        <PackageId>DagSemTools.RdfOwlTranslator</PackageId>
         <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
-        <Description>Represenation of Literals, Prefixes, IRIs etc.</Description>
+        <Description>Extracts axioms from Rdf into Owl Ontology</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -23,14 +23,20 @@
 
         <Platforms>AnyCPU</Platforms>
 
+        <RootNamespace>Rdf2Owl</RootNamespace>
+
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Resource.fs" />
+        <Compile Include="Ingress.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
+        <Compile Include="AxiomParser.fs" />
+        <Compile Include="ClassExpressionParser.fs" />
+        <Compile Include="Rdf2Owl.fs" />
+
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="IriTools" Version="2.2.0" />
@@ -38,14 +44,14 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <ProjectReference Include="..\Ingress\Ingress.fsproj" />
+        <ProjectReference Include="..\Rdf\Rdf.fsproj" />
+        <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
     </ItemGroup>
-
-    <ItemGroup>
-        <None Update="README.md">
-            <Pack>true</Pack>
-            <PackagePath>README.md</PackagePath>
-        </None>
-    </ItemGroup>
+    
 </Project>

@@ -1,0 +1,53 @@
+using FluentAssertions;
+using Xunit.Abstractions;
+
+namespace Api.Tests;
+using DagSemTools.Api;
+
+public class TestApiOntology(ITestOutputHelper output)
+{
+    TestUtils.TestOutputTextWriter outputWriter = new TestUtils.TestOutputTextWriter(output);
+
+
+    [Fact]
+    public void LoadEmptyOntologyWorks()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/empty.owl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+
+    }
+
+    [Fact]
+    public void LoadSubClassFromRestriction()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/subclass_of_restriction.owl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+
+    }
+
+
+    [Fact]
+    public void LoadInterection()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/intersection.owl.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+
+    }
+
+
+    [Fact]
+    public void LoadImfOntologyWorks()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/imf.owl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+
+    }
+}

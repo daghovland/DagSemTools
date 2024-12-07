@@ -1,7 +1,14 @@
-module OwlOntology.Ontology
-open Axioms
+(*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*)
+
+namespace DagSemTools.OwlOntology
+
 open IriTools
-open OwlOntology.Axioms
 
 type ontologyVersion =
         | UnNamedOntology
@@ -46,24 +53,24 @@ type Ontology(directlyImportsDocuments: directlyImportsDocument list, version: o
             
     let BuiltInDeclarations : Declaration list =
         let staticBuiltIns = [
-            Declaration.Declaration ([],ClassDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#Thing")))
-            Declaration.Declaration ([],ClassDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#Nothing")))
-            Declaration.Declaration ([],ObjectPropertyDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#topObjectProperty")))
-            Declaration.Declaration ([],ObjectPropertyDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#bottomObjectProperty")))
-            Declaration.Declaration ([],DataPropertyDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#bottomDataProperty")))
-            Declaration.Declaration ([],DataPropertyDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#topDataProperty")))
-            Declaration.Declaration ([],DatatypeDeclaration (Class.FullIri (IriReference "http://www.w3.org/2000/01/rdf-schema#Literal")))
-            Declaration.Declaration ([],AnnotationPropertyDeclaration (Class.FullIri (IriReference "TODO:: All built in annotation properties")))
+            Declaration ([],ClassDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#Thing")))
+            Declaration ([],ClassDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#Nothing")))
+            Declaration ([],ObjectPropertyDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#topObjectProperty")))
+            Declaration ([],ObjectPropertyDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#bottomObjectProperty")))
+            Declaration ([],DataPropertyDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#bottomDataProperty")))
+            Declaration ([],DataPropertyDeclaration (Class.FullIri (IriReference "http://www.w3.org/2002/07/owl#topDataProperty")))
+            Declaration ([],DatatypeDeclaration (Class.FullIri (IriReference "http://www.w3.org/2000/01/rdf-schema#Literal")))
+            Declaration ([],AnnotationPropertyDeclaration (Class.FullIri (IriReference "TODO:: All built in annotation properties")))
         ]
-        let datatypeBuiltIns = OWL2DatatypeMap |> List.map (fun x -> Declaration.Declaration ([],DatatypeDeclaration (Class.FullIri (IriReference x))))
-        let annotationBuiltIns = builtInAnnotationProperties |> List.map (fun x -> Declaration.Declaration ([],AnnotationPropertyDeclaration (Class.FullIri (IriReference x))))
+        let datatypeBuiltIns = OWL2DatatypeMap |> List.map (fun x -> Declaration ([],DatatypeDeclaration (Class.FullIri (IriReference x))))
+        let annotationBuiltIns = builtInAnnotationProperties |> List.map (fun x -> Declaration ([],AnnotationPropertyDeclaration (Class.FullIri (IriReference x))))
         List.concat [staticBuiltIns; datatypeBuiltIns; annotationBuiltIns]
                                                                   
         
     member this.DirectlyImportsDocuments = directlyImportsDocuments
     member this.Annotations = annotations
     
-    member this.Axioms = List.concat [axioms; BuiltInDeclarations |> List.map Axiom.Declaration] 
+    member this.Axioms = List.concat [axioms; BuiltInDeclarations |> List.map Axiom.AxiomDeclaration] 
     member this.Version = version
     
     member this.TryGetOntologyVersionIri() =

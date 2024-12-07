@@ -7,8 +7,7 @@
 *)
 namespace DagSemTools.Rdf
 
-open IriTools
-open DagSemTools.Resource
+open DagSemTools.Ingress
 
 module Ingress =
     type ResourceId = uint32
@@ -16,6 +15,8 @@ module Ingress =
     type QuadListIndex = uint
         
     [<Struct>]
+    [<StructuralEquality>]
+    [<NoComparison>]
     type Triple = {
             subject: ResourceId
             predicate: ResourceId
@@ -23,19 +24,36 @@ module Ingress =
         }
         
     [<Struct>]
+    [<StructuralEquality>]
+    [<NoComparison>]
     type Quad = {
             tripleId: ResourceId
             subject: ResourceId
             predicate: ResourceId
             obj: ResourceId
-        }
+        } with
+        override this.ToString() =
+            sprintf "%A: (%A, %A, %A)"
+                this.tripleId
+                this.subject 
+                this.predicate 
+                this.obj
+    
     
     [<Struct>]
+    [<StructuralEquality>]
+    [<NoComparison>]
     type TripleResource = {
             subject: Resource
             predicate: Resource
             obj: Resource
-    }
+    } with
+        override this.ToString() =
+            sprintf "(%A, %A, %A)" 
+                this.subject 
+                this.predicate 
+                this.obj
+    
     
       
     let doubleArraySize (originalArray: 'T array) : 'T array =
@@ -44,6 +62,22 @@ module Ingress =
         Array.blit originalArray 0 newArray 0 originalArray.Length
         newArray    
     
+    (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
+    let tryGetNonNegativeIntegerLiteral res =
+        match res with
+                    | Resource.IntegerLiteral nn -> Some nn
+                    | Resource.TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [Namespaces.XsdInt ; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger] ) -> nn |> int |> Some                              
+                    | x -> None
+    
+    (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
+    let tryGetBoolLiteral res =
+        match res with
+                    | Resource.BooleanLiteral nn -> Some nn
+                    | Resource.TypedLiteral (tp, nn) when (tp.ToString() = Namespaces.XsdBoolean) -> Some (match nn with
+                                                                                                           | "true" -> true
+                                                                                                           | "false" -> false
+                                                                                                           | x -> failwith $"Invalid use of xsd:boolean on value {x}")
+                    | _ -> None
     
   
     

@@ -1,5 +1,6 @@
 using DagSemTools.Api;
 using DagSemTools.Rdf;
+using DagSemTools.Ingress;
 using IriTools;
 using FluentAssertions;
 using Xunit.Abstractions;

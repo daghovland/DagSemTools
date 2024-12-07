@@ -6,22 +6,14 @@
     Contact: hovlanddag@gmail.com
 */
 
-using Antlr4.Runtime.Misc;
 using DagSemTools.AlcTableau;
-using DagSemTools.Resource;
-using Microsoft.FSharp.Collections;
+using DagSemTools.Ingress;
 using TestUtils;
 using Xunit.Abstractions;
+using FluentAssertions;
+using IriTools;
 
 namespace DagSemTools.Manchester.Parser.Unit.Tests;
-using Antlr4;
-using Antlr4.Runtime;
-using Antlr4.Runtime.Tree;
-using DagSemTools.ManchesterAntlr;
-using FluentAssertions;
-using DagSemTools;
-using IriTools;
-using Manchester.Parser;
 
 public class TestParser
 {

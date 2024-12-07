@@ -11,10 +11,9 @@
     Dotnet representation of OWL 2, as specified in https://www.w3.org/TR/2012/REC-owl2-syntax-20121211
 *)
 
-module OwlOntology.Axioms
+namespace DagSemTools.OwlOntology
 
-open System
-open DagSemTools.Resource
+open DagSemTools.Ingress
 open IriTools
 
     type Iri = 
@@ -23,7 +22,7 @@ open IriTools
         | PrefixedIri of PrefixName : string * LocalName : string
     
     type Individual =
-        | NamedIndividual of IriReference
+        | NamedIndividual of Iri
         | AnonymousIndividual of uint32
     
     type AnnotationProperty = Iri
@@ -33,9 +32,9 @@ open IriTools
     type Class = Iri
     
     type AnnotationValue =
-        Individual of Individual
-        | Literal of Resource
-        | Iri of Iri
+        IndividualAnnotation of Individual
+        | LiteralAnnotation of Resource
+        | IriAnnotation of Iri
         
     type Annotation = AnnotationProperty * AnnotationValue
         
@@ -46,7 +45,7 @@ open IriTools
         | AnnotationPropertyRange of Annotation list * AnnotationProperty * Iri
         
     type DataRange =
-        Datatype of Datatype
+        NamedDataRange of Datatype
         | DataIntersectionOf of DataRange list
         | DataUnionOf of DataRange list
         | DataComplementOf of DataRange
@@ -54,7 +53,8 @@ open IriTools
         | DatatypeRestriction of Datatype * (DataProperty * Resource) list
         
     type ObjectPropertyExpression =
-        | ObjectProperty of IriReference
+        | NamedObjectProperty of ObjectProperty
+        | AnonymousObjectProperty of uint32
         | InverseObjectProperty of ObjectPropertyExpression
         | ObjectPropertyChain of ObjectPropertyExpression list
         
@@ -64,7 +64,8 @@ open IriTools
     
        
     type ClassExpression =
-        Class of Class
+        ClassName of Class
+        | AnonymousClass of uint32
         | ObjectUnionOf of ClassExpression list
         | ObjectIntersectionOf of ClassExpression list
         | ObjectComplementOf of ClassExpression
@@ -73,15 +74,21 @@ open IriTools
         | ObjectAllValuesFrom of ObjectPropertyExpression * ClassExpression
         | ObjectHasValue of ObjectPropertyExpression * Individual
         | ObjectHasSelf of ObjectPropertyExpression
-        | ObjectMinCardinality of int * ObjectPropertyExpression * ClassExpression
-        | ObjectMaxCardinality of int * ObjectPropertyExpression * ClassExpression
-        | ObjectExactCardinality of int * ObjectPropertyExpression * ClassExpression
+        | ObjectMinQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
+        | ObjectMaxQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
+        | ObjectExactQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
+        | ObjectExactCardinality of int * ObjectPropertyExpression 
+        | ObjectMinCardinality of int * ObjectPropertyExpression
+        | ObjectMaxCardinality of int * ObjectPropertyExpression
         | DataSomeValuesFrom of DataProperty list * DataRange
         | DataAllValuesFrom of DataProperty list * DataRange
         | DataHasValue of DataProperty * Resource
-        | DataMinCardinality of int * DataProperty * DataRange list
-        | DataMaxCardinality of int * DataProperty * DataRange list
-        | DataExactCardinality of int * DataProperty * DataRange list
+        | DataMinQualifiedCardinality of int * DataProperty * DataRange
+        | DataMaxQualifiedCardinality of int * DataProperty * DataRange
+        | DataExactQualifiedCardinality of int * DataProperty * DataRange
+        | DataMinCardinality of int * DataProperty
+        | DataMaxCardinality of int * DataProperty
+        | DataExactCardinality of int * DataProperty
 
     type ObjectPropertyAxiom =
         | ObjectPropertyDomain of ObjectPropertyExpression * ClassExpression
@@ -123,7 +130,6 @@ open IriTools
         | NegativeObjectPropertyAssertion of Annotation list * ObjectPropertyExpression * Individual * Individual
         | DataPropertyAssertion of Annotation list * DataProperty * Individual * Resource
         | NegativeDataPropertyAssertion of Annotation list * DataProperty * Individual * Resource
-        
     
     type Entity =
         | ClassDeclaration of Class
@@ -133,15 +139,15 @@ open IriTools
         | AnnotationPropertyDeclaration of AnnotationProperty
         | NamedIndividualDeclaration of Individual
     
-    type Declaration = Declaration of Annotation list * Entity
+    type Declaration = Annotation list * Entity
     
     type Axiom =
-        Declaration of Declaration
-        | ClassAxiom of ClassAxiom
-        | ObjectPropertyAxiom of ObjectPropertyAxiom
-        | DataPropertyAxiom of DataPropertyAxiom
-        | DatatypeDefinition of Annotation list * Datatype * DataRange
-        | HasKey of Annotation list * ClassExpression * ObjectPropertyExpression list * DataProperty list
-        | Assertion of Assertion    
-        | AnnotationAxiom of AnnotationAxiom
+        AxiomDeclaration of Declaration
+        | AxiomClassAxiom of ClassAxiom
+        | AxiomObjectPropertyAxiom of ObjectPropertyAxiom
+        | AxiomDataPropertyAxiom of DataPropertyAxiom
+        | AxiomDatatypeDefinition of Annotation list * Datatype * DataRange
+        | AxiomHasKey of Annotation list * ClassExpression * ObjectPropertyExpression list * DataProperty list
+        | AxiomAssertion of Assertion    
+        | AxiomAnnotationAxiom of AnnotationAxiom
     

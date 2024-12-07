@@ -1,3 +1,11 @@
+(*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*)
+
 namespace DagSemTools.Rdf
 open Ingress
 
@@ -86,6 +94,8 @@ type TripleTable(tripleList: Triple array,
                 this.TripleCount <- nextTripleCount
                 ()
             
+        member this.Contains (triple : Triple) : bool =
+            this.ThreeKeysIndex.ContainsKey triple
         member this.GetTriplesWithSubject (subject: ResourceId) : Triple seq =
             match  (this.SubjectPredicateIndex.TryGetValue subject) with 
                                 |    true, subjMap -> subjMap |> Seq.collect (fun x -> x.Value) |> Seq.map this.GetTripleListEntry
@@ -123,3 +133,8 @@ type TripleTable(tripleList: Triple array,
                 |> Seq.where (fun triple ->  triple.obj = object)
         
        
+       member this.GetTriplesMentioning resource =
+           Seq.concat [this.GetTriplesWithSubject(resource)
+                       this.GetTriplesWithPredicate(resource)
+                       this.GetTriplesWithObject(resource)]
+           

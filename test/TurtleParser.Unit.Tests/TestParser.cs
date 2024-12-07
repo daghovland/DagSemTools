@@ -1,6 +1,12 @@
-using DagSemTools;
+/*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*/
 using DagSemTools.Rdf;
-using DagSemTools.Resource;
+using DagSemTools.Ingress;
 using DagSemTools.Turtle.Parser;
 using FluentAssertions;
 using IriTools;
@@ -315,10 +321,27 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ontology = File.ReadAllText("TestData/collections.ttl");
         var ont = TestOntology(ontology);
         ont.Triples.TripleCount.Should().Be(8);
-        ont.GetTriplesWithObject(ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfNil))))
+        var rdfNilId = ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfNil)));
+        ont.GetTriplesWithObject(rdfNilId)
             .Should().HaveCount(2);
         ont.GetTriplesWithPredicate(ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfFirst))))
             .Should().HaveCount(3);
+        var listRestId = ont.GetResourceId(Resource.NewIri((new IriReference(Namespaces.RdfRest))));
+
+        var emptyListTriple = ont.GetTriplesWithSubject(
+            ont.GetResourceId(Resource.NewIri(new IriReference("http://example.org/foo/subject2")))).Single();
+        emptyListTriple.obj.Should().Be(rdfNilId);
+
+        var listTriple = ont.GetTriplesWithSubject(
+            ont.GetResourceId(Resource.NewIri(new IriReference("http://example.org/foo/subject1")))).Single();
+        var listHead = listTriple.obj;
+        var headTriples = ont.GetTriplesWithSubject(listHead);
+        headTriples.Should().HaveCount(2);
+        var secondListElement = ont.GetTriplesWithSubjectPredicate(listHead, listRestId).Single().obj;
+        var thirdListElement = ont.GetTriplesWithSubjectPredicate(secondListElement, listRestId).Single().obj;
+        var endListElement = ont.GetTriplesWithSubjectPredicate(thirdListElement, listRestId).Single().obj;
+        endListElement.Should().Be(rdfNilId);
+
     }
 
 

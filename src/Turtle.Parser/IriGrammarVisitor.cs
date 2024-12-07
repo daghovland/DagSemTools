@@ -5,13 +5,10 @@
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
     Contact: hovlanddag@gmail.com
 */
-
-using System.Globalization;
-using Microsoft.FSharp.Collections;
-using DagSemTools.Rdf;
-using DagSemTools.Resource;
-
 namespace DagSemTools.Turtle.Parser;
+
+using Microsoft.FSharp.Collections;
+using DagSemTools.Ingress;
 using System.Collections.Generic;
 using IriTools;
 using static TurtleDocParser;

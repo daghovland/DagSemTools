@@ -6,10 +6,8 @@
     Contact: hovlanddag@gmail.com
 */
 
-using System.Globalization;
 using Microsoft.FSharp.Collections;
-using DagSemTools.Rdf;
-using DagSemTools.Resource;
+using DagSemTools.Ingress;
 
 namespace DagSemTools.Datalog.Parser;
 using System.Collections.Generic;

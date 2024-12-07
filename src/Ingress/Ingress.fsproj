@@ -7,10 +7,10 @@
         <PackageReadMeFile>README.md</PackageReadMeFile>
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.AlcTableau</PackageId>
+        <PackageId>DagSemTools.Ingress</PackageId>
         <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
-        <Description>For acyclic ALC ontologies</Description>
+        <Description>Represenation of Literals, Prefixes, IRIs etc.</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
@@ -20,39 +20,30 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        
+
         <Platforms>AnyCPU</Platforms>
-        
+
+        <RootNamespace>Resource</RootNamespace>
+
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="MapUtils.fs" />
-        <Compile Include="ALC.fs" />
-        <Compile Include="NNF.fs" />
-        <Compile Include="Tableau.fs" />
-        <Compile Include="DataRange.fs" />
-        <Compile Include="ReasonerService.fs" />
-        <Compile Include="QueryingService.fs" />
-        <Compile Include="ConjunctiveQuery.fs" />
-        <Compile Include="ConjunctiveQueryAnswer.fs" />
+        <Compile Include="Namespaces.fs" />
+        <Compile Include="Resource.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
     </ItemGroup>
-
     <ItemGroup>
-      <PackageReference Include="IriTools" Version="2.2.0" />
-      <PackageReference Update="FSharp.Core" Version="8.0.403" />
+        <PackageReference Include="IriTools" Version="2.2.0" />
+        <PackageReference Update="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\Ingress\Ingress.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
     </ItemGroup>
-
 
     <ItemGroup>
         <None Update="README.md">
