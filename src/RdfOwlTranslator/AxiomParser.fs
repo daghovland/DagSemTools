@@ -23,7 +23,8 @@ type AxiomParser (triples : TripleTable,
               annProps : Map<ResourceId, AnnotationProperty>,
               anns : ResourceId -> Annotation list,
               TryGetAnyPropertyAxiom: Annotation list -> ResourceId -> ResourceId -> (Annotation list -> ResourceId -> ObjectPropertyExpression -> Axiom) -> (Annotation list -> ResourceId -> DataProperty -> Axiom) ->(Annotation list -> ResourceId -> AnnotationProperty -> Axiom) -> Axiom,
-              TryGetDataOrObjectPropertyAxiom: ResourceId -> (ObjectPropertyExpression -> Axiom) -> (DataProperty -> Axiom) -> Axiom
+              TryGetDataOrObjectPropertyAxiom: ResourceId -> (ObjectPropertyExpression -> Axiom) -> (DataProperty -> Axiom) -> Axiom,
+              TryGetClassOrDataRangeAxiom: ResourceId -> (ClassExpression -> Axiom) -> (DataRange -> Axiom) -> Axiom
               ) =
     
     let tripleTable = triples
@@ -99,6 +100,13 @@ type AxiomParser (triples : TripleTable,
     let SubAnnotationPropertyAxiom  annotations superPropertyId objPropExpr =
          SubAnnotationPropertyOf (annotations, objPropExpr, FullIri ( tryGetResourceIri superPropertyId) )
         |> AxiomAnnotationAxiom
+    
+    let EquivalentClassAxiom objectExpression subjectExpression   =
+         EquivalentClasses ([], [subjectExpression; ClassExpressions objectExpression ])
+        |> AxiomClassAxiom
+    let rec EquivalentDataRangeAxiom  objectRange subjectRange =
+         AxiomDatatypeDefinition ([], subjectRange, DataRanges objectRange )
+    
     
     let EquivalentObjectPropertyAxiom annotations superPropertyId objPropExpr   =
          EquivalentObjectProperties (annotations, [objPropExpr; ObjectPropertyExpressions superPropertyId ])
@@ -189,14 +197,31 @@ type AxiomParser (triples : TripleTable,
                                                                                                                                | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
                                                                                     | Namespaces.OwlFunctionalProperty -> TryGetDataOrObjectPropertyAxiom triple.subject (FunctionalObjectPropertyAxiom (Annotations triple.subject))  (FunctionalDataPropertyAxiom (Annotations triple.subject) )
                                                                                                                                                 |> Some
+                                                                                    | Namespaces.OwlInverseFunctionalProperty -> InverseFunctionalObjectProperty ([], ObjectPropertyExpressions triple.subject)
+                                                                                                                                |> AxiomObjectPropertyAxiom
+                                                                                                                                |> Some
+                                                                                    | Namespaces.OwlReflexiveProperty -> ReflexiveObjectProperty ([], ObjectPropertyExpressions triple.subject)
+                                                                                                                                |> AxiomObjectPropertyAxiom
+                                                                                                                                |> Some
+                                                                                    | Namespaces.OwlIrreflexiveProperty -> IrreflexiveObjectProperty ([], ObjectPropertyExpressions triple.subject)
+                                                                                                                                |> AxiomObjectPropertyAxiom
+                                                                                                                                |> Some
+                                                                                    | Namespaces.OwlSymmetricProperty -> SymmetricObjectProperty ([], ObjectPropertyExpressions triple.subject)
+                                                                                                                                |> AxiomObjectPropertyAxiom
+                                                                                                                                |> Some
+                                                                                    | Namespaces.OwlAsymmetricProperty -> AsymmetricObjectProperty ([], ObjectPropertyExpressions triple.subject)
+                                                                                                                                |> AxiomObjectPropertyAxiom
+                                                                                                                                |> Some
+                                                                                    | Namespaces.OwlTransitiveProperty -> TransitiveObjectProperty ([], ObjectPropertyExpressions triple.subject)
+                                                                                                                                |> AxiomObjectPropertyAxiom
+                                                                                                                                |> Some
                                                                                     | _ -> None) 
                             | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf ([],
                                                                                   ClassExpressions triple.subject,
                                                                                   ClassExpressions triple.obj)
                                                            |> AxiomClassAxiom |> Some
-                            | Namespaces.OwlEquivalentClass -> ClassAxiom.EquivalentClasses ([], [ClassExpressions triple.subject
-                                                                                                  ClassExpressions triple.obj])
-                                                               |> AxiomClassAxiom |> Some
+                            | Namespaces.OwlEquivalentClass -> TryGetClassOrDataRangeAxiom triple.subject (EquivalentClassAxiom triple.obj) (EquivalentDataRangeAxiom triple.obj)
+                                                                |> Some
                             | Namespaces.OwlDisjointWith -> ClassAxiom.DisjointClasses ([], [ClassExpressions triple.subject; ClassExpressions triple.obj])
                                                                 |> AxiomClassAxiom |> Some
                             | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion ([], tryGetResourceClass triple.subject, triple.obj

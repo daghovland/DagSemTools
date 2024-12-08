@@ -255,7 +255,14 @@ type ClassExpressionParser (triples : TripleTable,
         match DataRanges.TryGetValue propResourceId with
         | true, prop -> prop
         | false, _ -> failwith $"Invalid OWL ontology: {resources.GetResource propResourceId} used  as a data range but not declared"
-                      
+        
+    (* This is aalled when resourceId can be a class or data range *)
+    let tryGetClassOrDataRangeAxiom  resourceId classDeclarer datatypeDeclarer =
+        match (ClassExpressions.TryGetValue resourceId, DataRanges.TryGetValue resourceId) with
+        | ((true, expr), (false, _)) -> classDeclarer expr
+        | ((false, _), (true, expr)) -> datatypeDeclarer expr
+        | _ -> failwith $"Invalid OWL Ontology. {GetResourceInfoForErrorMessage resourceId} must be declared as either data range or class expression"
+                
     (* These are called whenever setting CE, OPE, DPE, DR and AP
         These cannot be redefined, as this is an error *)
     let trySetClassExpression x expression =
@@ -686,4 +693,5 @@ type ClassExpressionParser (triples : TripleTable,
                         AnnotationProperties,
                         getAnnotations,
                         tryGetAnyPropertyAxiom,
-                        tryGetPropertyDeclaration)
+                        tryGetPropertyDeclaration,
+                        tryGetClassOrDataRangeAxiom)

@@ -111,6 +111,16 @@ module Namespaces =
     [<Literal>]
     let OwlInverseFunctionalProperty = Owl + "InverseFunctionalProperty"
     [<Literal>]
+    let OwlReflexiveProperty = Owl + "ReflexiveProperty"
+    [<Literal>]
+    let OwlIrreflexiveProperty = Owl + "IrreflexiveProperty"
+    [<Literal>]
+    let OwlSymmetricProperty = Owl + "SymmetricProperty"
+    [<Literal>]
+    let OwlAsymmetricProperty = Owl + "AsymmetricProperty"
+    [<Literal>]
+    let OwlTransitiveProperty = Owl + "TransitiveProperty"
+    [<Literal>]
     let OwlDisjointWith = Owl + "disjointWith"
     [<Literal>]
     let OwlDisjointUnionOf = Owl + "disjointUnionOf"
