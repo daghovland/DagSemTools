@@ -14,16 +14,16 @@ jobs:
     timeout-minutes: 10
 
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
       - name: Install Apache Jena
         run: |
           sudo apt-get update
           sudo apt-get install -y openjdk-21-jre-headless
           wget https://dlcdn.apache.org/jena/binaries/apache-jena-5.2.0.tar.gz
           tar -xzf apache-jena-5.2.0.tar.gz
-
-      - name: Checkout code
-        uses: actions/checkout@v4
-
+          
       - name: Download external test files
         run: |
           parallel ::: \
