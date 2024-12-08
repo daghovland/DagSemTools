@@ -21,7 +21,7 @@ type AxiomParser (triples : TripleTable,
               dataProps: ResourceId -> DataProperty,
               annProps : Map<ResourceId, AnnotationProperty>,
               anns : ResourceId -> Annotation list,
-              TryGetAnyPropertyAxiom: ResourceId -> (ObjectPropertyExpression -> Axiom) -> (DataProperty -> Axiom) ->(AnnotationProperty -> Axiom) -> Axiom
+              TryGetAnyPropertyAxiom: Annotation list -> ResourceId -> ResourceId -> (Annotation list -> ResourceId -> ObjectPropertyExpression -> Axiom) -> (Annotation list -> ResourceId -> DataProperty -> Axiom) ->(Annotation list -> ResourceId -> AnnotationProperty -> Axiom) -> Axiom
               ) =
     
     let tripleTable = triples
@@ -66,7 +66,13 @@ type AxiomParser (triples : TripleTable,
         match getResourceIri resourceId with
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used compulsory IRI position"
-
+       
+    let GetResourceInfoForErrorMessage(subject: ResourceId) : string =
+           tripleTable.GetTriplesMentioning subject
+            |> Seq.map resources.GetResourceTriple
+            |> Seq.map _.ToString()
+            |> String.concat ". \n"
+ 
     
     let tryGetResourceClass resourceId =
         match getResourceClass resourceId with
@@ -91,11 +97,11 @@ type AxiomParser (triples : TripleTable,
             acc
         else
             let head = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
-                        | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                        | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
                         | [headElement] -> headElement.obj
-                        | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                        | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
             if (Seq.contains head acc) then
-                failwith $"Invalid list defined at {resources.GetResource(listId)}"
+                failwith $"Invalid cyclic list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
             else
                 let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfRestId) |> Seq.toList with
                             | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
@@ -105,24 +111,35 @@ type AxiomParser (triples : TripleTable,
     let GetRdfListElements listId=
         _GetRdfListElements listId []    
     
-    let ObjectPropertyDomainAxiom range objPropExpr =
-         ObjectPropertyDomain (objPropExpr, ClassExpressions range )
+    let SubObjectPropertyAxiom annotations superPropertyId objPropExpr   =
+         SubObjectPropertyOf (annotations, (SubObjectPropertyExpression objPropExpr), ObjectPropertyExpressions superPropertyId )
         |> AxiomObjectPropertyAxiom
-    let DataPropertyDomainAxiom range objPropExpr =
-         DataPropertyDomain ([], objPropExpr, ClassExpressions range )
+    let SubDataPropertyAxiom  annotations superPropertyId objPropExpr =
+         SubDataPropertyOf (annotations, objPropExpr, DataPropertyExpressions superPropertyId )
         |> AxiomDataPropertyAxiom
-    let AnnotationPropertyDomainAxiom range objPropExpr =
-         AnnotationPropertyDomain ([], objPropExpr, FullIri ( tryGetResourceIri range) )
+    let SubAnnotationPropertyAxiom  annotations superPropertyId objPropExpr =
+         SubAnnotationPropertyOf (annotations, objPropExpr, FullIri ( tryGetResourceIri superPropertyId) )
         |> AxiomAnnotationAxiom
     
-    let ObjectPropertyRangeAxiom range objPropExpr =
+    
+    let ObjectPropertyDomainAxiom  annotations range objPropExpr =
+         ObjectPropertyDomain (objPropExpr, ClassExpressions range )
+        |> AxiomObjectPropertyAxiom
+    let DataPropertyDomainAxiom  annotations range objPropExpr =
+         DataPropertyDomain (annotations, objPropExpr, ClassExpressions range )
+        |> AxiomDataPropertyAxiom
+    let AnnotationPropertyDomainAxiom  annotations range objPropExpr =
+         AnnotationPropertyDomain (annotations, objPropExpr, FullIri ( tryGetResourceIri range) )
+        |> AxiomAnnotationAxiom
+    
+    let ObjectPropertyRangeAxiom  annotations range objPropExpr =
          ObjectPropertyRange (objPropExpr, ClassExpressions range )
         |> AxiomObjectPropertyAxiom
-    let DataPropertyRangeAxiom range objPropExpr =
-         DataPropertyRange ([], objPropExpr, DataRanges range )
+    let DataPropertyRangeAxiom  annotations range objPropExpr =
+         DataPropertyRange (annotations, objPropExpr, DataRanges range )
         |> AxiomDataPropertyAxiom
-    let AnnotationPropertyRangeAxiom range objPropExpr =
-         AnnotationPropertyRange ([], objPropExpr, FullIri ( tryGetResourceIri range) )
+    let AnnotationPropertyRangeAxiom  annotations range objPropExpr =
+         AnnotationPropertyRange ( annotations, objPropExpr, FullIri ( tryGetResourceIri range) )
         |> AxiomAnnotationAxiom
     
     (* This is an implementation of section 3.2.5 in https://www.w3.org/TR/owl2-mapping-to-rdf/#Analyzing_Declarations *)
@@ -192,10 +209,8 @@ type AxiomParser (triples : TripleTable,
                                                                 |> AxiomClassAxiom |> Some
                             | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion ([], tryGetResourceClass triple.subject, triple.obj |> GetRdfListElements |> List.map (ClassExpressions))
                                                                |> AxiomClassAxiom |> Some
-                            | Namespaces.RdfsSubPropertyOf -> SubObjectPropertyOf ([],
-                                                                                   triple.subject |> ObjectPropertyExpressions |> SubObjectPropertyExpression,
-                                                                                   ObjectPropertyExpressions triple.obj )
-                                                                |> AxiomObjectPropertyAxiom |> Some
+                            | Namespaces.RdfsSubPropertyOf -> TryGetAnyPropertyAxiom (Annotations triple.subject) triple.subject triple.obj SubObjectPropertyAxiom SubDataPropertyAxiom SubAnnotationPropertyAxiom
+                                                                 |> Some
                             | Namespaces.OwlPropertyChainAxiom -> SubObjectPropertyOf([],
                                                                                       triple.obj
                                                                                           |> GetRdfListElements
@@ -207,9 +222,9 @@ type AxiomParser (triples : TripleTable,
                                                                 |> AxiomObjectPropertyAxiom |> Some
                             | Namespaces.OwlPropertyDisjointWith -> DisjointObjectProperties([], [ObjectPropertyExpressions triple.subject; ObjectPropertyExpressions triple.obj])
                                                                     |> AxiomObjectPropertyAxiom |> Some
-                            | Namespaces.RdfsDomain -> TryGetAnyPropertyAxiom triple.subject (ObjectPropertyDomainAxiom triple.obj) (DataPropertyDomainAxiom triple.obj) (AnnotationPropertyDomainAxiom triple.obj)
+                            | Namespaces.RdfsDomain -> TryGetAnyPropertyAxiom (Annotations triple.subject) triple.subject triple.obj ObjectPropertyDomainAxiom DataPropertyDomainAxiom AnnotationPropertyDomainAxiom
                                                        |> Some
-                            | Namespaces.RdfsRange -> TryGetAnyPropertyAxiom triple.subject (ObjectPropertyRangeAxiom triple.obj) (DataPropertyRangeAxiom triple.obj) (AnnotationPropertyRangeAxiom triple.obj)
+                            | Namespaces.RdfsRange -> TryGetAnyPropertyAxiom (Annotations triple.subject) triple.subject triple.obj ObjectPropertyRangeAxiom DataPropertyRangeAxiom AnnotationPropertyRangeAxiom
                                                        |> Some
                             | _ -> None)
     

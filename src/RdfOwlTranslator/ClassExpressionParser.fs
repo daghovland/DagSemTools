@@ -250,14 +250,14 @@ type ClassExpressionParser (triples : TripleTable,
     (* This is called  when propResourceId can be an object-, data- or annotation-property
         and a declaration axiom is needed
         *)
-    let tryGetAnyPropertyAxiom propResourceId (objectDeclarer: ObjectPropertyExpression -> Axiom) (dataDeclarer: DataProperty -> Axiom) (annotationDeclarer : AnnotationProperty -> Axiom) =
+    let tryGetAnyPropertyAxiom annotationList propResourceId rangeResourceId (objectDeclarer: Annotation list -> ResourceId -> ObjectPropertyExpression -> Axiom) (dataDeclarer: Annotation list -> ResourceId -> DataProperty -> Axiom) (annotationDeclarer : Annotation list -> ResourceId -> AnnotationProperty -> Axiom) =
         match (ObjectPropertyExpressions.TryGetValue propResourceId, DataPropertyExpressions.TryGetValue propResourceId, AnnotationProperties.TryGetValue propResourceId) with
         | ((true, _), (true, _), _) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property: {GetResourceInfoForErrorMessage propResourceId}"
         | ((true, _), _, (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as annotation and object property: {GetResourceInfoForErrorMessage propResourceId}"
         | (_, (true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and annotation property: {GetResourceInfoForErrorMessage propResourceId}"
-        | ((true, expr), (false,_), (false, _)) -> objectDeclarer expr 
-        | ((false, _), (true,expr), (false, _)) -> dataDeclarer expr
-        | ((false, _), (false,_), (true, expr)) -> annotationDeclarer expr
+        | ((true, expr), (false,_), (false, _)) -> objectDeclarer annotationList rangeResourceId expr 
+        | ((false, _), (true,expr), (false, _)) -> dataDeclarer annotationList rangeResourceId expr
+        | ((false, _), (false,_), (true, expr)) -> annotationDeclarer annotationList rangeResourceId expr
         | ((false, _), (false, _), (false,_)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an annotation property, object property or datatype property: {GetResourceInfoForErrorMessage propResourceId}"
     
     
