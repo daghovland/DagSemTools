@@ -50,9 +50,6 @@ type AxiomParser (triples : TripleTable,
     let owlAnnTargetId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
     let owlInvObjPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
     let subClassPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
-    let rdfNilId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfNil)))
-    let rdfFirstId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfFirst)))
-    let rdfRestId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfRest)))
     let getResourceIri (resourceId : Ingress.ResourceId) : IriReference option =
         match resources.GetResource(resourceId) with 
             | Resource.Iri iri -> Some iri
@@ -87,30 +84,6 @@ type AxiomParser (triples : TripleTable,
         | true, decl -> decl
     
         
-    
-    (* Extracts an RDF list. See Table 3 in https://www.w3.org/TR/owl2-mapping-to-rdf/
-        Assumes head is the head of some rdf list in the triple-table
-        The requirements in the specs includes non-circular lists, so blindly assumes this is true
-     *)
-    let rec _GetRdfListElements listId acc  =
-        if (listId = rdfNilId) then
-            acc
-        else
-            let head = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
-                        | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
-                        | [headElement] -> headElement.obj
-                        | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
-            let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfRestId) |> Seq.toList with
-                            | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                            | [headElement] -> headElement.obj
-                            | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-            if (Seq.contains (head, rest) acc) then
-                failwith $"Invalid cyclic list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
-            else
-                _GetRdfListElements rest ((head, rest) :: acc)     
-    let GetRdfListElements listId=
-        _GetRdfListElements listId []
-        |> List.map fst
     
     let SubObjectPropertyAxiom annotations superPropertyId objPropExpr   =
          SubObjectPropertyOf (annotations, (SubObjectPropertyExpression objPropExpr), ObjectPropertyExpressions superPropertyId )
@@ -186,7 +159,7 @@ type AxiomParser (triples : TripleTable,
                                                                                                                            | [] -> None
                                                                                                                            | [disjointList] ->  ClassAxiom.DisjointClasses (Annotations triple.subject,
                                                                                                                                                                             disjointList.obj
-                                                                                                                                                                                |> GetRdfListElements
+                                                                                                                                                                                |> Ingress.GetRdfListElements tripleTable resources
                                                                                                                                                                                 |> List.map (ClassExpressions)
                                                                                                                                                                             )
                                                                                                                                                     |> AxiomClassAxiom
@@ -194,7 +167,9 @@ type AxiomParser (triples : TripleTable,
                                                                                                                            | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
                                                                                     | Namespaces.OwlAllDisjointProperties -> (match tripleTable.GetTriplesWithSubjectPredicate(triple.subject, owlMembersId) |> Seq.toList with
                                                                                                                                | [] -> None
-                                                                                                                               | [disjointList] ->  DisjointObjectProperties (Annotations triple.subject, disjointList.obj |> GetRdfListElements |> List.map (ObjectPropertyExpressions))
+                                                                                                                               | [disjointList] ->  DisjointObjectProperties (Annotations triple.subject, disjointList.obj
+                                                                                                                                                                              |> Ingress.GetRdfListElements tripleTable resources
+                                                                                                                                                                              |> List.map (ObjectPropertyExpressions))
                                                                                                                                                         |> AxiomObjectPropertyAxiom
                                                                                                                                                         |> Some
                                                                                                                                | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
@@ -208,13 +183,15 @@ type AxiomParser (triples : TripleTable,
                                                                |> AxiomClassAxiom |> Some
                             | Namespaces.OwlDisjointWith -> ClassAxiom.DisjointClasses ([], [ClassExpressions triple.subject; ClassExpressions triple.obj])
                                                                 |> AxiomClassAxiom |> Some
-                            | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion ([], tryGetResourceClass triple.subject, triple.obj |> GetRdfListElements |> List.map (ClassExpressions))
+                            | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion ([], tryGetResourceClass triple.subject, triple.obj
+                                                                                                                                 |> Ingress.GetRdfListElements tripleTable resources
+                                                                                                                                 |> List.map (ClassExpressions))
                                                                |> AxiomClassAxiom |> Some
                             | Namespaces.RdfsSubPropertyOf -> TryGetAnyPropertyAxiom (Annotations triple.subject) triple.subject triple.obj SubObjectPropertyAxiom SubDataPropertyAxiom SubAnnotationPropertyAxiom
                                                                  |> Some
                             | Namespaces.OwlPropertyChainAxiom -> SubObjectPropertyOf([],
                                                                                       triple.obj
-                                                                                          |> GetRdfListElements
+                                                                                          |> Ingress.GetRdfListElements tripleTable resources
                                                                                           |> List.map (ObjectPropertyExpressions)
                                                                                           |> subPropertyExpression.PropertyExpressionChain,
                                                                                       ObjectPropertyExpressions triple.subject)

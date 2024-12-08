@@ -80,38 +80,11 @@ type ClassExpressionParser (triples : TripleTable,
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used compulsory IRI position"
 
-    
     let tryGetResourceClass resourceId =
         match getResourceClass resourceId with
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used on class position"
 
-    
-        (* Extracts an RDF list. See Table 3 in https://www.w3.org/TR/owl2-mapping-to-rdf/
-        Assumes head is the head of some rdf list in the triple-table
-        The requirements in the specs includes non-circular lists, so blindly assumes this is true
-     *)
-    let rec _GetRdfListElements listId acc : ResourceId list =
-        if (listId = rdfNilId) then
-            acc
-        else
-            let head = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
-                        | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                        | [headElement] -> headElement.obj
-                        | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-            if (Seq.contains head acc) then
-                failwith $"Invalid list defined at {resources.GetResource(listId)}"
-            else
-                let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfRestId) |> Seq.toList with
-                            | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                            | [headElement] -> headElement.obj
-                            | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                _GetRdfListElements rest (head :: acc)     
-    let GetRdfListElements listId=
-        _GetRdfListElements listId []    
-
-    
-    
     (* Section 3.2.1 of https://www.w3.org/TR/owl2-mapping-to-rdf/#Mapping_from_RDF_Graphs_to_the_Structural_Specification*)
    
     (* This is for the set Decl from  the OWL2 specs, first part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
@@ -331,13 +304,13 @@ type ClassExpressionParser (triples : TripleTable,
         for classTriple in anonymousClassTriples do
             match (tryGetResourceIri classTriple.predicate).ToString()  with 
                     | Namespaces.OwlIntersectionOf ->
-                        let ys = GetRdfListElements classTriple.obj
+                        let ys = Ingress.GetRdfListElements tripleTable resources classTriple.obj
                         let yClassExpressions = ys |> List.map tryGetClassExpressions
                         let x = classTriple.subject
                         let classExpression = ObjectIntersectionOf yClassExpressions
                         trySetClassExpression x classExpression
                     | Namespaces.OwlUnionOf -> 
-                        let ys = GetRdfListElements classTriple.obj
+                        let ys = Ingress.GetRdfListElements tripleTable resources classTriple.obj
                         let yClassExpressions = ys |> List.map tryGetClassExpressions
                         let x = classTriple.subject
                         let classExpression = ObjectUnionOf yClassExpressions
@@ -349,7 +322,7 @@ type ClassExpressionParser (triples : TripleTable,
                         let classExpression = ObjectComplementOf yClassExpression
                         trySetClassExpression x classExpression
                     | Namespaces.OwlOneOf -> 
-                        let ys = GetRdfListElements classTriple.obj
+                        let ys = Ingress.GetRdfListElements tripleTable resources classTriple.obj
                         let ystars = ys
                                      |> List.map resources.GetResource
                                      |> List.map Ingress.tryGetIndividual
@@ -424,7 +397,7 @@ type ClassExpressionParser (triples : TripleTable,
     let parseValuesFromProperties dataValuesFromConstructor (restrictionTriples : Triple seq) =
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let ys = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertiesId) |> (_.obj)
-                    |> GetRdfListElements
+                    |> Ingress.GetRdfListElements tripleTable resources
                      |> List.map tryGetDataPropertyExpressions
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlAllValuesFromId) |> (_.obj)
         let restriction = dataValuesFromConstructor(ys, tryGetDataRange z)
