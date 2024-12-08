@@ -16,11 +16,15 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-
+        
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: 'temurin'
+          
       - name: Install Apache Jena
         run: |
-          sudo apt-get update
-          sudo apt-get install -y openjdk-21-jre-headless
           wget https://dlcdn.apache.org/jena/binaries/apache-jena-5.2.0.tar.gz
           tar -xzf apache-jena-5.2.0.tar.gz
           
