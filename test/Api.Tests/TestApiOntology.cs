@@ -31,7 +31,7 @@ public class TestApiOntology(ITestOutputHelper output)
 
 
     [Fact]
-    public void LoadInterection()
+    public void LoadIntersection()
     {
         var ontologyFileInfo = new FileInfo("TestData/intersection.owl.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
