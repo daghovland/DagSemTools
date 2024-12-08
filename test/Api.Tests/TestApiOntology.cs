@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using FluentAssertions;
 using Xunit.Abstractions;
 
@@ -52,7 +53,7 @@ public class TestApiOntology(ITestOutputHelper output)
     }
 
 
-    [Fact]
+    [Fact, Category("LongRunning")]
     public void LoadgeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");

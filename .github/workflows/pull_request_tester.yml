@@ -22,7 +22,10 @@ jobs:
         with:
           java-version: 17
           distribution: 'temurin'
-          
+
+      - name: Check Java version
+        run: java -version
+
       - name: Install Apache Jena
         run: |
           wget https://dlcdn.apache.org/jena/binaries/apache-jena-5.2.0.tar.gz
