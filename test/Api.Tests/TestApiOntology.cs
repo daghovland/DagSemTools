@@ -50,8 +50,8 @@ public class TestApiOntology(ITestOutputHelper output)
         ont.GetAxioms().Should().NotBeEmpty();
 
     }
-    
-    
+
+
     [Fact]
     public void LoadgeneOntologyWorks()
     {
