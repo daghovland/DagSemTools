@@ -92,7 +92,7 @@ type AxiomParser (triples : TripleTable,
         Assumes head is the head of some rdf list in the triple-table
         The requirements in the specs includes non-circular lists, so blindly assumes this is true
      *)
-    let rec _GetRdfListElements listId acc : ResourceId list =
+    let rec _GetRdfListElements listId acc  =
         if (listId = rdfNilId) then
             acc
         else
@@ -100,16 +100,17 @@ type AxiomParser (triples : TripleTable,
                         | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
                         | [headElement] -> headElement.obj
                         | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
-            if (Seq.contains head acc) then
-                failwith $"Invalid cyclic list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
-            else
-                let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfRestId) |> Seq.toList with
+            let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfRestId) |> Seq.toList with
                             | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
                             | [headElement] -> headElement.obj
                             | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                _GetRdfListElements rest (head :: acc)     
+            if (Seq.contains (head, rest) acc) then
+                failwith $"Invalid cyclic list defined at {resources.GetResource(listId)}: {GetResourceInfoForErrorMessage listId}"
+            else
+                _GetRdfListElements rest ((head, rest) :: acc)     
     let GetRdfListElements listId=
-        _GetRdfListElements listId []    
+        _GetRdfListElements listId []
+        |> List.map fst
     
     let SubObjectPropertyAxiom annotations superPropertyId objPropExpr   =
          SubObjectPropertyOf (annotations, (SubObjectPropertyExpression objPropExpr), ObjectPropertyExpressions superPropertyId )
