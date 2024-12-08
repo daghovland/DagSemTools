@@ -210,9 +210,9 @@ type ClassExpressionParser (triples : TripleTable,
    
     
     (* This is called  when propResourceId can only be an object or data property
-        and a delaration is needed
+        and a delaration or axioms is needed
         *)
-    let tryGetPropertyDeclaration propResourceId (objectDeclarer: ObjectPropertyExpression -> ClassExpression) (dataDeclarer: DataProperty -> ClassExpression) =
+    let tryGetPropertyDeclaration propResourceId (objectDeclarer) (dataDeclarer) =
         match (ObjectPropertyExpressions.TryGetValue propResourceId, DataPropertyExpressions.TryGetValue propResourceId) with
         | ((true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property: {GetResourceInfoForErrorMessage propResourceId}"
         | ((true, expr), (false,_)) -> objectDeclarer expr 
@@ -685,4 +685,5 @@ type ClassExpressionParser (triples : TripleTable,
                         tryGetDataPropertyExpressions,
                         AnnotationProperties,
                         getAnnotations,
-                        tryGetAnyPropertyAxiom)
+                        tryGetAnyPropertyAxiom,
+                        tryGetPropertyDeclaration)

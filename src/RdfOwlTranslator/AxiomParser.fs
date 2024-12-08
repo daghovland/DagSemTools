@@ -7,6 +7,7 @@
 *)
 namespace DagSemTools.RdfOwlTranslator
 
+open DagSemTools.Ingress.Namespaces
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Ingress
@@ -21,7 +22,8 @@ type AxiomParser (triples : TripleTable,
               dataProps: ResourceId -> DataProperty,
               annProps : Map<ResourceId, AnnotationProperty>,
               anns : ResourceId -> Annotation list,
-              TryGetAnyPropertyAxiom: Annotation list -> ResourceId -> ResourceId -> (Annotation list -> ResourceId -> ObjectPropertyExpression -> Axiom) -> (Annotation list -> ResourceId -> DataProperty -> Axiom) ->(Annotation list -> ResourceId -> AnnotationProperty -> Axiom) -> Axiom
+              TryGetAnyPropertyAxiom: Annotation list -> ResourceId -> ResourceId -> (Annotation list -> ResourceId -> ObjectPropertyExpression -> Axiom) -> (Annotation list -> ResourceId -> DataProperty -> Axiom) ->(Annotation list -> ResourceId -> AnnotationProperty -> Axiom) -> Axiom,
+              TryGetDataOrObjectPropertyAxiom: ResourceId -> (ObjectPropertyExpression -> Axiom) -> (DataProperty -> Axiom) -> Axiom
               ) =
     
     let tripleTable = triples
@@ -84,7 +86,10 @@ type AxiomParser (triples : TripleTable,
         | true, decl -> decl
     
         
-    
+    let FunctionalObjectPropertyAxiom annotations property =
+        FunctionalObjectProperty (annotations, property) |> AxiomObjectPropertyAxiom
+    let FunctionalDataPropertyAxiom annotations property =
+        FunctionalDataProperty (annotations, property) |> AxiomDataPropertyAxiom
     let SubObjectPropertyAxiom annotations superPropertyId objPropExpr   =
          SubObjectPropertyOf (annotations, (SubObjectPropertyExpression objPropExpr), ObjectPropertyExpressions superPropertyId )
         |> AxiomObjectPropertyAxiom
@@ -95,6 +100,14 @@ type AxiomParser (triples : TripleTable,
          SubAnnotationPropertyOf (annotations, objPropExpr, FullIri ( tryGetResourceIri superPropertyId) )
         |> AxiomAnnotationAxiom
     
+    let EquivalentObjectPropertyAxiom annotations superPropertyId objPropExpr   =
+         EquivalentObjectProperties (annotations, [objPropExpr; ObjectPropertyExpressions superPropertyId ])
+        |> AxiomObjectPropertyAxiom
+    let EquivalentDataPropertyAxiom  annotations superPropertyId objPropExpr =
+         EquivalentDataProperties (annotations, [objPropExpr; DataPropertyExpressions superPropertyId] )
+        |> AxiomDataPropertyAxiom
+    let EquivalentAnnotationPropertyAxiom  annotations superPropertyId objPropExpr =
+         failwith "Invalid OWL Ontology: owl:equivalentProperty cannot be used on annotation properties"
     
     let ObjectPropertyDomainAxiom  annotations range objPropExpr =
          ObjectPropertyDomain (objPropExpr, ClassExpressions range )
@@ -115,6 +128,7 @@ type AxiomParser (triples : TripleTable,
     let AnnotationPropertyRangeAxiom  annotations range objPropExpr =
          AnnotationPropertyRange ( annotations, objPropExpr, FullIri ( tryGetResourceIri range) )
         |> AxiomAnnotationAxiom
+    
     
     (* This is an implementation of section 3.2.5 in https://www.w3.org/TR/owl2-mapping-to-rdf/#Analyzing_Declarations *)
     member internal this.extractAxiom   (triple : Ingress.Triple) : Axiom option =
@@ -173,6 +187,8 @@ type AxiomParser (triples : TripleTable,
                                                                                                                                                         |> AxiomObjectPropertyAxiom
                                                                                                                                                         |> Some
                                                                                                                                | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
+                                                                                    | Namespaces.OwlFunctionalProperty -> TryGetDataOrObjectPropertyAxiom triple.subject (FunctionalObjectPropertyAxiom (Annotations triple.subject))  (FunctionalDataPropertyAxiom (Annotations triple.subject) )
+                                                                                                                                                |> Some
                                                                                     | _ -> None) 
                             | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf ([],
                                                                                   ClassExpressions triple.subject,
@@ -196,13 +212,18 @@ type AxiomParser (triples : TripleTable,
                                                                                           |> subPropertyExpression.PropertyExpressionChain,
                                                                                       ObjectPropertyExpressions triple.subject)
                                                                 |> AxiomObjectPropertyAxiom |> Some
-                            | Namespaces.OwlEquivalentProperty -> EquivalentObjectProperties([], [ObjectPropertyExpressions triple.subject; ObjectPropertyExpressions triple.obj])
-                                                                |> AxiomObjectPropertyAxiom |> Some
-                            | Namespaces.OwlPropertyDisjointWith -> DisjointObjectProperties([], [ObjectPropertyExpressions triple.subject; ObjectPropertyExpressions triple.obj])
+                            | Namespaces.OwlEquivalentProperty -> TryGetAnyPropertyAxiom (Annotations triple.subject) triple.subject triple.obj EquivalentObjectPropertyAxiom EquivalentDataPropertyAxiom EquivalentAnnotationPropertyAxiom
+                                                                  |> Some
+                            | Namespaces.OwlPropertyDisjointWith -> DisjointObjectProperties([], [ObjectPropertyExpressions triple.subject
+                                                                                                  ObjectPropertyExpressions triple.obj])
                                                                     |> AxiomObjectPropertyAxiom |> Some
                             | Namespaces.RdfsDomain -> TryGetAnyPropertyAxiom (Annotations triple.subject) triple.subject triple.obj ObjectPropertyDomainAxiom DataPropertyDomainAxiom AnnotationPropertyDomainAxiom
                                                        |> Some
                             | Namespaces.RdfsRange -> TryGetAnyPropertyAxiom (Annotations triple.subject) triple.subject triple.obj ObjectPropertyRangeAxiom DataPropertyRangeAxiom AnnotationPropertyRangeAxiom
                                                        |> Some
+                            | Namespaces.OwlObjectInverseOf -> InverseObjectProperties (Annotations triple.subject,
+                                                                                        ObjectPropertyExpressions triple.subject,
+                                                                                        ObjectPropertyExpressions triple.obj)
+                                                                |> AxiomObjectPropertyAxiom |> Some
                             | _ -> None)
     
