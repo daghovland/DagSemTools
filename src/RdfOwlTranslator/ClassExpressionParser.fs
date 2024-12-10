@@ -158,7 +158,7 @@ type ClassExpressionParser (triples : TripleTable,
         |> Seq.map (fun (id, iri) -> (id, NamedIndividual iri))
         |> Map.ofSeq
     
-    (* ANN *)
+    (* ANN: Section 3.2.2 and Table 10 in https://www.w3.org/TR/owl2-mapping-to-rdf/#ref-owl-2-specification *)
     let mutable Annotations : Map<ResourceId, Annotation list> =
         AnnotationProperties
         |> Map.toSeq
