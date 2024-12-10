@@ -214,11 +214,15 @@ type ClassExpressionParser (triples : TripleTable,
         *)
     let tryGetPropertyDeclaration propResourceId (objectDeclarer) (dataDeclarer) =
         match (ObjectPropertyExpressions.TryGetValue propResourceId, DataPropertyExpressions.TryGetValue propResourceId) with
-        | ((true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property: {GetResourceInfoForErrorMessage propResourceId}"
-        | ((true, expr), (false,_)) -> objectDeclarer expr 
-        | ((false, _), (true,expr)) -> dataDeclarer expr
-        | ((false, _), (false, _)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an object property or datatype property: {GetResourceInfoForErrorMessage propResourceId}"
+        | ((true, _), (true, _)) -> None 
+        | ((true, expr), (false,_)) -> Some (objectDeclarer expr) 
+        | ((false, _), (true,expr)) -> Some (dataDeclarer expr)
+        | ((false, _), (false, _)) -> None 
     
+    let RequireObjectOrDataPropDeclaration resourceId objectDeclarer dataDeclarer =
+        match tryGetPropertyDeclaration resourceId objectDeclarer dataDeclarer with
+        | Some ax -> ax
+        | None -> failwith $"Owl Invalid ontology. Property {resources.GetResource resourceId} must be declared as an object property or datatype property: {GetResourceInfoForErrorMessage resourceId}"
     
     (* This is called  when propResourceId can be an object-, data- or annotation-property
         and a declaration axiom is needed
@@ -260,8 +264,10 @@ type ClassExpressionParser (triples : TripleTable,
     let tryGetClassOrDataRangeAxiom  resourceId classDeclarer datatypeDeclarer =
         match (ClassExpressions.TryGetValue resourceId, DataRanges.TryGetValue resourceId) with
         | ((true, expr), (false, _)) -> classDeclarer expr
-        | ((false, _), (true, expr)) -> datatypeDeclarer expr
-        | _ -> failwith $"Invalid OWL Ontology. {GetResourceInfoForErrorMessage resourceId} must be declared as either data range or class expression"
+        | ((false, _), (true, expr)) -> match expr with
+                                            | DataRange.NamedDataRange dt -> datatypeDeclarer dt
+                                            | _ -> failwith $"Invalid OWL Ontology. Only datatypes can be defined. {resources.GetResource resourceId} is not a datatype"
+        | _ -> failwith $"Invalid OWL Ontology. {resources.GetResource resourceId} must be declared as either data range or class expression {GetResourceInfoForErrorMessage resourceId}"
                 
     (* These are called whenever setting CE, OPE, DPE, DR and AP
         These cannot be redefined, as this is an error *)
@@ -368,7 +374,7 @@ type ClassExpressionParser (triples : TripleTable,
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlSomeValueFromId) |> (_.obj)
         let objectSomeValuesFromCreator yExpr = ObjectSomeValuesFrom(yExpr, tryGetClassExpressions z)
         let dataSomeValuesFromCreator yExpr = DataSomeValuesFrom([yExpr], tryGetDataRange z)
-        let restriction = tryGetPropertyDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
+        let restriction = RequireObjectOrDataPropDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
         trySetClassExpression x restriction
 
     (* 
@@ -386,7 +392,7 @@ type ClassExpressionParser (triples : TripleTable,
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlAllValuesFromId) |> (_.obj)
         let objectSomeValuesFromCreator yExpr = ObjectAllValuesFrom(yExpr, tryGetClassExpressions z)
         let dataSomeValuesFromCreator yExpr = DataAllValuesFrom([yExpr], tryGetDataRange z)
-        let restriction = tryGetPropertyDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
+        let restriction = RequireObjectOrDataPropDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
         trySetClassExpression x restriction
     
     
@@ -454,7 +460,7 @@ type ClassExpressionParser (triples : TripleTable,
                 |> resources.GetResource
         let objectHasValueCreator yExpr = ObjectHasValue(yExpr, Ingress.tryGetIndividual z)
         let dataHasValueCreator yExpr = DataHasValue(yExpr, z)
-        let restriction = tryGetPropertyDeclaration y objectHasValueCreator dataHasValueCreator
+        let restriction = RequireObjectOrDataPropDeclaration y objectHasValueCreator dataHasValueCreator
         trySetClassExpression x restriction
         
     (* 

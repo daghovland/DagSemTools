@@ -35,8 +35,14 @@ module Ingress =
         | Resource.AnonymousBlankNode bn -> AnonymousIndividual bn
         | x -> failwith $"Invalid OWL Ontology: {x} attempted used as an individual. Only IRIs and blank nodes can be individuals"
         
-    
-           
+    let handleLiteralError x = failwith $"Invalid OWL Ontology: {x} attempted used as a literal. IRIs and blank nodes cannot be literals"
+    let tryGetLiteral res = 
+        match res with
+        | Resource.Iri iri -> handleLiteralError res
+        | Resource.AnonymousBlankNode bn -> handleLiteralError res
+        | _ -> res
+        
+        
     let GetResourceInfoForErrorMessage (tripleTable : TripleTable) (resources : ResourceManager) (subject: ResourceId) : string =
            tripleTable.GetTriplesMentioning subject
             |> Seq.map resources.GetResourceTriple

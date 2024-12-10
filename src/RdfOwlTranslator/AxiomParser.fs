@@ -12,6 +12,7 @@ open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Ingress
 open DagSemTools.OwlOntology
+open DagSemTools.RdfOwlTranslator.Ingress
 open IriTools
 
 type AxiomParser (triples : TripleTable,
@@ -23,8 +24,8 @@ type AxiomParser (triples : TripleTable,
               annProps : Map<ResourceId, AnnotationProperty>,
               anns : ResourceId -> Annotation list,
               TryGetAnyPropertyAxiom: Annotation list -> ResourceId -> ResourceId -> (Annotation list -> ResourceId -> ObjectPropertyExpression -> Axiom) -> (Annotation list -> ResourceId -> DataProperty -> Axiom) ->(Annotation list -> ResourceId -> AnnotationProperty -> Axiom) -> Axiom,
-              TryGetDataOrObjectPropertyAxiom: ResourceId -> (ObjectPropertyExpression -> Axiom) -> (DataProperty -> Axiom) -> Axiom,
-              TryGetClassOrDataRangeAxiom: ResourceId -> (ClassExpression -> Axiom) -> (DataRange -> Axiom) -> Axiom
+              TryGetDataOrObjectPropertyAxiom: ResourceId -> (ObjectPropertyExpression -> Axiom) -> (DataProperty -> Axiom) -> Axiom option,
+              TryGetClassOrDataRangeAxiom: ResourceId -> (ClassExpression -> Axiom) -> (Datatype -> Axiom) -> Axiom
               ) =
     
     let tripleTable = triples
@@ -58,6 +59,10 @@ type AxiomParser (triples : TripleTable,
             | Resource.Iri iri -> Some iri
             | _ -> None
         
+    let RequireDataOrObjectProperty resourceId objectPropDecl dataPropDecl =
+        match TryGetDataOrObjectPropertyAxiom resourceId objectPropDecl dataPropDecl with
+        | Some ax -> ax
+        | None -> failwith $"Invalid Owl Ontology {resources.GetResource resourceId} not correctly declared as exactly one data or object property: {GetResourceInfoForErrorMessage tripleTable resources resourceId}"
     
     let getResourceClass (resourceId : Ingress.ResourceId) : Class option =
         getResourceIri resourceId |> Option.map Class.FullIri
@@ -137,6 +142,12 @@ type AxiomParser (triples : TripleTable,
          AnnotationPropertyRange ( annotations, objPropExpr, FullIri ( tryGetResourceIri range) )
         |> AxiomAnnotationAxiom
     
+    let ObjectPropertyAssertionAxiom  subjectId objId predicate =
+         ObjectPropertyAssertion ([], predicate, Ingress.tryGetIndividual (resources.GetResource subjectId), Ingress.tryGetIndividual (resources.GetResource objId) )
+        |> AxiomAssertion
+    let DataPropertyAssertionAxiom   subjectId objId predicate =
+         DataPropertyAssertion ([], predicate, subjectId |> resources.GetResource |> tryGetIndividual, objId |> resources.GetResource |> tryGetLiteral )
+        |> AxiomAssertion
     
     (* This is an implementation of section 3.2.5 in https://www.w3.org/TR/owl2-mapping-to-rdf/#Analyzing_Declarations *)
     member internal this.extractAxiom   (triple : Ingress.Triple) : Axiom option =
@@ -195,7 +206,7 @@ type AxiomParser (triples : TripleTable,
                                                                                                                                                         |> AxiomObjectPropertyAxiom
                                                                                                                                                         |> Some
                                                                                                                                | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
-                                                                                    | Namespaces.OwlFunctionalProperty -> TryGetDataOrObjectPropertyAxiom triple.subject (FunctionalObjectPropertyAxiom (Annotations triple.subject))  (FunctionalDataPropertyAxiom (Annotations triple.subject) )
+                                                                                    | Namespaces.OwlFunctionalProperty -> RequireDataOrObjectProperty triple.subject (FunctionalObjectPropertyAxiom (Annotations triple.subject))  (FunctionalDataPropertyAxiom (Annotations triple.subject) )
                                                                                                                                                 |> Some
                                                                                     | Namespaces.OwlInverseFunctionalProperty -> InverseFunctionalObjectProperty ([], ObjectPropertyExpressions triple.subject)
                                                                                                                                 |> AxiomObjectPropertyAxiom
@@ -215,12 +226,15 @@ type AxiomParser (triples : TripleTable,
                                                                                     | Namespaces.OwlTransitiveProperty -> TransitiveObjectProperty ([], ObjectPropertyExpressions triple.subject)
                                                                                                                                 |> AxiomObjectPropertyAxiom
                                                                                                                                 |> Some
-                                                                                    | _ -> None) 
+                                                                                    | _ -> ClassAssertion ([],
+                                                                                                           ClassExpressions triple.obj,
+                                                                                                           (triple.subject |> resources.GetResource |> tryGetIndividual))
+                                                                                           |> AxiomAssertion |> Some)
                             | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf ([],
                                                                                   ClassExpressions triple.subject,
                                                                                   ClassExpressions triple.obj)
                                                            |> AxiomClassAxiom |> Some
-                            | Namespaces.OwlEquivalentClass -> TryGetClassOrDataRangeAxiom triple.subject (EquivalentClassAxiom triple.obj) (EquivalentDataRangeAxiom triple.obj)
+                            | Namespaces.OwlEquivalentClass -> TryGetClassOrDataRangeAxiom triple.obj (EquivalentClassAxiom triple.subject) (EquivalentDataRangeAxiom triple.subject)
                                                                 |> Some
                             | Namespaces.OwlDisjointWith -> ClassAxiom.DisjointClasses ([], [ClassExpressions triple.subject; ClassExpressions triple.obj])
                                                                 |> AxiomClassAxiom |> Some
@@ -250,5 +264,6 @@ type AxiomParser (triples : TripleTable,
                                                                                         ObjectPropertyExpressions triple.subject,
                                                                                         ObjectPropertyExpressions triple.obj)
                                                                 |> AxiomObjectPropertyAxiom |> Some
-                            | _ -> None)
+                            | _ -> TryGetDataOrObjectPropertyAxiom triple.predicate (ObjectPropertyAssertionAxiom triple.subject triple.obj) (DataPropertyAssertionAxiom triple.subject triple.obj))
+        
     
