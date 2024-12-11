@@ -11,4 +11,5 @@ ex:IntersectionClass
         a owl:Class ;
         owl:intersectionOf (ex:Class1 ex:Class2 )
     ] .
+ex:Class1 a owl:Class .
 

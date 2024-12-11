@@ -80,38 +80,11 @@ type ClassExpressionParser (triples : TripleTable,
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used compulsory IRI position"
 
-    
     let tryGetResourceClass resourceId =
         match getResourceClass resourceId with
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used on class position"
 
-    
-        (* Extracts an RDF list. See Table 3 in https://www.w3.org/TR/owl2-mapping-to-rdf/
-        Assumes head is the head of some rdf list in the triple-table
-        The requirements in the specs includes non-circular lists, so blindly assumes this is true
-     *)
-    let rec _GetRdfListElements listId acc : ResourceId list =
-        if (listId = rdfNilId) then
-            acc
-        else
-            let head = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfFirstId) |> Seq.toList with
-                        | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                        | [headElement] -> headElement.obj
-                        | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-            if (Seq.contains head acc) then
-                failwith $"Invalid list defined at {resources.GetResource(listId)}"
-            else
-                let rest = match tripleTable.GetTriplesWithSubjectPredicate(listId, rdfRestId) |> Seq.toList with
-                            | [] -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                            | [headElement] -> headElement.obj
-                            | _ -> failwith $"Invalid list defined at {resources.GetResource(listId)}"
-                _GetRdfListElements rest (head :: acc)     
-    let GetRdfListElements listId=
-        _GetRdfListElements listId []    
-
-    
-    
     (* Section 3.2.1 of https://www.w3.org/TR/owl2-mapping-to-rdf/#Mapping_from_RDF_Graphs_to_the_Structural_Specification*)
    
     (* This is for the set Decl from  the OWL2 specs, first part of table 7 in https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
@@ -185,7 +158,7 @@ type ClassExpressionParser (triples : TripleTable,
         |> Seq.map (fun (id, iri) -> (id, NamedIndividual iri))
         |> Map.ofSeq
     
-    (* ANN *)
+    (* ANN: Section 3.2.2 and Table 10 in https://www.w3.org/TR/owl2-mapping-to-rdf/#ref-owl-2-specification *)
     let mutable Annotations : Map<ResourceId, Annotation list> =
         AnnotationProperties
         |> Map.toSeq
@@ -237,27 +210,31 @@ type ClassExpressionParser (triples : TripleTable,
    
     
     (* This is called  when propResourceId can only be an object or data property
-        and a delaration is needed
+        and a delaration or axioms is needed
         *)
-    let tryGetPropertyDeclaration propResourceId (objectDeclarer: ObjectPropertyExpression -> ClassExpression) (dataDeclarer: DataProperty -> ClassExpression) =
+    let tryGetPropertyDeclaration propResourceId (objectDeclarer) (dataDeclarer) =
         match (ObjectPropertyExpressions.TryGetValue propResourceId, DataPropertyExpressions.TryGetValue propResourceId) with
-        | ((true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property: {GetResourceInfoForErrorMessage propResourceId}"
-        | ((true, expr), (false,_)) -> objectDeclarer expr 
-        | ((false, _), (true,expr)) -> dataDeclarer expr
-        | ((false, _), (false, _)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an object property or datatype property: {GetResourceInfoForErrorMessage propResourceId}"
+        | ((true, _), (true, _)) -> None 
+        | ((true, expr), (false,_)) -> Some (objectDeclarer expr) 
+        | ((false, _), (true,expr)) -> Some (dataDeclarer expr)
+        | ((false, _), (false, _)) -> None 
     
+    let RequireObjectOrDataPropDeclaration resourceId objectDeclarer dataDeclarer =
+        match tryGetPropertyDeclaration resourceId objectDeclarer dataDeclarer with
+        | Some ax -> ax
+        | None -> failwith $"Owl Invalid ontology. Property {resources.GetResource resourceId} must be declared as an object property or datatype property: {GetResourceInfoForErrorMessage resourceId}"
     
     (* This is called  when propResourceId can be an object-, data- or annotation-property
         and a declaration axiom is needed
         *)
-    let tryGetAnyPropertyAxiom propResourceId (objectDeclarer: ObjectPropertyExpression -> Axiom) (dataDeclarer: DataProperty -> Axiom) (annotationDeclarer : AnnotationProperty -> Axiom) =
+    let tryGetAnyPropertyAxiom annotationList propResourceId rangeResourceId (objectDeclarer: Annotation list -> ResourceId -> ObjectPropertyExpression -> Axiom) (dataDeclarer: Annotation list -> ResourceId -> DataProperty -> Axiom) (annotationDeclarer : Annotation list -> ResourceId -> AnnotationProperty -> Axiom) =
         match (ObjectPropertyExpressions.TryGetValue propResourceId, DataPropertyExpressions.TryGetValue propResourceId, AnnotationProperties.TryGetValue propResourceId) with
         | ((true, _), (true, _), _) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and object property: {GetResourceInfoForErrorMessage propResourceId}"
         | ((true, _), _, (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as annotation and object property: {GetResourceInfoForErrorMessage propResourceId}"
         | (_, (true, _), (true, _)) -> failwith $"Invalid Owl Ontology {resources.GetResource propResourceId} used both as data and annotation property: {GetResourceInfoForErrorMessage propResourceId}"
-        | ((true, expr), (false,_), (false, _)) -> objectDeclarer expr 
-        | ((false, _), (true,expr), (false, _)) -> dataDeclarer expr
-        | ((false, _), (false,_), (true, expr)) -> annotationDeclarer expr
+        | ((true, expr), (false,_), (false, _)) -> objectDeclarer annotationList rangeResourceId expr 
+        | ((false, _), (true,expr), (false, _)) -> dataDeclarer annotationList rangeResourceId expr
+        | ((false, _), (false,_), (true, expr)) -> annotationDeclarer annotationList rangeResourceId expr
         | ((false, _), (false, _), (false,_)) -> failwith $"Owl Invalid ontology. Property {resources.GetResource propResourceId} must be declared as an annotation property, object property or datatype property: {GetResourceInfoForErrorMessage propResourceId}"
     
     
@@ -282,7 +259,16 @@ type ClassExpressionParser (triples : TripleTable,
         match DataRanges.TryGetValue propResourceId with
         | true, prop -> prop
         | false, _ -> failwith $"Invalid OWL ontology: {resources.GetResource propResourceId} used  as a data range but not declared"
-                      
+        
+    (* This is aalled when resourceId can be a class or data range *)
+    let tryGetClassOrDataRangeAxiom  resourceId classDeclarer datatypeDeclarer =
+        match (ClassExpressions.TryGetValue resourceId, DataRanges.TryGetValue resourceId) with
+        | ((true, expr), (false, _)) -> classDeclarer expr
+        | ((false, _), (true, expr)) -> match expr with
+                                            | DataRange.NamedDataRange dt -> datatypeDeclarer dt
+                                            | _ -> failwith $"Invalid OWL Ontology. Only datatypes can be defined. {resources.GetResource resourceId} is not a datatype"
+        | _ -> failwith $"Invalid OWL Ontology. {resources.GetResource resourceId} must be declared as either data range or class expression {GetResourceInfoForErrorMessage resourceId}"
+                
     (* These are called whenever setting CE, OPE, DPE, DR and AP
         These cannot be redefined, as this is an error *)
     let trySetClassExpression x expression =
@@ -331,13 +317,13 @@ type ClassExpressionParser (triples : TripleTable,
         for classTriple in anonymousClassTriples do
             match (tryGetResourceIri classTriple.predicate).ToString()  with 
                     | Namespaces.OwlIntersectionOf ->
-                        let ys = GetRdfListElements classTriple.obj
+                        let ys = Ingress.GetRdfListElements tripleTable resources classTriple.obj
                         let yClassExpressions = ys |> List.map tryGetClassExpressions
                         let x = classTriple.subject
                         let classExpression = ObjectIntersectionOf yClassExpressions
                         trySetClassExpression x classExpression
                     | Namespaces.OwlUnionOf -> 
-                        let ys = GetRdfListElements classTriple.obj
+                        let ys = Ingress.GetRdfListElements tripleTable resources classTriple.obj
                         let yClassExpressions = ys |> List.map tryGetClassExpressions
                         let x = classTriple.subject
                         let classExpression = ObjectUnionOf yClassExpressions
@@ -349,7 +335,7 @@ type ClassExpressionParser (triples : TripleTable,
                         let classExpression = ObjectComplementOf yClassExpression
                         trySetClassExpression x classExpression
                     | Namespaces.OwlOneOf -> 
-                        let ys = GetRdfListElements classTriple.obj
+                        let ys = Ingress.GetRdfListElements tripleTable resources classTriple.obj
                         let ystars = ys
                                      |> List.map resources.GetResource
                                      |> List.map Ingress.tryGetIndividual
@@ -388,7 +374,7 @@ type ClassExpressionParser (triples : TripleTable,
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlSomeValueFromId) |> (_.obj)
         let objectSomeValuesFromCreator yExpr = ObjectSomeValuesFrom(yExpr, tryGetClassExpressions z)
         let dataSomeValuesFromCreator yExpr = DataSomeValuesFrom([yExpr], tryGetDataRange z)
-        let restriction = tryGetPropertyDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
+        let restriction = RequireObjectOrDataPropDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
         trySetClassExpression x restriction
 
     (* 
@@ -406,7 +392,7 @@ type ClassExpressionParser (triples : TripleTable,
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlAllValuesFromId) |> (_.obj)
         let objectSomeValuesFromCreator yExpr = ObjectAllValuesFrom(yExpr, tryGetClassExpressions z)
         let dataSomeValuesFromCreator yExpr = DataAllValuesFrom([yExpr], tryGetDataRange z)
-        let restriction = tryGetPropertyDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
+        let restriction = RequireObjectOrDataPropDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
         trySetClassExpression x restriction
     
     
@@ -424,7 +410,7 @@ type ClassExpressionParser (triples : TripleTable,
     let parseValuesFromProperties dataValuesFromConstructor (restrictionTriples : Triple seq) =
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let ys = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertiesId) |> (_.obj)
-                    |> GetRdfListElements
+                    |> Ingress.GetRdfListElements tripleTable resources
                      |> List.map tryGetDataPropertyExpressions
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlAllValuesFromId) |> (_.obj)
         let restriction = dataValuesFromConstructor(ys, tryGetDataRange z)
@@ -474,7 +460,7 @@ type ClassExpressionParser (triples : TripleTable,
                 |> resources.GetResource
         let objectHasValueCreator yExpr = ObjectHasValue(yExpr, Ingress.tryGetIndividual z)
         let dataHasValueCreator yExpr = DataHasValue(yExpr, z)
-        let restriction = tryGetPropertyDeclaration y objectHasValueCreator dataHasValueCreator
+        let restriction = RequireObjectOrDataPropDeclaration y objectHasValueCreator dataHasValueCreator
         trySetClassExpression x restriction
         
     (* 
@@ -712,4 +698,6 @@ type ClassExpressionParser (triples : TripleTable,
                         tryGetDataPropertyExpressions,
                         AnnotationProperties,
                         getAnnotations,
-                        tryGetAnyPropertyAxiom)
+                        tryGetAnyPropertyAxiom,
+                        tryGetPropertyDeclaration,
+                        tryGetClassOrDataRangeAxiom)

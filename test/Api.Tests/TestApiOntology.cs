@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using FluentAssertions;
 using Xunit.Abstractions;
 
@@ -31,12 +32,12 @@ public class TestApiOntology(ITestOutputHelper output)
 
 
     [Fact]
-    public void LoadInterection()
+    public void LoadIntersection()
     {
         var ontologyFileInfo = new FileInfo("TestData/intersection.owl.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
-        ont.GetAxioms().Should().NotBeEmpty();
+        ont.GetAxioms().ToList().Should().NotBeEmpty();
 
     }
 
@@ -44,7 +45,18 @@ public class TestApiOntology(ITestOutputHelper output)
     [Fact]
     public void LoadImfOntologyWorks()
     {
-        var ontologyFileInfo = new FileInfo("TestData/imf.owl");
+        var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+
+    }
+
+
+    [Fact, Category("LongRunning")]
+    public void LoadgeneOntologyWorks()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/go.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
