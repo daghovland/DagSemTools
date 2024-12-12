@@ -1,5 +1,6 @@
 using System.ComponentModel;
 using FluentAssertions;
+using Microsoft.FSharp.Collections;
 using Xunit.Abstractions;
 
 namespace Api.Tests;
@@ -49,7 +50,7 @@ public class TestApiOntology(ITestOutputHelper output)
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
-
+        ont.GetAxiomRules().ToList().Should().NotBeEmpty();
     }
 
 
