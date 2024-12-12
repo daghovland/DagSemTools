@@ -132,8 +132,10 @@ public class Graph : IGraph
     /// <inheritdoc />
     public void EnableOwlReasoning()
     {
-        _rules = DagSemTools.OWL2RL2Datalog.Reasoner.enableEqualityReasoning(Triples, _rules, Console.Error);
-        Reasoner.evaluate(ListModule.Empty<Rule>(), Triples);
+        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Triples.Triples, Triples.Resources).extractOntology;
+        var ontologyRules = DagSemTools.OWL2RL2Datalog.Reasoner.owl2Datalog(Triples.Resources, ontology, Console.Error);
+        _rules = _rules.Concat(ontologyRules);
+        Reasoner.evaluate(ListModule.OfSeq(_rules), Triples);
     }
 
     Datastore IGraph.Datastore => Triples;

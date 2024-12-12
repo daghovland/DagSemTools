@@ -34,7 +34,9 @@ let ``Equality RL adds equality axioms`` () =
     query.Should().HaveLength(1) |> ignore
     
     //Act
-    let rlProgram = Reasoner.enableEqualityReasoning tripleTable [] errorOutput
+    let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+    let ontology = ontologyTranslator.extractOntology
+    let rlProgram = Reasoner.owl2Datalog tripleTable.Resources ontology errorOutput
     DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
     
     //Assert
@@ -302,7 +304,10 @@ let ``Equality RL reasoning works`` () =
     let query1a = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex)
     query1a.Should().HaveLength(0) |> ignore
     
-    let rlProgram = Reasoner.enableEqualityReasoning tripleTable [] errorOutput
+    let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+    let ontology = ontologyTranslator.extractOntology
+    let rlProgram = Reasoner.owl2Datalog tripleTable.Resources ontology errorOutput
+    
     DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithObject(objIndex)
     query2.Should().HaveLength(3) |> ignore

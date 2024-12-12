@@ -28,7 +28,9 @@ let ``Subclass RL reasoning works`` () =
     let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query.Should().HaveLength(0) |> ignore
     
-    let rlProgram = Reasoner.enableOwlReasoning tripleTable [] errorOutput
+    let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+    let ontology = ontologyTranslator.extractOntology
+    let rlProgram = Reasoner.owl2Datalog tripleTable.Resources ontology errorOutput
     DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query2.Should().HaveLength(1) |> ignore
