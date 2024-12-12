@@ -26,6 +26,23 @@ module Reasoner =
         |> List.map (fun iri -> (Namespaces.RdfType, resources.AddResource (Resource.Iri (IriReference Namespaces.RdfType))))
         |> Map.ofList 
     
+    (* Used by the equality axiom handler below *)
+    let GetTypeImplicationDatalogRule (resourceMap : Map<string, Ingress.ResourceId>) (extensionalType, impliedType) =
+        { Rule.Head =
+              {
+                 TriplePattern.Subject = ResourceOrVariable.Variable "x"
+                 TriplePattern.Predicate =  ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
+                 TriplePattern.Object = ResourceOrVariable.Resource impliedType
+             };
+                Rule.Body = [
+              (RuleAtom.PositiveTriple {
+                Subject = ResourceOrVariable.Variable "x"
+                Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
+                Object = ResourceOrVariable.Resource extensionalType
+                })
+              ]
+              }
+    
     let getObjectPropertyExpressionResource (resources : ResourceManager) objProp=
         match objProp with
                  | NamedObjectProperty (FullIri iri) -> resources.AddResource (Resource.Iri iri)
@@ -85,22 +102,23 @@ module Reasoner =
     let SubClass2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) subClass superClass =
         let c1 = getClassExpressionResource resources subClass
         let c2 = getClassExpressionResource resources superClass
-        Some [
-             { Rule.Head =
-              {
-                 TriplePattern.Subject = ResourceOrVariable.Variable "x"
-                 TriplePattern.Predicate =  ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
-                 TriplePattern.Object = ResourceOrVariable.Resource c2
-             };
-                Rule.Body = [
-              (RuleAtom.PositiveTriple {
-                Subject = ResourceOrVariable.Variable "x"
-                Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
-                Object = ResourceOrVariable.Resource c1
-                })
-              ]
-              }
-        ]
+        Some [ GetTypeImplicationDatalogRule resourceMap (c1, c2) ]
+        
+    let pairs list =
+        [ for x in list do
+            for y in list do
+                if x <> y then yield (x, y) ]
+    
+    (* From Table 7 in https://www.w3.org/TR/owl2-profiles/#OWL_2_RL:
+        cax-eqc1 	T(?c1, owl:equivalentClass, ?c2) T(?x, rdf:type, ?c1) 	T(?x, rdf:type, ?c2)
+        cax-eqc2 	T(?c1, owl:equivalentClass, ?c2) T(?x, rdf:type, ?c2) 	T(?x, rdf:type, ?c1) 
+    *)
+    let EquivalentClass2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) classList =
+        classList
+            |> List.map (getClassExpressionResource resources)
+            |> pairs
+            |> List.map (GetTypeImplicationDatalogRule resourceMap)
+            |> Some
     let ObjectPropertyAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ObjectPropertyAxiom)  =
         match axiom with
         | ObjectPropertyDomain (objProp, domExp) -> ObjectPropertyDomain2Datalog resourceMap resources objProp domExp
@@ -110,6 +128,7 @@ module Reasoner =
     let ClassAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ClassAxiom)  =
         match axiom with
         | ClassAxiom.SubClassOf (_, subClass, superClass) -> SubClass2Datalog resourceMap resources subClass superClass
+        | ClassAxiom.EquivalentClasses (_, classList) -> EquivalentClass2Datalog resourceMap resources classList
         | _ -> None
     let owlAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : Axiom)  =
         match axiom with
