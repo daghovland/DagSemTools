@@ -11,6 +11,7 @@
     <ItemGroup>
         <Compile Include="TestEqualityAxioms.fs" />
         <Compile Include="TestClassAxioms.fs" />
+        <Compile Include="TestpropertyAxioms.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 

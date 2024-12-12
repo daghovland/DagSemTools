@@ -10,7 +10,7 @@ open Xunit
 open Faqt
 
 [<Fact>]
-let ``Subclass RL reasoning works`` () =
+let ``Subclass RL reasoning from rdf works`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
     

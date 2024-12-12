@@ -26,13 +26,21 @@ module Reasoner =
         |> List.map (fun iri -> (Namespaces.RdfType, resources.AddResource (Resource.Iri (IriReference Namespaces.RdfType))))
         |> Map.ofList 
     
+    let getObjectPropertyExpressionResource (resources : ResourceManager) objProp=
+        match objProp with
+                 | NamedObjectProperty (FullIri iri) -> resources.AddResource (Resource.Iri iri)
+                 | AnonymousObjectProperty bNode -> resources.ResourceMap.[Resource.AnonymousBlankNode bNode]
+                 | InverseObjectProperty _ -> failwith "Invalid Owl Ontology: Domain of unnamed inverse object property not supported"
+                 | ObjectPropertyChain _ -> failwith "Invalid Owl Ontology: Domain of object property chain not supported"
+    
+    let getClassExpressionResource (resources : ResourceManager) classExpr =
+        match classExpr with
+         | ClassName (FullIri iri) -> resources.AddResource (Resource.Iri iri)
+         | AnonymousClass bNode -> resources.ResourceMap.[Resource.AnonymousBlankNode bNode]
+         | _ -> failwith "Unnamed class not yet implemented for this operation. Sorry"
     let ObjectPropertyDomain2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) objProp domExp =
-        let propertyResource = match objProp with
-                                                         | NamedObjectProperty (FullIri iri) -> resources.AddResource (Resource.Iri iri)
-                                                         | _ -> failwith "Domain on unnamed object property is not yet implemented. Sorry"
-        let domainClassResource = match domExp with
-                                     | ClassName (FullIri iri) -> resources.AddResource (Resource.Iri iri)
-                                     | _ -> failwith "Unnamed class as domain is not yet implemented. Sorry"
+        let propertyResource = getObjectPropertyExpressionResource resources objProp
+        let domainClassResource = getClassExpressionResource resources domExp
         Some [
              { Rule.Head =
               {
@@ -52,14 +60,8 @@ module Reasoner =
         
     
     let ObjectPropertyRange2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) objProp rangeExp =
-        let propertyResource = match objProp with
-                                                         | NamedObjectProperty (FullIri iri) -> resources.AddResource (Resource.Iri iri)
-                                                         | AnonymousObjectProperty bNode -> resources.ResourceMap.[Resource.AnonymousBlankNode bNode]
-                                                         
-                                                         // | _ -> failwith "Domain on unnamed object property is not yet implemented. Sorry"
-        let rangeClassResource = match rangeExp with
-                                     | ClassName (FullIri iri) -> resources.AddResource (Resource.Iri iri)
-                                     | _ -> failwith "Unnamed class as domain is not yet implemented. Sorry"
+        let propertyResource = getObjectPropertyExpressionResource resources objProp
+        let rangeClassResource = getClassExpressionResource resources rangeExp
         Some [
              { Rule.Head =
               {
@@ -76,15 +78,43 @@ module Reasoner =
               ]
               }
         ]
+        
+    (* From Table 7 in https://www.w3.org/TR/owl2-profiles/#OWL_2_RL:
+        cax-sco 	T(?c1, rdfs:subClassOf, ?c2) T(?x, rdf:type, ?c1) 	T(?x, rdf:type, ?c2) 
+    *)
+    let SubClass2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) subClass superClass =
+        let c1 = getClassExpressionResource resources subClass
+        let c2 = getClassExpressionResource resources superClass
+        Some [
+             { Rule.Head =
+              {
+                 TriplePattern.Subject = ResourceOrVariable.Variable "x"
+                 TriplePattern.Predicate =  ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
+                 TriplePattern.Object = ResourceOrVariable.Resource c2
+             };
+                Rule.Body = [
+              (RuleAtom.PositiveTriple {
+                Subject = ResourceOrVariable.Variable "x"
+                Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
+                Object = ResourceOrVariable.Resource c1
+                })
+              ]
+              }
+        ]
     let ObjectPropertyAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ObjectPropertyAxiom)  =
         match axiom with
         | ObjectPropertyDomain (objProp, domExp) -> ObjectPropertyDomain2Datalog resourceMap resources objProp domExp
-                             
+        | ObjectPropertyRange (objProp, rangeExp) -> ObjectPropertyRange2Datalog resourceMap resources objProp rangeExp                             
         | _ -> None
     
+    let ClassAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ClassAxiom)  =
+        match axiom with
+        | ClassAxiom.SubClassOf (_, subClass, superClass) -> SubClass2Datalog resourceMap resources subClass superClass
+        | _ -> None
     let owlAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : Axiom)  =
         match axiom with
         | AxiomObjectPropertyAxiom propertyAxiom -> ObjectPropertyAxiom2Datalog resourceMap resources propertyAxiom
+        | AxiomClassAxiom classAxiom -> ClassAxiom2Datalog resourceMap resources classAxiom
         | _ -> None
     
     

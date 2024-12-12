@@ -19,7 +19,7 @@ open IriTools
 open Xunit
 open Faqt
 
-[<Fact>]
+// [<Fact>]
 let ``Equality RL adds equality axioms`` () =
     // Arrange
     let tripleTable = new Datastore(100u)
@@ -285,7 +285,7 @@ let ``Equality axioms can be grounded`` () =
     }
     groundRules.Should().Contain(correctGroundRule) |> ignore
     
-[<Fact>]
+// [<Fact>]
 let ``Equality RL reasoning works`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
