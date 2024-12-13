@@ -74,6 +74,7 @@ module Reasoner =
               ]
               }
         ]
+    
         
     
     let ObjectPropertyRange2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) objProp rangeExp =
@@ -95,6 +96,27 @@ module Reasoner =
               ]
               }
         ]
+    
+    (* prp-symp 	T(?p, rdf:type, owl:SymmetricProperty) T(?x, ?p, ?y) ->	T(?y, ?p, ?x)  *)
+    let SymmetricObjectProperty2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) objProp=
+        let propertyResource = getObjectPropertyExpressionResource resources objProp
+        Some [
+             { Rule.Head =
+              {
+                 TriplePattern.Subject = ResourceOrVariable.Variable "y"
+                 TriplePattern.Predicate =  ResourceOrVariable.Resource propertyResource
+                 TriplePattern.Object = ResourceOrVariable.Variable "x"
+             };
+                Rule.Body = [
+              (RuleAtom.PositiveTriple {
+                Subject = ResourceOrVariable.Variable "x"
+                Predicate = ResourceOrVariable.Resource propertyResource
+                Object = ResourceOrVariable.Variable "y"
+                })
+              ]
+              }
+        ]
+    
         
     (* From Table 7 in https://www.w3.org/TR/owl2-profiles/#OWL_2_RL:
         cax-sco 	T(?c1, rdfs:subClassOf, ?c2) T(?x, rdf:type, ?c1) 	T(?x, rdf:type, ?c2) 
@@ -122,7 +144,8 @@ module Reasoner =
     let ObjectPropertyAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ObjectPropertyAxiom)  =
         match axiom with
         | ObjectPropertyDomain (objProp, domExp) -> ObjectPropertyDomain2Datalog resourceMap resources objProp domExp
-        | ObjectPropertyRange (objProp, rangeExp) -> ObjectPropertyRange2Datalog resourceMap resources objProp rangeExp                             
+        | ObjectPropertyRange (objProp, rangeExp) -> ObjectPropertyRange2Datalog resourceMap resources objProp rangeExp
+        | SymmetricObjectProperty (_, objProp) -> SymmetricObjectProperty2Datalog resourceMap resources objProp 
         | _ -> None
     
     let ClassAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ClassAxiom)  =
