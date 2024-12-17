@@ -6,6 +6,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <Compile Include="ELIAxiom.cs.fs" />
         <Compile Include="ELITranslator.fs" />
         <Content Include="README.md" />
     </ItemGroup>

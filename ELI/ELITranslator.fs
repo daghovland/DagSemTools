@@ -8,19 +8,24 @@
 
 (* Implementation of the translation in section 4.3 of https://www.w3.org/TR/owl2-profiles/#OWL_2_RL *)
 
-namespace DagSemTools.OWL2RL2Datalog
+namespace DagSemTools.ELI
 open System.IO
+open DagSemTools.ELI.Axioms
 open DagSemTools.Rdf
 open DagSemTools.Datalog
 open DagSemTools.Ingress
 open DagSemTools.OwlOntology
 open IriTools
 
-module ELITranslator =
+module ELIExtractor =
     
-    let ELIClassExtractor classExpression =
+    let rec ELIClassExtractor classExpression  =
         match classExpression with
-        | ClassName className -> 
+        | ClassName className -> ELIClass.ClassName className |> Some
+        | ObjectIntersectionOf classList -> classList |> List.map ELIClassExtractor |> ELIClass.Intersection |> Some 
+        | ObjectSomeValuesFrom (role, cls) -> ELIClass.SomeValuesFrom (role, (ELIClassExtractor cls)) |> Some
+        | ObjectMinQualifiedCardinality (1, role, cls) -> ELIClass.SomeValuesFrom (role, (ELIClassExtractor cls)) |> Some
+        | _ -> None
     
     (*
         Separates the axioms into ELI-axioms and non-ELI-axioms
