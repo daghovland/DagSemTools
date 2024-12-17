@@ -58,7 +58,7 @@ module Reasoner =
     let ObjectPropertyDomain2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) objProp domExp =
         let propertyResource = getObjectPropertyExpressionResource resources objProp
         let domainClassResource = getClassExpressionResource resources domExp
-        Some [
+        [
              { Rule.Head =
               {
                  TriplePattern.Subject = ResourceOrVariable.Variable "x"
@@ -80,7 +80,7 @@ module Reasoner =
     let ObjectPropertyRange2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) objProp rangeExp =
         let propertyResource = getObjectPropertyExpressionResource resources objProp
         let rangeClassResource = getClassExpressionResource resources rangeExp
-        Some [
+        [
              { Rule.Head =
               {
                  TriplePattern.Subject = ResourceOrVariable.Variable "y"
@@ -100,7 +100,7 @@ module Reasoner =
     (* prp-symp 	T(?p, rdf:type, owl:SymmetricProperty) T(?x, ?p, ?y) ->	T(?y, ?p, ?x)  *)
     let SymmetricObjectProperty2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) objProp=
         let propertyResource = getObjectPropertyExpressionResource resources objProp
-        Some [
+        [
              { Rule.Head =
               {
                  TriplePattern.Subject = ResourceOrVariable.Variable "y"
@@ -118,13 +118,86 @@ module Reasoner =
         ]
     
         
-    (* From Table 7 in https://www.w3.org/TR/owl2-profiles/#OWL_2_RL:
-        cax-sco 	T(?c1, rdfs:subClassOf, ?c2) T(?x, rdf:type, ?c1) 	T(?x, rdf:type, ?c2) 
+    (* 
+        From Section 4.1 in https://arxiv.org/pdf/2008.02232 
     *)
-    let SubClass2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) subClass superClass =
-        let c1 = getClassExpressionResource resources subClass
-        let c2 = getClassExpressionResource resources superClass
-        Some [ GetTypeImplicationDatalogRule resourceMap (c1, c2) ]
+    let rec ParseSuperClass2RuleHead (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) subClass : RuleAtom seq seq =
+        match subClass with
+        | ObjectUnionOf classList ->
+           classList
+           |> Seq.map (fun u1 ->
+               ParseSuperClass2RuleHead resourceMap resources u1)
+           |> Seq.concat
+        | ObjectIntersectionOf classExpressionList ->
+           classExpressionList
+                                        |> Seq.map (ParseSuperClass2RuleHead resourceMap resources)
+                                        |> Seq.concat
+           
+        | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) ->
+                        let classExpressionResource = getClassExpressionResource resources classExpression
+                        let objectPropertyExpressionResource = getObjectPropertyExpressionResource resources objectPropertyExpression
+                        [[
+                          (RuleAtom.PositiveTriple {
+                            Subject = ResourceOrVariable.Variable "x"
+                            Predicate = ResourceOrVariable.Resource objectPropertyExpressionResource
+                            Object = ResourceOrVariable.Resource classExpressionResource
+                            })
+                        ]] 
+        | ClassName subClassName -> 
+                        let extensionalType = getClassExpressionResource resources subClass
+                        [[
+                          (RuleAtom.PositiveTriple {
+                            Subject = ResourceOrVariable.Variable "x"
+                            Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
+                            Object = ResourceOrVariable.Resource extensionalType
+                            })
+                        ]]
+                        
+        | _ -> []
+    
+    
+    
+    let rec ParseSubClass2RuleBody (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) subClass : RuleAtom seq seq =
+        match subClass with
+        | ObjectUnionOf classList ->
+           classList
+           |> Seq.map (fun u1 ->
+               ParseSubClass2RuleBody resourceMap resources u1)
+           |> Seq.concat
+        | ObjectIntersectionOf classExpressionList ->
+           classExpressionList
+                                        |> Seq.map (ParseSubClass2RuleBody resourceMap resources)
+                                        |> Seq.concat
+           
+        | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) ->
+                        let classExpressionResource = getClassExpressionResource resources classExpression
+                        let objectPropertyExpressionResource = getObjectPropertyExpressionResource resources objectPropertyExpression
+                        [[
+                          (RuleAtom.PositiveTriple {
+                            Subject = ResourceOrVariable.Variable "x"
+                            Predicate = ResourceOrVariable.Resource objectPropertyExpressionResource
+                            Object = ResourceOrVariable.Resource classExpressionResource
+                            })
+                        ]] 
+        | ClassName subClassName -> 
+                        let extensionalType = getClassExpressionResource resources subClass
+                        [[
+                          (RuleAtom.PositiveTriple {
+                            Subject = ResourceOrVariable.Variable "x"
+                            Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
+                            Object = ResourceOrVariable.Resource extensionalType
+                            })
+                        ]]
+                        
+        | _ -> []
+        
+    let SubClass2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) subClass superClass : Rule seq =
+        let ruleBodies = ParseSubClass2RuleBody resourceMap resources subClass
+        let heads = ParseSuperClass2RuleHead resourceMap resources superClass
+        heads |> Seq.map (fun head -> ruleBodies
+                                      |> Seq.map (fun body -> {Rule.Head = head; Rule.Body = body})
+                                      |> Seq.concat)
+        
         
     let pairs list =
         [ for x in list do
@@ -135,35 +208,34 @@ module Reasoner =
         cax-eqc1 	T(?c1, owl:equivalentClass, ?c2) T(?x, rdf:type, ?c1) 	T(?x, rdf:type, ?c2)
         cax-eqc2 	T(?c1, owl:equivalentClass, ?c2) T(?x, rdf:type, ?c2) 	T(?x, rdf:type, ?c1) 
     *)
-    let EquivalentClass2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) classList =
+    let EquivalentClass2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) classList: Rule seq =
         classList
             |> List.map (getClassExpressionResource resources)
             |> pairs
-            |> List.map (GetTypeImplicationDatalogRule resourceMap)
-            |> Some
+            |> Seq.map (GetTypeImplicationDatalogRule resourceMap)
     let ObjectPropertyAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ObjectPropertyAxiom)  =
         match axiom with
         | ObjectPropertyDomain (objProp, domExp) -> ObjectPropertyDomain2Datalog resourceMap resources objProp domExp
         | ObjectPropertyRange (objProp, rangeExp) -> ObjectPropertyRange2Datalog resourceMap resources objProp rangeExp
         | SymmetricObjectProperty (_, objProp) -> SymmetricObjectProperty2Datalog resourceMap resources objProp 
-        | _ -> None
+        | _ -> []
     
-    let ClassAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ClassAxiom)  =
+    let ClassAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ClassAxiom) : Rule seq =
         match axiom with
         | ClassAxiom.SubClassOf (_, subClass, superClass) -> SubClass2Datalog resourceMap resources subClass superClass
         | ClassAxiom.EquivalentClasses (_, classList) -> EquivalentClass2Datalog resourceMap resources classList
-        | _ -> None
-    let owlAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : Axiom)  =
+        | _ -> []
+    let owlAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : Axiom) : Rule seq =
         match axiom with
         | AxiomObjectPropertyAxiom propertyAxiom -> ObjectPropertyAxiom2Datalog resourceMap resources propertyAxiom
         | AxiomClassAxiom classAxiom -> ClassAxiom2Datalog resourceMap resources classAxiom
-        | _ -> None
+        | _ -> []
     
     
     let owl2Datalog (resources : ResourceManager) (owlOntology : Ontology) (errorOutput : TextWriter) =
         let resourceMap = GetBasicResources resources
         owlOntology.Axioms
-        |> List.choose (owlAxiom2Datalog resourceMap resources)
-        |> List.concat
+        |> List.map (owlAxiom2Datalog resourceMap resources)
+        |> Seq.concat
         
         
