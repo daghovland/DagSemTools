@@ -7,8 +7,9 @@
 
     <ItemGroup>
         <Compile Include="ELIAxiom.cs.fs" />
-        <Compile Include="ELITranslator.fs" />
+        <Compile Include="ELIExtractor.fs" />
         <Content Include="README.md" />
+        <Compile Include="ELI2RL.fs" />
     </ItemGroup>
 
     <ItemGroup>

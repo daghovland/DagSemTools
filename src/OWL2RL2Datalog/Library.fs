@@ -191,14 +191,6 @@ module Reasoner =
                         
         | _ -> []
         
-    let SubClass2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) subClass superClass : Rule seq =
-        let ruleBodies = ParseSubClass2RuleBody resourceMap resources subClass
-        let heads = ParseSuperClass2RuleHead resourceMap resources superClass
-        heads |> Seq.map (fun head -> ruleBodies
-                                      |> Seq.map (fun body -> {Rule.Head = head; Rule.Body = body})
-                                      |> Seq.concat)
-        
-        
     let pairs list =
         [ for x in list do
             for y in list do
@@ -222,7 +214,7 @@ module Reasoner =
     
     let ClassAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : ClassAxiom) : Rule seq =
         match axiom with
-        | ClassAxiom.SubClassOf (_, subClass, superClass) -> SubClass2Datalog resourceMap resources subClass superClass
+        // | ClassAxiom.SubClassOf (_, subClass, superClass) -> SubClass2Datalog resourceMap resources subClass superClass
         | ClassAxiom.EquivalentClasses (_, classList) -> EquivalentClass2Datalog resourceMap resources classList
         | _ -> []
     let owlAxiom2Datalog (resourceMap : Map<string, Ingress.ResourceId>) (resources : ResourceManager) (axiom : Axiom) : Rule seq =
