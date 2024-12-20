@@ -1,0 +1,61 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <OutputType>Library</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <PackageReadMeFile>README.md</PackageReadMeFile>
+        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <PackageId>DagSemTools.ELI</PackageId>
+        <Version>0.3.0</Version>
+        <Authors>Dag Hovland</Authors>
+        <Description>Translations to and from the description logic ELI</Description>
+        <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSource>true</IncludeSource>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+
+        <Platforms>AnyCPU</Platforms>
+
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="DagSemTools.ELI.Tests" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Compile Include="ELIAxiom.cs.fs" />
+        <Compile Include="ELIExtractor.fs" />
+        <Compile Include="ELI2RL.fs" />
+        <Content Include="README.md" >
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </Content>
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <ProjectReference Include="..\Datalog\Datalog.fsproj" />
+      <ProjectReference Include="..\Ingress\Ingress.fsproj" />
+      <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <None Update="README.md">
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </None>
+    </ItemGroup>
+</Project>

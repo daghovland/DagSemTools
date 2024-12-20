@@ -19,7 +19,6 @@ module Axioms =
         | ClassName of Class
         | Intersection of ELIClass list
         | SomeValuesFrom of ObjectPropertyExpression * ELIClass
-        
     type ELIAxiom =
         SubClassAxiom of ELIClass list * Class list 
         

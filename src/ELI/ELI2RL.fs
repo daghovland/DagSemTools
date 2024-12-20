@@ -25,9 +25,19 @@ module ELI2RL =
     
     let GetRoleTriplePattern (resources : ResourceManager) role subjectVar objectVar =
         { TriplePattern.Subject = ResourceOrVariable.Variable subjectVar
-          Predicate = (ResourceOrVariable.Resource  (resources.AddResource(Iri role)));
+          Predicate = (ResourceOrVariable.Resource  role);
           Object = ResourceOrVariable.Variable objectVar }
     
+    (* Called from translateELI below to handle object properties.
+        Assumes objProp is not inverse property.
+    *)
+    let GetObjPropTriplePattern (resources : ResourceManager) objProp subjectVar objectVar =
+        match objProp with 
+        | NamedObjectProperty (FullIri objProp) -> [GetRoleTriplePattern resources (resources.AddResource(Iri objProp)) subjectVar objectVar]
+        | AnonymousObjectProperty anObjProp -> [GetRoleTriplePattern resources (resources.ResourceMap.[AnonymousBlankNode anObjProp]) subjectVar objectVar]
+        | InverseObjectProperty _ -> failwith "Invalid or useless construct detected: Double inverse detected."
+        | ObjectPropertyChain propertyExpressions -> failwith "existential on property chain not yet supported. Sorry"
+        
     (* Algorithm 1 from https://arxiv.org/abs/2008.02232 *)
     let rec translateELI (resources : ResourceManager) concept varName clause =
         match concept with
@@ -38,13 +48,27 @@ module ELI2RL =
         | SomeValuesFrom (role, concept) ->
             let newVar = $"{varName}_{clause}"
             let roleTriples = match role with
-                                | InverseObjectProperty (NamedObjectProperty (FullIri objProp)) -> [GetRoleTriplePattern resources objProp newVar varName]
-                                | NamedObjectProperty (FullIri objProp) -> [GetRoleTriplePattern resources objProp varName newVar]
+                                | InverseObjectProperty role -> GetObjPropTriplePattern resources role newVar varName
+                                | role -> GetObjPropTriplePattern resources role varName newVar
             let conceptTriples = translateELI resources concept newVar 1
             roleTriples @ conceptTriples
+        | Top -> []
         
-    let GenerateRL (axiom : ELIAxiom) : DagSemTools.Datalog.Rule list  =
+    let translateSimpleSubclassAxiom (resources : ResourceManager) (subConcept : ELIClass) (superConcept : Class) : Rule =
+        let (FullIri superConceptIri) = superConcept 
+        { Head = GetTypeTriplePattern resources (superConceptIri) "X"
+          Body = (translateELI resources subConcept "X" 1 )
+                    |> List.map RuleAtom.PositiveTriple }
+        
+    let GenerateAxiomRL (resources : ResourceManager) (axiom : ELIAxiom) : DagSemTools.Datalog.Rule list  =
                 match axiom with
-                SubClassAxiom (subConcept, superConcept) -> {Head = GetTypeTriplePattern resources}
-                []
-
+                SubClassAxiom (subConcepts, superConcepts) ->
+                    subConcepts
+                    |> List.map (fun subConcept ->
+                        superConcepts
+                        |> List.map (fun superConcept ->
+                            translateSimpleSubclassAxiom resources subConcept superConcept)
+                        )
+                    |> List.concat
+    let GenerateTBoxRL (resources : ResourceManager) (axioms) =
+        axioms |> Seq.map (GenerateAxiomRL resources) |> Seq.concat
