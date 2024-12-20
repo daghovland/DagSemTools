@@ -227,7 +227,8 @@ module Reasoner =
     let owl2Datalog (resources : ResourceManager) (owlOntology : Ontology) (errorOutput : TextWriter) =
         let resourceMap = GetBasicResources resources
         owlOntology.Axioms
-        |> List.map (owlAxiom2Datalog resourceMap resources)
+        |> List.choose (DagSemTools.ELI.ELIExtractor.ELIAxiomxtractor)
         |> Seq.concat
+        |> (DagSemTools.ELI.ELI2RL.GenerateTBoxRL resources)
         
         

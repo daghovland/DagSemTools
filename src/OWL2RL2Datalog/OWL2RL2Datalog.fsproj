@@ -58,6 +58,7 @@
     </ItemGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\ELI\ELI.fsproj" />
       <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
       <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
     </ItemGroup>

@@ -57,8 +57,6 @@ module ELIExtractor =
         Separates the axioms into ELI-axioms and non-ELI-axioms
         ELI-Axioms are subclass axioms  
     *)
-    
-    
     let ELIAxiomxtractor (axiom : Axiom) =
         match axiom with
         | AxiomClassAxiom clAxiom ->
