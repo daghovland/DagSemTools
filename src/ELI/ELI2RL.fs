@@ -19,9 +19,9 @@ open IriTools
 module ELI2RL =
     
     let GetTypeTriplePattern (resources : ResourceManager) className varName =
-        { TriplePattern.Subject = ResourceOrVariable.Resource resources.ResourceMap.[Iri className]
+        { TriplePattern.Subject = ResourceOrVariable.Variable varName
           Predicate = (ResourceOrVariable.Resource  (resources.AddResource(Iri (IriReference Namespaces.RdfType))));
-          Object = ResourceOrVariable.Variable varName }
+          Object = ResourceOrVariable.Resource resources.ResourceMap.[Iri className] }
     
     let GetRoleTriplePattern (resources : ResourceManager) role subjectVar objectVar =
         { TriplePattern.Subject = ResourceOrVariable.Variable subjectVar

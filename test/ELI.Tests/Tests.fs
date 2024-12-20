@@ -1,6 +1,7 @@
 namespace DagSemTools.ELI.Tests
 
 open DagSemTools
+open DagSemTools.Datalog
 open DagSemTools.ELI.Axioms
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
@@ -37,3 +38,30 @@ module TestClassAxioms =
         let expectedAxiom2 = ELI.Axioms.SubClassAxiom ([ELI.Axioms.ELIClass.ClassName superClassIri],[subClassIri])
         let expectedAxiomList = Some [expectedAxiom2; expectedAxiom1]
         Assert.Equal(expectedAxiomList, translatedAxioms)
+        
+        
+    [<Fact>]
+    let ``Subclass axiom creates datalog rule`` () =
+        //Arrange
+        let resources = new ResourceManager(10u)
+        let subClassIri = (FullIri (IriReference "https://example.com/subclass"))
+        let superClassIri = (FullIri (IriReference "https://example.com/superclass"))
+        let axiom = ELI.Axioms.SubClassAxiom ([ELI.Axioms.ELIClass.ClassName subClassIri],[superClassIri])
+        //Act
+        let translatedRules = ELI.ELI2RL.GenerateTBoxRL resources [axiom] 
+        //Assert
+        let expectedRules : Datalog.Rule seq = [
+             {Head =
+                 { Subject = ResourceOrVariable.Variable "X"
+                   Predicate = ResourceOrVariable.Resource (resources.AddResource (Iri (IriReference Namespaces.RdfType)))
+                   Object = ResourceOrVariable.Resource (resources.AddResource (Iri (IriReference "https://example.com/superclass")))
+                   }
+              Body = [PositiveTriple {
+                                       Subject = ResourceOrVariable.Variable "X"
+                                       Predicate = ResourceOrVariable.Resource (resources.AddResource (Iri (IriReference Namespaces.RdfType)))
+                                       Object = ResourceOrVariable.Resource (resources.AddResource (Iri (IriReference "https://example.com/subclass")))
+                   }]
+              }
+        ]
+        Assert.Equal<Rule seq>(expectedRules, translatedRules)
+        
