@@ -70,12 +70,15 @@ module ELIExtractor =
                 |> List.map ELISuperClassExtractor
                 |> flattenOptionList
                 |> Option.map (List.concat)
-                |> Option.map (fun classNameList -> classNameList
-                                                        |> List.map (fun subClass ->
-                                                                        classNameList
-                                                                        |> List.map (fun superClass -> ELIAxiom.SubClassAxiom ([ELIClass.ClassName subClass], [superClass]))
-                                                                    )
-                                                        |> List.concat
+                |> Option.map (fun classNameList
+                                -> classNameList
+                                    |> List.map (fun subClass ->
+                                                    classNameList
+                                                    |> List.where (fun superClass -> not (subClass = superClass))
+                                                    |> List.map (fun superClass ->
+                                                        ELIAxiom.SubClassAxiom ([ELIClass.ClassName subClass], [superClass]))
+                                                )
+                                    |> List.concat
                                )
             | _ -> None
                                             

@@ -6,7 +6,6 @@
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
-        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
@@ -17,24 +16,20 @@
     <ItemGroup>
         <PackageReference Include="Faqt" Version="4.4.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
-        <PackageReference Include="xunit" Version="2.9.2" />
-        <PackageReference Include="xunit.abstractions" Version="2.0.3" />
+        <PackageReference Include="xunit" Version="2.4.2"/>
         <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="6.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
-    <!-- Use project references for local development -->
-    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\ELI\ELI.fsproj" />
     </ItemGroup>
-    
-    <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
-    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
-    </ItemGroup>
-
 
 </Project>
