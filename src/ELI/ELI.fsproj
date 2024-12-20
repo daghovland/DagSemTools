@@ -50,9 +50,12 @@
         <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
         <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
-        <PackageReference Update="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
+    <ItemGroup>
+        <PackageReference Update="FSharp.Core" Version="8.0.403" />
+    </ItemGroup>
+    
     <ItemGroup>
         <None Update="README.md">
             <Pack>true</Pack>
