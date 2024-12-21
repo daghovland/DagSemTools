@@ -21,9 +21,9 @@ public class OwlOntology
 {
     private DagSemTools.OwlOntology.Ontology _owlOntology;
     private Datastore _datastore;
-    
+
     internal OwlOntology(IGraph graph)
-    { 
+    {
         _datastore = graph.Datastore;
         var translator = new Rdf2Owl(_datastore.Triples, _datastore.Resources);
         _owlOntology = translator.extractOntology;
@@ -45,11 +45,11 @@ public class OwlOntology
     /// <returns></returns>
     public IEnumerable<Axiom> GetAxioms() =>
         _owlOntology.Axioms;
-    
+
     /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
-    public IEnumerable<Rule> GetAxiomRules() => 
+    public IEnumerable<Rule> GetAxiomRules() =>
         DagSemTools.OWL2RL2Datalog.Reasoner.owl2Datalog(_datastore.Resources, _owlOntology, Console.Error);
 }
