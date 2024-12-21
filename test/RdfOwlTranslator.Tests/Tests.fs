@@ -69,8 +69,10 @@ module Tests =
     let ``Create axiom-based Declaration Helper`` (typeIri: string) =
         let tripleTable = TripleTable(100u)
         let resources = ResourceManager(100u)
-let subjectResource =
-    resources.AddResource(Resource.Iri(new IriReference $"{typeIri}_instance"))
+
+        let subjectResource =
+            resources.AddResource(Resource.Iri(new IriReference $"{typeIri}_instance"))
+
         let anonymousReificationResource = resources.CreateUnnamedAnonResource()
 
         let rdfTypeResource =
