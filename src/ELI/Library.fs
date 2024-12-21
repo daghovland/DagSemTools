@@ -6,18 +6,15 @@
     Contact: hovlanddag@gmail.com
 *)
 
-(* Implementation of the translation in section 4.3 of https://www.w3.org/TR/owl2-profiles/#OWL_2_RL *)
-(* See also https://www.emse.fr/~zimmermann/Teaching/KRR/el.html *)
+(* Translation from ELI to RL, inspired by https://arxiv.org/abs/2008.02232 *)
+
 namespace DagSemTools.ELI
 
+open DagSemTools.ELI.ELIExtractor
 open DagSemTools.OwlOntology
+open DagSemTools.Rdf
 
-module Axioms =
+module Library =
 
-    type ComplexConcept =
-        | Top
-        | AtomicConcept of Class
-        | Intersection of ComplexConcept list
-        | SomeValuesFrom of ObjectPropertyExpression * ComplexConcept
-
-    type Formula = ConceptInclusion of ComplexConcept list * Class list
+    let Owl2Datalog (resources: ResourceManager) (axiom: Axiom) =
+        axiom |> ELIAxiomxtractor |> Option.map (ELI2RL.GenerateTBoxRL resources)

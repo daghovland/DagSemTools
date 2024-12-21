@@ -5,19 +5,16 @@
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
     Contact: hovlanddag@gmail.com
 *)
+namespace DagSemTools.Ingress
+(* Helper function(s) related to the list and option monads in F#  *)
 
-(* Implementation of the translation in section 4.3 of https://www.w3.org/TR/owl2-profiles/#OWL_2_RL *)
-(* See also https://www.emse.fr/~zimmermann/Teaching/KRR/el.html *)
-namespace DagSemTools.ELI
+module Monad =
 
-open DagSemTools.OwlOntology
-
-module Axioms =
-
-    type ComplexConcept =
-        | Top
-        | AtomicConcept of Class
-        | Intersection of ComplexConcept list
-        | SomeValuesFrom of ObjectPropertyExpression * ComplexConcept
-
-    type Formula = ConceptInclusion of ComplexConcept list * Class list
+    let flattenOptionList (inputList) =
+        List.fold
+            (fun agg el ->
+                match (agg, el) with
+                | (Some ls, Some e) -> Some(e :: ls)
+                | _ -> None)
+            (Some [])
+            inputList

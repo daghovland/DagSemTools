@@ -38,6 +38,7 @@
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
+        <Compile Include="Library.fs"/>
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">

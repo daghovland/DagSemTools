@@ -9,78 +9,74 @@
 (* Implementation of the translation in section 4.3 of https://www.w3.org/TR/owl2-profiles/#OWL_2_RL *)
 
 namespace DagSemTools.ELI
+
 open DagSemTools.ELI.Axioms
 open DagSemTools.OwlOntology
+open DagSemTools.Ingress
 
 module ELIExtractor =
-    
-    let flattenOptionList (inputList) =
-        List.fold
-            (fun agg el -> match (agg, el) with
-                                    | (Some ls, Some e) -> Some (e :: ls)
-                                    | _ -> None)
-            (Some [])
-            inputList
-    
-    let rec ELIClassExtractor classExpression  =
+
+
+
+    let rec ELIClassExtractor classExpression =
         match classExpression with
-        | ClassName className -> ELIClass.ClassName className |> Some
-        | ObjectIntersectionOf classList -> classList
-                                            |> List.map ELIClassExtractor
-                                            |> flattenOptionList
-                                            |> Option.map ELIClass.Intersection 
-        | ObjectSomeValuesFrom (role, cls) -> cls
-                                              |> ELIClassExtractor
-                                              |> Option.map (fun clsExpr -> ELIClass.SomeValuesFrom (role, clsExpr) )
-        | ObjectMinQualifiedCardinality (1, role, cls) -> cls
-                                                        |> ELIClassExtractor
-                                                        |> Option.map (fun clsExpr -> ELIClass.SomeValuesFrom (role, clsExpr))
+        | ClassName className -> ComplexConcept.AtomicConcept className |> Some
+        | ObjectIntersectionOf classList ->
+            classList
+            |> List.map ELIClassExtractor
+            |> Monad.flattenOptionList
+            |> Option.map ComplexConcept.Intersection
+        | ObjectSomeValuesFrom(role, cls) ->
+            cls
+            |> ELIClassExtractor
+            |> Option.map (fun clsExpr -> ComplexConcept.SomeValuesFrom(role, clsExpr))
+        | ObjectMinQualifiedCardinality(1, role, cls) ->
+            cls
+            |> ELIClassExtractor
+            |> Option.map (fun clsExpr -> ComplexConcept.SomeValuesFrom(role, clsExpr))
         | _ -> None
-    
+
     let rec ELISubClassExtractor subClassExpression =
         match subClassExpression with
-            ObjectUnionOf expressions -> expressions
-                                         |> List.map ELISubClassExtractor
-                                         |> List.concat
-            | expression -> [ELIClassExtractor expression]
-    
+        | ObjectUnionOf expressions -> expressions |> List.map ELISubClassExtractor |> List.concat
+        | expression -> [ ELIClassExtractor expression ]
+
     let rec ELISuperClassExtractor superClassExpression : Class list option =
         match superClassExpression with
-        ObjectIntersectionOf expressions -> expressions
-                                            |> List.map ELISuperClassExtractor
-                                            |> flattenOptionList
-                                            |> Option.map (List.concat)
-        | ClassName superClass -> Some [superClass]
+        | ObjectIntersectionOf expressions ->
+            expressions
+            |> List.map ELISuperClassExtractor
+            |> Monad.flattenOptionList
+            |> Option.map (List.concat)
+        | ClassName superClass -> Some [ superClass ]
         | _ -> None
-    
+
     (*
         Separates the axioms into ELI-axioms and non-ELI-axioms
         ELI-Axioms are subclass axioms  
     *)
-    let ELIAxiomxtractor (axiom : Axiom) =
+    let ELIAxiomxtractor (axiom: Axiom) =
         match axiom with
         | AxiomClassAxiom clAxiom ->
             match clAxiom with
-            | SubClassOf (_, sub, super) ->
-                match (ELISubClassExtractor sub |> flattenOptionList, ELISuperClassExtractor super) with
-                | (Some subExpr, Some superExpr) -> [ELIAxiom.SubClassAxiom (subExpr, superExpr)] |> Some
+            | SubClassOf(_, sub, super) ->
+                match (ELISubClassExtractor sub |> Monad.flattenOptionList, ELISuperClassExtractor super) with
+                | (Some subExpr, Some superExpr) -> [ Formula.ConceptInclusion(subExpr, superExpr) ] |> Some
                 | _ -> None
-            | EquivalentClasses (_, classes) ->
+            | EquivalentClasses(_, classes) ->
                 classes
                 |> List.map ELISuperClassExtractor
-                |> flattenOptionList
+                |> Monad.flattenOptionList
                 |> Option.map (List.concat)
-                |> Option.map (fun classNameList
-                                -> classNameList
-                                    |> List.map (fun subClass ->
-                                                    classNameList
-                                                    |> List.where (fun superClass -> not (subClass = superClass))
-                                                    |> List.map (fun superClass ->
-                                                        ELIAxiom.SubClassAxiom ([ELIClass.ClassName subClass], [superClass]))
-                                                )
-                                    |> List.concat
-                               )
+                |> Option.map (fun classNameList ->
+                    classNameList
+                    |> List.map (fun subClass ->
+                        classNameList
+                        |> List.where (fun superClass -> not (subClass = superClass))
+                        |> List.map (fun superClass ->
+                            Formula.ConceptInclusion([ ComplexConcept.AtomicConcept subClass ], [ superClass ])))
+                    |> List.concat)
             | _ -> None
-                                            
-                
+
+
         | _ -> None

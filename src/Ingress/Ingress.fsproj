@@ -34,6 +34,7 @@
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
+        <Compile Include="Monad.fs"/>
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="IriTools" Version="2.2.0" />
