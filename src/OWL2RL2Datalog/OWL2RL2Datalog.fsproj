@@ -43,11 +43,11 @@
     
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
-        <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
+        
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0" />
+        
     </ItemGroup>
 
     <ItemGroup>
