@@ -22,11 +22,12 @@ module TestClassAxioms =
         let translatedAxioms = ELI.ELIExtractor.ELIAxiomxtractor axiom
         //Assert
         let expectedAxiom =
-    Some
-        [ ELI.Axioms.DirectlyTranslatableConceptInclusion(
-              [ ELI.Axioms.ComplexConcept.AtomicConcept subClassIri ],
-              [ superClassIri ]
-          ) ]
+            Some
+                [ ELI.Axioms.DirectlyTranslatableConceptInclusion(
+                      [ ELI.Axioms.ComplexConcept.AtomicConcept subClassIri ],
+                      [ superClassIri ]
+                  ) ]
+
         Assert.Equal(expectedAxiom, translatedAxioms)
 
     [<Fact>]
@@ -41,10 +42,16 @@ module TestClassAxioms =
         let translatedAxioms = ELI.ELIExtractor.ELIAxiomxtractor axiom
         //Assert
         let expectedAxiom1 =
-            ELI.Axioms.DirectlyTranslatableConceptInclusion([ ELI.Axioms.ComplexConcept.AtomicConcept subClassIri ], [ superClassIri ])
+            ELI.Axioms.DirectlyTranslatableConceptInclusion(
+                [ ELI.Axioms.ComplexConcept.AtomicConcept subClassIri ],
+                [ superClassIri ]
+            )
 
         let expectedAxiom2 =
-            ELI.Axioms.DirectlyTranslatableConceptInclusion([ ELI.Axioms.ComplexConcept.AtomicConcept superClassIri ], [ subClassIri ])
+            ELI.Axioms.DirectlyTranslatableConceptInclusion(
+                [ ELI.Axioms.ComplexConcept.AtomicConcept superClassIri ],
+                [ subClassIri ]
+            )
 
         let expectedAxiomList = Some [ expectedAxiom2; expectedAxiom1 ]
         Assert.Equal(expectedAxiomList, translatedAxioms)
@@ -58,7 +65,10 @@ module TestClassAxioms =
         let superClassIri = (FullIri(IriReference "https://example.com/superclass"))
 
         let axiom =
-            ELI.Axioms.DirectlyTranslatableConceptInclusion([ ELI.Axioms.ComplexConcept.AtomicConcept subClassIri ], [ superClassIri ])
+            ELI.Axioms.DirectlyTranslatableConceptInclusion(
+                [ ELI.Axioms.ComplexConcept.AtomicConcept subClassIri ],
+                [ superClassIri ]
+            )
         //Act
         let translatedRules = ELI.ELI2RL.GenerateTBoxRL resources [ axiom ]
         //Assert

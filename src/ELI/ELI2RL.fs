@@ -51,13 +51,15 @@ module ELI2RL =
             |> List.concat
         | SomeValuesFrom(role, concept) ->
             let newVar = $"{varName}_{clause}"
-let roleTriples =
-    match role with
-    | InverseObjectProperty role -> GetObjPropTriplePattern resources role newVar varName
-    | role -> GetObjPropTriplePattern resources role varName newVar
+
+            let roleTriples =
+                match role with
+                | InverseObjectProperty role -> GetObjPropTriplePattern resources role newVar varName
+                | role -> GetObjPropTriplePattern resources role varName newVar
+
             let conceptTriples = translateELI resources concept newVar 1
             roleTriples @ conceptTriples
-        | Top -> []
+        | ComplexConcept.Top -> []
 
     let translateSimpleSubclassAxiom
         (resources: ResourceManager)
@@ -71,7 +73,7 @@ let roleTriples =
 
     let GenerateAxiomRL (resources: ResourceManager) (axiom: Formula) : DagSemTools.Datalog.Rule list =
         match axiom with
-        | ConceptInclusion(subConcepts, superConcepts) ->
+        | DirectlyTranslatableConceptInclusion(subConcepts, superConcepts) ->
             subConcepts
             |> List.map (fun subConcept ->
                 superConcepts

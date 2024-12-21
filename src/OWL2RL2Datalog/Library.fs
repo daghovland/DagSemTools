@@ -67,15 +67,16 @@ module Reasoner =
         =
         let propertyResource = getObjectPropertyExpressionResource resources objProp
         let rangeClassResource = getClassExpressionResource resources rangeExp
-[ { Rule.Head =
-      { TriplePattern.Subject = ResourceOrVariable.Variable "y"
-        TriplePattern.Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
-        TriplePattern.Object = ResourceOrVariable.Resource rangeClassResource }
-    Rule.Body =
-      [ (RuleAtom.PositiveTriple
-            { Subject = ResourceOrVariable.Variable "x"
-              Predicate = ResourceOrVariable.Resource propertyResource
-              Object = ResourceOrVariable.Variable "y" }) ] } ]
+
+        [ { Rule.Head =
+              { TriplePattern.Subject = ResourceOrVariable.Variable "y"
+                TriplePattern.Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
+                TriplePattern.Object = ResourceOrVariable.Resource rangeClassResource }
+            Rule.Body =
+              [ (RuleAtom.PositiveTriple
+                    { Subject = ResourceOrVariable.Variable "x"
+                      Predicate = ResourceOrVariable.Resource propertyResource
+                      Object = ResourceOrVariable.Variable "y" }) ] } ]
     (* prp-symp 	T(?p, rdf:type, owl:SymmetricProperty) T(?x, ?p, ?y) ->	T(?y, ?p, ?x)  *)
     let SymmetricObjectProperty2Datalog
         (resourceMap: Map<string, Ingress.ResourceId>)

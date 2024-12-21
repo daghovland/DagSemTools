@@ -104,8 +104,10 @@ type Ontology
 
     member this.DirectlyImportsDocuments = directlyImportsDocuments
     member this.Annotations = annotations
-member this.Axioms =
-    Seq.concat [ axioms; BuiltInDeclarations |> List.map Axiom.AxiomDeclaration ]
+
+    member this.Axioms =
+        Seq.concat [ axioms; BuiltInDeclarations |> List.map Axiom.AxiomDeclaration ]
+
     member this.Version = version
 
     member this.TryGetOntologyVersionIri() =
