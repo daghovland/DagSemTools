@@ -41,17 +41,20 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\Datalog\Datalog.fsproj" />   
+        <ProjectReference Include="..\Datalog\Datalog.fsproj" />
+        <ProjectReference Include="..\Ingress\Ingress.fsproj" />
         <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
         <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
     </ItemGroup>
 
     <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
+        <PackageReference Include="IriTools" Version="2.2.0" />
     </ItemGroup>
     
     <ItemGroup>
