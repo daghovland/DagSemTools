@@ -44,11 +44,16 @@
     
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
-        
+        <ProjectReference Include="..\ELI\ELI.fsproj" />
+        <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
+        <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
     </ItemGroup>
+    
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
-        
+        <PackageReference Include="DagSemTools.ELI" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="0.3.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -58,10 +63,5 @@
         </None>
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\ELI\ELI.fsproj" />
-      <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
-      <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
-    </ItemGroup>
 
 </Project>
