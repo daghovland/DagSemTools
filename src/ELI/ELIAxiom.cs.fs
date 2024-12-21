@@ -20,4 +20,16 @@ module Axioms =
         | Intersection of ComplexConcept list
         | SomeValuesFrom of ObjectPropertyExpression * ComplexConcept
 
-    type Formula = ConceptInclusion of ComplexConcept list * Class list
+
+    type NormalizedConcept =
+        | Top
+        | AtomicConcept of Class
+        | AllValuesFrom of ObjectPropertyExpression * ComplexConcept
+        | AtMosOneValueFrom of ObjectPropertyExpression * ComplexConcept
+
+
+    type Formula =
+        (* of the form U C_i <= /\ A_i , where U C_i is a disjunction of ELI-concepts and /\ A_i is a conjunction of atomic concept *)
+        | DirectlyTranslatableConceptInclusion of ComplexConcept list * Class list
+        (* /\ A_i <= C, where /\ A_i is a conjunction of atomic concepts and C is a concept *)
+        | NormalizedConceptInclusion of Class list * NormalizedConcept

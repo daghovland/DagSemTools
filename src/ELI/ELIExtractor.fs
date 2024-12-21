@@ -61,7 +61,8 @@ module ELIExtractor =
             match clAxiom with
             | SubClassOf(_, sub, super) ->
                 match (ELISubClassExtractor sub |> Monad.flattenOptionList, ELISuperClassExtractor super) with
-                | (Some subExpr, Some superExpr) -> [ Formula.ConceptInclusion(subExpr, superExpr) ] |> Some
+                | (Some subExpr, Some superExpr) ->
+                    [ Formula.DirectlyTranslatableConceptInclusion(subExpr, superExpr) ] |> Some
                 | _ -> None
             | EquivalentClasses(_, classes) ->
                 classes
@@ -74,7 +75,10 @@ module ELIExtractor =
                         classNameList
                         |> List.where (fun superClass -> not (subClass = superClass))
                         |> List.map (fun superClass ->
-                            Formula.ConceptInclusion([ ComplexConcept.AtomicConcept subClass ], [ superClass ])))
+                            Formula.DirectlyTranslatableConceptInclusion(
+                                [ ComplexConcept.AtomicConcept subClass ],
+                                [ superClass ]
+                            )))
                     |> List.concat)
             | _ -> None
 
