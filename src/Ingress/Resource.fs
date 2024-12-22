@@ -28,8 +28,6 @@ open IriTools
         | DateLiteral of literalDate: DateOnly
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
-        | DLTranslatedConceptName of concept: IriReference
-        | DLTranslatedExistential of role: IriReference * filler: IriReference
             override this.ToString() =
                 match this with
                 | Iri iri -> $"<(%A{iri})>"
@@ -48,8 +46,6 @@ open IriTools
                 | DateLiteral literalDate -> $"DateLiteral(%A{literalDate})"
                 | LangLiteral (lang, langliteral) -> $"%s{lang}@%s{langliteral})"
                 | TypedLiteral (typeIri, typedLiteral) -> $"%s{typedLiteral}^^%A{typeIri}"
-                | DLTranslatedConceptName concept -> $"Internal Representation for DL reasoning of (%A{concept})"
-                | DLTranslatedExistential (role, filler) -> $"Internal Representation for DL reasoning of (%A{role} some %A{filler})"
                 
     type prefixDeclaration =
         | PrefixDefinition of PrefixName: string * PrefixIri: IriReference

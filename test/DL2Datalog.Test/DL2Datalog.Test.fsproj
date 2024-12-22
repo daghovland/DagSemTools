@@ -31,9 +31,6 @@
 
 
     <!-- Use project references for local development -->
-    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\..\src\DL2Datalog\DL2Datalog.fsproj" />
-    </ItemGroup>
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">

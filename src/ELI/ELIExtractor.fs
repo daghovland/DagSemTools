@@ -84,3 +84,13 @@ module ELIExtractor =
 
 
         | _ -> None
+
+    (* This are helpers for the  implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
+    let conceptRepresentative (concept : ClassExpression) = 
+    
+    (* This is an implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
+    let SubClassAxiomNormalization (axiom: ClassAxiom) =
+        match axiom with
+        | SubClassOf (_annot, subClassExpression, superClassExpression) ->
+            Formula.NormalizedConceptInclusion (conceptRepresentative subClassExpression) (conceptRepresentative superClassExpression)
+            @ GetNormalizedPositiveConceptInclusions superClassExpression @ GetNormalizedNegativeConceptInclusions subClassExpressions

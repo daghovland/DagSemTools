@@ -25,7 +25,7 @@ module Axioms =
         | Top
         | AtomicConcept of Class
         | AllValuesFrom of ObjectPropertyExpression * ComplexConcept
-        | AtMosOneValueFrom of ObjectPropertyExpression * ComplexConcept
+        | AtMostOneValueFrom of ObjectPropertyExpression * ComplexConcept
 
 
     type Formula =
