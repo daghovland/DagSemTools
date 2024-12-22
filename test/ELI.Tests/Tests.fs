@@ -33,8 +33,8 @@ module TestClassAxioms =
     [<Fact>]
     let ``EquivalentClass axiom is extracted`` () =
         //Arrange
-        let subClassIri = (FullIri "https://example.com/subclass")
-        let superClassIri = (FullIri "https://example.com/superclass")
+        let subClassIri = (FullIri (IriReference "https://example.com/subclass"))
+        let superClassIri = (FullIri (IriReference "https://example.com/superclass"))
 
         let axiom =
             OwlOntology.AxiomClassAxiom(EquivalentClasses([], [ ClassName subClassIri; ClassName superClassIri ]))

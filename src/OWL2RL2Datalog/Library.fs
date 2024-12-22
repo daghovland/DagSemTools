@@ -10,6 +10,7 @@
 
 namespace DagSemTools.OWL2RL2Datalog
 
+open System.IO
 open DagSemTools.Rdf
 open DagSemTools.Datalog
 open DagSemTools.Ingress
@@ -125,7 +126,7 @@ module Reasoner =
         match axiom with
         | AxiomObjectPropertyAxiom propertyAxiom -> ObjectPropertyAxiom2Datalog resourceMap resources propertyAxiom
         | AxiomClassAxiom classAxiom ->
-            match Library.Owl2Datalog resources axiom with
+            match DagSemTools.ELI.Library.Owl2Datalog resources axiom with
             | Some rules -> rules
             | None -> failwith $"Axiom {axiom} not yet handled. Sorry"
         | _ -> failwith $"Axiom {axiom} not yet handled. Sorry"

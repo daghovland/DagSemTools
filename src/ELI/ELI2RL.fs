@@ -29,7 +29,8 @@ module ELI2RL =
           Predicate = (ResourceOrVariable.Resource role)
           Object = ResourceOrVariable.Variable objectVar }
 
-    (* Called from translateELI below to handle object properties.
+    (* 
+        Called from translateELI below to handle object properties.
         Assumes objProp is not inverse property.
     *)
     let GetObjPropTriplePattern (resources: ResourceManager) objProp subjectVar objectVar =
