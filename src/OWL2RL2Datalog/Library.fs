@@ -17,7 +17,7 @@ open DagSemTools.Ingress
 open DagSemTools.OwlOntology
 open IriTools
 
-module Reasoner =
+module Library =
 
     let GetBasicResources (resources: DagSemTools.Rdf.ResourceManager) =
         [ Namespaces.RdfType, Namespaces.OwlSameAs, Namespaces.OwlThing, Namespaces.OwlNothing ]
@@ -128,13 +128,11 @@ module Reasoner =
         | AxiomClassAxiom classAxiom ->
             match DagSemTools.ELI.Library.Owl2Datalog resources axiom with
             | Some rules -> rules
-            | None -> failwith $"Axiom {axiom} not yet handled. Sorry"
-        | _ -> failwith $"Axiom {axiom} not yet handled. Sorry"
-
+            | None -> [] //TODO: failwith $"Axiom {axiom} not yet handled. Sorry"
+        | _ -> [] //TODO: failwith $"Axiom {axiom} not yet handled. Sorry"
 
     let owl2Datalog (resources: ResourceManager) (owlOntology: Ontology) (errorOutput: TextWriter) =
         let resourceMap = GetBasicResources resources
-
         owlOntology.Axioms
         |> Seq.map (owlAxiom2Datalog resourceMap resources)
         |> Seq.concat

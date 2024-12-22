@@ -51,5 +51,5 @@ public class OwlOntology
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Rule> GetAxiomRules() =>
-        DagSemTools.OWL2RL2Datalog.Reasoner.owl2Datalog(_datastore.Resources, _owlOntology, Console.Error);
+        DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_datastore.Resources, _owlOntology, Console.Error);
 }
