@@ -13,6 +13,7 @@ namespace DagSemTools.ELI
 open DagSemTools.ELI.Axioms
 open DagSemTools.OwlOntology
 open DagSemTools.Ingress
+open IriTools
 
 module ELIExtractor =
 
@@ -86,11 +87,14 @@ module ELIExtractor =
         | _ -> None
 
     (* This are helpers for the  implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
-    let conceptRepresentative (concept : ClassExpression) = 
+    let conceptRepresentative (concept : ClassExpression) =
+        $"https://github.org/daghovland/DagSemTools{concept.GetHashCode()}"
+        |> IriReference
+        |> FullIri
     
     (* This is an implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
     let SubClassAxiomNormalization (axiom: ClassAxiom) =
         match axiom with
         | SubClassOf (_annot, subClassExpression, superClassExpression) ->
-            Formula.NormalizedConceptInclusion (conceptRepresentative subClassExpression) (conceptRepresentative superClassExpression)
+            [Formula.NormalizedConceptInclusion ([(conceptRepresentative subClassExpression)], (conceptRepresentative superClassExpression))]
             @ GetNormalizedPositiveConceptInclusions superClassExpression @ GetNormalizedNegativeConceptInclusions subClassExpressions
