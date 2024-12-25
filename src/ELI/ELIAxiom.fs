@@ -22,7 +22,7 @@ module Axioms =
 
 
     type NormalizedConcept =
-        | Top
+        | Bottom
         | AtomicNamedConcept of Class
         | AtomicAnonymousConcept
         | IntersectionConcept of Class list
