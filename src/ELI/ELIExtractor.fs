@@ -87,14 +87,101 @@ module ELIExtractor =
         | _ -> None
 
     (* This are helpers for the  implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
+    
+    (* This is the function A_C in Section 4.2 of https://arxiv.org/pdf/2008.02232 *) 
     let conceptRepresentative (concept : ClassExpression) =
         $"https://github.org/daghovland/DagSemTools{concept.GetHashCode()}"
         |> IriReference
         |> FullIri
+    (* This is a combination of the function st(C) and the normalization in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
+    let rec conceptPositiveOccurenceNormalization (concept : ClassExpression) =
+        let (subConcepts, superConcepts) =
+            match concept with
+            | ClassName conceptName ->
+                ([], [NormalizedConcept.AtomicNamedConcept conceptName ])
+            | AnonymousClass i ->
+                ([], [NormalizedConcept.AtomicAnonymousConcept])
+            | ObjectUnionOf classExpressions ->
+                (classExpressions, [classExpressions |> List.map conceptRepresentative |> UnionConcept])
+            | ObjectIntersectionOf classExpressions ->
+                (classExpressions, classExpressions |> List.map (fun classExpression ->  
+                        classExpression |> conceptRepresentative |> AtomicNamedConcept ))
+            | ObjectComplementOf classExpression ->
+                ([classExpression], [ComplementConcept (conceptRepresentative classExpression) ])
+            | ObjectOneOf individuals -> failwith "TODO"
+            | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) ->
+                ([classExpression], [SomeValuesFromConcept (objectPropertyExpression,  classExpression |> conceptRepresentative)])
+            | ObjectAllValuesFrom(objectPropertyExpression, classExpression) ->
+                ([classExpression], [AllValuesFrom (objectPropertyExpression,  classExpression |> conceptRepresentative)])
+            | ObjectHasValue(objectPropertyExpression, individual) -> failwith "todo"
+            | ObjectHasSelf objectPropertyExpression -> failwith "todo"
+            | ObjectMinQualifiedCardinality(i, objectPropertyExpression, classExpression) ->
+                failwith "todo"
+            | ObjectMaxQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
+            | ObjectExactQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
+            | ObjectExactCardinality(i, objectPropertyExpression) -> failwith "todo"
+            | ObjectMinCardinality(i, objectPropertyExpression) -> failwith "todo"
+            | ObjectMaxCardinality(i, objectPropertyExpression) -> failwith "todo"
+            | DataSomeValuesFrom(iris, dataRange) -> failwith "todo"
+            | DataAllValuesFrom(iris, dataRange) -> failwith "todo"
+            | DataHasValue(iri, resource) -> failwith "todo"
+            | DataMinQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+            | DataMaxQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+            | DataExactQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+            | DataMinCardinality(i, iri) -> failwith "todo"
+            | DataMaxCardinality(i, iri) -> failwith "todo"
+            | DataExactCardinality(i, iri) -> failwith "todo"
+        (subConcepts |> Seq.map conceptPositiveOccurenceNormalization |> List.concat) @
+        (superConcepts |> List.map (fun superConcept ->
+                Formula.NormalizedConceptInclusion ([conceptRepresentative concept], superConcept)))
+         
+    and conceptNegativeOccurenceNormalization (concept : ClassExpression) =
+        let (subExpressions, subConcepts) =
+            match concept with
+            | ClassName conceptName ->
+                ([], [ [conceptName] ])
+            | AnonymousClass i ->
+                failwith "todo"
+            | ObjectUnionOf classExpressions ->
+                (classExpressions, classExpressions |> List.map (fun classExpression ->
+                    [classExpression |> conceptRepresentative ] ))
+            | ObjectIntersectionOf classExpressions ->
+                (classExpressions, [classExpressions |> List.map conceptRepresentative])
+            | ObjectComplementOf classExpression ->
+                ([classExpression], [[ComplementConcept (conceptRepresentative classExpression) ]])
+            | ObjectOneOf individuals -> failwith "TODO"
+            | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) ->
+                ([classExpression], [SomeValuesFromConcept (objectPropertyExpression,  classExpression |> conceptRepresentative)])
+            | ObjectAllValuesFrom(objectPropertyExpression, classExpression) ->
+                [AllValuesFrom (objectPropertyExpression,  classExpression |> conceptRepresentative)]
+            | ObjectHasValue(objectPropertyExpression, individual) -> failwith "todo"
+            | ObjectHasSelf objectPropertyExpression -> failwith "todo"
+            | ObjectMinQualifiedCardinality(i, objectPropertyExpression, classExpression) ->
+                failwith "todo"
+            | ObjectMaxQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
+            | ObjectExactQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
+            | ObjectExactCardinality(i, objectPropertyExpression) -> failwith "todo"
+            | ObjectMinCardinality(i, objectPropertyExpression) -> failwith "todo"
+            | ObjectMaxCardinality(i, objectPropertyExpression) -> failwith "todo"
+            | DataSomeValuesFrom(iris, dataRange) -> failwith "todo"
+            | DataAllValuesFrom(iris, dataRange) -> failwith "todo"
+            | DataHasValue(iri, resource) -> failwith "todo"
+            | DataMinQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+            | DataMaxQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+            | DataExactQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+            | DataMinCardinality(i, iri) -> failwith "todo"
+            | DataMaxCardinality(i, iri) -> failwith "todo"
+            | DataExactCardinality(i, iri) -> failwith "todo"
+        (subExpressions |> Seq.map conceptPositiveOccurenceNormalization |> List.concat) @
+        (subConcepts |> List.map (fun subConcept ->
+                Formula.NormalizedConceptInclusion (subConcept, NormalizedConcept.AtomicNamedConcept (conceptRepresentative concept))))
+        
+    let rec GetNormalizedPositiveConceptInclusion concept =
+        [] 
     
     (* This is an implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
     let SubClassAxiomNormalization (axiom: ClassAxiom) =
         match axiom with
         | SubClassOf (_annot, subClassExpression, superClassExpression) ->
-            [Formula.NormalizedConceptInclusion ([(conceptRepresentative subClassExpression)], (conceptRepresentative superClassExpression))]
+            [Formula.NormalizedConceptInclusion ([(conceptRepresentative subClassExpression)], (superClassExpression |> conceptRepresentative |> AtomicNamedConcept))]
             @ GetNormalizedPositiveConceptInclusions superClassExpression @ GetNormalizedNegativeConceptInclusions subClassExpressions
