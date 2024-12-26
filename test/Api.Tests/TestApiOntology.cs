@@ -55,7 +55,7 @@ public class TestApiOntology(ITestOutputHelper output)
 
 
     [Fact, Category("LongRunning")]
-    public void LoadgeneOntologyWorks()
+    public void LoadGeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);

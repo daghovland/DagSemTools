@@ -16,5 +16,5 @@ open DagSemTools.Rdf
 
 module Library =
 
-    let Owl2Datalog (resources: ResourceManager) (axiom: Axiom) =
-        axiom |> ELIAxiomxtractor |> Option.map (ELI2RL.GenerateTBoxRL resources)
+    let Owl2Datalog (resources: ResourceManager) (axiom: ClassAxiom) =
+        axiom |> ELIAxiomExtractor |> Option.map (ELI2RL.GenerateTBoxRL resources)

@@ -97,11 +97,7 @@ module Library =
                       Object = ResourceOrVariable.Variable "y" }) ] } ]
 
 
-    let pairs list =
-        [ for x in list do
-              for y in list do
-                  if x <> y then
-                      yield (x, y) ]
+
 
     (* From Table 7 in https://www.w3.org/TR/owl2-profiles/#OWL_2_RL:
         cax-eqc1 	T(?c1, owl:equivalentClass, ?c2) T(?x, rdf:type, ?c1) 	T(?x, rdf:type, ?c2)
@@ -126,7 +122,7 @@ module Library =
         match axiom with
         | AxiomObjectPropertyAxiom propertyAxiom -> ObjectPropertyAxiom2Datalog resourceMap resources propertyAxiom
         | AxiomClassAxiom classAxiom ->
-            match DagSemTools.ELI.Library.Owl2Datalog resources axiom with
+            match DagSemTools.ELI.Library.Owl2Datalog resources classAxiom with
             | Some rules -> rules
             | None -> [] //TODO: failwith $"Axiom {axiom} not yet handled. Sorry"
         | _ -> [] //TODO: failwith $"Axiom {axiom} not yet handled. Sorry"

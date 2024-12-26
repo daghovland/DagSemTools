@@ -25,10 +25,6 @@ module Axioms =
         | Bottom
         | AtomicNamedConcept of Class
         | AtomicAnonymousConcept
-        | IntersectionConcept of Class list
-        | UnionConcept of Class list
-        | ComplementConcept of Class
-        | SomeValuesFromConcept of ObjectPropertyExpression * Class
         | AllValuesFrom of ObjectPropertyExpression * Class
         | AtMostOneValueFrom of ObjectPropertyExpression * Class
 

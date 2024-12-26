@@ -14,6 +14,7 @@ open DagSemTools.AlcTableau.ALC
 open DagSemTools.ELI.Axioms
 open DagSemTools.OwlOntology
 open DagSemTools.Ingress
+open DagSemTools.Rdf
 open IriTools
 
 module ELIExtractor =
@@ -53,40 +54,7 @@ module ELIExtractor =
         | ClassName superClass -> Some [ superClass ]
         | _ -> None
 
-    (*
-        Separates the axioms into ELI-axioms and non-ELI-axioms
-        ELI-Axioms are subclass axioms  
-    *)
-    let ELIAxiomxtractor (axiom: Axiom) =
-        match axiom with
-        | AxiomClassAxiom clAxiom ->
-            match clAxiom with
-            | SubClassOf(_, sub, super) ->
-                match (ELISubClassExtractor sub |> Monad.flattenOptionList, ELISuperClassExtractor super) with
-                | (Some subExpr, Some superExpr) ->
-                    [ Formula.DirectlyTranslatableConceptInclusion(subExpr, superExpr) ] |> Some
-                | _ -> None
-            | EquivalentClasses(_, classes) ->
-                classes
-                |> List.map ELISuperClassExtractor
-                |> Monad.flattenOptionList
-                |> Option.map (List.concat)
-                |> Option.map (fun classNameList ->
-                    classNameList
-                    |> List.map (fun subClass ->
-                        classNameList
-                        |> List.where (fun superClass -> not (subClass = superClass))
-                        |> List.map (fun superClass ->
-                            Formula.DirectlyTranslatableConceptInclusion(
-                                [ ComplexConcept.AtomicConcept subClass ],
-                                [ superClass ]
-                            )))
-                    |> List.concat)
-            | _ -> None
-
-
-        | _ -> None
-
+    
     (* This are helpers for the  implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
     
     (* This is the function A_C in Section 4.2 of https://arxiv.org/pdf/2008.02232 *) 
@@ -118,10 +86,10 @@ module ELIExtractor =
                         | AnonymousClass i ->
                             ([], [], [NormalizedConcept.AtomicAnonymousConcept])
                         | ObjectUnionOf classExpressions ->
-                            (classExpressions, [], [classExpressions |> List.map conceptRepresentative |> UnionConcept])
+                            failwith "Invalid OWL 2 RL: Union in the superclass position not allowed"
                         | ObjectOneOf individuals -> failwith "TODO"
                         | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) ->
-                            ([], [classExpression], [SomeValuesFromConcept (objectPropertyExpression,  classExpression |> conceptRepresentative)])
+                            failwith "Invalid OWL 2 RL: Existential in the superclass position not allowed"
                         | ObjectAllValuesFrom(objectPropertyExpression, classExpression) ->
                             ([], [classExpression], [AllValuesFrom (objectPropertyExpression,  classExpression |> conceptRepresentative)])
                         | ObjectHasValue(objectPropertyExpression, individual) -> failwith "todo"
@@ -216,3 +184,22 @@ module ELIExtractor =
         | SubClassOf (_annot, subClassExpression, superClassExpression) ->
             [Formula.NormalizedConceptInclusion ([(conceptRepresentative subClassExpression)], (superClassExpression |> conceptRepresentative |> AtomicNamedConcept))]
             @ conceptPositiveOccurenceNormalization superClassExpression @ conceptNegativeOccurenceNormalization subClassExpression
+            
+            
+    (*
+        Separates the axioms into ELI-axioms and non-ELI-axioms
+        ELI-Axioms are subclass axioms  
+    *)
+    let rec ELIAxiomExtractor (clAxiom: ClassAxiom) =
+            match clAxiom with
+            | SubClassOf(_, sub, super) ->
+                match (ELISubClassExtractor sub |> Monad.flattenOptionList, ELISuperClassExtractor super) with
+                | (Some subExpr, Some superExpr) ->
+                    [ Formula.DirectlyTranslatableConceptInclusion(subExpr, superExpr) ] |> Some
+                | _ -> SubClassAxiomNormalization clAxiom |> Some 
+            | EquivalentClasses(_, classes) ->
+                DagSemTools.Ingress.Monad.pairs classes
+                |> List.map (fun (subConcept, superConcept) -> ELIAxiomExtractor (SubClassOf ([], subConcept, superConcept)))
+                |> Monad.flattenOptionList
+                |> Option.map List.concat
+            | _ -> None

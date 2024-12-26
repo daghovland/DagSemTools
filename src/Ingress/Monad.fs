@@ -18,3 +18,9 @@ module Monad =
                 | _ -> None)
             (Some [])
             inputList
+
+    let pairs list =
+        [ for x in list do
+              for y in list do
+                  if x <> y then
+                      yield (x, y) ]

@@ -17,9 +17,9 @@ module TestClassAxioms =
         let superClassIri = (FullIri(IriReference "https://example.com/superclass"))
 
         let axiom =
-            OwlOntology.AxiomClassAxiom(SubClassOf([], ClassName subClassIri, ClassName superClassIri))
+            SubClassOf([], ClassName subClassIri, ClassName superClassIri)
         //Act
-        let translatedAxioms = ELI.ELIExtractor.ELIAxiomxtractor axiom
+        let translatedAxioms = ELI.ELIExtractor.ELIAxiomExtractor axiom
         //Assert
         let expectedAxiom =
             Some
@@ -37,9 +37,9 @@ module TestClassAxioms =
         let superClassIri = (FullIri (IriReference "https://example.com/superclass"))
 
         let axiom =
-            OwlOntology.AxiomClassAxiom(EquivalentClasses([], [ ClassName subClassIri; ClassName superClassIri ]))
+            EquivalentClasses([], [ ClassName subClassIri; ClassName superClassIri ])
         //Act
-        let translatedAxioms = ELI.ELIExtractor.ELIAxiomxtractor axiom
+        let translatedAxioms = ELI.ELIExtractor.ELIAxiomExtractor axiom
         //Assert
         let expectedAxiom1 =
             ELI.Axioms.DirectlyTranslatableConceptInclusion(
