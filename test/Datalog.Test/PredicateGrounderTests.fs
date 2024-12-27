@@ -53,7 +53,6 @@ module PredicateGrounderTests =
                         Body = [triplepattern2]}
             
             let groundRule = PredicateGrounder.instantiateRuleWithVariableMapping (predIndex, rule, (Variable "p"))
-            groundRule.Head.IsNormalHead.Should().BeTrue() |> ignore
             match groundRule.Head with
             | Contradiction -> failwith "bug"
             | NormalHead headPattern ->  headPattern.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
