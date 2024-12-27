@@ -21,12 +21,16 @@ module PredicateGrounder =
         | Variable _ -> None
         | ResourceOrVariable.Resource r -> Some r
 
+    let getRuleHeadPredicate (head : RuleHead) =
+        match head with
+        | Contradiction -> None
+        | NormalHead tp -> getTriplePredicate tp
     let getAtomPredicate (atom: RuleAtom)  =
         match atom with
         | PositiveTriple triple -> getTriplePredicate triple
         | NotTriple triple -> getTriplePredicate triple    
     let getPredicatesInUse (rules: Rule seq, triplestore: Datastore) =
-        let headPredicates = rules |> Seq.choose (fun rule -> getTriplePredicate rule.Head)
+        let headPredicates = rules |> Seq.choose (fun rule -> getRuleHeadPredicate rule.Head)
         let dataPredicates = triplestore.Resources.GetIriResourceIds()
         Seq. concat [headPredicates; dataPredicates] |> Seq.distinct
 
@@ -40,7 +44,9 @@ module PredicateGrounder =
         {Subject = tripleList.[0]; Predicate = tripleList.[1]; Object = tripleList.[2]}
         
     let instantiateRuleWithVariableMapping (predicate: Ingress.ResourceId, rule: Rule, variableName) =
-        let newHead = {rule.Head with Predicate = ResourceOrVariable.Resource predicate}
+        let newHead = match rule.Head with
+                        | Contradiction -> Contradiction
+                        | NormalHead triplePattern -> NormalHead {triplePattern with Predicate = ResourceOrVariable.Resource predicate}
         let newBody = rule.Body |> List.map (
             fun atom ->
                 match atom with
@@ -49,10 +55,14 @@ module PredicateGrounder =
                 )
         {rule with Head = newHead; Body = newBody}
     
-    let multiplyRuleHeadWithPredicates (predicates: Ingress.ResourceId seq) (rule: Rule) =
-        match rule.Head.Predicate with
-        | Variable s -> predicates |> Seq.map (fun p -> instantiateRuleWithVariableMapping(p, rule, Variable s))
-        | ResourceOrVariable.Resource _ -> [rule]
+    let multiplyRuleHeadWithPredicates (predicates: Ingress.ResourceId seq) (rule: Rule) : Rule seq=
+        match rule.Head with
+        | Contradiction -> [rule]
+        | NormalHead ruleHead ->
+                        match ruleHead.Predicate with
+                        | Variable s -> predicates
+                                        |> Seq.map (fun p -> instantiateRuleWithVariableMapping(p, rule, Variable s))
+                        | ResourceOrVariable.Resource _ -> [rule]
 
     let getTripleRelationVariable (triple : TriplePattern) =
         match triple.Predicate with

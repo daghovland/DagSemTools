@@ -11,13 +11,15 @@
     <ItemGroup>
         <Compile Include="TestEqualityAxioms.fs" />
         <Compile Include="TestClassAxioms.fs" />
+        <Compile Include="TestpropertyAxioms.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="Serilog.Sinks.InMemory" Version="0.11.0" />
         <PackageReference Include="xunit" Version="2.9.2" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>

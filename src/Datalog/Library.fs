@@ -30,6 +30,19 @@ type ResourceOrWildcard =
 type TriplePattern =
     {Subject: ResourceOrVariable; Predicate: ResourceOrVariable; Object: ResourceOrVariable}
 
+
+[<StructuralComparison>]
+[<StructuralEquality>]
+type RuleHead =
+    NormalHead of pattern: TriplePattern
+    | Contradiction
+    member this.GetVariables() =
+        match this with
+        | NormalHead triplePattern -> [triplePattern.Subject; triplePattern.Predicate; triplePattern.Object]
+        | Contradiction -> []
+        
+            
+        
 [<StructuralComparison>]
 [<StructuralEquality>]
 type RuleAtom = 
@@ -45,7 +58,7 @@ type TripleWildcard =
 [<StructuralComparison>]
 [<StructuralEquality>]
 type Rule = 
-    {Head: TriplePattern; Body: RuleAtom list}
+    {Head: RuleHead; Body: RuleAtom list}
 
 type Substitution = 
     Map<string, Ingress.ResourceId>
@@ -100,9 +113,12 @@ module Datalog =
         generatePatterns resourceList |> List.map (fun triplePart ->
             {Subject = List.item 0 triplePart; Predicate = List.item 1 triplePart; Object = List.item 2 triplePart})
         
-        
+    let RuleHeadToString (tripleTable : Datastore) ruleHead : string =
+        match ruleHead with
+        | NormalHead triplePattern -> TriplePatternToString tripleTable triplePattern
+        | Contradiction -> "false"
     let RuleToString (tripleTable : Datastore) (rule : Rule) : string =
-        let mutable headString = rule.Head |> TriplePatternToString tripleTable
+        let mutable headString = rule.Head |> RuleHeadToString tripleTable
         headString <- headString + " :- "
         rule.Body |> List.iter (fun atom -> headString <- headString + ResourceAtom tripleTable atom + ", ")
         headString
@@ -118,7 +134,7 @@ module Datalog =
                                                         | Variable v -> Some (v)
                                                         | _ -> None
                                 )
-        let variablesInHead = [rule.Head.Subject; rule.Head.Predicate; rule.Head.Object]
+        let variablesInHead = rule.Head.GetVariables()
                                 |> Seq.choose (fun r -> match r with
                                                         | Variable v -> Some (v)
                                                         | _ -> None

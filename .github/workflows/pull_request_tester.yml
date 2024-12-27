@@ -58,7 +58,7 @@ jobs:
             "Parser"
             "Turtle.Parser"
             "Datalog"
-            "DL2Datalog"
+            "ELI"
             "Datalog.Parser"
             "OWL2RL2Datalog"
             "Manchester"

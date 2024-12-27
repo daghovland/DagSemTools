@@ -85,6 +85,10 @@ module Namespaces =
     [<Literal>]
     let OwlAxiom = Owl + "Axiom"
     [<Literal>]
+    let OwlThing = Owl + "Thing"
+    [<Literal>]
+    let OwlNothing = Owl + "Nothing"
+    [<Literal>]
     let OwlAnnotation = Owl + "Annotation"
     [<Literal>]
     let OwlAnnotatedSource = Owl + "annotatedSource"

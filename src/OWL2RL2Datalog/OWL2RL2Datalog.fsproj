@@ -37,17 +37,23 @@
 
 
     <ItemGroup>
-        <PackageReference Include="Faqt" Version="4.2.1" />
+        <PackageReference Include="Faqt" Version="4.4.0" />
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
+        <PackageReference Include="IriTools" Version="2.2.0" />
     </ItemGroup>
     
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\Datalog\Datalog.fsproj" />
-        <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
+        <ProjectReference Include="..\ELI\ELI.fsproj" />
+        <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
+        <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
     </ItemGroup>
+    
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.ELI" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="0.3.0" />
     </ItemGroup>
 
     <ItemGroup>
@@ -56,5 +62,6 @@
             <PackagePath>README.md</PackagePath>
         </None>
     </ItemGroup>
+
 
 </Project>

@@ -72,4 +72,5 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
           TripleResource.predicate = ResourceList.[int triple.predicate]
           TripleResource.obj = ResourceList.[int triple.obj]
         }
-        
+     
+    

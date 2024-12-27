@@ -54,6 +54,11 @@ module Reasoner =
             Rules
                 |> Seq.filter isFact
                 |> Seq.map (fun rule -> rule.Head)
+                |> Seq.map (fun ruleHead ->
+                                            match ruleHead with
+                                            | Contradiction -> failwith "Contradiction found during reasoning. Aborting. Should handle better. Sorry"
+                                            | NormalHead pattern -> pattern
+                                            )
                 |> Seq.map (ApplySubstitutionTriple emptySubstitution)
         
         (* 
@@ -64,8 +69,11 @@ module Reasoner =
                 this.GetFacts() |> Seq.iter tripleStore.AddTriple
                 for triple in tripleStore.Triples.GetTriples() do
                     for rules in this.GetRulesForFact triple do
+                        let ruleMatchHead = match rules.Match.Rule.Head with
+                                            | Contradiction -> failwith $"Contradiction occurred during reasoning: {RuleToString tripleStore rules.Match.Rule}"
+                                            | NormalHead head -> head
                         for subs in evaluate tripleStore.Triples rules  do
-                            let newTriple = ApplySubstitutionTriple subs rules.Match.Rule.Head
+                            let newTriple = ApplySubstitutionTriple subs ruleMatchHead
                             tripleStore.AddTriple newTriple
 
     let evaluate (rules: Rule list, triplestore: Datastore) =

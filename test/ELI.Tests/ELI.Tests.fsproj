@@ -11,14 +11,14 @@
     <ItemGroup>
         <Compile Include="Tests.fs"/>
         <Compile Include="Program.fs"/>
-        <Folder Include="TestData\" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Faqt" Version="4.2.1" />
-        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
+        <PackageReference Include="Faqt" Version="4.4.0" />
+        <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+        <PackageReference Include="Serilog.Sinks.InMemory" Version="0.11.0" />
         <PackageReference Include="xunit" Version="2.9.2" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="2.8.2">
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -29,15 +29,8 @@
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
-
-    <!-- Use project references for local development -->
-    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\..\src\DL2Datalog\DL2Datalog.fsproj" />
-    </ItemGroup>
-
-    <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
-    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.DL2Datalog" Version="0.3.0" />
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\ELI\ELI.fsproj" />
     </ItemGroup>
 
 </Project>

@@ -6,8 +6,11 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Datalog;
 using DagSemTools.OwlOntology;
+using DagSemTools.Rdf;
 using DagSemTools.RdfOwlTranslator;
+using Serilog;
 
 namespace DagSemTools.Api;
 
@@ -18,11 +21,16 @@ namespace DagSemTools.Api;
 public class OwlOntology
 {
     private DagSemTools.OwlOntology.Ontology _owlOntology;
+    private Datastore _datastore;
+    private ILogger _logger;
 
-    internal OwlOntology(IGraph graph)
+    internal OwlOntology(IGraph graph, ILogger? logger = null)
     {
-        var datastore = graph.Datastore;
-        var translator = new Rdf2Owl(datastore.Triples, datastore.Resources);
+        _logger = logger ?? new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
+        _datastore = graph.Datastore;
+        var translator = new Rdf2Owl(_datastore.Triples, _datastore.Resources);
         _owlOntology = translator.extractOntology;
     }
 
@@ -42,4 +50,11 @@ public class OwlOntology
     /// <returns></returns>
     public IEnumerable<Axiom> GetAxioms() =>
         _owlOntology.Axioms;
+
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <returns></returns>
+    public IEnumerable<Rule> GetAxiomRules() =>
+        DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, _datastore.Resources, _owlOntology);
 }

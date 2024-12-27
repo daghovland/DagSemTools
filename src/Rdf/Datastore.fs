@@ -76,3 +76,5 @@ type Datastore(triples: TripleTable,
             |> Seq.map this.Resources.GetResourceTriple
             |> Seq.map _.ToString()
             |> String.concat ". "
+            
+    

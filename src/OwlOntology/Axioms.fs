@@ -18,8 +18,8 @@ open IriTools
 
     type Iri = 
         | FullIri of IriReference
-        | AbbreviatedIri of string
-        | PrefixedIri of PrefixName : string * LocalName : string
+        // | AbbreviatedIri of string
+        // | PrefixedIri of PrefixName : string * LocalName : string
     
     type Individual =
         | NamedIndividual of Iri
