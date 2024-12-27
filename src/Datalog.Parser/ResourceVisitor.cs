@@ -31,28 +31,16 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
 
     private UInt32 GetIriId(IriReference iri)
     {
-        var resource = GraphElement.NewIri(iri);
-        return Datastore.AddResource(resource);
+        var resource = RdfResource.NewIri(iri);
+        return Datastore.AddNodeResource(resource);
     }
 
-    /// <summary>
-    /// Visits an iri
-    /// </summary>
-    /// <param name="ctxt"></param>
-    /// <returns></returns>
     public override uint VisitIri(IriContext ctxt)
     {
         var iri = _iriGrammarVisitor.Visit(ctxt)
                   ?? throw new System.Exception($"IRI {ctxt.GetText()} is null");
         return GetIriId(iri);
     }
-
-
-    /// <summary>
-    /// Visits an iri
-    /// </summary>
-    /// <param name="ctxt"></param>
-    /// <returns></returns>
     public override uint VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext ctxt)
     {
         var iri = _iriGrammarVisitor.Visit(ctxt)
@@ -63,22 +51,22 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
     public override uint VisitIntegerLiteral(IntegerLiteralContext context)
     {
         int literal = int.Parse(context.INTEGER().GetText());
-        var resource = GraphElement.NewIntegerLiteral(literal);
-        return Datastore.AddResource(resource);
+        var resource = RdfLiteral.NewIntegerLiteral(literal);
+        return Datastore.AddLiteralResource(resource);
     }
 
     public override uint VisitDecimalLiteral(DecimalLiteralContext context)
     {
         decimal literal = decimal.Parse(context.DECIMAL().GetText(), CultureInfo.InvariantCulture);
-        var resource = GraphElement.NewDecimalLiteral(literal);
-        return Datastore.AddResource(resource);
+        var resource = RdfLiteral.NewDecimalLiteral(literal);
+        return Datastore.AddLiteralResource(resource);
     }
 
     public override uint VisitDoubleLiteral(DoubleLiteralContext context)
     {
         double literal = double.Parse(context.DOUBLE().GetText(), CultureInfo.InvariantCulture);
-        var resource = GraphElement.NewDoubleLiteral(literal);
-        return Datastore.AddResource(resource);
+        var resource = RdfLiteral.NewDoubleLiteral(literal);
+        return Datastore.AddLiteralResource(resource);
     }
 
     public override uint VisitNamedBlankNode(NamedBlankNodeContext context)
@@ -92,9 +80,9 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
     public override uint VisitCollection(CollectionContext context)
     {
 
-        var rdfnil = Datastore.AddResource(GraphElement.NewIri(new IriReference(Namespaces.RdfNil)));
-        var rdffirst = Datastore.AddResource(GraphElement.NewIri(new IriReference(Namespaces.RdfFirst)));
-        var rdfrest = Datastore.AddResource(GraphElement.NewIri(new IriReference(Namespaces.RdfRest)));
+        var rdfnil = Datastore.AddNodeResource(RdfResource.NewIri(new IriReference(Namespaces.RdfNil)));
+        var rdffirst = Datastore.AddNodeResource(RdfResource.NewIri(new IriReference(Namespaces.RdfFirst)));
+        var rdfrest = Datastore.AddNodeResource(RdfResource.NewIri(new IriReference(Namespaces.RdfRest)));
 
         return context.rdfobject()
             .Aggregate(
@@ -153,7 +141,7 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
     /// <param name="context"></param>
     /// <returns></returns>
     public override uint VisitTrueBooleanLiteral(TrueBooleanLiteralContext context)
-        => Datastore.AddResource(GraphElement.NewBooleanLiteral(true));
+        => Datastore.AddLiteralResource(RdfLiteral.NewBooleanLiteral(true));
 
     /// <summary>
     /// Visits the abbreviation 'false' for xsd:false
@@ -161,14 +149,14 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
     /// <param name="context"></param>
     /// <returns></returns>
     public override uint VisitFalseBooleanLiteral(FalseBooleanLiteralContext context)
-        => Datastore.AddResource(GraphElement.NewBooleanLiteral(false));
+        => Datastore.AddLiteralResource(RdfLiteral.NewBooleanLiteral(false));
 
     /// <inheritdoc />
     public override uint VisitPlainStringLiteral(PlainStringLiteralContext context)
     {
         var literalString = _stringVisitor.Visit(context.stringLiteral());
-        var literal = GraphElement.NewLiteralString(literalString);
-        return Datastore.AddResource(literal);
+        var literal = RdfLiteral.NewLiteralString(literalString);
+        return Datastore.AddLiteralResource(literal);
     }
 
     /// <summary>
@@ -180,8 +168,8 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
     {
         var literalString = _stringVisitor.Visit(context.stringLiteral());
         var langDir = context.LANG_DIR().GetText();
-        var literal = GraphElement.NewLangLiteral(literalString, langDir);
-        return Datastore.AddResource(literal);
+        var literal = RdfLiteral.NewLangLiteral(literalString, langDir);
+        return Datastore.AddLiteralResource(literal);
     }
     /// <summary>
     /// Visits a string literal that has a datatype specified, f.ex. "3"^^xsd:integer
@@ -192,21 +180,21 @@ internal class ResourceVisitor : DatalogBaseVisitor<uint>
     {
         var literalString = _stringVisitor.Visit(context.stringLiteral());
         IriReference typeIri = _iriGrammarVisitor.Visit(context.iri());
-        GraphElement typedLiteral = typeIri.ToString() switch
+        RdfLiteral typedLiteral = typeIri.ToString() switch
         {
-            Namespaces.XsdString => GraphElement.NewLiteralString(literalString),
-            Namespaces.XsdDouble => GraphElement.NewDoubleLiteral(double.Parse(literalString, CultureInfo.InvariantCulture)),
-            Namespaces.XsdDecimal => GraphElement.NewDecimalLiteral(decimal.Parse(literalString, CultureInfo.InvariantCulture)),
-            Namespaces.XsdInteger => GraphElement.NewIntegerLiteral(int.Parse(literalString)),
-            Namespaces.XsdFloat => GraphElement.NewFloatLiteral(float.Parse(literalString, CultureInfo.InvariantCulture)),
-            Namespaces.XsdBoolean => GraphElement.NewBooleanLiteral(bool.Parse(literalString)),
-            Namespaces.XsdDateTime => GraphElement.NewDateTimeLiteral(DateTime.Parse(literalString)),
-            Namespaces.XsdDate => GraphElement.NewDateLiteral(DateOnly.Parse(literalString)),
-            Namespaces.XsdDuration => GraphElement.NewDurationLiteral(TimeSpan.Parse(literalString)),
-            Namespaces.XsdTime => GraphElement.NewTimeLiteral(TimeOnly.Parse(literalString)),
-            _ => GraphElement.NewTypedLiteral(typeIri, literalString)
+            Namespaces.XsdString => RdfLiteral.NewLiteralString(literalString),
+            Namespaces.XsdDouble => RdfLiteral.NewDoubleLiteral(double.Parse(literalString, CultureInfo.InvariantCulture)),
+            Namespaces.XsdDecimal => RdfLiteral.NewDecimalLiteral(decimal.Parse(literalString, CultureInfo.InvariantCulture)),
+            Namespaces.XsdInteger => RdfLiteral.NewIntegerLiteral(int.Parse(literalString)),
+            Namespaces.XsdFloat => RdfLiteral.NewFloatLiteral(float.Parse(literalString, CultureInfo.InvariantCulture)),
+            Namespaces.XsdBoolean => RdfLiteral.NewBooleanLiteral(bool.Parse(literalString)),
+            Namespaces.XsdDateTime => RdfLiteral.NewDateTimeLiteral(DateTime.Parse(literalString)),
+            Namespaces.XsdDate => RdfLiteral.NewDateLiteral(DateOnly.Parse(literalString)),
+            Namespaces.XsdDuration => RdfLiteral.NewDurationLiteral(TimeSpan.Parse(literalString)),
+            Namespaces.XsdTime => RdfLiteral.NewTimeLiteral(TimeOnly.Parse(literalString)),
+            _ => RdfLiteral.NewTypedLiteral(typeIri, literalString)
         };
-        return Datastore.AddResource(typedLiteral);
+        return Datastore.AddLiteralResource(typedLiteral);
     }
 
 }

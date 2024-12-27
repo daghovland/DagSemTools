@@ -70,7 +70,7 @@ module TestClassAxioms =
     [<Fact>]
     let ``Subclass axiom creates datalog rule`` () =
         //Arrange
-        let resources = new ResourceManager(10u)
+        let resources = new GraphElementManager(10u)
         let subClassIri = (FullIri(IriReference "https://example.com/subclass"))
         let superClassIri = (FullIri(IriReference "https://example.com/superclass"))
 
@@ -85,19 +85,19 @@ module TestClassAxioms =
         let expectedRules: Datalog.Rule seq =
             [ { Head = NormalHead
                   { Subject = ResourceOrVariable.Variable "X"
-                    Predicate = ResourceOrVariable.Resource(resources.AddResource(Iri(IriReference Namespaces.RdfType)))
+                    Predicate = ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
                     Object =
                       ResourceOrVariable.Resource(
-                          resources.AddResource(Iri(IriReference "https://example.com/superclass"))
+                          resources.AddNodeResource(Iri(IriReference "https://example.com/superclass"))
                       ) }
                 Body =
                   [ PositiveTriple
                         { Subject = ResourceOrVariable.Variable "X"
                           Predicate =
-                            ResourceOrVariable.Resource(resources.AddResource(Iri(IriReference Namespaces.RdfType)))
+                            ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
                           Object =
                             ResourceOrVariable.Resource(
-                                resources.AddResource(Iri(IriReference "https://example.com/subclass"))
+                                resources.AddNodeResource(Iri(IriReference "https://example.com/subclass"))
                             ) } ] } ]
 
         Assert.Equal<Rule seq>(expectedRules, translatedRules)

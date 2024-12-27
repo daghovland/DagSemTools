@@ -10,12 +10,22 @@ namespace DagSemTools.Ingress
 open System
 open IriTools
 
+    
     [<StructuralComparison>]
     [<StructuralEquality>]
     [<Struct>]
-    type public GraphElement =
-        public Iri of iri:  IriReference
+    type public RdfResource =
+        Iri of iri:  IriReference
         | AnonymousBlankNode of anon_blankNode: uint32
+        override this.ToString() =
+                match this with
+                | Iri iri -> $"<(%A{iri})>"
+                | AnonymousBlankNode anon_blankNode -> $"_:(%u{anon_blankNode})"
+            
+    [<StructuralComparison>]
+    [<StructuralEquality>]
+    [<Struct>]
+    type public RdfLiteral =
         | LiteralString of literal: string
         | BooleanLiteral of literalBool: bool
         | DecimalLiteral of literalDec: decimal
@@ -28,10 +38,8 @@ open IriTools
         | DateLiteral of literalDate: DateOnly
         | LangLiteral of lang: string * langliteral: string
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
-            override this.ToString() =
+        override this.ToString() =
                 match this with
-                | Iri iri -> $"<(%A{iri})>"
-                | AnonymousBlankNode anon_blankNode -> $"_:(%u{anon_blankNode})"
                 | LiteralString literal -> $"(%s{literal})"
                 | BooleanLiteral literalBool -> match literalBool with
                                                     | true -> $"(true)"
@@ -46,6 +54,17 @@ open IriTools
                 | DateLiteral literalDate -> $"DateLiteral(%A{literalDate})"
                 | LangLiteral (lang, langliteral) -> $"%s{lang}@%s{langliteral})"
                 | TypedLiteral (typeIri, typedLiteral) -> $"%s{typedLiteral}^^%A{typeIri}"
+            
+    [<StructuralComparison>]
+    [<StructuralEquality>]
+    [<Struct>]
+    type public GraphElement =
+        | NodeOrEdge of resource: RdfResource
+        | GraphLiteral of literal: RdfLiteral
+            override this.ToString() =
+                match this with
+                | NodeOrEdge r -> r.ToString()
+                | GraphLiteral l -> l.ToString()
                 
     type prefixDeclaration =
         | PrefixDefinition of PrefixName: string * PrefixIri: IriReference

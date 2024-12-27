@@ -19,29 +19,29 @@ open IriTools
 
 module Library =
 
-    let GetBasicResources (resources: DagSemTools.Rdf.ResourceManager) =
+    let GetBasicResources (resources: DagSemTools.Rdf.GraphElementManager) =
         [ Namespaces.RdfType, Namespaces.OwlSameAs, Namespaces.OwlThing, Namespaces.OwlNothing ]
         |> List.map (fun iri ->
-            (Namespaces.RdfType, resources.AddResource(GraphElement.Iri(IriReference Namespaces.RdfType))))
+            (Namespaces.RdfType, resources.AddNodeResource(RdfResource.Iri(IriReference Namespaces.RdfType))))
         |> Map.ofList
 
-    let getObjectPropertyExpressionResource (resources: ResourceManager) objProp =
+    let getObjectPropertyExpressionResource (resources: GraphElementManager) objProp =
         match objProp with
-        | NamedObjectProperty(FullIri iri) -> resources.AddResource(GraphElement.Iri iri)
-        | AnonymousObjectProperty bNode -> resources.ResourceMap.[GraphElement.AnonymousBlankNode bNode]
+        | NamedObjectProperty(FullIri iri) -> resources.AddNodeResource(RdfResource.Iri iri)
+        | AnonymousObjectProperty bNode -> resources.AddNodeResource(AnonymousBlankNode bNode)
         | InverseObjectProperty _ ->
             failwith "Invalid Owl Ontology: Domain of unnamed inverse object property not supported"
         | ObjectPropertyChain _ -> failwith "Invalid Owl Ontology: Domain of object property chain not supported"
 
-    let getClassExpressionResource (resources: ResourceManager) classExpr =
+    let getClassExpressionResource (resources: GraphElementManager) classExpr =
         match classExpr with
-        | ClassName(FullIri iri) -> resources.AddResource(GraphElement.Iri iri)
-        | AnonymousClass bNode -> resources.ResourceMap.[GraphElement.AnonymousBlankNode bNode]
+        | ClassName(FullIri iri) -> resources.AddNodeResource(RdfResource.Iri iri)
+        | AnonymousClass bNode -> resources.AddNodeResource(AnonymousBlankNode bNode)
         | _ -> failwith "Unnamed class not yet implemented for this operation. Sorry"
 
     let ObjectPropertyDomain2Datalog
-        (resourceMap: Map<string, Ingress.ResourceId>)
-        (resources: ResourceManager)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
         objProp
         domExp
         =
@@ -61,8 +61,8 @@ module Library =
 
 
     let ObjectPropertyRange2Datalog
-        (resourceMap: Map<string, Ingress.ResourceId>)
-        (resources: ResourceManager)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
         objProp
         rangeExp
         =
@@ -80,8 +80,8 @@ module Library =
                       Object = ResourceOrVariable.Variable "y" }) ] } ]
     (* prp-symp 	T(?p, rdf:type, owl:SymmetricProperty) T(?x, ?p, ?y) ->	T(?y, ?p, ?x)  *)
     let SymmetricObjectProperty2Datalog
-        (resourceMap: Map<string, Ingress.ResourceId>)
-        (resources: ResourceManager)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
         objProp
         =
         let propertyResource = getObjectPropertyExpressionResource resources objProp
@@ -104,8 +104,8 @@ module Library =
         cax-eqc2 	T(?c1, owl:equivalentClass, ?c2) T(?x, rdf:type, ?c2) 	T(?x, rdf:type, ?c1) 
     *)
     let ObjectPropertyAxiom2Datalog
-        (resourceMap: Map<string, Ingress.ResourceId>)
-        (resources: ResourceManager)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
         (axiom: ObjectPropertyAxiom)
         =
         match axiom with
@@ -115,8 +115,8 @@ module Library =
         | _ -> []
 
     let owlAxiom2Datalog logger
-        (resourceMap: Map<string, Ingress.ResourceId>)
-        (resources: ResourceManager)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
         (axiom: Axiom)
         : Rule seq =
         match axiom with

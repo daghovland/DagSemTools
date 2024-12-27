@@ -29,8 +29,8 @@ module Stratifier =
     [<StructuralComparison>]
     type Relation =
         | AllRelations
-        | BinaryPredicate of ResourceId
-        | UnaryPredicate of predicate : ResourceId * obj : ResourceId 
+        | BinaryPredicate of GraphElementId
+        | UnaryPredicate of predicate : GraphElementId * obj : GraphElementId 
     
     
     (* A relation matches a triple if the predicate matches a binary relation or if both predicate and object matches a unary relation *)

@@ -7,6 +7,7 @@
 *)
 module DagSemTools.Rdf.Tests
 
+open DagSemTools.Ingress
 open DagSemTools.Rdf
 open Xunit
 open DagSemTools
@@ -18,22 +19,22 @@ open IriTools
 let ``Can add resource to tripletable`` () =
     let tripleTable = Datastore(1u)
     Assert.Equal(0u, tripleTable.Resources.ResourceCount)
-    let newIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com"))
+    let newIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com"))
     Assert.Equal(0u, newIndex)
     Assert.Equal(1u, tripleTable.Resources.ResourceCount)
-    let mappedResourceId = tripleTable.GetResourceId(Ingress.GraphElement.Iri(new IriReference "http://example.com"))
+    let mappedResourceId = tripleTable.GetGraphNodeId(Ingress.RdfResource.Iri(new IriReference "http://example.com"))
     Assert.Equal(0u, mappedResourceId)
-    let mappedResource = tripleTable.GetResource (mappedResourceId)
-    Assert.Equal(Ingress.GraphElement.Iri(new IriReference "http://example.com"), mappedResource)
+    let mappedResource = tripleTable.GetGraphElement (mappedResourceId)
+    Assert.Equal(GraphElement.NodeOrEdge (RdfResource.Iri(new IriReference "http://example.com")), mappedResource)
     
 [<Fact>]
 let ``Can add triple to tripletable`` () =
     let tripleTable = Rdf.Datastore(60u)
     Assert.Equal(0u, tripleTable.Resources.ResourceCount)
     Assert.Equal(0u, tripleTable.Triples.TripleCount)
-    let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-    let objdIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     Assert.Equal(3u, tripleTable.Resources.ResourceCount)
@@ -46,9 +47,9 @@ let ``Can add triple to tripletable`` () =
 [<Fact>]
 let ``Can query with subject to tripletable`` () =
     let tripleTable = Rdf.Datastore(60u)
-    let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-    let objdIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithSubject(subjectIndex)
@@ -58,9 +59,9 @@ let ``Can query with subject to tripletable`` () =
 [<Fact>]
 let ``Can query with object to tripletable`` () =
     let tripleTable = Rdf.Datastore(60u)
-    let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-    let objdIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithObject(objdIndex)
@@ -71,9 +72,9 @@ let ``Can query with object to tripletable`` () =
 [<Fact>]
 let ``Can query with subject object to tripletable`` () =
     let tripleTable = Rdf.Datastore(60u)
-    let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-    let objdIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objdIndex)
@@ -83,10 +84,10 @@ let ``Can query with subject object to tripletable`` () =
 [<Fact>]
 let ``Can query with resources to larger tripletable`` () =
     let tripleTable = Rdf.Datastore(60u)
-    let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-    let objdIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object"))
-    let objdIndex2 = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object2"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+    let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
     tripleTable.AddTriple(Triple)
@@ -109,12 +110,12 @@ let ``Can query with resources to larger tripletable`` () =
 [<Fact>]
 let ``Can get ObjectPredicate index after two triples`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-            let subjectIndex2 = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject2"))
-            let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-            let predIndex2 = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate2"))
-            let objdIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object2"))
+            let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+            let subjectIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject2"))
+            let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+            let predIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate2"))
+            let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
             
             let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
@@ -130,10 +131,10 @@ let ``Can get ObjectPredicate index after two triples`` () =
 [<Fact>]
 let ``Can query with subject object to larger tripletable`` () =
     let tripleTable = Rdf.Datastore(60u)
-    let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-    let objdIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object"))
-    let objdIndex2 = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object2"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+    let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
     tripleTable.AddTriple(Triple)
@@ -154,25 +155,25 @@ let ``Can query with subject object to larger tripletable`` () =
 [<Fact>]
 let ``Can query with subject predicate when object is literal`` () =
     let tripleTable = Rdf.Datastore(60u)
-    let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-    let objdIndex = tripleTable.AddResource(Ingress.GraphElement.LangLiteral("object", "en"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddLiteralResource(RdfLiteral.LangLiteral("object", "en"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let squery = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
     Assert.Equal(1, Seq.length squery)
     Assert.Equal(Triple, Seq.head squery)
-    let literal = tripleTable.GetResource(objdIndex)
-    Assert.Equal(Ingress.GraphElement.LangLiteral("object", "en"), literal)
+    let literal = tripleTable.GetGraphElement(objdIndex)
+    Assert.Equal(GraphElement.GraphLiteral(RdfLiteral.LangLiteral("object", "en")), literal)
 
 
     
 [<Fact>]
 let ``Can query with predicate to tripletable`` () =
     let tripleTable = Rdf.Datastore(60u)
-    let subjectIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/subject"))
-    let predIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/predicate"))
-    let objdIndex = tripleTable.AddResource(Ingress.GraphElement.Iri(new IriReference "http://example.com/object"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+    let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithPredicate(predIndex)
