@@ -1,4 +1,11 @@
-module TestClassAxioms
+(*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*)
+module DagSemTools.OWL2RL2Datalog.TestClassAxioms
 
 open DagSemTools
 open DagSemTools.Rdf
@@ -8,6 +15,15 @@ open DagSemTools.Ingress
 open IriTools
 open Xunit
 open Faqt
+open Serilog
+open Serilog.Sinks.InMemory
+
+let inMemorySink = new InMemorySink()
+let logger =
+    LoggerConfiguration()
+            .WriteTo.Sink(inMemorySink)
+            .CreateLogger()
+    
 
 [<Fact>]
 let ``Subclass RL reasoning from rdf works`` () =
@@ -30,10 +46,11 @@ let ``Subclass RL reasoning from rdf works`` () =
     
     let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
     let ontology = ontologyTranslator.extractOntology
-    let rlProgram = Library.owl2Datalog tripleTable.Resources ontology errorOutput
+    let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
     DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query2.Should().HaveLength(1) |> ignore
+    inMemorySink.LogEvents.Should().BeEmpty
     
 [<Fact>]
 let ``Equivalentclass RL reasoning from rdf works`` () =
@@ -63,7 +80,7 @@ let ``Equivalentclass RL reasoning from rdf works`` () =
     
     let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
     let ontology = ontologyTranslator.extractOntology
-    let rlProgram = Library.owl2Datalog tripleTable.Resources ontology errorOutput
+    let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
     DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query2.Should().HaveLength(1) |> ignore
@@ -95,7 +112,8 @@ let ``Equivalentclass RL reasoning from rdf works the other way`` () =
     
     let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
     let ontology = ontologyTranslator.extractOntology
-    let rlProgram = Library.owl2Datalog tripleTable.Resources ontology errorOutput
+    let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
     DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex)
     query2.Should().HaveLength(1) |> ignore
+    inMemorySink.LogEvents.Should().BeEmpty

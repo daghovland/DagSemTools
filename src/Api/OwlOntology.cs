@@ -10,6 +10,7 @@ using DagSemTools.Datalog;
 using DagSemTools.OwlOntology;
 using DagSemTools.Rdf;
 using DagSemTools.RdfOwlTranslator;
+using Serilog;
 
 namespace DagSemTools.Api;
 
@@ -21,9 +22,13 @@ public class OwlOntology
 {
     private DagSemTools.OwlOntology.Ontology _owlOntology;
     private Datastore _datastore;
-
-    internal OwlOntology(IGraph graph)
+    private ILogger _logger;
+    
+    internal OwlOntology(IGraph graph, ILogger? logger = null)
     {
+        _logger = logger ?? new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
         _datastore = graph.Datastore;
         var translator = new Rdf2Owl(_datastore.Triples, _datastore.Resources);
         _owlOntology = translator.extractOntology;
@@ -51,5 +56,5 @@ public class OwlOntology
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Rule> GetAxiomRules() =>
-        DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_datastore.Resources, _owlOntology, Console.Error);
+        DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, _datastore.Resources, _owlOntology);
 }

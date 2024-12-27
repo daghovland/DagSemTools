@@ -13,8 +13,9 @@ namespace DagSemTools.ELI
 open DagSemTools.ELI.ELIExtractor
 open DagSemTools.OwlOntology
 open DagSemTools.Rdf
+open Serilog
 
 module Library =
 
-    let Owl2Datalog (resources: ResourceManager) (axiom: ClassAxiom) =
-        axiom |> ELIAxiomExtractor |> Option.map (ELI2RL.GenerateTBoxRL resources)
+    let Owl2Datalog (logger : ILogger) (resources: ResourceManager) (axiom: ClassAxiom) =
+        axiom |> ELIAxiomExtractor logger |> Option.map (ELI2RL.GenerateTBoxRL logger resources)

@@ -25,8 +25,10 @@ module Axioms =
         | Bottom
         | AtomicNamedConcept of Class
         | AtomicAnonymousConcept
+        | ObjectHasValue of ObjectPropertyExpression * Individual
         | AllValuesFrom of ObjectPropertyExpression * Class
-        | AtMostOneValueFrom of ObjectPropertyExpression * Class
+        | AtMostOneValueFromQualified of ObjectPropertyExpression * Class
+        | AtMostOneValueFrom of ObjectPropertyExpression
 
 
     type Formula =

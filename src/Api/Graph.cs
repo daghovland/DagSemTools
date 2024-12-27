@@ -3,6 +3,7 @@ using IriTools;
 using DagSemTools.Rdf;
 using Microsoft.FSharp.Collections;
 using DagSemTools.Ingress;
+using Serilog;
 
 namespace DagSemTools.Api;
 
@@ -11,9 +12,13 @@ namespace DagSemTools.Api;
 /// </summary>
 public class Graph : IGraph
 {
-    internal Graph(Datastore triples)
+    private ILogger _logger;
+    internal Graph(Datastore triples, ILogger? logger = null)
     {
         Triples = triples;
+        _logger = logger ?? new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
     }
 
     private Datastore Triples { get; init; }
@@ -133,7 +138,7 @@ public class Graph : IGraph
     public void EnableOwlReasoning()
     {
         var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Triples.Triples, Triples.Resources).extractOntology;
-        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(Triples.Resources, ontology, Console.Error);
+        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Triples.Resources, ontology);
         _rules = _rules.Concat(ontologyRules);
         Reasoner.evaluate(ListModule.OfSeq(_rules), Triples);
     }

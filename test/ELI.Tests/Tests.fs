@@ -7,9 +7,17 @@ open DagSemTools.Ingress
 open DagSemTools.OwlOntology
 open IriTools
 open Xunit
+open Serilog
+open Serilog.Sinks.InMemory
+open Faqt
 
 module TestClassAxioms =
-
+    let inMemorySink = new InMemorySink()
+    let logger =
+        LoggerConfiguration()
+            .WriteTo.Sink(inMemorySink)
+            .CreateLogger()
+            
     [<Fact>]
     let ``Subclass axiom is extracted`` () =
         //Arrange
@@ -19,7 +27,7 @@ module TestClassAxioms =
         let axiom =
             SubClassOf([], ClassName subClassIri, ClassName superClassIri)
         //Act
-        let translatedAxioms = ELI.ELIExtractor.ELIAxiomExtractor axiom
+        let translatedAxioms = ELI.ELIExtractor.ELIAxiomExtractor logger axiom
         //Assert
         let expectedAxiom =
             Some
@@ -29,6 +37,7 @@ module TestClassAxioms =
                   ) ]
 
         Assert.Equal(expectedAxiom, translatedAxioms)
+        inMemorySink.LogEvents.Should().BeEmpty()
 
     [<Fact>]
     let ``EquivalentClass axiom is extracted`` () =
@@ -39,7 +48,7 @@ module TestClassAxioms =
         let axiom =
             EquivalentClasses([], [ ClassName subClassIri; ClassName superClassIri ])
         //Act
-        let translatedAxioms = ELI.ELIExtractor.ELIAxiomExtractor axiom
+        let translatedAxioms = ELI.ELIExtractor.ELIAxiomExtractor logger axiom
         //Assert
         let expectedAxiom1 =
             ELI.Axioms.DirectlyTranslatableConceptInclusion(
@@ -55,6 +64,7 @@ module TestClassAxioms =
 
         let expectedAxiomList = Some [ expectedAxiom2; expectedAxiom1 ]
         Assert.Equal(expectedAxiomList, translatedAxioms)
+        inMemorySink.LogEvents.Should().BeEmpty()
 
 
     [<Fact>]
@@ -70,7 +80,7 @@ module TestClassAxioms =
                 [ superClassIri ]
             )
         //Act
-        let translatedRules = ELI.ELI2RL.GenerateTBoxRL resources [ axiom ]
+        let translatedRules = ELI.ELI2RL.GenerateTBoxRL logger resources [ axiom ]
         //Assert
         let expectedRules: Datalog.Rule seq =
             [ { Head =
@@ -91,3 +101,4 @@ module TestClassAxioms =
                             ) } ] } ]
 
         Assert.Equal<Rule seq>(expectedRules, translatedRules)
+        inMemorySink.LogEvents.Should().BeEmpty

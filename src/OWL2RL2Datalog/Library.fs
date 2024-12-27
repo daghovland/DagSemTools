@@ -114,7 +114,7 @@ module Library =
         | SymmetricObjectProperty(_, objProp) -> SymmetricObjectProperty2Datalog resourceMap resources objProp
         | _ -> []
 
-    let owlAxiom2Datalog
+    let owlAxiom2Datalog logger
         (resourceMap: Map<string, Ingress.ResourceId>)
         (resources: ResourceManager)
         (axiom: Axiom)
@@ -122,13 +122,13 @@ module Library =
         match axiom with
         | AxiomObjectPropertyAxiom propertyAxiom -> ObjectPropertyAxiom2Datalog resourceMap resources propertyAxiom
         | AxiomClassAxiom classAxiom ->
-            match DagSemTools.ELI.Library.Owl2Datalog resources classAxiom with
+            match DagSemTools.ELI.Library.Owl2Datalog logger resources classAxiom with
             | Some rules -> rules
             | None -> [] //TODO: failwith $"Axiom {axiom} not yet handled. Sorry"
         | _ -> [] //TODO: failwith $"Axiom {axiom} not yet handled. Sorry"
 
-    let owl2Datalog (resources: ResourceManager) (owlOntology: Ontology) (errorOutput: TextWriter) =
+    let owl2Datalog logger resources (owlOntology: Ontology)  =
         let resourceMap = GetBasicResources resources
         owlOntology.Axioms
-        |> Seq.map (owlAxiom2Datalog resourceMap resources)
+        |> Seq.map (owlAxiom2Datalog logger resourceMap resources)
         |> Seq.concat

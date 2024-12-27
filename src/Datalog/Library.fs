@@ -30,6 +30,13 @@ type ResourceOrWildcard =
 type TriplePattern =
     {Subject: ResourceOrVariable; Predicate: ResourceOrVariable; Object: ResourceOrVariable}
 
+
+[<StructuralComparison>]
+[<StructuralEquality>]
+type RuleHead =
+    NormalHead of TriplePattern
+    | Contradiction
+
 [<StructuralComparison>]
 [<StructuralEquality>]
 type RuleAtom = 
@@ -45,7 +52,7 @@ type TripleWildcard =
 [<StructuralComparison>]
 [<StructuralEquality>]
 type Rule = 
-    {Head: TriplePattern; Body: RuleAtom list}
+    {Head: RuleHead; Body: RuleAtom list}
 
 type Substitution = 
     Map<string, Ingress.ResourceId>
