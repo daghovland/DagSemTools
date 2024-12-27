@@ -15,13 +15,13 @@ open DagSemTools.Rdf.Ingress
 [<StructuralComparison>]
 [<StructuralEquality>]
 type ResourceOrVariable = 
-    | Resource of Ingress.ResourceId
+    | Resource of GraphElementId
     | Variable of string
 
 [<StructuralComparison>]
 [<StructuralEquality>]
 type ResourceOrWildcard = 
-    | Resource of Ingress.ResourceId
+    | Resource of GraphElementId
     | Wildcard
 
 
@@ -61,7 +61,7 @@ type Rule =
     {Head: RuleHead; Body: RuleAtom list}
 
 type Substitution = 
-    Map<string, Ingress.ResourceId>
+    Map<string, Ingress.GraphElementId>
 type PartialRule = 
     {Rule: Rule; Match : TriplePattern}
 type PartialRuleMatch = 
@@ -73,12 +73,12 @@ module Datalog =
     let isFact (rule) = rule.Body |> List.isEmpty
     let VariableToString (v : string) : string = $"?{v}"
     
-    let ResourceToString (tripleTable: Datastore) (r : Ingress.ResourceId) : string =
-        (tripleTable.GetResource r).ToString()
+    let ResourceToString (tripleTable: Datastore) r : string =
+        (tripleTable.GetGraphElement r).ToString()
     
-    let ResourceOrVariableToString (tripleTable : Datastore) (res : ResourceOrVariable) : string =
+    let ResourceOrVariableToString (tripleTable : Datastore) res : string =
         match res with
-        | ResourceOrVariable.Resource r -> (tripleTable.GetResource r).ToString()
+        | ResourceOrVariable.Resource r -> (tripleTable.GetGraphElement r).ToString()
         | Variable v -> VariableToString v
     
 
@@ -151,7 +151,7 @@ module Datalog =
             let unsafeVarsString = String.concat ", " unsafeHeadVariables
             raise (new ArgumentException($"Unsafe variables {unsafeVarsString} in rule: {rule.ToString()}"))
         
-    let ApplySubstitutionResource (sub : Substitution) (res : ResourceOrVariable) : ResourceId =
+    let ApplySubstitutionResource (sub : Substitution) (res : ResourceOrVariable) : GraphElementId =
         match res with
         | ResourceOrVariable.Resource r -> r
         | Variable v -> match sub.TryGetValue v with
@@ -165,7 +165,7 @@ module Datalog =
         }
     
     
-    let GetSubstitution (resource : Ingress.ResourceId, variable : ResourceOrVariable) (subs : Substitution)  : Substitution option =
+    let GetSubstitution (resource : Ingress.GraphElementId, variable : ResourceOrVariable) (subs : Substitution)  : Substitution option =
         match variable, resource with
         | Variable v, _  ->
             match subs.TryGetValue v with
@@ -175,7 +175,7 @@ module Datalog =
         | ResourceOrVariable.Resource r, s when r = s -> Some subs
         | _ -> None
     
-    let GetSubstitutionOption (subs : Substitution option) (resource : Ingress.ResourceId, variable : ResourceOrVariable) : Substitution option =
+    let GetSubstitutionOption (subs : Substitution option) (resource, variable) : Substitution option =
         Option.bind (GetSubstitution (resource, variable)) subs    
     let GetSubstitutions (subs) (fact : Triple) (factPattern : TriplePattern)  : Substitution option =
         let resourceList = [

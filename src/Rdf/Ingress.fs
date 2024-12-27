@@ -10,7 +10,7 @@ namespace DagSemTools.Rdf
 open DagSemTools.Ingress
 
 module Ingress =
-    type ResourceId = uint32
+    type GraphElementId = uint32
     type TripleListIndex = uint
     type QuadListIndex = uint
         
@@ -18,19 +18,19 @@ module Ingress =
     [<StructuralEquality>]
     [<NoComparison>]
     type Triple = {
-            subject: ResourceId
-            predicate: ResourceId
-            obj: ResourceId
+            subject: GraphElementId
+            predicate: GraphElementId
+            obj: GraphElementId
         }
         
     [<Struct>]
     [<StructuralEquality>]
     [<NoComparison>]
     type Quad = {
-            tripleId: ResourceId
-            subject: ResourceId
-            predicate: ResourceId
-            obj: ResourceId
+            tripleId: GraphElementId
+            subject: GraphElementId
+            predicate: GraphElementId
+            obj: GraphElementId
         } with
         override this.ToString() =
             sprintf "%A: (%A, %A, %A)"
@@ -44,9 +44,9 @@ module Ingress =
     [<StructuralEquality>]
     [<NoComparison>]
     type TripleResource = {
-            subject: Resource
-            predicate: Resource
-            obj: Resource
+            subject: GraphElement
+            predicate: GraphElement
+            obj: GraphElement
     } with
         override this.ToString() =
             sprintf "(%A, %A, %A)" 
@@ -63,21 +63,29 @@ module Ingress =
         newArray    
     
     (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
-    let tryGetNonNegativeIntegerLiteral res =
-        match res with
-                    | Resource.IntegerLiteral nn -> Some nn
-                    | Resource.TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [Namespaces.XsdInt ; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger] ) -> nn |> int |> Some                              
-                    | x -> None
+    let tryGetNonNegativeIntegerLiteral (gel : GraphElement) =
+        match gel with
+        | NodeOrEdge _ -> None
+        | GraphLiteral res ->
+            match res with
+                | IntegerLiteral nn -> Some nn
+                | TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [Namespaces.XsdInt ; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger] ) ->
+                    nn |> int |> Some                              
+                | x -> None
     
     (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
-    let tryGetBoolLiteral res =
+    let tryGetBoolLiteral gel =
+        match gel with
+        | NodeOrEdge _ -> None
+        | GraphLiteral res ->
         match res with
-                    | Resource.BooleanLiteral nn -> Some nn
-                    | Resource.TypedLiteral (tp, nn) when (tp.ToString() = Namespaces.XsdBoolean) -> Some (match nn with
-                                                                                                           | "true" -> true
-                                                                                                           | "false" -> false
-                                                                                                           | x -> failwith $"Invalid use of xsd:boolean on value {x}")
-                    | _ -> None
+            | BooleanLiteral nn -> Some nn
+            | TypedLiteral (tp, nn) when (tp.ToString() = Namespaces.XsdBoolean) ->
+               Some (match nn with
+                       | "true" -> true
+                       | "false" -> false
+                       | x -> failwith $"Invalid use of xsd:boolean on value {x}")
+            | _ -> None
     
   
     

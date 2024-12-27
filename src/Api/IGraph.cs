@@ -12,7 +12,7 @@ public interface IGraph
     /// Returns true if the graph is empty, that is, has no triples.
     /// </summary>
     /// <returns></returns>
-    public bool isEmpty();
+    public bool IsEmpty();
     /// <summary>
     /// Returns an enumerator over all triples in the graph that have the given predicate and object.
     /// Similar to the sparql query "SELECT * WHERE { ?s predicate obj }".

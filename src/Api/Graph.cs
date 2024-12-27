@@ -3,6 +3,7 @@ using IriTools;
 using DagSemTools.Rdf;
 using Microsoft.FSharp.Collections;
 using DagSemTools.Ingress;
+using Microsoft.FSharp.Core;
 using Serilog;
 
 namespace DagSemTools.Api;
@@ -41,49 +42,56 @@ public class Graph : IGraph
 
 
     /// <inheritdoc />
-    public bool isEmpty() => Triples.Triples.TripleCount == 0;
+    public bool IsEmpty() => Triples.Triples.TripleCount == 0;
 
 
-    private BlankNodeOrIriResource GetBlankNodeOrIriResource(uint resourceId)
+    private Resource GetBlankNodeOrIriResource(uint resourceId)
     {
-        var resource = Triples.GetResource(resourceId);
-        switch (resource)
+        var resource = Triples.GetGraphNode(resourceId);
+        if (!FSharpOption<RdfResource>.get_IsSome(resource))
+            throw new ArgumentException($"Resource {resource} is not an Iri or a blank node"); ;
+
+        switch (resource.Value)
         {
-            case DagSemTools.Ingress.Resource { IsIri: true } r:
+            case { IsIri: true } r:
                 return new IriResource(new IriReference(r.iri));
-            case var r when r.IsAnonymousBlankNode:
+            case { IsAnonymousBlankNode: true } r:
                 return new BlankNodeResource($"{r.anon_blankNode}");
-            default: throw new ArgumentException($"Resource {resource.ToString()} is not an Iri or a blank node"); ;
+            default: throw new Exception($"BUG: Resource {resource.ToString()} is a resource but not an Iri or a blank node"); ;
         }
     }
 
 
     private IriResource GetIriResource(uint resourceId)
     {
-        var resource = Triples.GetResource(resourceId);
-        if (!resource.IsIri)
-            throw new ArgumentException($"Resource {resource.ToString()} is not an Iri");
-        return new IriResource(new IriReference(resource.iri));
-
+        var resource = GetBlankNodeOrIriResource(resourceId);
+        if (resource is IriResource r)
+            return r;
+        throw new ArgumentException($"Resource {resource.ToString()} is not an Iri");
     }
 
-    private Resource GetResource(uint resourceId)
+    private GraphElement GetResource(uint resourceId)
     {
-        var resource = Triples.GetResource(resourceId);
-        switch (resource)
+        var resource = Triples.GetGraphElement(resourceId);
+        if (resource.IsNodeOrEdge)
         {
-            case DagSemTools.Ingress.Resource { IsIri: true } r:
+            var r = resource.resource;
+            if (r.IsIri)
                 return new IriResource(new IriReference(r.iri));
-            case var r when r.IsAnonymousBlankNode:
+            if (r.IsAnonymousBlankNode)
                 return new BlankNodeResource($"{r.anon_blankNode}");
-            case var r when r.IsLangLiteral:
-                return new LiteralResource(r.langliteral);
-            case DagSemTools.Ingress.Resource { IsDateLiteral: true } r:
-                return new LiteralResource(r.literalDate.ToString());
-            case DagSemTools.Ingress.Resource { IsLiteralString: true } r:
-                return new LiteralResource(r.literal);
-            default: throw new NotImplementedException("Literal type not implemented. Sorry");
+            throw new Exception("BUG: Resource that is neither Iri nor Blank Node !!");
         }
+
+        if (!resource.IsGraphLiteral) throw new Exception("BUG: Resource that is neither resource or literal!!");
+        var lit = resource.literal;
+        if (lit.IsLangLiteral)
+            return new RdfLiteral(lit.langliteral);
+        if (lit.IsDateLiteral)
+            return new RdfLiteral(lit.literalDate.ToString());
+        if (lit.IsLiteralString)
+            return new RdfLiteral(lit.literal);
+        throw new NotImplementedException($"Literal type {lit.ToString()} not implemented. Sorry");
     }
 
     private Triple GetTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
@@ -93,8 +101,8 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
-        (Triples.Resources.ResourceMap.TryGetValue(DagSemTools.Ingress.Resource.NewIri(obj), out var objIdx)
-         && Triples.Resources.ResourceMap.TryGetValue(DagSemTools.Ingress.Resource.NewIri(predicate), out var predIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(obj)), out var objIdx)
+         && Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
             ? Triples
                 .GetTriplesWithObjectPredicate(objIdx, predIdx)
                 .Select(GetTriple)
@@ -103,8 +111,8 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate) =>
-        (Triples.Resources.ResourceMap.TryGetValue(DagSemTools.Ingress.Resource.NewIri(subject), out var subjIdx)
-         && Triples.Resources.ResourceMap.TryGetValue(DagSemTools.Ingress.Resource.NewIri(predicate), out var predIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)), out var subjIdx)
+                                                       && Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
             ? Triples
                 .GetTriplesWithSubjectPredicate(subjIdx, predIdx)
                 .Select(GetTriple)
@@ -112,7 +120,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubject(IriReference subject) =>
-        (Triples.Resources.ResourceMap.TryGetValue(DagSemTools.Ingress.Resource.NewIri(subject), out var subjIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)), out var subjIdx))
             ? Triples
                 .GetTriplesWithSubject(subjIdx)
                 .Select(GetTriple)
@@ -120,7 +128,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicate(IriReference predicate) =>
-        (Triples.Resources.ResourceMap.TryGetValue(DagSemTools.Ingress.Resource.NewIri(predicate), out var predIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
             ? Triples
                 .GetTriplesWithPredicate(predIdx)
                 .Select(GetTriple)
@@ -128,7 +136,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithObject(IriReference @object) =>
-        (Triples.Resources.ResourceMap.TryGetValue(DagSemTools.Ingress.Resource.NewIri(@object), out var objIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(@object)), out var objIdx))
             ? Triples
                 .GetTriplesWithObject(objIdx)
                 .Select(GetTriple)

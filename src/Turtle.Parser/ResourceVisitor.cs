@@ -32,8 +32,8 @@ internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
 
     private UInt32 GetIriId(IriReference iri)
     {
-        var resource = Resource.NewIri(iri);
-        return Datastore.AddResource(resource);
+        var resource = RdfResource.NewIri(iri);
+        return Datastore.AddNodeResource(resource);
     }
 
     /// <summary>
@@ -61,22 +61,22 @@ internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
     public override uint VisitIntegerLiteral(IntegerLiteralContext context)
     {
         int literal = int.Parse(context.INTEGER().GetText());
-        var resource = Resource.NewIntegerLiteral(literal);
-        return Datastore.AddResource(resource);
+        var resource = RdfLiteral.NewIntegerLiteral(literal);
+        return Datastore.AddLiteralResource(resource);
     }
 
     public override uint VisitDecimalLiteral(DecimalLiteralContext context)
     {
         decimal literal = decimal.Parse(context.DECIMAL().GetText(), CultureInfo.InvariantCulture);
-        var resource = Resource.NewDecimalLiteral(literal);
-        return Datastore.AddResource(resource);
+        var resource = RdfLiteral.NewDecimalLiteral(literal);
+        return Datastore.AddLiteralResource(resource);
     }
 
     public override uint VisitDoubleLiteral(DoubleLiteralContext context)
     {
         double literal = double.Parse(context.DOUBLE().GetText(), CultureInfo.InvariantCulture);
-        var resource = Resource.NewDoubleLiteral(literal);
-        return Datastore.AddResource(resource);
+        var resource = RdfLiteral.NewDoubleLiteral(literal);
+        return Datastore.AddLiteralResource(resource);
     }
 
     public override uint VisitNamedBlankNode(NamedBlankNodeContext context)
@@ -90,9 +90,9 @@ internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
     public override uint VisitCollection(CollectionContext context)
     {
 
-        var rdfnil = Datastore.AddResource(Resource.NewIri(new IriReference(Namespaces.RdfNil)));
-        var rdffirst = Datastore.AddResource(Resource.NewIri(new IriReference(Namespaces.RdfFirst)));
-        var rdfrest = Datastore.AddResource(Resource.NewIri(new IriReference(Namespaces.RdfRest)));
+        var rdfnil = Datastore.AddNodeResource(RdfResource.NewIri(new IriReference(Namespaces.RdfNil)));
+        var rdffirst = Datastore.AddNodeResource(RdfResource.NewIri(new IriReference(Namespaces.RdfFirst)));
+        var rdfrest = Datastore.AddNodeResource(RdfResource.NewIri(new IriReference(Namespaces.RdfRest)));
 
         return context.rdfobject()
             .Aggregate(
@@ -147,44 +147,44 @@ internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
     }
 
     public override uint VisitTrueBooleanLiteral(TrueBooleanLiteralContext context)
-        => Datastore.AddResource(Resource.NewBooleanLiteral(true));
+        => Datastore.AddLiteralResource(RdfLiteral.NewBooleanLiteral(true));
 
     public override uint VisitFalseBooleanLiteral(FalseBooleanLiteralContext context)
-        => Datastore.AddResource(Resource.NewBooleanLiteral(false));
+        => Datastore.AddLiteralResource(RdfLiteral.NewBooleanLiteral(false));
 
     public override uint VisitPlainStringLiteral(PlainStringLiteralContext context)
     {
         var literalString = _stringVisitor.Visit(context.stringLiteral());
-        var literal = Resource.NewLiteralString(literalString);
-        return Datastore.AddResource(literal);
+        var literal = RdfLiteral.NewLiteralString(literalString);
+        return Datastore.AddLiteralResource(literal);
     }
 
     public override uint VisitLangLiteral(LangLiteralContext context)
     {
         var literalString = _stringVisitor.Visit(context.stringLiteral());
         var langDir = context.LANG_DIR().GetText();
-        var literal = Resource.NewLangLiteral(literalString, langDir);
-        return Datastore.AddResource(literal);
+        var literal = RdfLiteral.NewLangLiteral(literalString, langDir);
+        return Datastore.AddLiteralResource(literal);
     }
     public override uint VisitTypedLiteral(TypedLiteralContext context)
     {
         var literalString = _stringVisitor.Visit(context.stringLiteral());
         IriReference typeIri = _iriGrammarVisitor.Visit(context.iri());
-        Resource typedLiteral = typeIri.ToString() switch
+        RdfLiteral typedLiteral = typeIri.ToString() switch
         {
-            Namespaces.XsdString => Resource.NewLiteralString(literalString),
-            Namespaces.XsdDouble => Resource.NewDoubleLiteral(double.Parse(literalString, CultureInfo.InvariantCulture)),
-            Namespaces.XsdDecimal => Resource.NewDecimalLiteral(decimal.Parse(literalString, CultureInfo.InvariantCulture)),
-            Namespaces.XsdInteger => Resource.NewIntegerLiteral(int.Parse(literalString)),
-            Namespaces.XsdFloat => Resource.NewFloatLiteral(float.Parse(literalString, CultureInfo.InvariantCulture)),
-            Namespaces.XsdBoolean => Resource.NewBooleanLiteral(bool.Parse(literalString)),
-            Namespaces.XsdDateTime => Resource.NewDateTimeLiteral(DateTime.Parse(literalString)),
-            Namespaces.XsdDate => Resource.NewDateLiteral(DateOnly.Parse(literalString)),
-            Namespaces.XsdDuration => Resource.NewDurationLiteral(TimeSpan.Parse(literalString)),
-            Namespaces.XsdTime => Resource.NewTimeLiteral(TimeOnly.Parse(literalString)),
-            _ => Resource.NewTypedLiteral(typeIri, literalString)
+            Namespaces.XsdString => RdfLiteral.NewLiteralString(literalString),
+            Namespaces.XsdDouble => RdfLiteral.NewDoubleLiteral(double.Parse(literalString, CultureInfo.InvariantCulture)),
+            Namespaces.XsdDecimal => RdfLiteral.NewDecimalLiteral(decimal.Parse(literalString, CultureInfo.InvariantCulture)),
+            Namespaces.XsdInteger => RdfLiteral.NewIntegerLiteral(int.Parse(literalString)),
+            Namespaces.XsdFloat => RdfLiteral.NewFloatLiteral(float.Parse(literalString, CultureInfo.InvariantCulture)),
+            Namespaces.XsdBoolean => RdfLiteral.NewBooleanLiteral(bool.Parse(literalString)),
+            Namespaces.XsdDateTime => RdfLiteral.NewDateTimeLiteral(DateTime.Parse(literalString)),
+            Namespaces.XsdDate => RdfLiteral.NewDateLiteral(DateOnly.Parse(literalString)),
+            Namespaces.XsdDuration => RdfLiteral.NewDurationLiteral(TimeSpan.Parse(literalString)),
+            Namespaces.XsdTime => RdfLiteral.NewTimeLiteral(TimeOnly.Parse(literalString)),
+            _ => RdfLiteral.NewTypedLiteral(typeIri, literalString)
         };
-        return Datastore.AddResource(typedLiteral);
+        return Datastore.AddLiteralResource(typedLiteral);
     }
 
 }

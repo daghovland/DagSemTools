@@ -117,12 +117,12 @@ public class TestParser
         ruleTriplePattern.Subject.Should().Be(ResourceOrVariable.NewVariable("?s"));
 
         var predicateResource = ResourceOrVariable
-            .NewResource(datastore.AddResource(Resource
+            .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference("https://example.com/data#predicate2"))));
         ruleTriplePattern.Predicate.Should().Be(predicateResource);
 
         var objectResource = ResourceOrVariable
-            .NewResource(datastore.AddResource(Resource
+            .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference("https://example.com/data3#obj"))));
         ruleTriplePattern.Object.Should().Be(objectResource);
 
@@ -148,7 +148,7 @@ public class TestParser
             ResourceOrVariable.NewVariable("?p"),
             ResourceOrVariable.NewVariable("?y"))));
         var rdfTypeResource = ResourceOrVariable
-            .NewResource(datastore.AddResource(Resource
+            .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference(Namespaces.RdfType))));
         var expectedHead = RuleHead.NewNormalHead(new TriplePattern(
             ResourceOrVariable.NewVariable("?x"),
@@ -173,19 +173,18 @@ public class TestParser
         ont.First().Head.Should().Be(RuleHead.NewNormalHead(new TriplePattern(
             ResourceOrVariable.NewVariable("?new_node"),
             ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Resource
-                    .NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
+                .NewResource(datastore.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
             ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Resource
+                .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
 
         ont.First().Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
             ResourceOrVariable.NewVariable("?node"),
             ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Resource
+                .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
             ResourceOrVariable
-                .NewResource(datastore.GetResourceId(Resource
+                .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }
 

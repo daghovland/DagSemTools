@@ -34,7 +34,7 @@ module PredicateGrounder =
         let dataPredicates = triplestore.Resources.GetIriResourceIds()
         Seq. concat [headPredicates; dataPredicates] |> Seq.distinct
 
-    let instantiateTripleWithVariableMapping (triple : TriplePattern) (variableName : ResourceOrVariable) (predicate : Ingress.ResourceId) : TriplePattern =
+    let instantiateTripleWithVariableMapping (triple : TriplePattern) (variableName : ResourceOrVariable) predicate : TriplePattern =
         let tripleList =
             [triple.Subject; triple.Predicate; triple.Object]
             |> List.map (fun res -> 
@@ -43,7 +43,7 @@ module PredicateGrounder =
                     | _ -> res)
         {Subject = tripleList.[0]; Predicate = tripleList.[1]; Object = tripleList.[2]}
         
-    let instantiateRuleWithVariableMapping (predicate: Ingress.ResourceId, rule: Rule, variableName) =
+    let instantiateRuleWithVariableMapping (predicate, rule: Rule, variableName) =
         let newHead = match rule.Head with
                         | Contradiction -> Contradiction
                         | NormalHead triplePattern -> NormalHead {triplePattern with Predicate = ResourceOrVariable.Resource predicate}
@@ -55,7 +55,7 @@ module PredicateGrounder =
                 )
         {rule with Head = newHead; Body = newBody}
     
-    let multiplyRuleHeadWithPredicates (predicates: Ingress.ResourceId seq) (rule: Rule) : Rule seq=
+    let multiplyRuleHeadWithPredicates predicates (rule: Rule) : Rule seq=
         match rule.Head with
         | Contradiction -> [rule]
         | NormalHead ruleHead ->
@@ -76,7 +76,7 @@ module PredicateGrounder =
             | NotTriple triple -> getTripleRelationVariable triple
             )
     
-    let getGroundPredicateRules (rule: Rule) (predicates: Ingress.ResourceId seq) (relationVariableName: string) : Rule seq =
+    let getGroundPredicateRules (rule: Rule) predicates (relationVariableName: string) : Rule seq =
         predicates |> Seq.map (fun pred -> instantiateRuleWithVariableMapping(pred, rule, Variable relationVariableName))
     
     (* 
@@ -84,7 +84,7 @@ module PredicateGrounder =
         Currently not used, since attempting to make the reasoner handle variables in the body 
         in the stratification properly.
      *)
-    let multiplyRuleBodyWithPredicates (predicates: Ingress.ResourceId seq) (rule: Rule) : Rule seq =
+    let multiplyRuleBodyWithPredicates predicates (rule: Rule) : Rule seq =
         let relationVariables = getBodyRelationVariables rule
         if relationVariables |> Seq.isEmpty then
             [rule]

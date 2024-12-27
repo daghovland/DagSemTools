@@ -4,6 +4,7 @@ using DagSemTools.Ingress;
 using IriTools;
 using FluentAssertions;
 using Xunit.Abstractions;
+using RdfLiteral = DagSemTools.Api.RdfLiteral;
 
 namespace Api.Tests;
 
@@ -47,7 +48,7 @@ public class TestApi(ITestOutputHelper output)
         mbox.Should().HaveCount(1);
 
         var eve = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name"))
-            .Where(tr => tr.Object.Equals(new LiteralResource("Eve")));
+            .Where(tr => tr.Object.Equals(new RdfLiteral("Eve")));
         eve.Should().HaveCount(1);
     }
 

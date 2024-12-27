@@ -30,11 +30,11 @@ let ``Subclass RL reasoning from rdf works`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
     
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let rdfTypeIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.RdfType)))
-    let objIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let subClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.RdfsSubClassOf)))
-    let objIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let rdfTypeIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfType)))
+    let objIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+    let subClassIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfsSubClassOf)))
+    let objIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
     let contentTriple = {Ingress.Triple.subject = subjectIndex; predicate = rdfTypeIndex; obj = objIndex}
     tripleTable.AddTriple(contentTriple)
     let subClassTriple = {Triple.subject = objIndex; predicate = subClassIndex; obj = objIndex2}
@@ -57,12 +57,12 @@ let ``Equivalentclass RL reasoning from rdf works`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
     
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let rdfTypeIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.RdfType)))
-    let objIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let eqClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlEquivalentClass)))
-    let classTypeIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlClass)))
-    let objIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let rdfTypeIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfType)))
+    let objIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+    let eqClassIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlEquivalentClass)))
+    let classTypeIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlClass)))
+    let objIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
     let class1Triple = {Ingress.Triple.subject = objIndex; predicate = rdfTypeIndex; obj = classTypeIndex}
     tripleTable.AddTriple(class1Triple)
     let class2Triple = {Ingress.Triple.subject = objIndex2; predicate = rdfTypeIndex; obj = classTypeIndex}
@@ -91,12 +91,12 @@ let ``Equivalentclass RL reasoning from rdf works the other way`` () =
     let tripleTable = new Datastore(100u)
     let errorOutput = new System.IO.StringWriter()
     
-    let subjectIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/subject"))
-    let rdfTypeIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.RdfType)))
-    let objIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object"))
-    let eqClassIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlEquivalentClass)))
-    let objIndex2 = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference "http://example.com/object2"))
-    let classTypeIndex = tripleTable.AddResource(Ingress.Resource.Iri(new IriReference (Namespaces.OwlClass)))
+    let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+    let rdfTypeIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfType)))
+    let objIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+    let eqClassIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlEquivalentClass)))
+    let objIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
+    let classTypeIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlClass)))
     let contentTriple = {Ingress.Triple.subject = subjectIndex; predicate = rdfTypeIndex; obj = objIndex2}
     let class1Triple = {Ingress.Triple.subject = objIndex; predicate = rdfTypeIndex; obj = classTypeIndex}
     tripleTable.AddTriple(class1Triple)

@@ -29,7 +29,7 @@
 
     <ItemGroup>
         <Compile Include="Namespaces.fs" />
-        <Compile Include="Resource.fs" />
+        <Compile Include="GraphElement.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>

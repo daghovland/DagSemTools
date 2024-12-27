@@ -3,7 +3,7 @@ namespace DagSemTools.Api;
 /// <summary>
 /// Represents a blank node resource.
 /// </summary>
-public class BlankNodeResource(string name) : BlankNodeOrIriResource
+public class BlankNodeResource(string name) : Resource
 {
     private readonly string _name = name;
 
@@ -13,7 +13,7 @@ public class BlankNodeResource(string name) : BlankNodeOrIriResource
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(Resource? other) =>
+    public override bool Equals(GraphElement? other) =>
         other != null && (ReferenceEquals(this, other) || other is BlankNodeResource bnr && bnr._name == _name);
 
     /// <summary>
@@ -23,7 +23,7 @@ public class BlankNodeResource(string name) : BlankNodeOrIriResource
     /// <param name="other"></param>
     /// <returns></returns>
     public override bool Equals(object? other) =>
-        other != null && other is Resource bnr && Equals(bnr);
+        other != null && other is GraphElement bnr && Equals(bnr);
 
     /// <inheritdoc />
     public override string ToString() => $"_:{_name}";
