@@ -1,7 +1,7 @@
 namespace DagSemTools.Api;
 
 /// <inheritdoc />
-public class LiteralResource(string value) : Resource
+public class RdfLiteral(string value) : GraphElement
 {
     /// <summary>
     /// The string value of the literal. 
@@ -14,9 +14,9 @@ public class LiteralResource(string value) : Resource
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(Resource? other) =>
+    public override bool Equals(GraphElement? other) =>
         other != null && (ReferenceEquals(this, other) ||
-                          (other is LiteralResource literal && literal.Value.Equals(Value)));
+                          (other is RdfLiteral literal && literal.Value.Equals(Value)));
 
     /// <inheritdoc />
     public override string ToString() => Value;

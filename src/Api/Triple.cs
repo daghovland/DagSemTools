@@ -6,13 +6,13 @@ namespace DagSemTools.Api;
 /// <summary>
 /// Represents a triple in RDF. https://www.w3.org/TR/rdf12-concepts/#dfn-rdf-triple
 /// </summary>
-public class Triple(BlankNodeOrIriResource subject, IriReference predicate, Resource @object)
+public class Triple(Resource subject, IriReference predicate, GraphElement @object)
 {
 
     /// <summary>
     /// The subject of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-subject
     /// </summary>
-    public BlankNodeOrIriResource Subject { get; } = subject;
+    public Resource Subject { get; } = subject;
 
     /// <summary>
     /// The predicate of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-predicate
@@ -22,7 +22,7 @@ public class Triple(BlankNodeOrIriResource subject, IriReference predicate, Reso
     /// <summary>
     /// The object of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-object
     /// </summary>
-    public Resource Object { get; } = @object;
+    public GraphElement Object { get; } = @object;
 
 }
 

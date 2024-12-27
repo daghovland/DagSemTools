@@ -42,10 +42,10 @@ public class Graph : IGraph
 
 
     /// <inheritdoc />
-    public bool isEmpty() => Triples.Triples.TripleCount == 0;
+    public bool IsEmpty() => Triples.Triples.TripleCount == 0;
 
 
-    private BlankNodeOrIriResource GetBlankNodeOrIriResource(uint resourceId)
+    private Resource GetBlankNodeOrIriResource(uint resourceId)
     {
         var resource = Triples.GetGraphNode(resourceId);
         if (!FSharpOption<RdfResource>.get_IsSome(resource))
@@ -70,7 +70,7 @@ public class Graph : IGraph
         throw new ArgumentException($"Resource {resource.ToString()} is not an Iri");
     }
 
-    private Resource GetResource(uint resourceId)
+    private GraphElement GetResource(uint resourceId)
     {
         var resource = Triples.GetGraphElement(resourceId);
         if (resource.IsNodeOrEdge)
@@ -86,11 +86,11 @@ public class Graph : IGraph
         if (!resource.IsGraphLiteral) throw new Exception("BUG: Resource that is neither resource or literal!!");
         var lit = resource.literal;
         if (lit.IsLangLiteral)
-            return new LiteralResource(lit.langliteral);
+            return new RdfLiteral(lit.langliteral);
         if (lit.IsDateLiteral)
-            return new LiteralResource(lit.literalDate.ToString());
+            return new RdfLiteral(lit.literalDate.ToString());
         if (lit.IsLiteralString)
-            return new LiteralResource(lit.literal);
+            return new RdfLiteral(lit.literal);
         throw new NotImplementedException($"Literal type {lit.ToString()} not implemented. Sorry");
     }
 
@@ -101,8 +101,8 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
-        (Triples.Resources.GraphElementMap.TryGetValue(GraphElement.NewNodeOrEdge(RdfResource.NewIri(obj)), out var objIdx)
-         && Triples.Resources.GraphElementMap.TryGetValue(GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(obj)), out var objIdx)
+         && Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
             ? Triples
                 .GetTriplesWithObjectPredicate(objIdx, predIdx)
                 .Select(GetTriple)
@@ -111,8 +111,8 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate) =>
-        (Triples.Resources.GraphElementMap.TryGetValue(GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)), out var subjIdx)
-                                                       && Triples.Resources.GraphElementMap.TryGetValue(GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)), out var subjIdx)
+                                                       && Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
             ? Triples
                 .GetTriplesWithSubjectPredicate(subjIdx, predIdx)
                 .Select(GetTriple)
@@ -120,7 +120,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubject(IriReference subject) =>
-        (Triples.Resources.GraphElementMap.TryGetValue(GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)), out var subjIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)), out var subjIdx))
             ? Triples
                 .GetTriplesWithSubject(subjIdx)
                 .Select(GetTriple)
@@ -128,7 +128,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicate(IriReference predicate) =>
-        (Triples.Resources.GraphElementMap.TryGetValue(GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(predicate)), out var predIdx))
             ? Triples
                 .GetTriplesWithPredicate(predIdx)
                 .Select(GetTriple)
@@ -136,7 +136,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithObject(IriReference @object) =>
-        (Triples.Resources.GraphElementMap.TryGetValue(GraphElement.NewNodeOrEdge(RdfResource.NewIri(@object)), out var objIdx))
+        (Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(@object)), out var objIdx))
             ? Triples
                 .GetTriplesWithObject(objIdx)
                 .Select(GetTriple)

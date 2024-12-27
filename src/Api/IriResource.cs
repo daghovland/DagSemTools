@@ -4,7 +4,7 @@ using IriTools;
 /// <summary>
 /// Represents a resource that is identified by an IRI.
 /// </summary>
-public class IriResource : BlankNodeOrIriResource
+public class IriResource : Resource
 {
     /// <summary>
     /// The IRI that identifies the resource.
@@ -22,7 +22,7 @@ public class IriResource : BlankNodeOrIriResource
     /// </summary>
     /// <param name="other"></param>
     /// <returns></returns>
-    public override bool Equals(Resource? other) =>
+    public override bool Equals(GraphElement? other) =>
         other != null && (ReferenceEquals(this, other) ||
                           (other is IriResource iri && iri.Iri.Equals(Iri)));
 
@@ -39,7 +39,7 @@ public class IriResource : BlankNodeOrIriResource
     /// <param name="obj"></param>
     /// <returns></returns>
     public override bool Equals(object? obj) =>
-        obj != null && obj is Resource r && Equals(r);
+        obj != null && obj is GraphElement r && Equals(r);
 
     /// <inheritdoc />
     public override int GetHashCode()
