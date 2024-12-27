@@ -23,7 +23,7 @@ public class OwlOntology
     private DagSemTools.OwlOntology.Ontology _owlOntology;
     private Datastore _datastore;
     private ILogger _logger;
-    
+
     internal OwlOntology(IGraph graph, ILogger? logger = null)
     {
         _logger = logger ?? new LoggerConfiguration()

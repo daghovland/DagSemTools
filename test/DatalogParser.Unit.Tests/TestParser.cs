@@ -150,7 +150,7 @@ public class TestParser
         var rdfTypeResource = ResourceOrVariable
             .NewResource(datastore.AddResource(Resource
                 .NewIri(new IriReference(Namespaces.RdfType))));
-        var expectedHead = RuleHead.NewNormalHead( new TriplePattern(
+        var expectedHead = RuleHead.NewNormalHead(new TriplePattern(
             ResourceOrVariable.NewVariable("?x"),
             rdfTypeResource,
             ResourceOrVariable.NewVariable("?c")));
@@ -170,7 +170,7 @@ public class TestParser
         ont.Should().NotBeNull();
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(1);
-        ont.First().Head.Should().Be(RuleHead.NewNormalHead( new TriplePattern(
+        ont.First().Head.Should().Be(RuleHead.NewNormalHead(new TriplePattern(
             ResourceOrVariable.NewVariable("?new_node"),
             ResourceOrVariable
                 .NewResource(datastore.GetResourceId(Resource

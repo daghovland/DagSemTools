@@ -103,14 +103,16 @@ module ELI2RL =
     
     (* The first case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <= bottom *) 
-    // TODO: First datalog engine must handle "false" in rule head
-    // let translateEmptyIntersection
-    //     (resources: ResourceManager)
-    //     (subConcept: ComplexConcept)
-    //     (subConcepts: Class list)
-    //     : Rule =
-    //     { Head = False
-    //       Body = subConcepts }
+    let translateEmptyIntersection
+        (resources: ResourceManager)
+        (subConcepts: Class list)
+        : Rule =
+        { Head = Contradiction
+          Body = subConcepts
+                           |> List.map (fun (FullIri name) -> name)
+                           |> List.map (GetTypeTriplePattern resources "X")
+                           |> List.map PositiveTriple
+                           }
     
     (* The second case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <= A *) 
@@ -195,9 +197,8 @@ module ELI2RL =
             |> List.concat
         | NormalizedConceptInclusion(subConceptIntersection, superConcept) ->
             match superConcept with
-            | Bottom ->
-                logger.Error "TODO: Bottom on superclass needs a treatment of false as rule head in datalog"
-                []
+            | Bottom -> 
+                [translateEmptyIntersection resources subConceptIntersection]
             | AtomicNamedConcept concept ->
                 getAtomicNormalizedRule resources subConceptIntersection concept
             | AllValuesFrom(objectPropertyExpression, qualifyingConcept) ->
