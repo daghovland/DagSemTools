@@ -49,10 +49,14 @@ module PredicateGrounderTests =
                              TriplePattern.Predicate =  Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
-            let rule = {Head =  triplepattern; Body = [triplepattern2]}
+            let rule = {Head =  NormalHead( triplepattern )
+                        Body = [triplepattern2]}
             
             let groundRule = PredicateGrounder.instantiateRuleWithVariableMapping (predIndex, rule, (Variable "p"))
-            groundRule.Head.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
+            groundRule.Head.IsNormalHead.Should().BeTrue() |> ignore
+            match groundRule.Head with
+            | Contradiction -> failwith "bug"
+            | NormalHead headPattern ->  headPattern.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
             groundRule.Body.Should().HaveLength(1) |> ignore
             let pred = groundRule.Body.[0] |> PredicateGrounder.getAtomPredicate |> Option.get
             pred.Should().Be(predIndex)
@@ -74,10 +78,12 @@ module PredicateGrounderTests =
                              TriplePattern.Predicate =  Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
-            let rule = {Head =  triplepattern; Body = [triplepattern2]}
+            let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let groundRule = PredicateGrounder.instantiateRuleWithVariableMapping (predIndex, rule, (Variable "p"))
-            groundRule.Head.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
+            match groundRule.Head with
+            | Contradiction -> failwith "bug"
+            | NormalHead headPattern ->  headPattern.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
             groundRule.Body.Should().HaveLength(1) |> ignore
             let pred = groundRule.Body.[0] |> PredicateGrounder.getAtomPredicate |> Option.get
             pred.Should().Be(predIndex)
@@ -107,14 +113,20 @@ module PredicateGrounderTests =
                              TriplePattern.Predicate =  Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
-            let rule = {Head =  triplepattern; Body = [triplepattern2]}
+            let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let groundRules = PredicateGrounder.groundRulePredicates ([rule], tripleTable)
             groundRules.Should().HaveLength(4) |> ignore
-            let predGroundRules = groundRules |> Seq.filter (fun r -> r.Head.Predicate = ResourceOrVariable.Resource predIndex)
+            let predGroundRules = groundRules
+                                  |> Seq.choose (fun rule -> match rule.Head with
+                                                                | Contradiction -> None
+                                                                | NormalHead headPattern ->
+                                                                    if headPattern.Predicate = ResourceOrVariable.Resource predIndex then
+                                                                        Some rule
+                                                                    else
+                                                                        None)
             predGroundRules.Should().HaveLength(1) |> ignore
             let groundRule = predGroundRules |> Seq.head
-            groundRule.Head.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
             groundRule.Body.Should().HaveLength(1) |> ignore
             let pred = groundRule.Body.[0] |> PredicateGrounder.getAtomPredicate |> Option.get
             pred.Should().Be(predIndex)
@@ -135,7 +147,7 @@ module PredicateGrounderTests =
                              TriplePattern.Predicate =  Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
-            let rule = {Head =  triplepattern; Body = [triplepattern2]}
+            let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let groundRules = PredicateGrounder.groundRulePredicates ([rule], tripleTable)
             groundRules.Should().HaveLength(3) |> ignore
@@ -158,9 +170,9 @@ module PredicateGrounderTests =
                              TriplePattern.Predicate =  Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
-            let rule = {Head =  triplepattern; Body = [triplepattern2]}
+            let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
-            let predicate = PredicateGrounder.getTriplePredicate rule.Head
+            let predicate = PredicateGrounder.getRuleHeadPredicate rule.Head
             predicate.Should().Be(Some(predIndex)) |> ignore
             
             
@@ -187,7 +199,7 @@ module PredicateGrounderTests =
                              TriplePattern.Predicate =  Variable "p"
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                             }
-            let rule = {Head =  triplepattern; Body = [triplepattern2]}
+            let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let predicates = PredicateGrounder.getPredicatesInUse ([rule], tripleTable)
             predicates.Should().HaveLength(4) |> ignore

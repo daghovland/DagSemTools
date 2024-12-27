@@ -78,7 +78,10 @@ module Stratifier =
                                         | ResourceOrVariable.Resource res -> match triple.Object with
                                                                                     | ResourceOrVariable.Variable _ -> (BinaryPredicate res)
                                                                                     | ResourceOrVariable.Resource obj -> (UnaryPredicate (res, obj))
-    
+    let GetRuleHeadRelation (triple : RuleHead) : Relation option =
+            match triple with
+            | Contradiction  -> None
+            | NormalHead pattern -> GetTriplePatternRelation pattern |> Some
     let GetRuleAtomRelation (atom : RuleAtom) : Relation =
         let triple = match atom with
                         | PositiveTriple t -> t
@@ -93,7 +96,7 @@ module Stratifier =
                                     rule.Body |> Seq.map GetRuleAtomRelation
                                     )
     let GetHeadRelations rules = rules
-                                |> Seq.map (fun rule -> rule.Head |> GetTriplePatternRelation)
+                                |> Seq.choose (fun rule -> rule.Head |> GetRuleHeadRelation)
                             
                 
     (* The intensional relations (properties) are those that occur in the head of at least one rule *)       
@@ -107,7 +110,7 @@ module Stratifier =
     
     (* The extensional relations (properties) are those that only occur in the body of rules *)       
     let GetExtentionalRelations (rules : Rule list)  =
-        if rules |> Seq.exists (fun rule -> rule.Head |> GetTriplePatternRelation = AllRelations) then
+        if rules |> Seq.exists (fun rule -> rule.Head |> GetRuleHeadRelation = Some AllRelations) then
             Seq.empty
         else
             GetBodyRelations rules |> Seq.except (GetHeadRelations rules) |> Seq.distinct
@@ -185,10 +188,12 @@ module Stratifier =
                                                              output = false
                                                              })
             rules |> Seq.iter (fun rule ->
-                                        let headRelation = rule.Head |> GetTriplePatternRelation
-                                        let headRelationNo = relationMap.[headRelation]
-                                        rule.Body
-                                           |> Seq.iter (updateRelation _ordered headRelationNo)
+                                        match rule.Head |> GetRuleHeadRelation with
+                                            | None -> ()
+                                            | Some headRelation ->
+                                                let headRelationNo = relationMap.[headRelation]
+                                                rule.Body
+                                                   |> Seq.iter (updateRelation _ordered headRelationNo)
                                 )
             updateWildcardRelation _ordered
         
@@ -273,7 +278,7 @@ module Stratifier =
                 // if ordered_relations.[relation_id].intensional then
                 let relation_rules = rules
                                         |> List.filter (fun rule ->
-                                            (rule.Head |> GetTriplePatternRelation) = relation
+                                            (rule.Head |> GetRuleHeadRelation) = Some relation
                                             )
                 ordered_rules <- Seq.append relation_rules ordered_rules
                 ordered_relations.[int relation_id].intensional <- false
@@ -305,7 +310,7 @@ module Stratifier =
                             let cycle_element = cycle |> Seq.head
                             let rules = rules
                                         |> List.filter (fun rule ->
-                                            (rule.Head |> GetTriplePatternRelation) = relations.[cycle_element]
+                                            (rule.Head |> GetRuleHeadRelation) = Some relations.[cycle_element]
                                             )
                             rules |> List.forall (this.RuleIsCoveredByCycle (cycle |> Seq.map (fun id -> relations.[id])))
                             )

@@ -85,7 +85,7 @@ module ELI2RL =
         : Rule =
         let (FullIri superConceptIri) = superConcept
 
-        { Head = GetTypeTriplePattern resources "X" (superConceptIri)
+        { Head = NormalHead ( GetTypeTriplePattern resources "X" (superConceptIri))
           Body = (translateELI resources subConcept "X" 1) |> List.map RuleAtom.PositiveTriple }
 
     
@@ -115,7 +115,7 @@ module ELI2RL =
     (* The second case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <= A *) 
     let getAtomicNormalizedRule (resources : ResourceManager) (subConceptIntersection) (FullIri conceptName) =
-        [{Head = GetTypeTriplePattern resources "X" conceptName
+        [{Head = NormalHead ( GetTypeTriplePattern resources "X" conceptName )
           Body = subConceptIntersection
                            |> List.map (fun (FullIri name) -> name)
                            |> List.map (GetTypeTriplePattern resources "X")
@@ -125,7 +125,7 @@ module ELI2RL =
     (* The anonymous class version of the second case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <= A *) 
     let getAtomicAnonymousNormalizedRule (resources : ResourceManager) (subConceptIntersection) =
-        [{Head = GetAnonymousTypeTriplePattern resources "X"
+        [{Head = NormalHead ( GetAnonymousTypeTriplePattern resources "X" )
           Body = subConceptIntersection
                            |> List.map (fun (FullIri name) -> name)
                            |> List.map (GetTypeTriplePattern resources "X")
@@ -136,7 +136,7 @@ module ELI2RL =
     (* The third case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1(X) and ... and A_n(X) and R(X,Y) -> A(Y) *) 
     let getUniversalNormalizedRule (resources : ResourceManager) (subConceptIntersection) (objectProperty) (FullIri conceptName) =
-        [{Head = GetTypeTriplePattern resources "Y" conceptName
+        [{Head = NormalHead ( GetTypeTriplePattern resources "Y" conceptName )
           Body = subConceptIntersection
                            |> Seq.map (fun (FullIri name) -> name)
                            |> Seq.map (GetTypeTriplePattern resources "X")
@@ -148,7 +148,7 @@ module ELI2RL =
        A_1 and ... and A_n <=  <=1 R. A *) 
     let getQualifiedAtMostOneNormalizedRule (resources : ResourceManager) (subConceptIntersection) (objectProperty) (FullIri conceptName) =
         let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
-        [{Head = GetObjPropTriplePattern resources sameAs "Y1" "Y2"
+        [{Head = NormalHead ( GetObjPropTriplePattern resources sameAs "Y1" "Y2" )
           Body = subConceptIntersection
                            |> Seq.map (fun (FullIri name) -> name)
                            |> Seq.map (GetTypeTriplePattern resources "X")
@@ -164,7 +164,7 @@ module ELI2RL =
        A_1 and ... and A_n <=  <=1 R *) 
     let getAtMostOneNormalizedRule (resources : ResourceManager) (subConceptIntersection) (objectProperty) =
         let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
-        [{Head = GetObjPropTriplePattern resources sameAs "Y1" "Y2"
+        [{Head = NormalHead ( GetObjPropTriplePattern resources sameAs "Y1" "Y2" )
           Body = subConceptIntersection
                            |> Seq.map (fun (FullIri name) -> name)
                            |> Seq.map (GetTypeTriplePattern resources "X")
@@ -177,7 +177,7 @@ module ELI2RL =
     (*  A_1 and ... and A_n <=  ObjectHasValue(R, i) *) 
     let getObjectHasValueNormalizedRule (resources : ResourceManager) (subConceptIntersection) (objectProperty : ObjectPropertyExpression) (individual : Individual) =
         let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
-        [{Head = GetObjValueTriplePattern resources objectProperty "X" individual
+        [{Head = NormalHead ( GetObjValueTriplePattern resources objectProperty "X" individual )
           Body = subConceptIntersection
                            |> Seq.map (fun (FullIri name) -> name)
                            |> Seq.map (GetTypeTriplePattern resources "X")

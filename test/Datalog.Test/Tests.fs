@@ -47,7 +47,7 @@ module Tests =
                              obj = objdIndex2
                              }
         
-        let rule = {Head =  triplepattern; Body = [triplepattern2]}
+        let rule = {Head =  NormalHead triplepattern; Body = [triplepattern2]}
         let prog = Reasoner.DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Single(rules)
@@ -75,7 +75,7 @@ module Tests =
                              obj = objdIndex3
                              }
         
-        let rule = {Head =  triplepattern; Body = [triplepattern2]}
+        let rule = {Head =  NormalHead triplepattern; Body = [triplepattern2]}
         let prog = Reasoner.DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Empty(rules)
@@ -145,7 +145,8 @@ module Tests =
         let objdIndex2 = tripleTable.AddResource(Iri(new IriReference "http://example.com/object2"))
         let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
-        let rule =  {Head =  ConstantTriplePattern Triple2; Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple)]}
+        let rule =  {Head =  NormalHead ( ConstantTriplePattern Triple2 )
+                     Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple)]}
         let TriplePatter = {
                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
@@ -177,7 +178,8 @@ module Tests =
             let Triple3 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex3}
             
             
-            let rule =  {Head =  ConstantTriplePattern Triple2; Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple) ; RuleAtom.NotTriple (ConstantTriplePattern Triple3)]}
+            let rule =  {Head =  NormalHead( ConstantTriplePattern Triple2 )
+                         Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple) ; RuleAtom.NotTriple (ConstantTriplePattern Triple3)]}
             let TriplePatter = {
                                 TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                                 TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
@@ -215,7 +217,8 @@ module Tests =
                              TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex
                              }
-            let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
+            let rule =  {Head = headPattern |> NormalHead
+                         Body = [ positiveMatch //; negativeMatch
                                                                      ]}
             let prog = Reasoner.DatalogProgram([rule], tripleTable)
             let triple = Subject1Obj1
@@ -252,7 +255,7 @@ module Tests =
                              TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex
                              }
-            let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch //; negativeMatch
                                                                      ]}
             let prog = Reasoner.DatalogProgram([rule], tripleTable)
             let triple = Subject1Obj1
@@ -288,7 +291,7 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex
                              }
             
-            let rule =  {Head =  headPattern; Body = [ positiveMatch //; negativeMatch
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch //; negativeMatch
                                                                      ]}
             Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3) |> List.ofSeq
@@ -329,7 +332,7 @@ module Tests =
                                     TriplePattern.Predicate = ResourceOrVariable.Resource subClassOfIndex
                                     TriplePattern.Object = ResourceOrVariable.Variable "?super" 
                                     }
-            let rule =  {Head =  headPattern; Body = [ subClassTypeAtom; isSubClassOfAtom ]}
+            let rule =  {Head = NormalHead (headPattern); Body = [ subClassTypeAtom; isSubClassOfAtom ]}
             
             //Act
             Reasoner.evaluate([rule], tripleTable)
@@ -404,7 +407,7 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Variable "s"
                              }
             
-            let rule =  {Head =  headPattern; Body = [ positiveMatch1 ; positiveMatch2
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2
                                                                      ]}
             Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex) |> List.ofSeq
@@ -445,9 +448,8 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
             
-            let rule =  {Head =  headPattern; Body = [ positiveMatch
-                                                       negativeMatch
-                                                       ]
+            let rule =  {Head = NormalHead (headPattern)
+                         Body = [ positiveMatch; negativeMatch ]
             }
             let partitioner  = Stratifier.RulePartitioner [rule]
             let ordered_relations = partitioner.GetOrderedRelations()
@@ -484,7 +486,7 @@ module Tests =
                              }
             
             
-            let rule =  {Head =  headPattern; Body = [ positiveMatch ] }
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ] }
             let partitioner  = Stratifier.RulePartitioner [rule]
             let cycles = partitioner.cycle_finder [] 0
             cycles.Should().HaveLength(1) |> ignore
@@ -509,7 +511,7 @@ module Tests =
                              }
             
             
-            let rule =  {Head =  headPattern; Body = [  ] }
+            let rule =  {Head = NormalHead (headPattern); Body = [  ] }
             DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
             let query2 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
             query2.Should().HaveLength(1) |> ignore
@@ -537,7 +539,7 @@ module Tests =
                              }
             
             
-            let rule =  {Head =  headPattern; Body = [ positiveMatch ] }
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ] }
             let partitioner  = Stratifier.RulePartitioner [rule]
             let orderedRules = partitioner.orderRules
             orderedRules.Should().HaveLength(1) |> ignore
@@ -566,7 +568,7 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex
                              }
             
-            let rule =  {Head =  headPattern; Body = [ negativeMatch
+            let rule =  {Head = NormalHead (headPattern); Body = [ negativeMatch
                                                        ]
             }
             let partitioner  = Stratifier.RulePartitioner [rule]
@@ -606,9 +608,8 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
                              }
             
-            let rule =  {Head =  headPattern; Body = [ positiveMatch
-                                                       negativeMatch
-                                                       ]
+            let rule =  {Head =  NormalHead headPattern
+                         Body = [ positiveMatch; negativeMatch ]
             }
             let partitioner  = Stratifier.RulePartitioner [rule]
             let ordered_relations = partitioner.GetOrderedRelations()
@@ -669,10 +670,11 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
             
-            let ruleA =  {Head =  headPatternA; Body = [ positiveMatchA; positiveMatchB ]
+            let ruleA =  {Head = NormalHead (headPatternA)
+                          Body = [ positiveMatchA; positiveMatchB ]
             }
-            let ruleB = {Head =  headPatternB; Body = [ negativeMatch
-                                                       ]
+            let ruleB = {Head = NormalHead (headPatternB)
+                         Body = [ negativeMatch ]
             }
             let partitioner  = Stratifier.RulePartitioner [ruleA; ruleB]
             let ordered_relations = partitioner.GetOrderedRelations()
@@ -719,9 +721,8 @@ module Tests =
                              TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
                              }
             
-            let rule =  {Head =  headPattern; Body = [ positiveMatch
-                                                       negativeMatch
-                                                       ]
+            let rule =  {Head = NormalHead (headPattern)
+                         Body = [ positiveMatch; negativeMatch ]
             }
             Reasoner.evaluate([rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3)
@@ -806,7 +807,8 @@ module Tests =
         let objdIndex2 = tripleTable.AddResource(Iri(new IriReference "http://example.com/object2"))
         let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
-        let rule =  {Head =  ConstantTriplePattern Triple2; Body = [RuleAtom.PositiveTriple(ConstantTriplePattern Triple)]}
+        let rule =  {Head =  ConstantTriplePattern Triple2 |> NormalHead
+                     Body = [RuleAtom.PositiveTriple(ConstantTriplePattern Triple)]}
         let tripleAnswersBefore = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
         Assert.Equal(1, tripleAnswersBefore |> Seq.length)
         let triples2Answers = tripleAnswersBefore |> Seq.filter (fun tr -> tr = Triple2)

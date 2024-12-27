@@ -70,7 +70,8 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
                 Predicate = ResourceOrVariable.Variable varName
                 Object = ResourceOrVariable.Resource objextIndex
             }
-        let rule : Rule = {Head = triplePattern "s1"; Body = [PositiveTriple (triplePattern "s2")]}
+        let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
+                           Body = [PositiveTriple (triplePattern "s2")]}
         let partitioner = DagSemTools.Datalog.Stratifier.RulePartitioner [rule]
         let stratification = partitioner.orderRules
         stratification.Should().HaveLength(1) |> ignore
@@ -91,7 +92,8 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
                 Predicate = ResourceOrVariable.Variable varName
                 Object = ResourceOrVariable.Resource objextIndex
             }
-        let rule : Rule = {Head = triplePattern "s1"; Body = [PositiveTriple (triplePattern "s2")]}
+        let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
+                           Body = [PositiveTriple (triplePattern "s2")]}
         let evaluatorFunction = fun () -> DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
         Assert.Throws<ArgumentException>(evaluatorFunction) |> ignore
         
@@ -119,7 +121,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
                 Predicate = ResourceOrVariable.Variable "p"
                 Object = ResourceOrVariable.Resource objextIndex
             }
-        let rule : Rule = {Head = headPattern; Body = [PositiveTriple (bodyPattern)]}
+        let rule : Rule = {Head = NormalHead headPattern; Body = [PositiveTriple (bodyPattern)]}
         
         let query1 = tripleTable.GetTriplesWithObject(objextIndex2)
         query1.Should().HaveLength(0) |> ignore
@@ -152,7 +154,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = {
+            Head = NormalHead{
                 Subject = Variable "s"
                 Predicate = Variable "p2"
                 Object = Variable "o" 
@@ -200,7 +202,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = {
+            Head = NormalHead {
                 Subject = Variable "s"
                 Predicate = Variable "p2"
                 Object = Variable "o" 
@@ -250,7 +252,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = {
+            Head = NormalHead {
                 Subject = Variable "s"
                 Predicate = Variable "p2"
                 Object = Variable "o" 
@@ -274,7 +276,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         // Assert
         groundRules.Should().HaveLength(5) |> ignore
         let correctGroundRule =  {
-            Head = {
+            Head = NormalHead {
                 Subject = Variable "s"
                 Predicate = ResourceOrVariable.Resource predIndex2
                 Object = Variable "o" 

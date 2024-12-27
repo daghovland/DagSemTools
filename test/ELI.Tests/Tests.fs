@@ -83,7 +83,7 @@ module TestClassAxioms =
         let translatedRules = ELI.ELI2RL.GenerateTBoxRL logger resources [ axiom ]
         //Assert
         let expectedRules: Datalog.Rule seq =
-            [ { Head =
+            [ { Head = NormalHead
                   { Subject = ResourceOrVariable.Variable "X"
                     Predicate = ResourceOrVariable.Resource(resources.AddResource(Iri(IriReference Namespaces.RdfType)))
                     Object =

@@ -48,7 +48,7 @@ module Library =
         let propertyResource = getObjectPropertyExpressionResource resources objProp
         let domainClassResource = getClassExpressionResource resources domExp
 
-        [ { Rule.Head =
+        [ { Rule.Head = NormalHead
               { TriplePattern.Subject = ResourceOrVariable.Variable "x"
                 TriplePattern.Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
                 TriplePattern.Object = ResourceOrVariable.Resource domainClassResource }
@@ -69,7 +69,7 @@ module Library =
         let propertyResource = getObjectPropertyExpressionResource resources objProp
         let rangeClassResource = getClassExpressionResource resources rangeExp
 
-        [ { Rule.Head =
+        [ { Rule.Head = NormalHead
               { TriplePattern.Subject = ResourceOrVariable.Variable "y"
                 TriplePattern.Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
                 TriplePattern.Object = ResourceOrVariable.Resource rangeClassResource }
@@ -86,7 +86,7 @@ module Library =
         =
         let propertyResource = getObjectPropertyExpressionResource resources objProp
 
-        [ { Rule.Head =
+        [ { Rule.Head = NormalHead
               { TriplePattern.Subject = ResourceOrVariable.Variable "y"
                 TriplePattern.Predicate = ResourceOrVariable.Resource propertyResource
                 TriplePattern.Object = ResourceOrVariable.Variable "x" }
