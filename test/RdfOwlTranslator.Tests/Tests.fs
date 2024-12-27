@@ -31,13 +31,13 @@ module Tests =
         let resources = ResourceManager(100u)
 
         let subjectResource =
-            resources.AddResource(Resource.Iri(new IriReference "http://example.com/subject"))
+            resources.AddResource(GraphElement.Iri(new IriReference "http://example.com/subject"))
 
         let rdfTypeResource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfType)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.RdfType)))
 
         let owlclassResource =
-            resources.AddResource(Resource.Iri(new IriReference(typeIri)))
+            resources.AddResource(GraphElement.Iri(new IriReference(typeIri)))
 
         let typeTriple: Triple =
             { subject = subjectResource
@@ -71,27 +71,27 @@ module Tests =
         let resources = ResourceManager(100u)
 
         let subjectResource =
-            resources.AddResource(Resource.Iri(new IriReference $"{typeIri}_instance"))
+            resources.AddResource(GraphElement.Iri(new IriReference $"{typeIri}_instance"))
 
         let anonymousReificationResource = resources.CreateUnnamedAnonResource()
 
         let rdfTypeResource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfType)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.RdfType)))
 
         let owlAxiomResource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.OwlAxiom)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.OwlAxiom)))
 
         let owlAnnTarget =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.OwlAnnotatedTarget)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.OwlAnnotatedTarget)))
 
         let owlAnnSource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.OwlAnnotatedSource)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.OwlAnnotatedSource)))
 
         let owlAnnProp =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.OwlAnnotatedProperty)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.OwlAnnotatedProperty)))
 
         let owlclassResource =
-            resources.AddResource(Resource.Iri(new IriReference(typeIri)))
+            resources.AddResource(GraphElement.Iri(new IriReference(typeIri)))
 
         let typeTriple: Triple =
             { subject = anonymousReificationResource
@@ -133,10 +133,10 @@ module Tests =
             ``Create axiom-based Declaration Helper`` owlClassIri
 
         let superClassResource =
-            resources.AddResource(Resource.Iri(new IriReference "http://example.com/superclass"))
+            resources.AddResource(GraphElement.Iri(new IriReference "http://example.com/superclass"))
 
         let subClassOfResource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfsSubClassOf)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.RdfsSubClassOf)))
 
         let subclassOfTriple: Triple =
             { subject = subjectResource
@@ -175,16 +175,16 @@ module Tests =
             ``Create axiom-based Declaration Helper`` Namespaces.OwlObjectProperty
 
         let superPropertyResource =
-            resources.AddResource(Resource.Iri(new IriReference "http://example.com/superclass"))
+            resources.AddResource(GraphElement.Iri(new IriReference "http://example.com/superclass"))
 
         let subClassOfResource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfsSubPropertyOf)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.RdfsSubPropertyOf)))
 
         let rdfTypeResource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfType)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.RdfType)))
 
         let objectPropResource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.OwlObjectProperty)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.OwlObjectProperty)))
 
         let superPropertyDeclarationTriple: Triple =
             { subject = superPropertyResource
@@ -233,13 +233,13 @@ module Tests =
         let resources = ResourceManager(100u)
 
         let subjectResource =
-            resources.AddResource(Resource.Iri(new IriReference "http://example.com/subject"))
+            resources.AddResource(GraphElement.Iri(new IriReference "http://example.com/subject"))
 
         let rdfTypeResource =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfType)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.RdfType)))
 
         let subclassResource =
-            resources.AddResource(Resource.Iri(new IriReference "http://example.com/subclass"))
+            resources.AddResource(GraphElement.Iri(new IriReference "http://example.com/subclass"))
 
         let typeTriple: Triple =
             { subject = subjectResource
@@ -249,10 +249,10 @@ module Tests =
         tripleTable.AddTriple typeTriple
 
         let subClassOfRelation =
-            resources.AddResource(Resource.Iri(new IriReference(Namespaces.RdfsSubClassOf)))
+            resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.RdfsSubClassOf)))
 
         let superclassResource =
-            resources.AddResource(Resource.Iri(new IriReference "http://example.com/superclass"))
+            resources.AddResource(GraphElement.Iri(new IriReference "http://example.com/superclass"))
 
         let subClassTriple: Triple =
             { subject = subclassResource

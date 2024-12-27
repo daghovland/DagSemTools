@@ -18,7 +18,7 @@ module Ingress =
     let createSubClassAxiom subclass superclass = 
         ClassAxiom.SubClassOf ([], (ClassName subclass), (ClassName superclass))
     
-    let createAnnotationValue (individuals : Map<ResourceId, Individual>) (resId : ResourceId) (res: Resource) =
+    let createAnnotationValue (individuals : Map<ResourceId, Individual>) (resId : ResourceId) (res: GraphElement) =
         match individuals.TryGetValue resId with
         | true, individual -> match res with 
                                 | Iri i -> AnnotationValue.IndividualAnnotation (NamedIndividual (FullIri i))
@@ -31,15 +31,15 @@ module Ingress =
                                 
     let tryGetIndividual res = 
         match res with
-        | Resource.Iri iri -> NamedIndividual (FullIri iri)
-        | Resource.AnonymousBlankNode bn -> AnonymousIndividual bn
+        | GraphElement.Iri iri -> NamedIndividual (FullIri iri)
+        | GraphElement.AnonymousBlankNode bn -> AnonymousIndividual bn
         | x -> failwith $"Invalid OWL Ontology: {x} attempted used as an individual. Only IRIs and blank nodes can be individuals"
         
     let handleLiteralError x = failwith $"Invalid OWL Ontology: {x} attempted used as a literal. IRIs and blank nodes cannot be literals"
     let tryGetLiteral res = 
         match res with
-        | Resource.Iri iri -> handleLiteralError res
-        | Resource.AnonymousBlankNode bn -> handleLiteralError res
+        | GraphElement.Iri iri -> handleLiteralError res
+        | GraphElement.AnonymousBlankNode bn -> handleLiteralError res
         | _ -> res
         
         
@@ -54,9 +54,9 @@ module Ingress =
         The requirements in the specs includes non-circular lists, so blindly assumes this is true
      *)
     let rec _GetRdfListElements (tripleTable : TripleTable) (resources : ResourceManager) listId acc  =
-        let rdfNilId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfNil)))
-        let rdfFirstId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfFirst)))
-        let rdfRestId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfRest)))
+        let rdfNilId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfNil)))
+        let rdfFirstId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfFirst)))
+        let rdfRestId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfRest)))
     
         if (listId = rdfNilId) then
             acc

@@ -33,13 +33,13 @@ open IriTools
     
     type AnnotationValue =
         IndividualAnnotation of Individual
-        | LiteralAnnotation of Resource
+        | LiteralAnnotation of GraphElement
         | IriAnnotation of Iri
         
     type Annotation = AnnotationProperty * AnnotationValue
         
     type AnnotationAxiom =
-        | AnnotationAssertion of Annotation list * AnnotationProperty * Resource * Resource
+        | AnnotationAssertion of Annotation list * AnnotationProperty * GraphElement * GraphElement
         | SubAnnotationPropertyOf of Annotation list * AnnotationProperty * AnnotationProperty
         | AnnotationPropertyDomain of Annotation list * AnnotationProperty * Iri
         | AnnotationPropertyRange of Annotation list * AnnotationProperty * Iri
@@ -49,8 +49,8 @@ open IriTools
         | DataIntersectionOf of DataRange list
         | DataUnionOf of DataRange list
         | DataComplementOf of DataRange
-        | DataOneOf of Resource list
-        | DatatypeRestriction of Datatype * (DataProperty * Resource) list
+        | DataOneOf of GraphElement list
+        | DatatypeRestriction of Datatype * (DataProperty * GraphElement) list
         
     type ObjectPropertyExpression =
         | NamedObjectProperty of ObjectProperty
@@ -82,7 +82,7 @@ open IriTools
         | ObjectMaxCardinality of int * ObjectPropertyExpression
         | DataSomeValuesFrom of DataProperty list * DataRange
         | DataAllValuesFrom of DataProperty list * DataRange
-        | DataHasValue of DataProperty * Resource
+        | DataHasValue of DataProperty * GraphElement
         | DataMinQualifiedCardinality of int * DataProperty * DataRange
         | DataMaxQualifiedCardinality of int * DataProperty * DataRange
         | DataExactQualifiedCardinality of int * DataProperty * DataRange
@@ -128,8 +128,8 @@ open IriTools
         | ClassAssertion of Annotation list * ClassExpression * Individual
         | ObjectPropertyAssertion of Annotation list * ObjectPropertyExpression * Individual * Individual
         | NegativeObjectPropertyAssertion of Annotation list * ObjectPropertyExpression * Individual * Individual
-        | DataPropertyAssertion of Annotation list * DataProperty * Individual * Resource
-        | NegativeDataPropertyAssertion of Annotation list * DataProperty * Individual * Resource
+        | DataPropertyAssertion of Annotation list * DataProperty * Individual * GraphElement
+        | NegativeDataPropertyAssertion of Annotation list * DataProperty * Individual * GraphElement
     
     type Entity =
         | ClassDeclaration of Class

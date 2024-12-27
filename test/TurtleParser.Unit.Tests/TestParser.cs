@@ -237,7 +237,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/blank_nodes.ttl");
         var ont = TestOntology(ontology);
-        var knows = ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows")));
+        var knows = ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows")));
         ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
         Assert.NotNull(ont);
     }
@@ -277,7 +277,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology(ontology);
         ont.Triples.TripleCount.Should().Be(2);
         var reifiedTriples = ont.GetReifiedTriplesWithPredicate(
-            ont.GetResourceId(Resource.NewIri(new IriReference("http://www.example.org/jobTitle"))))
+            ont.GetResourceId(GraphElement.NewIri(new IriReference("http://www.example.org/jobTitle"))))
             .ToList();
         reifiedTriples.Should().HaveCount(1);
         var employee38 = reifiedTriples.First().subject;
@@ -299,7 +299,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ontology = File.ReadAllText("TestData/triple_term.ttl");
         var ont = TestOntology(ontology);
         ont.Triples.TripleCount.Should().Be(3);
-        var reifications = ont.GetTriplesWithPredicate(ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfReifies)))).ToList();
+        var reifications = ont.GetTriplesWithPredicate(ont.GetResourceId(GraphElement.NewIri(new IriReference(Namespaces.RdfReifies)))).ToList();
         reifications.Should().HaveCount(1);
         var tripleId = reifications.First().obj;
         ont.GetReifiedTriplesWithId(tripleId).Should().HaveCount(1);
@@ -321,19 +321,19 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ontology = File.ReadAllText("TestData/collections.ttl");
         var ont = TestOntology(ontology);
         ont.Triples.TripleCount.Should().Be(8);
-        var rdfNilId = ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfNil)));
+        var rdfNilId = ont.GetResourceId(GraphElement.NewIri(new IriReference(Namespaces.RdfNil)));
         ont.GetTriplesWithObject(rdfNilId)
             .Should().HaveCount(2);
-        ont.GetTriplesWithPredicate(ont.GetResourceId(Resource.NewIri(new IriReference(Namespaces.RdfFirst))))
+        ont.GetTriplesWithPredicate(ont.GetResourceId(GraphElement.NewIri(new IriReference(Namespaces.RdfFirst))))
             .Should().HaveCount(3);
-        var listRestId = ont.GetResourceId(Resource.NewIri((new IriReference(Namespaces.RdfRest))));
+        var listRestId = ont.GetResourceId(GraphElement.NewIri((new IriReference(Namespaces.RdfRest))));
 
         var emptyListTriple = ont.GetTriplesWithSubject(
-            ont.GetResourceId(Resource.NewIri(new IriReference("http://example.org/foo/subject2")))).Single();
+            ont.GetResourceId(GraphElement.NewIri(new IriReference("http://example.org/foo/subject2")))).Single();
         emptyListTriple.obj.Should().Be(rdfNilId);
 
         var listTriple = ont.GetTriplesWithSubject(
-            ont.GetResourceId(Resource.NewIri(new IriReference("http://example.org/foo/subject1")))).Single();
+            ont.GetResourceId(GraphElement.NewIri(new IriReference("http://example.org/foo/subject1")))).Single();
         var listHead = listTriple.obj;
         var headTriples = ont.GetTriplesWithSubject(listHead);
         headTriples.Should().HaveCount(2);
@@ -354,12 +354,12 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology(ontology);
         Assert.NotNull(ont);
 
-        var knows = ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows")));
+        var knows = ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows")));
         var triplesWithKnows = ont.GetTriplesWithPredicate(knows).ToList();
         triplesWithKnows.Should().HaveCount(1);
 
 
-        var name = ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
+        var name = ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
         var triplesWithName = ont.GetTriplesWithPredicate(name).ToList();
         triplesWithName.Should().HaveCount(1);
 
@@ -372,31 +372,31 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology(ontology);
         Assert.NotNull(ont);
 
-        var knows = ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows")));
+        var knows = ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows")));
         var triplesWithKnows = ont.GetTriplesWithPredicate(knows).ToList();
         triplesWithKnows.Should().HaveCount(2);
 
 
-        var name = ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
+        var name = ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
         var triplesWithName = ont.GetTriplesWithPredicate(name).ToList();
         triplesWithName.Should().HaveCount(3);
 
         triplesWithKnows.First().obj.Should().Be(triplesWithName.Skip(1).First().subject);
 
-        var mbox = ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox")));
+        var mbox = ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox")));
 
         var triplesWithMail = ont.GetTriplesWithPredicate(mbox).ToList();
         triplesWithMail.Should().HaveCount(1);
         var ontTriples = ont.Triples.GetTriples().Select(tr => ont.GetResourceTriple(tr));
 
         var eve = ont
-            .GetTriplesWithPredicate(ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
+            .GetTriplesWithPredicate(ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
             .Where(tr => ont.GetResource(tr.obj).literal.Equals("Eve"));
         eve.Should().HaveCount(1);
 
 
         var alice = ont
-            .GetTriplesWithPredicate(ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
+            .GetTriplesWithPredicate(ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
             .Where(tr => ont.GetResource(tr.obj).literal.Equals("Alice"));
         alice.Should().HaveCount(1);
 
@@ -428,7 +428,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                 [ foaf:name "Alice" ].
             """, _outputWriter);
         var alice = ont
-            .GetTriplesWithPredicate(ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
+            .GetTriplesWithPredicate(ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
             .Where(tr => ont.GetResource(tr.obj).literal.Equals("Alice"));
         alice.Should().HaveCount(1);
 
@@ -442,10 +442,10 @@ public class TestParser : IDisposable, IAsyncDisposable
                                     prefix : <http://example.org/>
                                     [] foaf:knows :person1, :person2 .
                                     """);
-        var knows = ont.GetResourceId(Resource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows")));
+        var knows = ont.GetResourceId(GraphElement.NewIri(new IriReference("http://xmlns.com/foaf/0.1/knows")));
         ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
         Assert.NotNull(ont);
-        var person2 = ont.GetResourceId(Resource.NewIri(new IriReference("http://example.org/person2")));
+        var person2 = ont.GetResourceId(GraphElement.NewIri(new IriReference("http://example.org/person2")));
         ont.GetTriplesWithObjectPredicate(person2, knows).Should().HaveCount(1);
     }
 

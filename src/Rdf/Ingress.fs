@@ -44,9 +44,9 @@ module Ingress =
     [<StructuralEquality>]
     [<NoComparison>]
     type TripleResource = {
-            subject: Resource
-            predicate: Resource
-            obj: Resource
+            subject: GraphElement
+            predicate: GraphElement
+            obj: GraphElement
     } with
         override this.ToString() =
             sprintf "(%A, %A, %A)" 
@@ -65,15 +65,15 @@ module Ingress =
     (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
     let tryGetNonNegativeIntegerLiteral res =
         match res with
-                    | Resource.IntegerLiteral nn -> Some nn
-                    | Resource.TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [Namespaces.XsdInt ; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger] ) -> nn |> int |> Some                              
+                    | GraphElement.IntegerLiteral nn -> Some nn
+                    | GraphElement.TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [Namespaces.XsdInt ; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger] ) -> nn |> int |> Some                              
                     | x -> None
     
     (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
     let tryGetBoolLiteral res =
         match res with
-                    | Resource.BooleanLiteral nn -> Some nn
-                    | Resource.TypedLiteral (tp, nn) when (tp.ToString() = Namespaces.XsdBoolean) -> Some (match nn with
+                    | GraphElement.BooleanLiteral nn -> Some nn
+                    | GraphElement.TypedLiteral (tp, nn) when (tp.ToString() = Namespaces.XsdBoolean) -> Some (match nn with
                                                                                                            | "true" -> true
                                                                                                            | "false" -> false
                                                                                                            | x -> failwith $"Invalid use of xsd:boolean on value {x}")

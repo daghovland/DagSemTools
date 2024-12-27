@@ -22,21 +22,21 @@ module Library =
     let GetBasicResources (resources: DagSemTools.Rdf.ResourceManager) =
         [ Namespaces.RdfType, Namespaces.OwlSameAs, Namespaces.OwlThing, Namespaces.OwlNothing ]
         |> List.map (fun iri ->
-            (Namespaces.RdfType, resources.AddResource(Resource.Iri(IriReference Namespaces.RdfType))))
+            (Namespaces.RdfType, resources.AddResource(GraphElement.Iri(IriReference Namespaces.RdfType))))
         |> Map.ofList
 
     let getObjectPropertyExpressionResource (resources: ResourceManager) objProp =
         match objProp with
-        | NamedObjectProperty(FullIri iri) -> resources.AddResource(Resource.Iri iri)
-        | AnonymousObjectProperty bNode -> resources.ResourceMap.[Resource.AnonymousBlankNode bNode]
+        | NamedObjectProperty(FullIri iri) -> resources.AddResource(GraphElement.Iri iri)
+        | AnonymousObjectProperty bNode -> resources.ResourceMap.[GraphElement.AnonymousBlankNode bNode]
         | InverseObjectProperty _ ->
             failwith "Invalid Owl Ontology: Domain of unnamed inverse object property not supported"
         | ObjectPropertyChain _ -> failwith "Invalid Owl Ontology: Domain of object property chain not supported"
 
     let getClassExpressionResource (resources: ResourceManager) classExpr =
         match classExpr with
-        | ClassName(FullIri iri) -> resources.AddResource(Resource.Iri iri)
-        | AnonymousClass bNode -> resources.ResourceMap.[Resource.AnonymousBlankNode bNode]
+        | ClassName(FullIri iri) -> resources.AddResource(GraphElement.Iri iri)
+        | AnonymousClass bNode -> resources.ResourceMap.[GraphElement.AnonymousBlankNode bNode]
         | _ -> failwith "Unnamed class not yet implemented for this operation. Sorry"
 
     let ObjectPropertyDomain2Datalog

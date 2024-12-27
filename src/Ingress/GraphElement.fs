@@ -13,7 +13,7 @@ open IriTools
     [<StructuralComparison>]
     [<StructuralEquality>]
     [<Struct>]
-    type public Resource =
+    type public GraphElement =
         public Iri of iri:  IriReference
         | AnonymousBlankNode of anon_blankNode: uint32
         | LiteralString of literal: string

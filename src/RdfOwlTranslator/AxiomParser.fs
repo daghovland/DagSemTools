@@ -38,25 +38,25 @@ type AxiomParser (triples : TripleTable,
     let Annotations = anns
     
     
-    let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
-    let owlOntologyId = resources.AddResource(Resource.Iri(new IriReference(Namespaces.OwlOntology)))
-    let versionPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlVersionIri)))
-    let importsPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlImport)))
-    let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlClass)))
-    let owlRestrictionId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlRestriction)))
-    let owlOnPropertyId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnProperty)))
-    let owlOnClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnClass)))
-    let owlQualifiedCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlQualifiedCardinality)))
-    let owlAxiomId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAxiom)))
-    let owlMembersId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMembers)))
-    let owlAnnPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
-    let owlAnnSourceId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
-    let owlAnnTargetId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
-    let owlInvObjPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
-    let subClassPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
+    let rdfTypeId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfType)))
+    let owlOntologyId = resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.OwlOntology)))
+    let versionPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlVersionIri)))
+    let importsPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlImport)))
+    let owlClassId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlClass)))
+    let owlRestrictionId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlRestriction)))
+    let owlOnPropertyId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlOnProperty)))
+    let owlOnClassId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlOnClass)))
+    let owlQualifiedCardinalityId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlQualifiedCardinality)))
+    let owlAxiomId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAxiom)))
+    let owlMembersId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlMembers)))
+    let owlAnnPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
+    let owlAnnSourceId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
+    let owlAnnTargetId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
+    let owlInvObjPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
+    let subClassPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
     let getResourceIri (resourceId : Ingress.ResourceId) : IriReference option =
         match resources.GetResource(resourceId) with 
-            | Resource.Iri iri -> Some iri
+            | GraphElement.Iri iri -> Some iri
             | _ -> None
         
     let RequireDataOrObjectProperty resourceId objectPropDecl dataPropDecl =

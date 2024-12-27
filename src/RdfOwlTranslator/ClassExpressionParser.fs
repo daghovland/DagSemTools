@@ -26,45 +26,45 @@ type ClassExpressionParser (triples : TripleTable,
     let tripleTable = triples
     let resources = resourceManager
 
-    let rdfTypeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfType)))
-    let owlOntologyId = resources.AddResource(Resource.Iri(new IriReference(Namespaces.OwlOntology)))
-    let versionPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlVersionIri)))
-    let importsPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlImport)))
-    let owlClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlClass)))
-    let owlRestrictionId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlRestriction)))
-    let owlOnPropertyId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnProperty)))
-    let owlOnPropertiesId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnProperties)))
-    let owlSomeValueFromId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlSomeValuesFrom)))
-    let owlAllValuesFromId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAllValuesFrom)))
-    let owlIntersectionOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlIntersectionOf)))
-    let owlUnionOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlUnionOf)))
-    let owlComplementOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlComplementOf)))
-    let owlOneOfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOneOf)))
-    let owlHasValueId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlHasValue)))
-    let owlHasSelfId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlHasSelf)))
-    let owlOnClassId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnClass)))
+    let rdfTypeId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfType)))
+    let owlOntologyId = resources.AddResource(GraphElement.Iri(new IriReference(Namespaces.OwlOntology)))
+    let versionPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlVersionIri)))
+    let importsPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlImport)))
+    let owlClassId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlClass)))
+    let owlRestrictionId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlRestriction)))
+    let owlOnPropertyId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlOnProperty)))
+    let owlOnPropertiesId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlOnProperties)))
+    let owlSomeValueFromId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlSomeValuesFrom)))
+    let owlAllValuesFromId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAllValuesFrom)))
+    let owlIntersectionOfId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlIntersectionOf)))
+    let owlUnionOfId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlUnionOf)))
+    let owlComplementOfId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlComplementOf)))
+    let owlOneOfId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlOneOf)))
+    let owlHasValueId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlHasValue)))
+    let owlHasSelfId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlHasSelf)))
+    let owlOnClassId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlOnClass)))
     
-    let owlOnDataRangeId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlOnDataRange)))
-    let owlQualifiedCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlQualifiedCardinality)))
-    let owlMaxQualifiedCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMaxQualifiedCardinality)))
-    let owlMinQualifiedCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMinQualifiedCardinality)))
-    let owlMaxCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMaxCardinality)))
-    let owlMinCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMinCardinality)))
-    let owlCardinalityId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlCardinality)))
-    let owlAxiomId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAxiom)))
-    let owlMembersId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlMembers)))
-    let owlAnnPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
-    let owlAnnSourceId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
-    let owlAnnTargetId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
-    let owlInvObjPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
-    let subClassPropId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
-    let rdfNilId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfNil)))
-    let rdfFirstId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfFirst)))
-    let rdfRestId = resources.AddResource(Resource.Iri (new IriReference(Namespaces.RdfRest)))
+    let owlOnDataRangeId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlOnDataRange)))
+    let owlQualifiedCardinalityId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlQualifiedCardinality)))
+    let owlMaxQualifiedCardinalityId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlMaxQualifiedCardinality)))
+    let owlMinQualifiedCardinalityId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlMinQualifiedCardinality)))
+    let owlMaxCardinalityId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlMaxCardinality)))
+    let owlMinCardinalityId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlMinCardinality)))
+    let owlCardinalityId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlCardinality)))
+    let owlAxiomId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAxiom)))
+    let owlMembersId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlMembers)))
+    let owlAnnPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
+    let owlAnnSourceId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
+    let owlAnnTargetId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
+    let owlInvObjPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
+    let subClassPropId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
+    let rdfNilId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfNil)))
+    let rdfFirstId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfFirst)))
+    let rdfRestId = resources.AddResource(GraphElement.Iri (new IriReference(Namespaces.RdfRest)))
 
     let getResourceIri (resourceId : Ingress.ResourceId) : IriReference option =
         match resources.GetResource(resourceId) with 
-            | Resource.Iri iri -> Some iri
+            | GraphElement.Iri iri -> Some iri
             | _ -> None
         
     let GetResourceInfoForErrorMessage(subject: ResourceId) : string =
@@ -112,7 +112,7 @@ type ClassExpressionParser (triples : TripleTable,
     (* This is run to initialize Decl(G), and then CE, OPE, DPE, DR and AP as in Tables 7 and section 3.2.1 in the specification
        Note that the silent ignoring of blank nodes is per specifiation *)
     let getInitialDeclarations (typeIri : string)  =
-        let typeId = resources.AddResource(Resource.Iri (new IriReference(typeIri)))
+        let typeId = resources.AddResource(GraphElement.Iri (new IriReference(typeIri)))
         Seq.concat [getBasicDeclarations typeId; getAxiomDeclarations typeId]
         |> Seq.choose (fun id -> getResourceIri id |> Option.map Iri.FullIri 
                                                 |> Option.map (fun iri -> (id, iri)))
@@ -188,7 +188,7 @@ type ClassExpressionParser (triples : TripleTable,
                             failwith $"Invalid OWL ontology: Property {resources.GetResource propResourceId} used both as object property and either data or annotation property: {GetResourceInfoForErrorMessage propResourceId}"
                       else
                           match (resources.GetResource propResourceId) with
-                          | Resource.Iri iri -> NamedObjectProperty (FullIri iri)
+                          | GraphElement.Iri iri -> NamedObjectProperty (FullIri iri)
                           // | Resource.AnonymousBlankNode bn -> AnonymousObjectProperty bn
                           | x -> failwith $"Invalid OWL Ontology: {x} used as an object property"
     
@@ -204,7 +204,7 @@ type ClassExpressionParser (triples : TripleTable,
                             failwith $"Invalid OWL ontology: Property {resources.GetResource propResourceId} used both as data property and either object or annotation property"
                       else
                           match (resources.GetResource propResourceId) with
-                          | Resource.Iri iri -> FullIri iri
+                          | GraphElement.Iri iri -> FullIri iri
                           // | Resource.AnonymousBlankNode bn -> AnonymousObjectProperty bn
                           | x -> failwith $"Invalid OWL Ontology: {x} used as an object property"
    
@@ -249,7 +249,7 @@ type ClassExpressionParser (triples : TripleTable,
                             failwith $"Invalid OWL ontology: Property {resources.GetResource propResourceId} used both as a data range and a class"
                       else
                           match (resources.GetResource propResourceId) with
-                          | Resource.Iri iri -> ClassName (FullIri iri)
+                          | GraphElement.Iri iri -> ClassName (FullIri iri)
                           | AnonymousBlankNode bn -> AnonymousClass bn
                           | x -> failwith $"Invalid OWL Ontology: {x} used as a class"
                           

@@ -4,8 +4,8 @@ open DagSemTools.Rdf.Ingress
 open DagSemTools.Ingress
 open System.Collections.Generic
 
-type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
-                 resourceList: Resource array,
+type ResourceManager(resourceMap: Dictionary<GraphElement, ResourceId>,
+                 resourceList: GraphElement array,
                  resourceCount: uint) =
     
     let mutable ResourceList = resourceList
@@ -33,7 +33,7 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
     new(init_rdf_size : uint) =
         let init_resources = max 10 (int init_rdf_size / 10)
         let init_triples = max 10 (int init_rdf_size / 60)
-        ResourceManager(new Dictionary<Resource, ResourceId>(),
+        ResourceManager(new Dictionary<GraphElement, ResourceId>(),
                     Array.zeroCreate init_resources,
                     0u
                     )
@@ -54,7 +54,7 @@ type ResourceManager(resourceMap: Dictionary<Resource, ResourceId>,
         
     member this.CreateUnnamedAnonResource() =
         anonResourceCount <- anonResourceCount + 1
-        let newAnonResource = Resource.AnonymousBlankNode((uint) anonResourceCount)
+        let newAnonResource = GraphElement.AnonymousBlankNode((uint) anonResourceCount)
         this.AddResource(newAnonResource)
     member this.GetOrCreateNamedAnonResource(name) =
         match anonResourceMap.TryGetValue(name) with

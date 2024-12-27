@@ -28,14 +28,14 @@ type Datastore(triples: TripleTable,
         this.ReifiedTriples.AddQuad { tripleId = id; subject = triple.subject; predicate = triple.predicate; obj = triple.obj }
     
         
-    member this.AddResource (resource: Resource) : ResourceId =
+    member this.AddResource (resource: GraphElement) : ResourceId =
         this.Resources.AddResource resource
     
-    member this.GetResource (resourceId: ResourceId) : Resource =
+    member this.GetResource (resourceId: ResourceId) : GraphElement =
         ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, this.Resources.ResourceCount);
         this.Resources.GetResource(resourceId)
         
-    member this.GetResourceId (resource : Resource) =
+    member this.GetResourceId (resource : GraphElement) =
         this.Resources.ResourceMap.[resource]
     member this.NewAnonymousBlankNode() =
         this.Resources.CreateUnnamedAnonResource()
