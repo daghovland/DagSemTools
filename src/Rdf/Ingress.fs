@@ -72,12 +72,13 @@ module Ingress =
     (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
     let tryGetBoolLiteral res =
         match res with
-                    | GraphElement.BooleanLiteral nn -> Some nn
-                    | GraphElement.TypedLiteral (tp, nn) when (tp.ToString() = Namespaces.XsdBoolean) -> Some (match nn with
-                                                                                                           | "true" -> true
-                                                                                                           | "false" -> false
-                                                                                                           | x -> failwith $"Invalid use of xsd:boolean on value {x}")
-                    | _ -> None
+            | GraphElement.BooleanLiteral nn -> Some nn
+            | GraphElement.TypedLiteral (tp, nn) when (tp.ToString() = Namespaces.XsdBoolean) ->
+               Some (match nn with
+                       | "true" -> true
+                       | "false" -> false
+                       | x -> failwith $"Invalid use of xsd:boolean on value {x}")
+            | _ -> None
     
   
     
