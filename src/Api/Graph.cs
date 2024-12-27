@@ -48,12 +48,12 @@ public class Graph : IGraph
     private BlankNodeOrIriResource GetBlankNodeOrIriResource(uint resourceId)
     {
         var resource = Triples.GetGraphNode(resourceId);
-        if(!FSharpOption<RdfResource>.get_IsSome(resource))
+        if (!FSharpOption<RdfResource>.get_IsSome(resource))
             throw new ArgumentException($"Resource {resource} is not an Iri or a blank node"); ;
-        
+
         switch (resource.Value)
         {
-            case  { IsIri: true } r:
+            case { IsIri: true } r:
                 return new IriResource(new IriReference(r.iri));
             case { IsAnonymousBlankNode: true } r:
                 return new BlankNodeResource($"{r.anon_blankNode}");
@@ -76,7 +76,7 @@ public class Graph : IGraph
         if (resource.IsNodeOrEdge)
         {
             var r = resource.resource;
-            if(r.IsIri)
+            if (r.IsIri)
                 return new IriResource(new IriReference(r.iri));
             if (r.IsAnonymousBlankNode)
                 return new BlankNodeResource($"{r.anon_blankNode}");
@@ -85,11 +85,11 @@ public class Graph : IGraph
 
         if (!resource.IsGraphLiteral) throw new Exception("BUG: Resource that is neither resource or literal!!");
         var lit = resource.literal;
-        if(lit.IsLangLiteral)
+        if (lit.IsLangLiteral)
             return new LiteralResource(lit.langliteral);
         if (lit.IsDateLiteral)
             return new LiteralResource(lit.literalDate.ToString());
-        if(lit.IsLiteralString)
+        if (lit.IsLiteralString)
             return new LiteralResource(lit.literal);
         throw new NotImplementedException($"Literal type {lit.ToString()} not implemented. Sorry");
     }
