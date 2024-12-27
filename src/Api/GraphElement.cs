@@ -9,7 +9,7 @@ namespace DagSemTools.Api
     {
         /// <inheritdoc />
         public abstract bool Equals(GraphElement? other);
-        
+
         /// <summary>
         /// Compares based on the string representation in ToString()
         /// </summary>
