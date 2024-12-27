@@ -157,9 +157,9 @@ module PredicateGrounderTests =
             let tripleTable = Datastore(60u)
             
             let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
-            let predIndex = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
+            let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
             let triplepattern =  {
                                  TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
                                  TriplePattern.Predicate =  ResourceOrVariable.Resource predIndex
@@ -179,10 +179,10 @@ module PredicateGrounderTests =
           let ``Multiplier can get predicates from program`` () =
             let tripleTable = Datastore(60u)
             
-            let subjectIndex = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
-            let predIndex = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
-            let objdIndex = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
-            let objdIndex2 = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
+            let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+            let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+            let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+            let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
             let triple : Triple = {
                                  subject = subjectIndex
                                  predicate =  predIndex

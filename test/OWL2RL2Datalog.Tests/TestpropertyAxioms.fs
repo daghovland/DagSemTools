@@ -36,11 +36,11 @@ let ``Object Property Domain and Range RL reasoning works`` () =
     let objectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
     let propertyIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/property"))
     let rdfTypeIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfType)))
-    let objPropTypeIndex = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlObjectProperty)))
-    let rangeIndex = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/rangeClass"))
-    let domainIndex = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/domainClass"))
-    let owlDomainId = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfsDomain)))
-    let owlRangeId = tripleTable.AddResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfsRange)))
+    let objPropTypeIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlObjectProperty)))
+    let rangeIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/rangeClass"))
+    let domainIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/domainClass"))
+    let owlDomainId = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfsDomain)))
+    let owlRangeId = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.RdfsRange)))
     let objPropTypeTriple = {Ingress.Triple.subject = propertyIndex; predicate = rdfTypeIndex; obj = objPropTypeIndex}
     tripleTable.AddTriple(objPropTypeTriple)
     let domainTriple = {Triple.subject = propertyIndex; predicate = owlDomainId; obj = domainIndex}

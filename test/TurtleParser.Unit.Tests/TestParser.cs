@@ -391,13 +391,13 @@ public class TestParser : IDisposable, IAsyncDisposable
 
         var eve = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals("Eve"));
+            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Eve")));
         eve.Should().HaveCount(1);
 
 
         var alice = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals("Alice"));
+            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
         alice.Should().HaveCount(1);
 
 
@@ -429,7 +429,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """, _outputWriter);
         var alice = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals("Alice"));
+            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
         alice.Should().HaveCount(1);
 
     }
