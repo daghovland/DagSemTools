@@ -152,7 +152,7 @@ public class Graph : IGraph
     /// <inheritdoc />
     public void EnableEqualityReasoning() =>
         LoadDatalog(OWL2RL2Datalog.Equality.GetEqualityAxioms(Triples.Resources));
-    
+
 
     Datastore IGraph.Datastore => Triples;
 

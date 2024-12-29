@@ -83,7 +83,7 @@ public interface IGraph
     /// </summary>
     public void EnableEqualityReasoning();
 
-    
+
     /// <summary>
     /// Gives access to the underlying F# Datastore structure
     /// This is not stable, and only provided for exceptional cases

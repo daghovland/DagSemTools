@@ -56,17 +56,17 @@ public class TestApiOntology(ITestOutputHelper output)
         IriReference ind2Iri = new("https://example.com/vocab#ind2");
         rdf.GetTriplesWithSubjectPredicate(ind1Iri, rdfTypeIri).Should().NotBeEmpty();
         rdf.GetTriplesWithSubjectPredicate(ind2Iri, rdfTypeIri).Should().BeEmpty();
-        
+
         // Act
         rdf.EnableEqualityReasoning();
         rdf.LoadDatalog(datalogProgram);
-        
-        
+
+
         // Assert
         rdf.GetTriplesWithSubjectPredicate(ind2Iri, rdfTypeIri).Should().NotBeEmpty();
     }
-    
-    
+
+
 
     [Fact]
     public void LoadIntersection()
