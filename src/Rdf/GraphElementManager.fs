@@ -12,7 +12,6 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
     let mutable ResourceList = resourceList
     let mutable anonResourceCount = 0
     let mutable anonResourceMap : Map<string, GraphElementId> = Map.empty
-    let equalityHandler : UnionFind = new UnionFind()
     member val ResourceCount = resourceCount with get, set
     
     

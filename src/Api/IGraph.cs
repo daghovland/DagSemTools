@@ -76,6 +76,15 @@ public interface IGraph
     public void EnableOwlReasoning();
 
     /// <summary>
+    /// Experimental: Enables owl:sameAs reasoning 
+    /// https://www.w3.org/TR/owl2-profiles/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules
+    /// Note that this adds new triples to the datastore
+    /// Also it limits the reasoners functionality on negation, since very few programs are stratifiable after these axioms are added
+    /// </summary>
+    public void EnableEqualityReasoning();
+
+    
+    /// <summary>
     /// Gives access to the underlying F# Datastore structure
     /// This is not stable, and only provided for exceptional cases
     /// </summary>

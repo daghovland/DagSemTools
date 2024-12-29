@@ -147,9 +147,12 @@ public class Graph : IGraph
     {
         var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Triples.Triples, Triples.Resources).extractOntology;
         var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Triples.Resources, ontology);
-        _rules = _rules.Concat(ontologyRules);
-        Reasoner.evaluate(ListModule.OfSeq(_rules), Triples);
+        LoadDatalog(ontologyRules);
     }
+    /// <inheritdoc />
+    public void EnableEqualityReasoning() =>
+        LoadDatalog(OWL2RL2Datalog.Equality.GetEqualityAxioms(Triples.Resources));
+    
 
     Datastore IGraph.Datastore => Triples;
 

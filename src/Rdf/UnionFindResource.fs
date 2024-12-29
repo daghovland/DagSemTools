@@ -6,8 +6,9 @@
     Contact: hovlanddag@gmail.com
 *)
 
-(* Union-Find is only suitable for the Rdf representation because deletion is not supported.
-    (Deleting owl:sameAs triple would have to split up the structure, which is not easy to calculate)s *)
+(* Union-Find is not currently used.
+    It could be used efficiently during query evaluaton over the triple-store,
+    but during reasoning it would be tricky. *)
 namespace DagSemTools.Rdf
 
 open DagSemTools.Rdf.Ingress

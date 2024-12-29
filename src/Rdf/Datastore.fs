@@ -13,6 +13,8 @@ type Datastore(triples: TripleTable,
     member val NamedGraphs = namedGraphs with get, set
     member val Resources = resources with get, set
     
+    member val equalityHandler =  UnionFind()
+    
     new(init_rdf_size : uint) =
         let init_resources : uint = uint ( max 10 (int init_rdf_size / 10) )
         let init_triples = uint ( max 10 (int init_rdf_size / 60) )

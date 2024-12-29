@@ -29,10 +29,12 @@
         <EmbeddedResource Include="datalog/equality.datalog"/>
         <EmbeddedResource Include="datalog/class.datalog"/>
         <EmbeddedResource Include="datalog/property.datalog"/>
+        <Content Include="datalog\README.md" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
+        <Compile Include="Equality.fs" />
     </ItemGroup>
 
 

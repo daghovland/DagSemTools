@@ -58,7 +58,9 @@ public class TestApiOntology(ITestOutputHelper output)
         rdf.GetTriplesWithSubjectPredicate(ind2Iri, rdfTypeIri).Should().BeEmpty();
         
         // Act
+        rdf.EnableOwlReasoning();
         rdf.LoadDatalog(datalogProgram);
+        
         
         // Assert
         rdf.GetTriplesWithSubjectPredicate(ind2Iri, rdfTypeIri).Should().NotBeEmpty();
