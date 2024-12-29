@@ -26,20 +26,20 @@ public class Graph : IGraph
 
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
 
-    /// <summary>
-    /// Loads and runs datalog rules from the file
-    /// Note that this adds new triples to the datastore
-    /// </summary>
-    /// <param name="datalog">The file with the datalog program</param>
-    /// <exception cref="InvalidOperationException"></exception>
+    /// <inheritDoc />
     public void LoadDatalog(FileInfo datalog)
     {
         var newRules = Datalog.Parser.Parser.ParseFile(datalog, System.Console.Error,
             Triples ?? throw new InvalidOperationException());
+        LoadDatalog(newRules);
+    }
+
+    /// <inheritDoc />
+    public void LoadDatalog(IEnumerable<Rule> newRules)
+    {
         _rules = _rules.Concat(newRules);
         Reasoner.evaluate(ListModule.OfSeq(_rules), Triples);
     }
-
 
     /// <inheritdoc />
     public bool IsEmpty() => Triples.Triples.TripleCount == 0;

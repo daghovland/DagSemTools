@@ -1,4 +1,5 @@
 using IriTools;
+using DagSemTools.Datalog;
 using DagSemTools.Rdf;
 
 namespace DagSemTools.Api;
@@ -58,6 +59,14 @@ public interface IGraph
     /// <param name="datalog">The file with the datalog program</param>
     /// <exception cref="InvalidOperationException"></exception>
     public void LoadDatalog(FileInfo datalog);
+
+    /// <summary>
+    /// Loads and runs datalog rules from the file
+    /// The rules are added to (not replacing) the existing rules
+    /// Note that this adds new triples to the datastore (materialises)
+    /// </summary>
+    /// <param name="newRules">The new rules to be added</param>
+    public void LoadDatalog(IEnumerable<Rule> newRules);
 
     /// <summary>
     /// Enables OWL 2 RL Reasoning
