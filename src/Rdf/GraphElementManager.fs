@@ -1,5 +1,6 @@
 namespace DagSemTools.Rdf
 
+open System.Runtime.Versioning
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Ingress
 open System.Collections.Generic
@@ -11,7 +12,9 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
     let mutable ResourceList = resourceList
     let mutable anonResourceCount = 0
     let mutable anonResourceMap : Map<string, GraphElementId> = Map.empty
+    let equalityHandler : UnionFind = new UnionFind()
     member val ResourceCount = resourceCount with get, set
+    
     
     member this.GetGraphElement (resourceId: GraphElementId) =
         if resourceId >= this.ResourceCount then
