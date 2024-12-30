@@ -29,7 +29,6 @@
             <PackagePath>README.md</PackagePath>
         </Content>
         <Compile Include="Ingress.fs" />
-        <Compile Include="UnionFindResource.fs" />
         <Compile Include="GraphElementManager.fs" />
         <Compile Include="TripleTable.fs" />
         <Compile Include="QuadTable.fs" />
