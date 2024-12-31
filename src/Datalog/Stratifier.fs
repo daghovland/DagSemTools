@@ -12,6 +12,7 @@ namespace DagSemTools.Datalog
 open System.Collections.Generic
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Datalog.Datalog
+open Serilog
 
 (* 
     The Stratifier module intends to create a stratification of a datalog program, such that negation can be supported
@@ -136,7 +137,7 @@ module Stratifier =
         NegativeIntentionalProperties rules |> Seq.isEmpty
   
     (* The RulePartitioner creates a stratification of the program if it is stratifiable, and otherwise fails *)
-    type RulePartitioner(rules: Rule list) =
+    type RulePartitioner (logger: ILogger, rules: Rule list) =
         
         let relations = GetRelations rules |> Seq.toArray
         let relationMap = relations |> Array.mapi (fun i r -> r, i) |> Map.ofArray
@@ -206,6 +207,13 @@ module Stratifier =
         let mutable next_elements_queue = Queue<int>()
         let mutable n_unordered = Array.length ordered_relations - ready_elements_queue.Count
         
+        let printCycle cycle =
+            cycle
+            |> Seq.map (fun n -> $"Cycle element: %i{n}")
+            |> String.concat ", "
+                
+                
+        
         (* Called when the topological sorting cannot proceed, hence assuming the existence of a cycle *)
         member this.cycle_finder (visited : int seq) (current : int) : int seq seq =
             let current_element = ordered_relations.[current]
@@ -221,9 +229,11 @@ module Stratifier =
                                                         | PositiveRelationEdge relation_id -> 
                                                             (this.cycle_finder (Seq.append visited [current]) relation_id)
                                                         | NegativeRelationEdge relation_id ->
-                                                            if (this.cycle_finder (Seq.append visited [current]) relation_id |> Seq.isEmpty |> not) then
-                                                                // TODO: Output cycle
-                                                                failwith "Datalog program contains a cycle with negation and is not stratifiable!"
+                                                            let cycleFinder = this.cycle_finder (Seq.append visited [current]) relation_id
+                                                            if (cycleFinder |> Seq.isEmpty |> not) then
+                                                                let cycleString = cycleFinder |> Seq.head |> printCycle
+                                                                logger.Error($"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}")
+                                                                failwith $"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}"
                                                             else
                                                                 Seq.empty
                                                     )
@@ -339,7 +349,7 @@ module Stratifier =
                 
         (* Order the rules topologically based on dependency. Used for stratification
             Each Rule seq in the outermost seq is a partition, and these partitions must be handled sequentially during materialization *)
-        member this.orderRules  : Rule seq seq =
+        member this.orderRules  :  Rule seq seq =
             let mutable stratification = []
             if ready_elements_queue.Count = 0 then
                     this.handle_cycle()

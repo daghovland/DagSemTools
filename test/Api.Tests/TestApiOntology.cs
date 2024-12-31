@@ -82,11 +82,20 @@ public class TestApiOntology(ITestOutputHelper output)
     [Fact]
     public void LoadImfOntologyWorks()
     {
+        // Arrange
         var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
-        var ont = OwlOntology.Create(rdf);
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var aboxFileInfo = new FileInfo("TestData/imf-data.ttl");
+        var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdfImf);
         ont.GetAxioms().Should().NotBeEmpty();
-        ont.GetAxiomRules().ToList().Should().NotBeEmpty();
+        
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        rdfImf.LoadDatalog(axiomRules);
+        
+        _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
 
@@ -97,6 +106,8 @@ public class TestApiOntology(ITestOutputHelper output)
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
-
+        var datalogProgram = ont.GetAxiomRules().ToList();
+        datalogProgram.Should().NotBeEmpty();
+        rdf.LoadDatalog(datalogProgram);
     }
 }

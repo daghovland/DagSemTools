@@ -34,6 +34,7 @@
     <ItemGroup>
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
         <PackageReference Include="IriTools" Version="2.2.0" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />

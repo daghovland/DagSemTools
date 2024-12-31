@@ -1,0 +1,4 @@
+@prefix : <http://example.org/object#> .
+@prefix imf: <http://ns.imfid.org/imf#> .
+
+:system1 a imf:Block.

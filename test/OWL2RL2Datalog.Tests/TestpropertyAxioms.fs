@@ -57,7 +57,7 @@ let ``Object Property Domain and Range RL reasoning works`` () =
     let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
     let ontology = ontologyTranslator.extractOntology
     let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology 
-    DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
+    DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
     
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, domainIndex)
     query2.Should().HaveLength(1) |> ignore

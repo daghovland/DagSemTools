@@ -47,7 +47,7 @@ let ``Subclass RL reasoning from rdf works`` () =
     let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
     let ontology = ontologyTranslator.extractOntology
     let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
-    DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
+    DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query2.Should().HaveLength(1) |> ignore
     inMemorySink.LogEvents.Should().BeEmpty
@@ -81,7 +81,7 @@ let ``Equivalentclass RL reasoning from rdf works`` () =
     let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
     let ontology = ontologyTranslator.extractOntology
     let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
-    DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
+    DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query2.Should().HaveLength(1) |> ignore
 
@@ -113,7 +113,7 @@ let ``Equivalentclass RL reasoning from rdf works the other way`` () =
     let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
     let ontology = ontologyTranslator.extractOntology
     let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
-    DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
+    DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex)
     query2.Should().HaveLength(1) |> ignore
     inMemorySink.LogEvents.Should().BeEmpty

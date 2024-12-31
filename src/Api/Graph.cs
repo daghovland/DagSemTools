@@ -38,7 +38,7 @@ public class Graph : IGraph
     public void LoadDatalog(IEnumerable<Rule> newRules)
     {
         _rules = _rules.Concat(newRules);
-        Reasoner.evaluate(ListModule.OfSeq(_rules), Triples);
+        Reasoner.evaluate(_logger, ListModule.OfSeq(_rules), Triples);
     }
 
     /// <inheritdoc />
