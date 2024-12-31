@@ -78,6 +78,22 @@ public class TestApiOntology(ITestOutputHelper output)
 
     }
 
+    [Fact]
+    public void LoadDarlingExampleWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/darlingExample.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+        
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        rdf.LoadDatalog(axiomRules);
+        
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
 
     [Fact]
     public void LoadImfOntologyWorks()

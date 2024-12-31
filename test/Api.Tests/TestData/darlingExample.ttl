@@ -1,0 +1,53 @@
+@prefix : <http://example.org/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# This is the example on page 7 of https://arxiv.org/pdf/2008.02232
+
+:C rdf:type owl:Class .
+:D rdf:type owl:Class .
+:E rdf:type owl:Class .
+:F rdf:type owl:Class .
+:A rdf:type owl:Class .
+
+:r rdf:type owl:ObjectProperty .
+:s rdf:type owl:ObjectProperty .
+:t rdf:type owl:ObjectProperty .
+:u rdf:type owl:ObjectProperty .
+
+[
+    rdf:type owl:Class ;
+    owl:intersectionOf (
+                           [
+                               rdf:type owl:Restriction ;
+                               owl:onProperty :r ;
+                               owl:someValuesFrom [
+                                                      rdf:type owl:Restriction ;
+                                                      owl:onProperty :s ;
+                                                      owl:someValuesFrom [
+                                                                             rdf:type owl:Class ;
+                                                                             owl:intersectionOf (:C :D) ;
+                                                                         ] ;
+                                                  ] ;
+                           ]
+                           [
+                               rdf:type owl:Restriction ;
+                               owl:onProperty :t ;
+                               owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                               owl:onClass [
+                                               rdf:type owl:Class ;
+                                               owl:unionOf (:E [
+                                                                   rdf:type owl:Restriction ;
+                                                                   owl:onProperty [
+                                                                                      rdf:type owl:InverseObjectProperty ;
+                                                                                      owl:inverseOf :u ;
+                                                                                  ] ;
+                                                                   owl:someValuesFrom :F ;
+                                                               ]) ;
+                                           ] ;
+                           ]
+                       ) ;
+    rdfs:subClassOf :A ;
+] .
