@@ -1,4 +1,5 @@
 using IriTools;
+using DagSemTools.Datalog;
 using DagSemTools.Rdf;
 
 namespace DagSemTools.Api;
@@ -60,11 +61,28 @@ public interface IGraph
     public void LoadDatalog(FileInfo datalog);
 
     /// <summary>
+    /// Loads and runs datalog rules from the file
+    /// The rules are added to (not replacing) the existing rules
+    /// Note that this adds new triples to the datastore (materialises)
+    /// </summary>
+    /// <param name="newRules">The new rules to be added</param>
+    public void LoadDatalog(IEnumerable<Rule> newRules);
+
+    /// <summary>
     /// Enables OWL 2 RL Reasoning
     /// https://www.w3.org/TR/owl2-profiles/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules
     /// Note that this adds new triples to the datastore
     /// </summary>
     public void EnableOwlReasoning();
+
+    /// <summary>
+    /// Experimental: Enables owl:sameAs reasoning 
+    /// https://www.w3.org/TR/owl2-profiles/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules
+    /// Note that this adds new triples to the datastore
+    /// Also it limits the reasoners functionality on negation, since very few programs are stratifiable after these axioms are added
+    /// </summary>
+    public void EnableEqualityReasoning();
+
 
     /// <summary>
     /// Gives access to the underlying F# Datastore structure

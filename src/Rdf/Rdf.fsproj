@@ -33,8 +33,6 @@
         <Compile Include="TripleTable.fs" />
         <Compile Include="QuadTable.fs" />
         <Compile Include="Datastore.fs" />
-        
-        
     </ItemGroup>
 
     <ItemGroup>
@@ -50,7 +48,6 @@
         <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />
         <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
     </ItemGroup>
-
 
     <ItemGroup>
         <None Update="README.md">

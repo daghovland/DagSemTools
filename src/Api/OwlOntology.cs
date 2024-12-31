@@ -38,10 +38,11 @@ public class OwlOntology
     /// Factory method for creating an owl ontology.
     /// </summary>
     /// <param name="graph"></param>
+    /// <param name="logger"></param>
     /// <returns></returns>
-    public static OwlOntology Create(IGraph graph)
+    public static OwlOntology Create(IGraph graph, ILogger? logger = null)
     {
-        return new OwlOntology(graph);
+        return new OwlOntology(graph, logger);
     }
 
     /// <summary>
