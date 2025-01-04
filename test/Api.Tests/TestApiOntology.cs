@@ -92,6 +92,8 @@ public class TestApiOntology(ITestOutputHelper output)
         axiomRules.Should().NotBeEmpty();
         rdf.LoadDatalog(axiomRules);
         
+        //Assert
+        rdf.GetTriplesWithSubjectPredicate(axiomRules[0], axiomRules[1])
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 

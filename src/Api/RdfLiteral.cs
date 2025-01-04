@@ -1,14 +1,10 @@
 namespace DagSemTools.Api;
 
 /// <inheritdoc />
-public class RdfLiteral(string value) : GraphElement
+public abstract class RdfLiteral(Ingress.RdfLiteral rdfLiteral) : GraphElement
 {
-    /// <summary>
-    /// The string value of the literal. 
-    /// </summary>
-    public string Value { get; } = value;
-
-
+    internal readonly Ingress.RdfLiteral InternalRdfLiteral = rdfLiteral;
+    
     /// <summary>
     /// Two literals are equal if their string values are equal.
     /// </summary>
@@ -16,15 +12,12 @@ public class RdfLiteral(string value) : GraphElement
     /// <returns></returns>
     public override bool Equals(GraphElement? other) =>
         other != null && (ReferenceEquals(this, other) ||
-                          (other is RdfLiteral literal && literal.Value.Equals(Value)));
+                          (other is RdfLiteral literal && literal.InternalRdfLiteral.Equals(InternalRdfLiteral)));
 
     /// <inheritdoc />
-    public override string ToString() => Value;
+    public override string ToString() => InternalRdfLiteral.ToString();
 
 
     /// <inheritdoc />
-    public override int GetHashCode()
-    {
-        return Value.GetHashCode();
-    }
+    public override int GetHashCode() => InternalRdfLiteral.GetHashCode();
 }

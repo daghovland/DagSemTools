@@ -51,3 +51,24 @@
                        ) ;
     rdfs:subClassOf :A ;
 ] .
+
+# :x is an example individual that should be inferred to be of type :A
+:x rdf:type owl:NamedIndividual ;
+    :r :y1 ;
+    :t :z1 .
+
+# Individual :y1 satisfies ∃s.(C ⊓ D)
+:y1 rdf:type owl:NamedIndividual ;
+    :s :y2 .
+
+:y2 rdf:type owl:NamedIndividual, :C, :D .
+
+# Individual :z1 satisfies E ⊔ ∃u⁻.F
+:z1 rdf:type owl:NamedIndividual, :E .
+
+# :notx is an example thas should not be inferred to be of type :A
+:notx rdf:type owl:NamedIndividual ;
+:r :noty1 ;
+:t :notz1 .
+:noty1 rdf:type owl:NamedIndividual .
+:notz1 rdf:type owl:NamedIndividual, :E .
