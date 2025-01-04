@@ -58,17 +58,8 @@ public interface IGraph
     /// </summary>
     /// <param name="triple"></param>
     /// <returns></returns>
-    // public bool ContainsTriple(Triple triple);
+    public bool ContainsTriple(Triple triple);
 
-    /// <summary>
-    /// Returns true if and only if the triple is in the Graph
-    /// Similar to the sparql query "ASK WHERE { subject predicate object }".
-    /// </summary>
-    /// <param name="subject"></param>
-    /// <param name="predicate"></param>
-    /// <param name="obj"></param>
-    /// <returns></returns>
-    public bool ContainsTriple(IriReference subject, IriReference predicate, IriReference obj);
     
     /// <summary>
     /// Loads and runs datalog rules from the file

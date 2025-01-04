@@ -28,7 +28,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public bool ContainsTriple(Triple apiTriple) =>
-        GetTriple(apiTriple, out Rdf.Ingress.Triple rdfTriple) 
+        TryGetRdfTriple(apiTriple, out var rdfTriple) 
          && Triples
              .ContainsTriple(rdfTriple);
 
@@ -53,7 +53,7 @@ public class Graph : IGraph
             RdfLiteral literal =>  GetRdfLiteralGraphElementId(literal, out idx),
             _ => throw new Exception($"Unknown resource type: {gel.GetType().FullName}"),
         };
-    internal bool FromApiTriple(Triple apiTriple, out Rdf.Ingress.Triple rdfTriple)
+    internal bool TryGetRdfTriple(Triple apiTriple, out Rdf.Ingress.Triple rdfTriple)
     {
         if (GetRdfResourceGraphElementId(apiTriple.Subject, out var subjIdx) &&
             GetRdfIriGraphElementId(apiTriple.Predicate, out var predIdx) &&
@@ -66,6 +66,14 @@ public class Graph : IGraph
         rdfTriple = default;
         return false;
     }
+    
+    internal Rdf.Ingress.Triple EnsureRdfTriple(Triple apiTriple) => 
+        (GetRdfResourceGraphElementId(apiTriple.Subject, out var subjIdx) &&
+            GetRdfIriGraphElementId(apiTriple.Predicate, out var predIdx) &&
+            GetRdfGraphElementId(apiTriple.Object, out var objIdx)) ? 
+        new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx) : 
+        throw new Exception($"BUG: Something went wrong when translating {apiTriple}");    
+
     /// <inheritDoc />
     public void LoadDatalog(FileInfo datalog)
     {
@@ -102,7 +110,7 @@ public class Graph : IGraph
     }
 
 
-    private IriResource GetIriResource(uint resourceId)
+    private IriResource GetApiIriResource(uint resourceId)
     {
         var resource = GetBlankNodeOrIriResource(resourceId);
         if (resource is IriResource r)
@@ -125,18 +133,13 @@ public class Graph : IGraph
 
         if (!resource.IsGraphLiteral) throw new Exception("BUG: Resource that is neither resource or literal!!");
         var lit = resource.literal;
-        if (lit.IsLangLiteral)
-            return new RdfLiteral(lit.langliteral);
-        if (lit.IsDateLiteral)
-            return new RdfLiteral(lit.literalDate.ToString());
-        if (lit.IsLiteralString)
-            return new RdfLiteral(lit.literal);
-        throw new NotImplementedException($"Literal type {lit.ToString()} not implemented. Sorry");
+        return new RdfLiteral(lit);
     }
 
-    private Triple GetTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
-    new Triple(this.GetBlankNodeOrIriResource(triple.subject),
-            GetIriResource(triple.predicate).Iri,
+
+    private Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
+        new (GetBlankNodeOrIriResource(triple.subject),
+            GetApiIriResource(triple.predicate).Iri,
             GetResource(triple.obj));
     
     /// <inheritdoc />
@@ -145,7 +148,7 @@ public class Graph : IGraph
          && GetRdfIriGraphElementId(predicate, out var predIdx))
             ? Triples
                 .GetTriplesWithObjectPredicate(objIdx, predIdx)
-                .Select(GetTriple)
+                .Select(EnsureApiTriple)
             : [];
 
 
@@ -155,7 +158,7 @@ public class Graph : IGraph
          && GetRdfIriGraphElementId(predicate, out var predIdx))
             ? Triples
                 .GetTriplesWithSubjectPredicate(subjIdx, predIdx)
-                .Select(GetTriple)
+                .Select(EnsureApiTriple)
             : [];
 
     /// <inheritdoc />
@@ -163,7 +166,7 @@ public class Graph : IGraph
         (GetRdfIriGraphElementId(subject, out var subjIdx))
             ? Triples
                 .GetTriplesWithSubject(subjIdx)
-                .Select(GetTriple)
+                .Select(EnsureApiTriple)
             : [];
 
     /// <inheritdoc />
@@ -171,7 +174,7 @@ public class Graph : IGraph
         (GetRdfIriGraphElementId(predicate, out var predIdx))
             ? Triples
                 .GetTriplesWithPredicate(predIdx)
-                .Select(GetTriple)
+                .Select(EnsureApiTriple)
             : [];
 
     /// <inheritdoc />
@@ -179,7 +182,7 @@ public class Graph : IGraph
         (GetRdfIriGraphElementId(@object, out var objIdx))
             ? Triples
                 .GetTriplesWithObject(objIdx)
-                .Select(GetTriple)
+                .Select(EnsureApiTriple)
             : [];
 
     /// <inheritdoc />

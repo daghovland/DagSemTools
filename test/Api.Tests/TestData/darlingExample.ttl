@@ -66,7 +66,7 @@
 # Individual :z1 satisfies E ⊔ ∃u⁻.F
 :z1 rdf:type owl:NamedIndividual, :E .
 
-# :notx is an example thas should not be inferred to be of type :A
+# :notx is an example that should not be inferred to be of type :A
 :notx rdf:type owl:NamedIndividual ;
 :r :noty1 ;
 :t :notz1 .

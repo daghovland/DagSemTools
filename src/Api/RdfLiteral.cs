@@ -1,9 +1,17 @@
 namespace DagSemTools.Api;
 
 /// <inheritdoc />
-public abstract class RdfLiteral(Ingress.RdfLiteral rdfLiteral) : GraphElement
+public class RdfLiteral(Ingress.RdfLiteral rdfLiteral) : GraphElement
 {
     internal readonly Ingress.RdfLiteral InternalRdfLiteral = rdfLiteral;
+
+    /// <summary>
+    /// Creates an rdf literal of type xsd:string. This is the default type in rdf
+    /// </summary>
+    /// <param name="rdfLiteral"></param>
+    /// <returns></returns>
+    public static RdfLiteral StringRdfLiteral(string rdfLiteral) =>
+        new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString(rdfLiteral));
     
     /// <summary>
     /// Two literals are equal if their string values are equal.

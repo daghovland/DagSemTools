@@ -48,7 +48,7 @@ public class TestApi(ITestOutputHelper output)
         mbox.Should().HaveCount(1);
 
         var eve = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name"))
-            .Where(tr => tr.Object.Equals(new RdfLiteral("Eve")));
+            .Where(tr => tr.Object.Equals(RdfLiteral.StringRdfLiteral("Eve")));
         eve.Should().HaveCount(1);
     }
 
