@@ -29,6 +29,7 @@
 
     <ItemGroup>
         <Compile Include="Ingress.fs" />
+        <Compile Include="TopologicalSort.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>

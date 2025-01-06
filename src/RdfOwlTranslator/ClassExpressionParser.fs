@@ -338,8 +338,8 @@ type ClassExpressionParser (triples : TripleTable,
             let owlAxiomName = (RequireResourceIri classTriple.predicate).ToString()
             let ys = match owlAxiomName with
                         | OwlComplementOf -> [classTriple.obj]
-                        | _ -> Ingress.GetRdfListElements tripleTable resources classTriple.obj
-            let predecessors = ys |> Seq.filter GetPredecessorClassExpressions
+                        | _ -> Ingress.GetRdfListElements tripleTable resources classTriple.obj 
+            let predecessors = ys |> List.filter GetPredecessorClassExpressions
             (x, predecessors,
              fun () ->
                     let classExpression =
@@ -582,10 +582,11 @@ type ClassExpressionParser (triples : TripleTable,
     let parseObjectCardinality (restrictionTriples : Triple seq) cardinalityId cardinalityExpressionConstructor =
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
+        (x, [y], fun () ->
         let n = RequireQualificationCardinality restrictionTriples cardinalityId
         let OPE_y = tryGetObjectPropertyExpressions y
         let restriction = cardinalityExpressionConstructor(n, OPE_y)
-        trySetClassExpression x restriction
+        trySetClassExpression x restriction)
     
     let parseObjectMinCardinality (restrictionTriples : Triple seq) =
         parseObjectCardinality restrictionTriples owlMinCardinalityId ObjectMinCardinality
@@ -653,9 +654,52 @@ type ClassExpressionParser (triples : TripleTable,
     let parseDataExactQualifiedCardinality (restrictionTriples : Triple seq) =
         parseDataQualifiedCardinality restrictionTriples owlQualifiedCardinalityId DataExactQualifiedCardinality
     
-    
+    (* This is called from the parseAnonymousTriples below, assuming that parseRestrictions is all the triples in a store with the same subject of type owl:Restriction  *)
+    let parseRestrictions restrictionTriples predicates triplesString =
+        
+        if predicates |> Seq.contains OwlOnProperties then
+                if (predicates |> Seq.contains OwlAllValuesFrom) then
+                        (parseAllValuesFromProperties restrictionTriples)
+                else if predicates |> Seq.contains OwlSomeValuesFrom then
+                    (parseSomeValueFromProperties restrictionTriples)
+                else failwith $"Invalid OWL ontology: OwlOnProperties without either OwlAllValuesFrom or OwlSomeValuesFrom"
+            else if predicates |> Seq.contains OwlSomeValuesFrom then
+                parseSomeValueFrom restrictionTriples
+            else if predicates |> Seq.contains OwlAllValuesFrom then
+                parseAllValuesFrom restrictionTriples
+            else if predicates |> Seq.contains OwlHasValue then
+                parseHasValue restrictionTriples
+            else if predicates |> Seq.contains OwlHasSelf then
+                parseObjectHasSelf restrictionTriples
+            else if predicates |> Seq.contains OwlOnClass then
+                if predicates |> Seq.contains OwlMaxQualifiedCardinality then
+                    parseObjectMaxQualifiedCardinality restrictionTriples
+                else if predicates |> Seq.contains OwlMinQualifiedCardinality then
+                    parseObjectMinQualifiedCardinality restrictionTriples
+                else if predicates |> Seq.contains OwlQualifiedCardinality then
+                    parseObjectExactQualifiedCardinality restrictionTriples
+                else failwith $"Invalid OWL Ontology: OwlOnClass without qualified cardinality specified"
+            else if predicates |> Seq.contains OwlOnDataRange then
+                if predicates |> Seq.contains OwlMaxQualifiedCardinality then
+                    parseDataMaxQualifiedCardinality restrictionTriples
+                else if predicates |> Seq.contains OwlMinQualifiedCardinality then
+                    parseDataMinQualifiedCardinality restrictionTriples
+                else if predicates |> Seq.contains OwlQualifiedCardinality then
+                    parseDataExactQualifiedCardinality restrictionTriples
+                else failwith $"Invalid OWL Ontology OwlOnDataRange without qualified cardingality specified"
+            else if predicates |> Seq.contains OwlMinCardinality then
+                    parseObjectMinCardinality restrictionTriples
+            else if predicates |> Seq.contains OwlMaxCardinality then
+                    parseObjectMaxCardinality restrictionTriples
+            else if predicates |> Seq.contains OwlCardinality then
+                    parseObjectExactCardinality restrictionTriples
+            else if predicates |> Seq.contains OwlOnProperties then
+                    failwith $"TODO: {triplesString} not implemented yet"
+            else
+                failwith $"Invalid owl:Restriction on triples {triplesString}"
                 
-    let parseAnonymousRestrictions() : (GraphElementId * GraphElementId list * (unit -> unit)) seq=
+                
+    let parseAnonymousRestrictions() =
         let anonymousClassTriples = tripleTable.GetTriplesWithObjectPredicate(owlRestrictionId, rdfTypeId)
                                             |> Seq.choose (fun tr -> match resources.GetResource(tr.subject) with
                                                                                     | Some (AnonymousBlankNode x) -> Some (tr.subject)
@@ -673,51 +717,13 @@ type ClassExpressionParser (triples : TripleTable,
             let triplesString = restrictionTriples
                                 |> Seq.map resources.GetResourceTriple
                                 |> Seq.map (_.ToString()) |> String.concat "."
-                
-            if predicates |> Seq.contains OwlOnProperties then
-                if predicates |> Seq.contains OwlSomeValuesFrom then
-                    parseSomeValueFromProperties restrictionTriples
-                else if (predicates |> Seq.contains OwlAllValuesFrom) then
-                        parseAllValuesFromProperties restrictionTriples
-            else if predicates |> Seq.contains OwlSomeValuesFrom then
-                parseSomeValueFrom restrictionTriples
-            else if predicates |> Seq.contains OwlAllValuesFrom then
-                parseAllValuesFrom restrictionTriples
-            else if predicates |> Seq.contains OwlHasValue then
-                parseHasValue restrictionTriples
-            else if predicates |> Seq.contains OwlHasSelf then
-                parseObjectHasSelf restrictionTriples
-            else if predicates |> Seq.contains OwlOnClass then
-                if predicates |> Seq.contains OwlMaxQualifiedCardinality then
-                    parseObjectMaxQualifiedCardinality restrictionTriples
-                else if predicates |> Seq.contains OwlMinQualifiedCardinality then
-                    parseObjectMinQualifiedCardinality restrictionTriples
-                else if predicates |> Seq.contains OwlQualifiedCardinality then
-                    parseObjectExactQualifiedCardinality restrictionTriples
-            else if predicates |> Seq.contains OwlOnDataRange then
-                if predicates |> Seq.contains OwlMaxQualifiedCardinality then
-                    parseDataMaxQualifiedCardinality restrictionTriples
-                else if predicates |> Seq.contains OwlMinQualifiedCardinality then
-                    parseDataMinQualifiedCardinality restrictionTriples
-                else if predicates |> Seq.contains OwlQualifiedCardinality then
-                    parseDataExactQualifiedCardinality restrictionTriples
-            else if predicates |> Seq.contains OwlMinCardinality then
-                    parseObjectMinCardinality restrictionTriples
-            else if predicates |> Seq.contains OwlMaxCardinality then
-                    parseObjectMaxCardinality restrictionTriples
-            else if predicates |> Seq.contains OwlCardinality then
-                    parseObjectExactCardinality restrictionTriples
-            else if predicates |> Seq.contains OwlOnProperties then
-                    failwith $"TODO: {triplesString} not implemented yet"
-            else
-                failwith $"Invalid owl:Restriction on triples {triplesString}"
-                )
+            
+            parseRestrictions restrictionTriples predicates triplesString    
+            )
                   
-    let topologicalOrdering unordered   =
-        unordered |> Seq.map (fun (_,_,f) -> f)
     let parseClassExpressions() =
         let unorderedClassExpressions = Seq.concat [parseAnonymousClassExpressions() ; parseAnonymousRestrictions()]
-        topologicalOrdering unorderedClassExpressions
+        TopologicalSort.sort unorderedClassExpressions
         |> Seq.iter (fun clExpr -> clExpr())
     
     
