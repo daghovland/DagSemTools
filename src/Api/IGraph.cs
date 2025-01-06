@@ -60,7 +60,7 @@ public interface IGraph
     /// <returns></returns>
     public bool ContainsTriple(Triple triple);
 
-    
+
     /// <summary>
     /// Loads and runs datalog rules from the file
     /// Note that this adds new triples to the datastore

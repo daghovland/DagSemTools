@@ -63,7 +63,7 @@ type AxiomParser (triples : TripleTable,
     let getResourceClass (resourceId : Ingress.GraphElementId) : Class option =
         resources.GetNamedResource resourceId |> Option.map Class.FullIri
 
-    let tryGetResourceIri resourceId =
+    let RequireResourceIri resourceId =
         match resources.GetNamedResource resourceId with
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used compulsory IRI position"
@@ -75,13 +75,13 @@ type AxiomParser (triples : TripleTable,
             |> String.concat ". \n"
  
     
-    let tryGetResourceClass resourceId =
+    let RequireResourceClass resourceId =
         match getResourceClass resourceId with
         | Some c -> c
         | None -> failwith $"Invalid resource {resourceId} used on class position"
 
     
-    let tryGetDeclaration (declarationMap : Map<GraphElementId, 'T>) resourceId =
+    let RequireDeclaration (declarationMap : Map<GraphElementId, 'T>) resourceId =
         let resource = resources.GetGraphElement(resourceId)
         match declarationMap.TryGetValue(resourceId) with
         | false, _ -> failwith $"Invalid OWL ontology. The resource {resource} used as a {declarationMap.Values.GetType()} without declaration."
@@ -99,7 +99,7 @@ type AxiomParser (triples : TripleTable,
          SubDataPropertyOf (annotations, objPropExpr, DataPropertyExpressions superPropertyId )
         |> AxiomDataPropertyAxiom
     let SubAnnotationPropertyAxiom  annotations superPropertyId objPropExpr =
-         SubAnnotationPropertyOf (annotations, objPropExpr, FullIri ( tryGetResourceIri superPropertyId) )
+         SubAnnotationPropertyOf (annotations, objPropExpr, FullIri ( RequireResourceIri superPropertyId) )
         |> AxiomAnnotationAxiom
     
     let EquivalentClassAxiom objectExpression subjectExpression   =
@@ -125,7 +125,7 @@ type AxiomParser (triples : TripleTable,
          DataPropertyDomain (annotations, objPropExpr, ClassExpressions range )
         |> AxiomDataPropertyAxiom
     let AnnotationPropertyDomainAxiom  annotations range objPropExpr =
-         AnnotationPropertyDomain (annotations, objPropExpr, FullIri ( tryGetResourceIri range) )
+         AnnotationPropertyDomain (annotations, objPropExpr, FullIri ( RequireResourceIri range) )
         |> AxiomAnnotationAxiom
     
     let ObjectPropertyRangeAxiom  annotations range objPropExpr =
@@ -135,7 +135,7 @@ type AxiomParser (triples : TripleTable,
          DataPropertyRange (annotations, objPropExpr, DataRanges range )
         |> AxiomDataPropertyAxiom
     let AnnotationPropertyRangeAxiom  annotations range objPropExpr =
-         AnnotationPropertyRange ( annotations, objPropExpr, FullIri ( tryGetResourceIri range) )
+         AnnotationPropertyRange ( annotations, objPropExpr, FullIri ( RequireResourceIri range) )
         |> AxiomAnnotationAxiom
     
     let ObjectPropertyAssertionAxiom  subjectId objId predicate =
@@ -262,7 +262,7 @@ type AxiomParser (triples : TripleTable,
                                                                 |> Some
                             | Namespaces.OwlDisjointWith -> ClassAxiom.DisjointClasses (axiomAnns, [ClassExpressions triple.subject; ClassExpressions triple.obj])
                                                                 |> AxiomClassAxiom |> Some
-                            | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion (axiomAnns, tryGetResourceClass triple.subject, triple.obj
+                            | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion (axiomAnns, RequireResourceClass triple.subject, triple.obj
                                                                                                                                  |> Ingress.GetRdfListElements tripleTable resources
                                                                                                                                  |> List.map (ClassExpressions))
                                                                |> AxiomClassAxiom |> Some
@@ -288,6 +288,8 @@ type AxiomParser (triples : TripleTable,
                                                                                         ObjectPropertyExpressions triple.subject,
                                                                                         ObjectPropertyExpressions triple.obj)
                                                                 |> AxiomObjectPropertyAxiom |> Some
-                            | _ -> TryGetDataOrObjectPropertyAxiom triple.predicate (ObjectPropertyAssertionAxiom triple.subject triple.obj) (DataPropertyAssertionAxiom triple.subject triple.obj))
+                            | _ -> TryGetDataOrObjectPropertyAxiom triple.predicate
+                                       (ObjectPropertyAssertionAxiom triple.subject triple.obj)
+                                       (DataPropertyAssertionAxiom triple.subject triple.obj))
         
     

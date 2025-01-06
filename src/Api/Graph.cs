@@ -28,7 +28,7 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public bool ContainsTriple(Triple apiTriple) =>
-        TryGetRdfTriple(apiTriple, out var rdfTriple) 
+        TryGetRdfTriple(apiTriple, out var rdfTriple)
          && Triples
              .ContainsTriple(rdfTriple);
 
@@ -50,7 +50,7 @@ public class Graph : IGraph
         gel switch
         {
             Resource resource => GetRdfResourceGraphElementId(resource, out idx),
-            RdfLiteral literal =>  GetRdfLiteralGraphElementId(literal, out idx),
+            RdfLiteral literal => GetRdfLiteralGraphElementId(literal, out idx),
             _ => throw new Exception($"Unknown resource type: {gel.GetType().FullName}"),
         };
     internal bool TryGetRdfTriple(Triple apiTriple, out Rdf.Ingress.Triple rdfTriple)
@@ -66,13 +66,13 @@ public class Graph : IGraph
         rdfTriple = default;
         return false;
     }
-    
-    internal Rdf.Ingress.Triple EnsureRdfTriple(Triple apiTriple) => 
+
+    internal Rdf.Ingress.Triple EnsureRdfTriple(Triple apiTriple) =>
         (GetRdfResourceGraphElementId(apiTriple.Subject, out var subjIdx) &&
             GetRdfIriGraphElementId(apiTriple.Predicate, out var predIdx) &&
-            GetRdfGraphElementId(apiTriple.Object, out var objIdx)) ? 
-        new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx) : 
-        throw new Exception($"BUG: Something went wrong when translating {apiTriple}");    
+            GetRdfGraphElementId(apiTriple.Object, out var objIdx)) ?
+        new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx) :
+        throw new Exception($"BUG: Something went wrong when translating {apiTriple}");
 
     /// <inheritDoc />
     public void LoadDatalog(FileInfo datalog)
@@ -138,10 +138,10 @@ public class Graph : IGraph
 
 
     private Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
-        new (GetBlankNodeOrIriResource(triple.subject),
+        new(GetBlankNodeOrIriResource(triple.subject),
             GetApiIriResource(triple.predicate).Iri,
             GetResource(triple.obj));
-    
+
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
         (GetRdfIriGraphElementId(obj, out var objIdx)
@@ -199,5 +199,5 @@ public class Graph : IGraph
 
     Datastore IGraph.Datastore => Triples;
 
-    
+
 }

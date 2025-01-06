@@ -282,3 +282,46 @@ module Tests =
                 | _ -> false)
 
         ontologyAxioms.Should().Contain(expectedAxioms)
+
+
+    [<Fact>]
+    let ``Subclass of intersection Axiom can be parsed from triples`` () =
+        //Arrange
+        let tripleTable = TripleTable(100u)
+        let resources = GraphElementManager(100u)
+        let subClassNode = resources.CreateUnnamedAnonResource()
+        let subClassOfRelation =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfsSubClassOf)))
+
+        
+        let superclassResource =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference "http://example.com/superclass"))
+
+        let subClassTriple: Triple =
+            { subject = subClassNode
+              predicate = subClassOfRelation
+              obj = superclassResource }
+
+        tripleTable.AddTriple subClassTriple
+
+        //Act
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let ontology: Ontology = translator.extractOntology
+
+        //Assert
+        let subClass: ClassExpression =
+            ClassName(Iri.FullIri(new IriReference "http://example.com/subclass"))
+
+        let superClass: ClassExpression =
+            ClassName(Iri.FullIri(new IriReference "http://example.com/superclass"))
+
+        let expectedAxioms = AxiomClassAxiom(SubClassOf([], subClass, superClass))
+
+        let ontologyAxioms =
+            ontology.Axioms
+            |> Seq.where (fun ax ->
+                match ax with
+                | Axiom.AxiomClassAxiom _ -> true
+                | _ -> false)
+
+        ontologyAxioms.Should().Contain(expectedAxioms)

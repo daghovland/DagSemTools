@@ -19,6 +19,7 @@ public class TestApiOntology(ITestOutputHelper output)
     private ILogger _logger =
         new LoggerConfiguration()
             .WriteTo.Sink(_inMemorySink)
+            .WriteTo.Console()
             .CreateLogger();
 
     [Fact]
@@ -78,7 +79,7 @@ public class TestApiOntology(ITestOutputHelper output)
 
     }
 
-    
+
     [Fact]
     public void QuantifiedExistentialReasoningWorks()
     {
@@ -87,21 +88,21 @@ public class TestApiOntology(ITestOutputHelper output)
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
-        var calculatedTriple = new Triple(new ("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-        var notCalculatedTriple = new Triple(new ("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-        
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
         axiomRules.Should().NotBeEmpty();
         rdf.LoadDatalog(axiomRules);
-        
+
         //Assert
         rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
         rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
-    
-    
+
+
     [Fact]
     public void IntersectionOfQuantifiedExistentialReasoningWorks()
     {
@@ -109,15 +110,18 @@ public class TestApiOntology(ITestOutputHelper output)
         var ontologyFileInfo = new FileInfo("TestData/intersectionOfRestrictionsWorks.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
-        ont.GetAxioms().Should().NotBeEmpty();
-        var calculatedTriple = new Triple(new ("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-        var notCalculatedTriple = new Triple(new ("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-        
+        var axioms = ont.GetAxioms().ToList();
+        axioms.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
         axiomRules.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
         rdf.LoadDatalog(axiomRules);
-        
+
         //Assert
         rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
         rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
@@ -125,6 +129,32 @@ public class TestApiOntology(ITestOutputHelper output)
     }
 
     
+    
+    [Fact]
+    public void IntersectionOfClassesReasoningWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/intersectionOfClassesWorks.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        var axioms = ont.GetAxioms().ToList();
+        axioms.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        rdf.LoadDatalog(axiomRules);
+
+        //Assert
+        rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
+        rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
     [Fact]
     public void LoadDarlingExampleWorks()
     {
@@ -133,14 +163,14 @@ public class TestApiOntology(ITestOutputHelper output)
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
-        var calculatedTriple = new Triple(new ("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-        var notCalculatedTriple = new Triple(new ("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-        
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
         axiomRules.Should().NotBeEmpty();
         rdf.LoadDatalog(axiomRules);
-        
+
         //Assert
         rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
         rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
@@ -157,12 +187,12 @@ public class TestApiOntology(ITestOutputHelper output)
         var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdfImf);
         ont.GetAxioms().Should().NotBeEmpty();
-        
+
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
         axiomRules.Should().NotBeEmpty();
         rdfImf.LoadDatalog(axiomRules);
-        
+
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 

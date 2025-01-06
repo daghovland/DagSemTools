@@ -12,7 +12,7 @@ public class RdfLiteral(Ingress.RdfLiteral rdfLiteral) : GraphElement
     /// <returns></returns>
     public static RdfLiteral StringRdfLiteral(string rdfLiteral) =>
         new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString(rdfLiteral));
-    
+
     /// <summary>
     /// Two literals are equal if their string values are equal.
     /// </summary>
