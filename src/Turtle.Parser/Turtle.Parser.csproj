@@ -15,14 +15,13 @@
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        
+      <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-      
+      <PackageTags>Rdf Turtle Parser</PackageTags>
       <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 	<ItemGroup>

@@ -9,6 +9,8 @@
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <IsTestProject>false</IsTestProject>
         <IsPackable>false</IsPackable>
+        <Copyright>Copyright Dag Hovland 2024</Copyright>
+        
     </PropertyGroup>
 
     <ItemGroup>

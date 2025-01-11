@@ -720,10 +720,15 @@ type ClassExpressionParser (triples : TripleTable,
             
             parseRestrictions restrictionTriples predicates triplesString    
             )
-                  
+    
+    let sortClassExpressions unorderedClassExpressions =
+        unorderedClassExpressions
+        |> Seq.map (fun (el, preds, clExpr) -> (el, pred))
+        |> 
+    
     let parseClassExpressions() =
         let unorderedClassExpressions = Seq.concat [parseAnonymousClassExpressions() ; parseAnonymousRestrictions()]
-        TopologicalSort.sort unorderedClassExpressions
+        sortClassExpressions unorderedClassExpressions
         |> Seq.iter (fun clExpr -> clExpr())
     
     

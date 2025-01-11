@@ -12,6 +12,7 @@
         <Authors>Dag Hovland</Authors>
         <Description>DotNet representation of OWL 2 Ontology</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
+        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -20,6 +21,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Platforms>AnyCPU</Platforms>
+        <PackageTags>Owl</PackageTags>
     </PropertyGroup>
 
     <ItemGroup>
