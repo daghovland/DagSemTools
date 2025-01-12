@@ -9,6 +9,6 @@ on:
 
 jobs:
   test:
-    uses: ./.github/workflows/shared-build_workflow.yml
+    uses: ./.github/workflows/shared_build_workflow.yml
     with:
       version: 0.0.1-pr-${{ github.event.pull_request.number }}-${{ github.sha }}

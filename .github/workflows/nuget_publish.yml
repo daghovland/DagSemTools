@@ -7,7 +7,7 @@ on:
 
 jobs:
   build:
-    uses: ./.github/workflows/shared-build_workflow.yml
+    uses: ./.github/workflows/shared_build_workflow.yml
     with:
       version: ${{ github.event.release.tag_name }}
 
