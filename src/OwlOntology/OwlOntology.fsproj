@@ -8,7 +8,6 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.OwlOntology</PackageId>
-        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>DotNet representation of OWL 2 Ontology</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
@@ -22,6 +21,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Platforms>AnyCPU</Platforms>
         <PackageTags>Owl</PackageTags>
+        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
     </PropertyGroup>
 
     <ItemGroup>
@@ -44,7 +44,7 @@
         <ProjectReference Include="..\Ingress\Ingress.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Ingress" Version="$(Version)" />
     </ItemGroup>
     
     <ItemGroup>

@@ -37,10 +37,10 @@
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Turtle.Parser" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Turtle.Parser" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Ingress" Version="$(Version)" />
     </ItemGroup>
     
     <ItemGroup>

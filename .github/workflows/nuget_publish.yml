@@ -1,0 +1,30 @@
+name: Release Build and Deploy
+
+on:
+  release:
+    types:
+      - published
+
+jobs:
+  build:
+    uses: ./.github/workflows/shared_build_workflow.yml
+    with:
+      version: ${{ github.event.release.tag_name }}
+
+  publish:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download NuGet packages
+        uses: actions/download-artifact@v3
+        with:
+          name: nuget-packages
+
+      - name: Publish to NuGet.org
+        env:
+          NUGET_API_KEY: ${{ secrets.NUGET_API_KEY }}
+        run: |
+          for package in *.nupkg; do
+            dotnet nuget push "$package" --source https://api.nuget.org/v3/index.json --api-key $NUGET_API_KEY
+          done

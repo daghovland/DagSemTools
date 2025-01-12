@@ -9,7 +9,6 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.ELI</PackageId>
-        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>Translations to and from the description logic ELI</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
@@ -48,9 +47,9 @@
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Ingress" Version="$(Version)" />
     </ItemGroup>
 
     <ItemGroup>
