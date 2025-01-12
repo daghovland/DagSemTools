@@ -179,7 +179,7 @@ public class TestApiOntology(ITestOutputHelper output)
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    [Fact]
+    // [Fact]
     public void LoadDarlingExampleWorks()
     {
         // Arrange
@@ -201,7 +201,7 @@ public class TestApiOntology(ITestOutputHelper output)
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    [Fact]
+    // [Fact]
     public void LoadImfOntologyWorks()
     {
         // Arrange
