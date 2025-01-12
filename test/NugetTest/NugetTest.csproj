@@ -21,11 +21,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
-    <PackageReference Include="DagSemTools.Parser" Version="0.3.0"/>
-    <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
-    <PackageReference Include="DagSemTools.Turtle.Parser" Version="0.3.0"/>
-    <PackageReference Include="DagSemTools.Api" Version="0.3.0"/>
-    <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0"/>
+    <PackageReference Include="DagSemTools.Parser" Version="$(Version)"/>
+    <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
+    <PackageReference Include="DagSemTools.Turtle.Parser" Version="$(Version)"/>
+    <PackageReference Include="DagSemTools.Api" Version="$(Version)"/>
+    <PackageReference Include="DagSemTools.Datalog.Parser" Version="$(Version)"/>
   </ItemGroup>
 
   <ItemGroup>

@@ -7,13 +7,12 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Manchester</PackageId>
-        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For outputing Manchester Owl</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
-
+        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSource>true</IncludeSource>
@@ -39,7 +38,7 @@
         <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
     </ItemGroup>
 
     <ItemGroup>

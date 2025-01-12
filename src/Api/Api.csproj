@@ -9,13 +9,12 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Api</PackageId>
-        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For Rdf, reasoning and querying</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        
+        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSource>true</IncludeSource>
@@ -40,13 +39,13 @@
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.OWL2RL2Datalog" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Datalog.Parser" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Turtle.Parser" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Datalog" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.OWL2RL2Datalog" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Datalog.Parser" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Turtle.Parser" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
     </ItemGroup>
     
     <ItemGroup>

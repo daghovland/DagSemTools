@@ -7,7 +7,6 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Rdf</PackageId>
-        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For Rdf, reasoning and querying</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
@@ -19,7 +18,7 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        
+        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
@@ -45,8 +44,8 @@
         <ProjectReference Include="..\Ingress\Ingress.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.AlcTableau" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Ingress" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Ingress" Version="$(Version)" />
     </ItemGroup>
 
     <ItemGroup>

@@ -9,13 +9,12 @@
         <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.OWL2RL2Datalog</PackageId>
-        <Version>0.3.0</Version>
         <Authors>Dag Hovland</Authors>
         <Description>For RL reasoning over DagSemTools.Datalog</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
-
+        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSource>true</IncludeSource>
@@ -48,10 +47,10 @@
     </ItemGroup>
     
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Datalog" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.ELI" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Datalog" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.ELI" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="$(Version)" />
     </ItemGroup>
 
     <ItemGroup>

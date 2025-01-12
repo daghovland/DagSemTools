@@ -6,24 +6,21 @@
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <PackageReadMeFile>README.md</PackageReadMeFile>
-        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.Turtle.Parser</PackageId>
-        <Version>0.3.0</Version>
-        <Authors>Dag Hovland</Authors>
-        <Description>For parsing Rdf-1.2 Turtle</Description>
-        <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-        
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <IncludeSource>true</IncludeSource>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-      
-      <Platforms>AnyCPU</Platforms>
+    <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <PackageId>DagSemTools.Turtle.Parser</PackageId>
+    <Authors>Dag Hovland</Authors>
+    <Description>For parsing Rdf-1.2 Turtle</Description>
+    <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <IncludeSource>true</IncludeSource>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
@@ -52,8 +49,8 @@
     
     <!-- Use NuGet package references if BuildingProject is not true -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Parser" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Parser" Version="$(Version)" />
     </ItemGroup>
     
     <ItemGroup>
