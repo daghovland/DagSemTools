@@ -85,4 +85,4 @@ jobs:
           dotnet test ./DagSemTools.sln 
         
       - name: Run nuget package tests
-        run: dotnet test /p:Version=${{ GITHUB_SHA }} test/NugetTest/NugetTest.sln
+        run: dotnet test /p:Version=$GITHUB_SHA test/NugetTest/NugetTest.sln
