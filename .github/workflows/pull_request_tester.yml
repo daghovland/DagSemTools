@@ -45,7 +45,10 @@ jobs:
   
       - name: Format code
         run: dotnet format ./DagSemTools.sln --verbosity diagnostic --verify-no-changes --no-restore
-  
+
+      - name: Set test-build version name
+        run: echo "VERSION=0.0.1-alpha-${GITHUB_SHA::8}" >> $GITHUB_ENV
+                              
       - name: Build projects
         run: | 
           mkdir localNugetPackages
@@ -68,15 +71,15 @@ jobs:
           )
           for project in "${projects[@]}"; do
               echo "Building and packing project: $project"
-              dotnet build --configuration Release /p:Version=$GITHUB_SHA ./src/$project/$project.*sproj
-              dotnet pack --configuration Release /p:Version=$GITHUB_SHA --output localNugetPackages ./src/$project/$project.*sproj
+              dotnet build --configuration Release /p:Version=$VERSION ./src/$project/$project.*sproj
+              dotnet pack --configuration Release /p:Version=$VERSION --output localNugetPackages ./src/$project/$project.*sproj
           done
       
       - name: Build and run test projects
         run: |
           for project in test/*; do
               echo "Building test project: $project"
-              dotnet build --configuration Release /p:Version=$GITHUB_SHA $project
+              dotnet build --configuration Release /p:Version=$VERSION $project
               dotnet test --configuration Release $project
           done
   
@@ -85,4 +88,4 @@ jobs:
           dotnet test ./DagSemTools.sln 
         
       - name: Run nuget package tests
-        run: dotnet test /p:Version=$GITHUB_SHA test/NugetTest/NugetTest.sln
+        run: dotnet test /p:Version=$VERSION test/NugetTest/NugetTest.sln
