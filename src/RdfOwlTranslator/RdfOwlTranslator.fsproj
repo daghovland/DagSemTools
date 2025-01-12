@@ -21,9 +21,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <PackageTags>Rdf Owl</PackageTags>
         <Platforms>AnyCPU</Platforms>
-
         <RootNamespace>Rdf2Owl</RootNamespace>
-
     </PropertyGroup>
 
     <ItemGroup>
@@ -35,6 +33,7 @@
         <Compile Include="AxiomParser.fs" />
         <Compile Include="ClassExpressionParser.fs" />
         <Compile Include="Rdf2Owl.fs" />
+        <Compile Include="AssemblyInfo.fs" />
 
     </ItemGroup>
     <ItemGroup>
@@ -54,4 +53,5 @@
         <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
     </ItemGroup>
     
+
 </Project>

@@ -74,3 +74,18 @@ module Ingress =
     let GetRdfListElements  (tripleTable : TripleTable) (resources : GraphElementManager) listId=
         _GetRdfListElements tripleTable resources listId []
         |> List.map fst
+        
+    (* This function sorts the graph element IDs corresponding to the different class expressions *)
+    let sortClassExpressionIds unorderedClassExpressions =
+        unorderedClassExpressions
+        |> Seq.map (fun (el, preds, clExpr) -> (el, preds))
+        |> Map.ofSeq
+        |> DependencyGraph.TopologicalSort
+    
+    (* This function sorts the graph element IDs corresponding to the different class expressions *)
+    let sortClassExpressions unorderedClassExpressions =
+        let idExprMap = unorderedClassExpressions |> Seq.map (fun (el, _, clExpr) -> (el, clExpr)) |> Map.ofSeq
+        unorderedClassExpressions
+        |> sortClassExpressionIds
+        |> Seq.map (fun clId -> idExprMap.[clId])
+    

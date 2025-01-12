@@ -6,22 +6,6 @@
     <Nullable>enable</Nullable>
     <OutputType>Library</OutputType>
     <PackageReadMeFile>README.md</PackageReadMeFile>
-        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
-        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
-        <PackageId>DagSemTools.Turtle.Parser</PackageId>
-        <Authors>Dag Hovland</Authors>
-        <Description>For parsing Rdf-1.2 Turtle</Description>
-        <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
-        <PublishRepositoryUrl>true</PublishRepositoryUrl>
-        <RepositoryType>git</RepositoryType>
-      <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
-        <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <EmbedUntrackedSources>true</EmbedUntrackedSources>
-        <IncludeSource>true</IncludeSource>
-        <IncludeSymbols>true</IncludeSymbols>
-        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-      <PackageTags>Rdf Turtle Parser</PackageTags>
-      <Platforms>AnyCPU</Platforms>
     <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     <PackageId>DagSemTools.Turtle.Parser</PackageId>
@@ -36,8 +20,8 @@
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageTags>Rdf Turtle Parser</PackageTags>
     <Platforms>AnyCPU</Platforms>
->>>>>>> main
   </PropertyGroup>
 	<ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
@@ -76,12 +60,12 @@
       <Folder Include="grammars\gen\" />
     </ItemGroup>
 
-            <ItemGroup>
-              <Content Include="README.md">
-                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-                <Pack>true</Pack>
-                <PackagePath>README.md</PackagePath>
-              </Content>
-        </ItemGroup>
+    <ItemGroup>
+      <Content Include="README.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <Pack>true</Pack>
+        <PackagePath>README.md</PackagePath>
+      </Content>
+    </ItemGroup>
 
 </Project>

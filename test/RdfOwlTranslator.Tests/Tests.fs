@@ -283,27 +283,180 @@ module Tests =
 
         ontologyAxioms.Should().Contain(expectedAxioms)
 
+    
+    [<Fact>]
+    let ``Sorting of class expressions works`` () =
+        //Arrange
+        let tripleTable = TripleTable(100u)
+        let resources = GraphElementManager(100u)
+        let superClassNode = resources.CreateUnnamedAnonResource()
+        let subClassOfRelation =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfsSubClassOf)))
+        let rdfTypeRelation =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfType)))
+        let owlClassRelation =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.OwlClass)))
+        let owlIntersectionRelation =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.OwlIntersectionOf)))
 
+        let subclassResource =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference "http://example.com/subclass"))
+        let superClassResource1 =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference "http://example.com/superclass1"))
+        let superClassResource2 =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference "http://example.com/superclass2"))
+
+        
+        
+        let subClassTriple: Triple =
+            { subject = subclassResource
+              predicate = subClassOfRelation
+              obj = superClassNode }
+
+        tripleTable.AddTriple subClassTriple
+
+        let owlClassTriple: Triple =
+            { subject = superClassNode
+              predicate = rdfTypeRelation
+              obj = owlClassRelation }
+
+        tripleTable.AddTriple owlClassTriple
+        
+        let intersectionListHead = resources.CreateUnnamedAnonResource()
+        let owlIntersectionTriple: Triple =
+                    { subject = superClassNode
+                      predicate = owlIntersectionRelation
+                      obj = intersectionListHead }
+
+        tripleTable.AddTriple owlIntersectionTriple
+        
+        let rdfHeadId =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfFirst)))
+        
+        let owlIntersectionheadTriple: Triple =
+                    { subject = intersectionListHead
+                      predicate = rdfHeadId
+                      obj = superClassResource1 }
+
+        tripleTable.AddTriple owlIntersectionheadTriple
+        
+        let intersectionListRest = resources.CreateUnnamedAnonResource()
+        let rdfRestId =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfRest)))
+        let owlIntersectionRestTriple: Triple =
+                    { subject = intersectionListHead
+                      predicate = rdfRestId
+                      obj = intersectionListRest }
+
+        tripleTable.AddTriple owlIntersectionRestTriple
+        
+        let owlIntersectionSecondTriple: Triple =
+                    { subject = intersectionListRest
+                      predicate = rdfHeadId
+                      obj = superClassResource2 }
+        tripleTable.AddTriple owlIntersectionSecondTriple
+        
+        let rdfNilId =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfNil)))
+        let owlIntersectionLastTriple: Triple =
+                    { subject = intersectionListRest
+                      predicate = rdfRestId
+                      obj = rdfNilId }
+
+        tripleTable.AddTriple owlIntersectionLastTriple
+        
+        //Act
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let classExpressionParser = new DagSemTools.RdfOwlTranslator.ClassExpressionParser(tripleTable, resources)
+        let anonExpr = classExpressionParser.parseAnonymousClassExpressions()
+        anonExpr.Should().HaveLength(1) |> ignore
+        let restrExpr = classExpressionParser.parseAnonymousRestrictions()
+        restrExpr.Should().HaveLength(0) |> ignore
+        let orderedExpr = classExpressionParser.parseClassExpressions()
+        orderedExpr.Should().HaveLength(1)
+        
     [<Fact>]
     let ``Subclass of intersection Axiom can be parsed from triples`` () =
         //Arrange
         let tripleTable = TripleTable(100u)
         let resources = GraphElementManager(100u)
-        let subClassNode = resources.CreateUnnamedAnonResource()
+        let superClassNode = resources.CreateUnnamedAnonResource()
         let subClassOfRelation =
             resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfsSubClassOf)))
+        let rdfTypeRelation =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfType)))
+        let owlClassRelation =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.OwlClass)))
+        let owlIntersectionRelation =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.OwlIntersectionOf)))
+
+        let subclassResource =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference "http://example.com/subclass"))
+        let superClassResource1 =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference "http://example.com/superclass1"))
+        let superClassResource2 =
+            resources.AddNodeResource(RdfResource.Iri(new IriReference "http://example.com/superclass2"))
 
         
-        let superclassResource =
-            resources.AddNodeResource(RdfResource.Iri(new IriReference "http://example.com/superclass"))
-
+        
         let subClassTriple: Triple =
-            { subject = subClassNode
+            { subject = subclassResource
               predicate = subClassOfRelation
-              obj = superclassResource }
+              obj = superClassNode }
 
         tripleTable.AddTriple subClassTriple
 
+        let owlClassTriple: Triple =
+            { subject = superClassNode
+              predicate = rdfTypeRelation
+              obj = owlClassRelation }
+
+        tripleTable.AddTriple owlClassTriple
+        
+        let intersectionListHead = resources.CreateUnnamedAnonResource()
+        let owlIntersectionTriple: Triple =
+                    { subject = superClassNode
+                      predicate = owlIntersectionRelation
+                      obj = intersectionListHead }
+
+        tripleTable.AddTriple owlIntersectionTriple
+        
+        let rdfHeadId =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfFirst)))
+        
+        let owlIntersectionheadTriple: Triple =
+                    { subject = intersectionListHead
+                      predicate = rdfHeadId
+                      obj = superClassResource1 }
+
+        tripleTable.AddTriple owlIntersectionheadTriple
+        
+        let intersectionListRest = resources.CreateUnnamedAnonResource()
+        let rdfRestId =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfRest)))
+        let owlIntersectionRestTriple: Triple =
+                    { subject = intersectionListHead
+                      predicate = rdfRestId
+                      obj = intersectionListRest }
+
+        tripleTable.AddTriple owlIntersectionRestTriple
+        
+        let owlIntersectionSecondTriple: Triple =
+                    { subject = intersectionListRest
+                      predicate = rdfHeadId
+                      obj = superClassResource2 }
+        tripleTable.AddTriple owlIntersectionSecondTriple
+        
+        let rdfNilId =
+                    resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.RdfNil)))
+        let owlIntersectionLastTriple: Triple =
+                    { subject = intersectionListRest
+                      predicate = rdfRestId
+                      obj = rdfNilId }
+
+        tripleTable.AddTriple owlIntersectionLastTriple
+        
+        
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
         let ontology: Ontology = translator.extractOntology
@@ -312,10 +465,14 @@ module Tests =
         let subClass: ClassExpression =
             ClassName(Iri.FullIri(new IriReference "http://example.com/subclass"))
 
-        let superClass: ClassExpression =
-            ClassName(Iri.FullIri(new IriReference "http://example.com/superclass"))
+        let superClass1: ClassExpression =
+            ClassName(Iri.FullIri(new IriReference "http://example.com/superclass2"))
+        let superClass2: ClassExpression =
+                    ClassName(Iri.FullIri(new IriReference "http://example.com/superclass1"))
 
-        let expectedAxioms = AxiomClassAxiom(SubClassOf([], subClass, superClass))
+        let intersection : ClassExpression =
+            ObjectIntersectionOf [superClass1; superClass2]
+        let expectedAxioms = AxiomClassAxiom(SubClassOf([], subClass, intersection))
 
         let ontologyAxioms =
             ontology.Axioms

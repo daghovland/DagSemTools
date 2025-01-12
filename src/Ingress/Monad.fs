@@ -24,3 +24,8 @@ module Monad =
               for y in list do
                   if x <> y then
                       yield (x, y) ]
+    
+    let updateFirst f (a, b, c) = (f a, b, c)
+    let updateSecond f (a, b, c) = (a, f b, c)
+    let updateThird f (a, b, c) = (a, b, f c)
+        

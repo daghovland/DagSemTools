@@ -19,36 +19,47 @@ module DependencyGraph =
     * The Art of Computer Programming, Vol. 1, Algorithm T in Chapter "Links and Lists"
     
     The input is a map of already integer-encoded elements as keys which maps to the list of successors of that element
-    
+    The output is the reverse sorted list. (Since some applications need the reverse order)
    *)
-  let topologicalSortKahn (graph: Map<int, list<int>>) =
-    let inDegreeFolder acc _ neighbors  =
-        neighbors |> List.fold (fun acc neighbor -> 
-            acc |> Map.add neighbor (acc.[neighbor] + 1)) acc
+  let ReverseTopologicalSort graph =
+    
+    (* This function is called during preprocessing and calculates the number of predecessors *)
+    let NumPredecessorCalculator acc _ successors  =
+        successors |> List.fold (fun acc successor -> 
+            acc |> Map.add successor (acc.[successor] + 1u)) acc
         
-    let mutable inDegree : Map<int, int> = 
+    let mutable GetNumPredecessors  = 
         graph 
-        |> Map.fold inDegreeFolder (graph |> Map.map (fun node _ -> 0))
+        |> Map.fold NumPredecessorCalculator (graph |> Map.map (fun node _ -> 0u))
 
-    let queue  = 
-        inDegree
-        |> Map.filter (fun _ degree -> degree = 0)
+    (* This queue is filled with elements that do not have predecessors,
+        or where the predecessors have also been handled *)
+    let ReadyElementQueue  = 
+        GetNumPredecessors
+        |> Map.filter (fun _ numPredecessors -> numPredecessors = 0u)
         |> Map.keys
         |> Queue
        
-    let mutable result = []
+    let mutable sortedList = []
 
-    while queue.Count > 0 do
-        let node = queue.Dequeue()
-        result <- node :: result
+    while ReadyElementQueue.Count > 0 do
+        let node = ReadyElementQueue.Dequeue()
+        sortedList <- node :: sortedList
 
-        for neighbor in graph.[node] do
-            let newDegree = inDegree.[neighbor] - 1
-            inDegree <- inDegree.Add(neighbor, newDegree)
-            if newDegree = 0 then
-                queue.Enqueue neighbor
+        for successor in graph.[node] do
+            let remainingPredecessors = GetNumPredecessors.[successor] - 1u
+            GetNumPredecessors <- GetNumPredecessors.Add(successor, remainingPredecessors)
+            if remainingPredecessors = 0u then
+                ReadyElementQueue.Enqueue successor
 
-    if List.length result = graph.Count then
-        List.rev result
+    if List.length sortedList = graph.Count then
+        List.rev sortedList
     else
         failwith "Graph contains a cycle"
+
+  (* The input is a map of already integer-encoded elements as keys which maps to the list of successors of that element
+    The output is the reverse sorted list. *)
+  let TopologicalSort graph =
+      graph
+      |> ReverseTopologicalSort
+      |> List.rev

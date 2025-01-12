@@ -2,11 +2,9 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
-        <RootNamespace>Rdf2Owl.Tests</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
