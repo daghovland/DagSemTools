@@ -6,6 +6,7 @@ on:
       version:
         description: 'Version of the build'
         required: true
+        type: string
 
 jobs:
   build:
