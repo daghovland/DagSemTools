@@ -391,7 +391,7 @@ type ClassExpressionParser (triples : TripleTable,
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlSomeValueFromId) |> (_.obj)
-        (x, [y; z], fun () ->
+        (x, [z], fun () ->
         let objectSomeValuesFromCreator yExpr = ObjectSomeValuesFrom(yExpr, tryGetClassExpressions z)
         let dataSomeValuesFromCreator yExpr = DataSomeValuesFrom([yExpr], tryGetDataRange z)
         let restriction = RequireObjectOrDataPropDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
@@ -410,7 +410,7 @@ type ClassExpressionParser (triples : TripleTable,
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlAllValuesFromId) |> (_.obj)
-        (x, [y; z], fun () ->
+        (x, [z], fun () ->
         let objectSomeValuesFromCreator yExpr = ObjectAllValuesFrom(yExpr, tryGetClassExpressions z)
         let dataSomeValuesFromCreator yExpr = DataAllValuesFrom([yExpr], tryGetDataRange z)
         let restriction = RequireObjectOrDataPropDeclaration y objectSomeValuesFromCreator dataSomeValuesFromCreator
@@ -433,8 +433,7 @@ type ClassExpressionParser (triples : TripleTable,
         let predecessors = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertiesId)
                            |> (_.obj)
                            |> Ingress.GetRdfListElements tripleTable resources
-        let unhandledPredecessors = predecessors |> Seq.filter GetPredecessorClassExpressions
-        (x, predecessors, fun () ->
+        (x, [], fun () ->
         let ys = predecessors |> List.map tryGetDataPropertyExpressions
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlAllValuesFromId) |> (_.obj)
         let restriction = dataValuesFromConstructor(ys, tryGetDataRange z)
@@ -500,7 +499,7 @@ type ClassExpressionParser (triples : TripleTable,
     member internal this.parseObjectHasSelf (restrictionTriples : Triple seq) =
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
-        (x, [y], fun () ->
+        (x, [], fun () ->
         let has_self = restrictionTriples
                        |> Seq.find (fun tr -> tr.predicate = owlHasSelfId)
                        |> (_.obj)
@@ -529,7 +528,7 @@ type ClassExpressionParser (triples : TripleTable,
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = qualifierPropertyId) |> (_.obj)
-        (x, [y; z], fun () ->
+        (x, [z], fun () ->
         let n = this.RequireQualificationCardinality restrictionTriples cardinalityQualifierResourceId
         let OPE_y = tryGetProperty y
         let CE_z = tryGetObjectType z
@@ -581,7 +580,7 @@ type ClassExpressionParser (triples : TripleTable,
     member internal this.parseObjectCardinality (restrictionTriples : Triple seq) cardinalityId cardinalityExpressionConstructor =
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
-        (x, [y], fun () ->
+        (x, [], fun () ->
         let n = this.RequireQualificationCardinality restrictionTriples cardinalityId
         let OPE_y = tryGetObjectPropertyExpressions y
         let restriction = cardinalityExpressionConstructor(n, OPE_y)
