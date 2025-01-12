@@ -1,91 +1,14 @@
-name: Test code
+name: Validate Pull Request
 
 on:
-  push:
-    branches:
-      - main
   pull_request:
-    branches:
-      - main
+    types:
+      - opened
+      - synchronize
+      - reopened
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        
-      - name: Set up JDK 17
-        uses: actions/setup-java@v4
-        with:
-          java-version: 17
-          distribution: 'temurin'
-
-      - name: Check Java version
-        run: java -version
-
-      - name: Install Apache Jena
-        run: |
-          wget https://dlcdn.apache.org/jena/binaries/apache-jena-5.2.0.tar.gz
-          tar -xzf apache-jena-5.2.0.tar.gz
-          
-      - name: Download external test files
-        run: |
-          parallel ::: \
-          "curl -o test/Api.Tests/TestData/imf.ttl http://ns.imfid.org/20240531/imf-ontology.owl.ttl" \
-          "curl -o test/Api.Tests/TestData/go.owl.xml http://current.geneontology.org/ontology/go.owl"
-          ./apache-jena-5.2.0/bin/riot --output=TURTLE test/Api.Tests/TestData/go.owl.xml > test/Api.Tests/TestData/go.ttl
-      
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.x'
-  
-      - name: Format code
-        run: dotnet format ./DagSemTools.sln --verbosity diagnostic --verify-no-changes --no-restore
-
-      - name: Set test-build version name
-        run: echo "VERSION=0.0.1-alpha-${GITHUB_SHA::8}" >> $GITHUB_ENV
-                              
-      - name: Build projects
-        run: | 
-          mkdir localNugetPackages
-          projects=(
-            "Ingress"
-            "AlcTableau"
-            "Rdf"
-            "OwlOntology"
-            "RdfOwlTranslator"
-            "Parser"
-            "Turtle.Parser"
-            "Datalog"
-            "ELI"
-            "Datalog.Parser"
-            "OWL2RL2Datalog"
-            "Manchester"
-            "Manchester.Parser"
-            "Api"
-            "TestUtils"
-          )
-          for project in "${projects[@]}"; do
-              echo "Building and packing project: $project"
-              dotnet build --configuration Release /p:Version=$VERSION ./src/$project/$project.*sproj
-              dotnet pack --configuration Release /p:Version=$VERSION --output localNugetPackages ./src/$project/$project.*sproj
-          done
-      
-      - name: Build and run test projects
-        run: |
-          for project in test/*; do
-              echo "Building test project: $project"
-              dotnet build --configuration Release /p:Version=$VERSION $project
-              dotnet test --configuration Release $project
-          done
-  
-      - name: Run tests
-        run: |
-          dotnet test ./DagSemTools.sln 
-        
-      - name: Run nuget package tests
-        run: dotnet test /p:Version=$VERSION test/NugetTest/NugetTest.sln
+  test:
+    uses: ./.github/workflows/shared-build_workflow.yml
+    with:
+      version: 0.0.1-pr-${{ github.event.pull_request.number }}-${{ github.sha }}
