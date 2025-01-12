@@ -68,15 +68,15 @@ jobs:
           )
           for project in "${projects[@]}"; do
               echo "Building and packing project: $project"
-              dotnet build --configuration Release /p:Version=${{ GITHUB_SHA }} ./src/$project/$project.*sproj
-              dotnet pack --configuration Release /p:Version=${{ GITHUB_SHA }} --output localNugetPackages ./src/$project/$project.*sproj
+              dotnet build --configuration Release /p:Version=$GITHUB_SHA ./src/$project/$project.*sproj
+              dotnet pack --configuration Release /p:Version=$GITHUB_SHA --output localNugetPackages ./src/$project/$project.*sproj
           done
       
       - name: Build and run test projects
         run: |
           for project in test/*; do
               echo "Building test project: $project"
-              dotnet build --configuration Release /p:Version=${{ GITHUB_SHA }} $project
+              dotnet build --configuration Release /p:Version=$GITHUB_SHA $project
               dotnet test --configuration Release $project
           done
   
