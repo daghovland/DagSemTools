@@ -38,9 +38,9 @@
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.Rdf" Version="0.3.0" />
-        <PackageReference Include="DagSemTools.OwlOntology" Version="0.3.0" />
+        <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
     </ItemGroup>
 
     <ItemGroup>
