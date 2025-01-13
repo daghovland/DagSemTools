@@ -18,11 +18,9 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
-        <Platforms>AnyCPU</Platforms>
-
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
+    
     <ItemGroup>
         <Compile Include="Printer.fs" />
         <Content Include="README.md">
@@ -35,19 +33,14 @@
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
+    
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
     </ItemGroup>
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
     </ItemGroup>
-
-    <ItemGroup>
-    </ItemGroup>
-    <ItemGroup>
-      <None Include="README.md" />
-    </ItemGroup>
-
+    
     <ItemGroup>
         <None Update="README.md">
             <Pack>true</Pack>
