@@ -179,27 +179,27 @@ public class TestApiOntology(ITestOutputHelper output)
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    // [Fact]
-    // public void LoadDarlingExampleWorks()
-    // {
-    //     // Arrange
-    //     var ontologyFileInfo = new FileInfo("TestData/darlingExample.ttl");
-    //     var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
-    //     var ont = OwlOntology.Create(rdf);
-    //     ont.GetAxioms().Should().NotBeEmpty();
-    //     var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-    //     var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-    //
-    //     // Act
-    //     var axiomRules = ont.GetAxiomRules().ToList();
-    //     axiomRules.Should().NotBeEmpty();
-    //     rdf.LoadDatalog(axiomRules);
-    //
-    //     //Assert
-    //     rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
-    //     rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
-    //     _inMemorySink.LogEvents.Should().HaveCount(0);
-    // }
+    [Fact]
+    public void LoadDarlingExampleWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/darlingExample.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+    
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        rdf.LoadDatalog(axiomRules);
+    
+        //Assert
+        rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
+        rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
     //
     // [Fact]
     // public void LoadImfOntologyWorks()
