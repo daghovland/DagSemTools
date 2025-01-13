@@ -44,9 +44,6 @@ jobs:
       - name: Format code
         run: dotnet format ./DagSemTools.sln --verbosity diagnostic --verify-no-changes --no-restore
 
-      - name: Set test-build version name
-        run: echo "VERSION=0.0.1-alpha-${GITHUB_SHA::8}" >> $GITHUB_ENV
-
       - name: Build projects
         run: |
           mkdir localNugetPackages
