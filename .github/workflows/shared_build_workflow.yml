@@ -75,12 +75,11 @@ jobs:
           for project in test/*; do
               echo "Building test project: $project"
               dotnet build --configuration Release /p:Version=${{ inputs.version }} $project
-              dotnet test --configuration Release $project
           done
 
       - name: Run tests
         run: |
-          dotnet test ./DagSemTools.sln 
+          dotnet test --configuration Release /p:Version=${{ inputs.version }} ./DagSemTools.sln 
           
       - name: Run nuget package tests
         run: dotnet test /p:Version=${{ inputs.version }} test/NugetTest/NugetTest.sln
