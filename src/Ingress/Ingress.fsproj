@@ -29,6 +29,7 @@
     <ItemGroup>
         <Compile Include="Namespaces.fs" />
         <Compile Include="GraphElement.fs" />
+        <Compile Include="DependencyGraph.fs" />
         <Content Include="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
@@ -36,8 +37,10 @@
         <Compile Include="Monad.fs"/>
     </ItemGroup>
     <ItemGroup>
+        <PackageReference Include="Faqt" Version="4.4.0" />
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">

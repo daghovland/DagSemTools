@@ -74,6 +74,9 @@ type Datastore(triples: TripleTable,
     member this.GetTriplesWithSubjectObject (subject: GraphElementId, object: GraphElementId) : Triple seq =
         this.Triples.GetTriplesWithSubjectObject (subject, object)
         
+    member this.ContainsTriple (triple : Triple) : bool =
+            this.Triples.Contains triple
+        
     member this.GetReifiedTriplesWithId(id: GraphElementId) : Quad seq =
         this.ReifiedTriples.GetQuadsWithId id
     member this.GetReifiedTriplesWithSubject(subject: GraphElementId) : Quad seq =
@@ -84,6 +87,7 @@ type Datastore(triples: TripleTable,
         this.ReifiedTriples.GetQuadsWithObject obj
     member this.GetReifiedTriplesWithSubjectPredicate(subject: GraphElementId, predicate: GraphElementId) : Quad seq =
         this.ReifiedTriples.GetQuadsWithSubjectPredicate (subject, predicate)
+
     member this.GetResourceInfoForErrorMessage(subject: GraphElementId) : string =
            this.Triples.GetTriplesMentioning subject
             |> Seq.map this.Resources.GetResourceTriple

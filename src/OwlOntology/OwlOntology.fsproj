@@ -11,6 +11,7 @@
         <Authors>Dag Hovland</Authors>
         <Description>DotNet representation of OWL 2 Ontology</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
+        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
@@ -19,6 +20,7 @@
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <Platforms>AnyCPU</Platforms>
+        <PackageTags>Owl</PackageTags>
         <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
     </PropertyGroup>
 
@@ -35,6 +37,7 @@
     <ItemGroup>
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">

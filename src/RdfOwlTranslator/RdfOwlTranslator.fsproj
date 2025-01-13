@@ -19,11 +19,9 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-
+        <PackageTags>Rdf Owl</PackageTags>
         <Platforms>AnyCPU</Platforms>
-
         <RootNamespace>Rdf2Owl</RootNamespace>
-
     </PropertyGroup>
 
     <ItemGroup>
@@ -35,11 +33,13 @@
         <Compile Include="AxiomParser.fs" />
         <Compile Include="ClassExpressionParser.fs" />
         <Compile Include="Rdf2Owl.fs" />
+        <Compile Include="AssemblyInfo.fs" />
 
     </ItemGroup>
     <ItemGroup>
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
@@ -53,4 +53,5 @@
         <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
     </ItemGroup>
     
+
 </Project>

@@ -19,6 +19,7 @@ public class TestApiOntology(ITestOutputHelper output)
     private ILogger _logger =
         new LoggerConfiguration()
             .WriteTo.Sink(_inMemorySink)
+            .WriteTo.Console()
             .CreateLogger();
 
     [Fact]
@@ -80,23 +81,155 @@ public class TestApiOntology(ITestOutputHelper output)
 
 
     [Fact]
-    public void LoadImfOntologyWorks()
+    public void QuantifiedExistentialReasoningWorks()
     {
-        var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/someValuesExample.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
-        ont.GetAxiomRules().ToList().Should().NotBeEmpty();
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        rdf.LoadDatalog(axiomRules);
+
+        //Assert
+        rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
+        rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
 
-    [Fact, Category("LongRunning")]
-    public void LoadGeneOntologyWorks()
+    [Fact]
+    public void IntersectionOfQuantifiedExistentialReasoningWorks()
     {
-        var ontologyFileInfo = new FileInfo("TestData/go.ttl");
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/intersectionOfRestrictionsWorks.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
-        ont.GetAxioms().Should().NotBeEmpty();
+        var axioms = ont.GetAxioms().ToList();
+        axioms.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
 
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        rdf.LoadDatalog(axiomRules);
+
+        //Assert
+        rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
+        rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
     }
+
+
+
+    [Fact]
+    public void IntersectionOfClassesReasoningWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/intersectionOfClassesWorks.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        var axioms = ont.GetAxioms().ToList();
+        axioms.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        rdf.LoadDatalog(axiomRules);
+
+        //Assert
+        rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
+        rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+    [Fact]
+    public void ExistentialOfInverseReasoningWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/someValuesFromInverse.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        var axioms = ont.GetAxioms().ToList();
+        axioms.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+        rdf.LoadDatalog(axiomRules);
+
+        //Assert
+        rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
+        rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
+    // [Fact]
+    // public void LoadDarlingExampleWorks()
+    // {
+    //     // Arrange
+    //     var ontologyFileInfo = new FileInfo("TestData/darlingExample.ttl");
+    //     var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+    //     var ont = OwlOntology.Create(rdf);
+    //     ont.GetAxioms().Should().NotBeEmpty();
+    //     var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+    //     var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+    //
+    //     // Act
+    //     var axiomRules = ont.GetAxiomRules().ToList();
+    //     axiomRules.Should().NotBeEmpty();
+    //     rdf.LoadDatalog(axiomRules);
+    //
+    //     //Assert
+    //     rdf.ContainsTriple(calculatedTriple).Should().BeTrue();
+    //     rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
+    //     _inMemorySink.LogEvents.Should().HaveCount(0);
+    // }
+    //
+    // [Fact]
+    // public void LoadImfOntologyWorks()
+    // {
+    //     // Arrange
+    //     var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
+    //     var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+    //     var aboxFileInfo = new FileInfo("TestData/imf-data.ttl");
+    //     var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, outputWriter);
+    //     var ont = OwlOntology.Create(rdfImf);
+    //     ont.GetAxioms().Should().NotBeEmpty();
+    //
+    //     // Act
+    //     var axiomRules = ont.GetAxiomRules().ToList();
+    //     axiomRules.Should().NotBeEmpty();
+    //     rdfImf.LoadDatalog(axiomRules);
+    //
+    //     _inMemorySink.LogEvents.Should().HaveCount(0);
+    // }
+
+
+    // [Fact, Category("LongRunning")]
+    // public void LoadGeneOntologyWorks()
+    // {
+    //     var ontologyFileInfo = new FileInfo("TestData/go.ttl");
+    //     var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+    //     var ont = OwlOntology.Create(rdf);
+    //     ont.GetAxioms().Should().NotBeEmpty();
+    //     var datalogProgram = ont.GetAxiomRules().ToList();
+    //     datalogProgram.Should().NotBeEmpty();
+    //     rdf.LoadDatalog(datalogProgram);
+    // }
 }

@@ -12,6 +12,8 @@ open DagSemTools.Datalog.Datalog
 open DagSemTools.Rdf
 open DagSemTools.Ingress
 open IriTools
+open Serilog
+open Serilog.Sinks.InMemory
 open Xunit 
 open Ingress
 open DagSemTools.Datalog
@@ -23,6 +25,13 @@ open Faqt
 
 module Tests =
     
+    let inMemorySink = new InMemorySink()
+    let logger =
+        LoggerConfiguration()
+                .WriteTo.Sink(inMemorySink)
+                .CreateLogger()
+    
+
     
     [<Fact>]
     let ``Datalog program fetches rule`` () =
@@ -293,7 +302,7 @@ module Tests =
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch //; negativeMatch
                                                                      ]}
-            Reasoner.evaluate([rule], tripleTable)
+            Reasoner.evaluate(logger, [rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3) |> List.ofSeq
             Assert.Equal(2, matches.Length)
           
@@ -335,7 +344,7 @@ module Tests =
             let rule =  {Head = NormalHead (headPattern); Body = [ subClassTypeAtom; isSubClassOfAtom ]}
             
             //Act
-            Reasoner.evaluate([rule], tripleTable)
+            Reasoner.evaluate(logger, [rule], tripleTable)
             
             //Assert
             let matches = tripleTable.GetTriplesWithSubjectObject(subjectIndex, superClassIndex) |> List.ofSeq
@@ -409,7 +418,7 @@ module Tests =
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2
                                                                      ]}
-            Reasoner.evaluate([rule], tripleTable)
+            Reasoner.evaluate(logger, [rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex) |> List.ofSeq
             Assert.Equal(2, matches.Length)
 
@@ -451,7 +460,7 @@ module Tests =
             let rule =  {Head = NormalHead (headPattern)
                          Body = [ positiveMatch; negativeMatch ]
             }
-            let partitioner  = Stratifier.RulePartitioner [rule]
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
             let ordered_relations = partitioner.GetOrderedRelations()
             ordered_relations.Should().HaveLength(3) |> ignore
             let init_queue = partitioner.GetReadyElementsQueue()
@@ -487,7 +496,7 @@ module Tests =
             
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ] }
-            let partitioner  = Stratifier.RulePartitioner [rule]
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
             let cycles = partitioner.cycle_finder [] 0
             cycles.Should().HaveLength(1) |> ignore
             let cycle = cycles |> Seq.head
@@ -512,7 +521,7 @@ module Tests =
             
             
             let rule =  {Head = NormalHead (headPattern); Body = [  ] }
-            DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
+            DagSemTools.Datalog.Reasoner.evaluate (logger, [rule], tripleTable)
             let query2 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
             query2.Should().HaveLength(1) |> ignore
     
@@ -540,7 +549,7 @@ module Tests =
             
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ] }
-            let partitioner  = Stratifier.RulePartitioner [rule]
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
             let orderedRules = partitioner.orderRules
             orderedRules.Should().HaveLength(1) |> ignore
             let firstPartition = orderedRules |> Seq.head
@@ -571,7 +580,7 @@ module Tests =
             let rule =  {Head = NormalHead (headPattern); Body = [ negativeMatch
                                                        ]
             }
-            let partitioner  = Stratifier.RulePartitioner [rule]
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
             (fun () -> partitioner.orderRules).Should().Throw<Exception,_>() |> ignore
               
     [<Fact>]
@@ -611,7 +620,7 @@ module Tests =
             let rule =  {Head =  NormalHead headPattern
                          Body = [ positiveMatch; negativeMatch ]
             }
-            let partitioner  = Stratifier.RulePartitioner [rule]
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
             let ordered_relations = partitioner.GetOrderedRelations()
             ordered_relations.Should().HaveLength(2) |> ignore
             let init_queue = partitioner.GetReadyElementsQueue()
@@ -676,7 +685,7 @@ module Tests =
             let ruleB = {Head = NormalHead (headPatternB)
                          Body = [ negativeMatch ]
             }
-            let partitioner  = Stratifier.RulePartitioner [ruleA; ruleB]
+            let partitioner  = Stratifier.RulePartitioner (logger, [ruleA; ruleB])
             let ordered_relations = partitioner.GetOrderedRelations()
             ordered_relations.Should().HaveLength(3) |> ignore
             
@@ -724,7 +733,7 @@ module Tests =
             let rule =  {Head = NormalHead (headPattern)
                          Body = [ positiveMatch; negativeMatch ]
             }
-            Reasoner.evaluate([rule], tripleTable)
+            Reasoner.evaluate(logger, [rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3)
             Assert.Single matches
           
@@ -814,7 +823,7 @@ module Tests =
         let triples2Answers = tripleAnswersBefore |> Seq.filter (fun tr -> tr = Triple2)
         Assert.Equal(0, triples2Answers |> Seq.length)
         
-        Reasoner.evaluate ([rule], tripleTable)
+        Reasoner.evaluate (logger, [rule], tripleTable)
         
         Assert.Equal(2u, tripleTable.Triples.TripleCount)
         let tripleAnswers2 = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)

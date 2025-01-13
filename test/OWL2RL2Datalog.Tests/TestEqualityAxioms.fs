@@ -45,7 +45,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
-        DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
+        DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
         
         //Assert
         let query2 = tripleTable.GetTriplesWithObject(subjectIndex2)
@@ -72,7 +72,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
             }
         let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
                            Body = [PositiveTriple (triplePattern "s2")]}
-        let partitioner = DagSemTools.Datalog.Stratifier.RulePartitioner [rule]
+        let partitioner = DagSemTools.Datalog.Stratifier.RulePartitioner (logger, [rule])
         let stratification = partitioner.orderRules
         stratification.Should().HaveLength(1) |> ignore
 
@@ -94,7 +94,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
             }
         let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
                            Body = [PositiveTriple (triplePattern "s2")]}
-        let evaluatorFunction = fun () -> DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
+        let evaluatorFunction = fun () -> DagSemTools.Datalog.Reasoner.evaluate (logger, [rule], tripleTable)
         Assert.Throws<ArgumentException>(evaluatorFunction) |> ignore
         
 
@@ -126,7 +126,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let query1 = tripleTable.GetTriplesWithObject(objextIndex2)
         query1.Should().HaveLength(0) |> ignore
         
-        DagSemTools.Datalog.Reasoner.evaluate ([rule], tripleTable)
+        DagSemTools.Datalog.Reasoner.evaluate (logger, [rule],  tripleTable)
         let query2 = tripleTable.GetTriplesWithObject(objextIndex2)
         query2.Should().HaveLength(1) |> ignore
         let query3 = tripleTable.GetTriplesWithPredicate(predIndex)
@@ -173,7 +173,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
             ] 
         }
         // Act
-        DagSemTools.Datalog.Reasoner.evaluate ([sameAsRule2], tripleTable)
+        DagSemTools.Datalog.Reasoner.evaluate (logger, [sameAsRule2], tripleTable)
         
         // Assert
         let query3 = tripleTable.GetTriplesWithPredicate(predIndex2)
@@ -222,7 +222,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         }
         // Act
         let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates([sameAsRule2], tripleTable) |> Seq.toList
-        let stratifier = Stratifier.RulePartitioner rules_with_iri_predicates
+        let stratifier = Stratifier.RulePartitioner (logger, rules_with_iri_predicates)
         let relationInfos = stratifier.GetOrderedRelations()
         
         //Assert
@@ -319,7 +319,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
         
-        DagSemTools.Datalog.Reasoner.evaluate (rlProgram |> Seq.toList, tripleTable)
+        DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
         let query2 = tripleTable.GetTriplesWithObject(objIndex)
         query2.Should().HaveLength(3) |> ignore
         let query3 = tripleTable.GetTriplesWithPredicate(predIndex)

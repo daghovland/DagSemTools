@@ -53,6 +53,15 @@ public interface IGraph
     public IEnumerable<Triple> GetTriplesWithObject(IriReference obj);
 
     /// <summary>
+    /// Returns true if and only if the triple is in the Graph
+    /// Similar to the sparql query "ASK WHERE { subject predicate object }".
+    /// </summary>
+    /// <param name="triple"></param>
+    /// <returns></returns>
+    public bool ContainsTriple(Triple triple);
+
+
+    /// <summary>
     /// Loads and runs datalog rules from the file
     /// Note that this adds new triples to the datastore
     /// </summary>

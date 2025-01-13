@@ -1,0 +1,74 @@
+@prefix : <http://example.org/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+# This is the example on page 7 of https://arxiv.org/pdf/2008.02232
+
+:C rdf:type owl:Class .
+:D rdf:type owl:Class .
+:E rdf:type owl:Class .
+:F rdf:type owl:Class .
+:A rdf:type owl:Class .
+
+:r rdf:type owl:ObjectProperty .
+:s rdf:type owl:ObjectProperty .
+:t rdf:type owl:ObjectProperty .
+:u rdf:type owl:ObjectProperty .
+
+[
+    rdf:type owl:Class ;
+    owl:intersectionOf (
+                           [
+                               rdf:type owl:Restriction ;
+                               owl:onProperty :r ;
+                               owl:someValuesFrom [
+                                                      rdf:type owl:Restriction ;
+                                                      owl:onProperty :s ;
+                                                      owl:someValuesFrom [
+                                                                             rdf:type owl:Class ;
+                                                                             owl:intersectionOf (:C :D) ;
+                                                                         ] ;
+                                                  ] ;
+                           ]
+                           [
+                               rdf:type owl:Restriction ;
+                               owl:onProperty :t ;
+                               owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                               owl:onClass [
+                                               rdf:type owl:Class ;
+                                               owl:unionOf (:E [
+                                                                   rdf:type owl:Restriction ;
+                                                                   owl:onProperty [
+                                                                                      rdf:type owl:InverseObjectProperty ;
+                                                                                      owl:inverseOf :u ;
+                                                                                  ] ;
+                                                                   owl:someValuesFrom :F ;
+                                                               ]) ;
+                                           ] ;
+                           ]
+                       ) ;
+    rdfs:subClassOf :A ;
+] .
+
+# :x is an example individual that should be inferred to be of type :A
+:x rdf:type owl:NamedIndividual ;
+    :r :y1 ;
+    :t :z1 .
+
+# Individual :y1 satisfies ∃s.(C ⊓ D)
+:y1 rdf:type owl:NamedIndividual ;
+    :s :y2 .
+
+:y2 rdf:type owl:NamedIndividual, :C, :D .
+
+# Individual :z1 satisfies E ⊔ ∃u⁻.F
+:z1 rdf:type owl:NamedIndividual, :E .
+
+# :notx is an example that should not be inferred to be of type :A
+:notx rdf:type owl:NamedIndividual ;
+:r :noty1 ;
+:t :notz1 .
+:noty1 rdf:type owl:NamedIndividual .
+:notz1 rdf:type owl:NamedIndividual, :E .

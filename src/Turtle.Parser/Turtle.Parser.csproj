@@ -20,6 +20,7 @@
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <PackageTags>Rdf Turtle Parser</PackageTags>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
 	<ItemGroup>
@@ -27,6 +28,7 @@
 		<PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
         <PackageReference Include="FSharp.Core" Version="8.0.403" />
         <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
     <ItemGroup>
         <Antlr4 Include="grammars\TurtleDoc.g4">
@@ -58,12 +60,12 @@
       <Folder Include="grammars\gen\" />
     </ItemGroup>
 
-            <ItemGroup>
-              <Content Include="README.md">
-                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-                <Pack>true</Pack>
-                <PackagePath>README.md</PackagePath>
-              </Content>
-        </ItemGroup>
+    <ItemGroup>
+      <Content Include="README.md">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        <Pack>true</Pack>
+        <PackagePath>README.md</PackagePath>
+      </Content>
+    </ItemGroup>
 
 </Project>

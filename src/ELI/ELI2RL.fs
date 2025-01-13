@@ -20,23 +20,23 @@ open Serilog
 
 module ELI2RL =
 
-    let GetTypeTriplePattern (resources: GraphElementManager) varName className =
+    let internal GetTypeTriplePattern (resources: GraphElementManager) varName className =
         { TriplePattern.Subject = ResourceOrVariable.Variable varName
           Predicate = ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
           Object = ResourceOrVariable.Resource (resources.AddNodeResource(Iri className)) }
 
     
-    let GetAnonymousTypeTriplePattern (resources: GraphElementManager) varName=
+    let internal GetAnonymousTypeTriplePattern (resources: GraphElementManager) varName=
         { TriplePattern.Subject = ResourceOrVariable.Variable varName
           Predicate = ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
           Object = ResourceOrVariable.Resource (resources.CreateUnnamedAnonResource()) }
     
-    let GetRoleTriplePattern (resources: GraphElementManager) role subjectVar objectVar =
+    let internal GetRoleTriplePattern (resources: GraphElementManager) role subjectVar objectVar =
         { TriplePattern.Subject = ResourceOrVariable.Variable subjectVar
           Predicate = (ResourceOrVariable.Resource role)
           Object = ResourceOrVariable.Variable objectVar }
 
-    let GetRoleValueTriplePattern (resources: GraphElementManager) role subjectVar (objectValue : Individual) =
+    let internal GetRoleValueTriplePattern (resources: GraphElementManager) role subjectVar (objectValue : Individual) =
         let obj = match objectValue with
                     | NamedIndividual (FullIri name) -> resources.AddNodeResource(Iri name) 
                     | AnonymousIndividual anonId -> resources.GetOrCreateNamedAnonResource($"{anonId}")
@@ -49,17 +49,22 @@ module ELI2RL =
         Called from translateELI below to handle object properties.
         Assumes objProp is not inverse property.
     *)
-    let GetObjPropTriplePattern (resources: GraphElementManager) objProp subjectVar objectVar =
+    let GetNonInvObjPropTriplePattern (resources: GraphElementManager) objProp subjectVar objectVar =
         match objProp with
         | NamedObjectProperty(FullIri objProp) ->
             GetRoleTriplePattern resources (resources.AddNodeResource(Iri objProp)) subjectVar objectVar
         | AnonymousObjectProperty anObjProp ->
             GetRoleTriplePattern resources (resources.AddNodeResource(AnonymousBlankNode anObjProp)) subjectVar objectVar
-        | InverseObjectProperty _ -> failwith "Invalid or useless construct detected: Double inverse detected."
+        | InverseObjectProperty prop -> failwith $"Invalid or useless construct detected: Double inverse detected on {prop}."
         | ObjectPropertyChain propertyExpressions -> failwith "existential on property chain not yet supported. Sorry"
 
+    let rec GetObjPropTriplePattern (resources: GraphElementManager) role varName newVar =
+                match role with
+                | InverseObjectProperty role -> GetObjPropTriplePattern resources role newVar varName
+                | role -> GetNonInvObjPropTriplePattern resources role varName newVar
+    
     (* Algorithm 1 from https://arxiv.org/abs/2008.02232 *)
-    let rec translateELI (resources: GraphElementManager) concept varName clause =
+    let rec internal translateELI (resources: GraphElementManager) concept varName clause =
         match concept with
         | ComplexConcept.AtomicConcept(FullIri atomicClass) -> [ GetTypeTriplePattern resources varName atomicClass ]
         | Intersection clauses ->
@@ -70,15 +75,13 @@ module ELI2RL =
             let newVar = $"{varName}_{clause}"
 
             let roleTriples =
-                match role with
-                | InverseObjectProperty role -> GetObjPropTriplePattern resources role newVar varName
-                | role -> GetObjPropTriplePattern resources role varName newVar
+                 GetObjPropTriplePattern resources role varName newVar
 
             let conceptTriples = translateELI resources concept newVar 1
             [roleTriples] @ conceptTriples
         | ComplexConcept.Top -> []
 
-    let translateSimpleSubclassAxiom
+    let internal translateSimpleSubclassAxiom
         (resources: GraphElementManager)
         (subConcept: ComplexConcept)
         (superConcept: Class)
@@ -92,7 +95,7 @@ module ELI2RL =
     (* 
         Called from translateELI below to handle ObjectHasValue.
     *)
-    let GetObjValueTriplePattern (resources: GraphElementManager) objProp subjectVar (objectIndividual : Individual) =
+    let internal GetObjValueTriplePattern (resources: GraphElementManager) objProp subjectVar (objectIndividual : Individual) =
         match objProp with
         | NamedObjectProperty(FullIri objProp) ->
             GetRoleValueTriplePattern resources (resources.AddNodeResource(Iri objProp)) subjectVar objectIndividual
@@ -103,7 +106,7 @@ module ELI2RL =
     
     (* The first case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <= bottom *) 
-    let translateEmptyIntersection
+    let internal translateEmptyIntersection
         (resources: GraphElementManager)
         (subConcepts: Class list)
         : Rule =
@@ -116,7 +119,7 @@ module ELI2RL =
     
     (* The second case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <= A *) 
-    let getAtomicNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (FullIri conceptName) =
+    let internal getAtomicNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (FullIri conceptName) =
         [{Head = NormalHead ( GetTypeTriplePattern resources "X" conceptName )
           Body = subConceptIntersection
                            |> List.map (fun (FullIri name) -> name)
@@ -126,7 +129,7 @@ module ELI2RL =
 
     (* The anonymous class version of the second case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <= A *) 
-    let getAtomicAnonymousNormalizedRule (resources : GraphElementManager) (subConceptIntersection) =
+    let internal getAtomicAnonymousNormalizedRule (resources : GraphElementManager) (subConceptIntersection) =
         [{Head = NormalHead ( GetAnonymousTypeTriplePattern resources "X" )
           Body = subConceptIntersection
                            |> List.map (fun (FullIri name) -> name)
@@ -148,7 +151,7 @@ module ELI2RL =
                            }]
     (* The fourth case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <=  <=1 R. A *) 
-    let getQualifiedAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) (FullIri conceptName) =
+    let internal getQualifiedAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) (FullIri conceptName) =
         let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
         [{Head = NormalHead ( GetObjPropTriplePattern resources sameAs "Y1" "Y2" )
           Body = subConceptIntersection
@@ -164,7 +167,7 @@ module ELI2RL =
                            }]
     (* The fourth case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <=  <=1 R *) 
-    let getAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) =
+    let internal getAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) =
         let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
         [{Head = NormalHead ( GetObjPropTriplePattern resources sameAs "Y1" "Y2" )
           Body = subConceptIntersection
@@ -177,7 +180,7 @@ module ELI2RL =
                            |> Seq.toList
                            }]
     (*  A_1 and ... and A_n <=  ObjectHasValue(R, i) *) 
-    let getObjectHasValueNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty : ObjectPropertyExpression) (individual : Individual) =
+    let internal getObjectHasValueNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty : ObjectPropertyExpression) (individual : Individual) =
         let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
         [{Head = NormalHead ( GetObjValueTriplePattern resources objectProperty "X" individual )
           Body = subConceptIntersection

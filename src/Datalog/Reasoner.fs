@@ -9,6 +9,7 @@ namespace DagSemTools.Datalog
 
 open DagSemTools.Rdf
 open Datalog
+open Serilog
 open Stratifier
     
 module Reasoner =
@@ -76,9 +77,9 @@ module Reasoner =
                             let newTriple = ApplySubstitutionTriple subs ruleMatchHead
                             tripleStore.AddTriple newTriple
 
-    let evaluate (rules: Rule list, triplestore: Datastore) =
+    let evaluate (logger: ILogger, rules: Rule list, triplestore: Datastore) =
             // let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates(rules, triplestore) |> Seq.toList
-            let stratifier = RulePartitioner rules
+            let stratifier = RulePartitioner (logger, rules)
             let stratification = stratifier.orderRules
             for partition in stratification do
                 let program = DatalogProgram(Rules = Seq.toList partition, tripleStore = triplestore)
