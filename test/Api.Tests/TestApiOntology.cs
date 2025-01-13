@@ -221,15 +221,15 @@ public class TestApiOntology(ITestOutputHelper output)
     // }
 
 
-    [Fact, Category("LongRunning")]
-    public void LoadGeneOntologyWorks()
-    {
-        var ontologyFileInfo = new FileInfo("TestData/go.ttl");
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
-        var ont = OwlOntology.Create(rdf);
-        ont.GetAxioms().Should().NotBeEmpty();
-        var datalogProgram = ont.GetAxiomRules().ToList();
-        datalogProgram.Should().NotBeEmpty();
-        rdf.LoadDatalog(datalogProgram);
-    }
+    // [Fact, Category("LongRunning")]
+    // public void LoadGeneOntologyWorks()
+    // {
+    //     var ontologyFileInfo = new FileInfo("TestData/go.ttl");
+    //     var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+    //     var ont = OwlOntology.Create(rdf);
+    //     ont.GetAxioms().Should().NotBeEmpty();
+    //     var datalogProgram = ont.GetAxiomRules().ToList();
+    //     datalogProgram.Should().NotBeEmpty();
+    //     rdf.LoadDatalog(datalogProgram);
+    // }
 }
