@@ -200,36 +200,36 @@ public class TestApiOntology(ITestOutputHelper output)
         rdf.ContainsTriple(notCalculatedTriple).Should().BeFalse();
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
-    //
-    // [Fact]
-    // public void LoadImfOntologyWorks()
-    // {
-    //     // Arrange
-    //     var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
-    //     var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
-    //     var aboxFileInfo = new FileInfo("TestData/imf-data.ttl");
-    //     var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, outputWriter);
-    //     var ont = OwlOntology.Create(rdfImf);
-    //     ont.GetAxioms().Should().NotBeEmpty();
-    //
-    //     // Act
-    //     var axiomRules = ont.GetAxiomRules().ToList();
-    //     axiomRules.Should().NotBeEmpty();
-    //     rdfImf.LoadDatalog(axiomRules);
-    //
-    //     _inMemorySink.LogEvents.Should().HaveCount(0);
-    // }
+    
+    [Fact(Skip = "Not working, github issue: https://github.com/daghovland/DagSemTools/issues/55" )]
+    public void LoadImfOntologyWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var aboxFileInfo = new FileInfo("TestData/imf-data.ttl");
+        var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdfImf);
+        ont.GetAxioms().Should().NotBeEmpty();
+    
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        rdfImf.LoadDatalog(axiomRules);
+    
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
 
 
-    // [Fact, Category("LongRunning")]
-    // public void LoadGeneOntologyWorks()
-    // {
-    //     var ontologyFileInfo = new FileInfo("TestData/go.ttl");
-    //     var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
-    //     var ont = OwlOntology.Create(rdf);
-    //     ont.GetAxioms().Should().NotBeEmpty();
-    //     var datalogProgram = ont.GetAxiomRules().ToList();
-    //     datalogProgram.Should().NotBeEmpty();
-    //     rdf.LoadDatalog(datalogProgram);
-    // }
+     [Fact(Skip = "Takes too long for normal testing. https://github.com/daghovland/DagSemTools/issues/58"), Category("LongRunning") ]
+     public void LoadGeneOntologyWorks()
+     {
+         var ontologyFileInfo = new FileInfo("TestData/go.ttl");
+         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+         var ont = OwlOntology.Create(rdf);
+         ont.GetAxioms().Should().NotBeEmpty();
+         var datalogProgram = ont.GetAxiomRules().ToList();
+         datalogProgram.Should().NotBeEmpty();
+         rdf.LoadDatalog(datalogProgram);
+    }
 }
