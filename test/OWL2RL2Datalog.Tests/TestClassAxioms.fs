@@ -8,9 +8,12 @@
 module DagSemTools.OWL2RL2Datalog.TestClassAxioms
 
 open DagSemTools
+open DagSemTools.AlcTableau.ALC
+open DagSemTools.Datalog
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools.OWL2RL2Datalog
+open DagSemTools.OwlOntology
 open DagSemTools.Ingress
 open IriTools
 open Xunit
@@ -85,6 +88,57 @@ let ``Equivalentclass RL reasoning from rdf works`` () =
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query2.Should().HaveLength(1) |> ignore
 
+[<Fact>]
+let ``Min qualified cardinality on union works``() =
+    // Arrange
+    let tripleTable = new Datastore(100u)
+    let errorOutput = new System.IO.StringWriter()
+    
+    let Airi = IriReference "https://example.com/class/A"
+    let A = ClassName (FullIri Airi)
+    let Eiri = IriReference "https://example.com/class/E"
+    let E = ClassName (FullIri Eiri)
+    let Firi = IriReference "https://example.com/class/F"
+    let F = ClassName (FullIri Firi)
+    
+    let union = ObjectUnionOf [E; F]
+    let roleIri = IriReference "https://example.com/property/t"
+    let role = NamedObjectProperty (FullIri roleIri)
+    let restriction = ObjectMinQualifiedCardinality(1, role, union)
+    let subClassAxiom = AxiomClassAxiom (SubClassOf ([], restriction, A))
+    let ontology = OwlOntology.Ontology([], ontologyVersion.UnNamedOntology,[], [subClassAxiom])
+    // Act
+    let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
+    
+    // Assert
+    let Aresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri Airi))
+    let Eresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri Eiri))
+    let Fresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri Firi))
+    let roleresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri roleIri))
+    
+    let rdfTypeResource = tripleTable.Resources.AddResource (NodeOrEdge (Iri (IriReference Namespaces.RdfType)))
+    let ruleHead =
+        NormalHead {Subject = ResourceOrVariable.Variable "X"
+                    Predicate = ResourceOrVariable.Resource rdfTypeResource
+                    Object = ResourceOrVariable.Resource Aresource}
+    let expectedAxiom = {
+        DagSemTools.Datalog.Head = ruleHead
+        DagSemTools.Datalog.Body = [PositiveTriple {
+            Subject = ResourceOrVariable.Variable "X"
+            Predicate = ResourceOrVariable.Resource roleresource
+            Object = ResourceOrVariable.Variable "X1"
+            };
+            PositiveTriple{
+             Subject = ResourceOrVariable.Variable "X1"
+             Predicate = ResourceOrVariable.Resource rdfTypeResource
+             Object = ResourceOrVariable.Resource Eresource
+             }]
+    }
+    let Arules = rlProgram |> Seq.filter (fun rule -> rule.Head = ruleHead)
+    Arules.Should().NotBeEmpty() |> ignore
+    Arules.Should().Contain(expectedAxiom)
+    
+    
 
 [<Fact>]
 let ``Equivalentclass RL reasoning from rdf works the other way`` () =
