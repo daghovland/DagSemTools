@@ -215,8 +215,11 @@ module ELIExtractor =
     let SubClassAxiomNormalization (logger: ILogger) (axiom: ClassAxiom) =
         match axiom with
         | SubClassOf (_annot, subClassExpression, superClassExpression) ->
-            [Formula.NormalizedConceptInclusion ([(conceptRepresentative subClassExpression)], (superClassExpression |> conceptRepresentative |> AtomicNamedConcept))]
-            @ conceptPositiveOccurenceNormalization logger superClassExpression @ conceptNegativeOccurenceNormalization logger subClassExpression
+            [Formula.NormalizedConceptInclusion (
+                                                 [(conceptRepresentative subClassExpression)],
+                                                 (superClassExpression |> conceptRepresentative |> AtomicNamedConcept))]
+            @ conceptPositiveOccurenceNormalization logger superClassExpression
+            @ conceptNegativeOccurenceNormalization logger subClassExpression
         | DisjointClasses _ -> failwith "todo"
         | EquivalentClasses(tuples, classExpressions) -> failwith "todo"
         | DisjointUnion(tuples, iri, classExpressions) -> 

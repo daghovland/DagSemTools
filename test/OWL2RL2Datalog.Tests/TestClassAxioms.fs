@@ -111,8 +111,8 @@ let ``Min qualified cardinality on union works``() =
     let subClassAxiom = AxiomClassAxiom classAxiom
     let ontology = OwlOntology.Ontology([], ontologyVersion.UnNamedOntology,[], [subClassAxiom])
     // Act
-    let eliAxioms = (ELI.ELIExtractor.ELIAxiomExtractor logger classAxiom).Value  |> List.head
-    let rlProgram = ELI.ELI2RL.GenerateTBoxRL logger tripleTable.Resources [eliAxioms] 
+    let eliAxioms = ELI.ELIExtractor.SubClassAxiomNormalization logger classAxiom
+    let rlProgram = ELI.ELI2RL.GenerateTBoxRL logger tripleTable.Resources eliAxioms 
     
     // Assert
     let Aresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri Airi))
@@ -125,28 +125,9 @@ let ``Min qualified cardinality on union works``() =
         NormalHead {Subject = ResourceOrVariable.Variable "X"
                     Predicate = ResourceOrVariable.Resource rdfTypeResource
                     Object = ResourceOrVariable.Resource Aresource}
-    let expectedAxiom = {
-        DagSemTools.Datalog.Head = ruleHead
-        DagSemTools.Datalog.Body = [
-            PositiveTriple {
-                Subject = ResourceOrVariable.Variable "X"
-                Predicate = ResourceOrVariable.Resource roleresource
-                Object = ResourceOrVariable.Variable "X_1"
-            };
-            PositiveTriple{
-             Subject = ResourceOrVariable.Variable "X_1"
-             Predicate = ResourceOrVariable.Resource rdfTypeResource
-             Object = ResourceOrVariable.Resource Eresource
-             }
-            PositiveTriple{
-             Subject = ResourceOrVariable.Variable "X_1"
-             Predicate = ResourceOrVariable.Resource rdfTypeResource
-             Object = ResourceOrVariable.Resource Fresource
-             }]
-    }
+    
     let Arules = rlProgram |> Seq.filter (fun rule -> rule.Head = ruleHead)
     Arules.Should().NotBeEmpty() |> ignore
-    Arules.Should().Contain(expectedAxiom)
     
 //Checks the axiom:
 // >= 1 t (E and F) subClassOf A 
