@@ -88,6 +88,8 @@ let ``Equivalentclass RL reasoning from rdf works`` () =
     let query2 = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
     query2.Should().HaveLength(1) |> ignore
 
+//Checks the axiom:
+// >= 1 t (E U F) subClassOf A 
 [<Fact>]
 let ``Min qualified cardinality on union works``() =
     // Arrange
@@ -105,6 +107,66 @@ let ``Min qualified cardinality on union works``() =
     let roleIri = IriReference "https://example.com/property/t"
     let role = NamedObjectProperty (FullIri roleIri)
     let restriction = ObjectMinQualifiedCardinality(1, role, union)
+    let classAxiom = (SubClassOf ([], restriction, A))
+    let subClassAxiom = AxiomClassAxiom classAxiom
+    let ontology = OwlOntology.Ontology([], ontologyVersion.UnNamedOntology,[], [subClassAxiom])
+    // Act
+    let eliAxioms = (ELI.ELIExtractor.ELIAxiomExtractor logger classAxiom).Value  |> List.head
+    let rlProgram = ELI.ELI2RL.GenerateTBoxRL logger tripleTable.Resources [eliAxioms] 
+    
+    // Assert
+    let Aresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri Airi))
+    let Eresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri Eiri))
+    let Fresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri Firi))
+    let roleresource = tripleTable.Resources.AddResource (NodeOrEdge (Iri roleIri))
+    
+    let rdfTypeResource = tripleTable.Resources.AddResource (NodeOrEdge (Iri (IriReference Namespaces.RdfType)))
+    let ruleHead =
+        NormalHead {Subject = ResourceOrVariable.Variable "X"
+                    Predicate = ResourceOrVariable.Resource rdfTypeResource
+                    Object = ResourceOrVariable.Resource Aresource}
+    let expectedAxiom = {
+        DagSemTools.Datalog.Head = ruleHead
+        DagSemTools.Datalog.Body = [
+            PositiveTriple {
+                Subject = ResourceOrVariable.Variable "X"
+                Predicate = ResourceOrVariable.Resource roleresource
+                Object = ResourceOrVariable.Variable "X_1"
+            };
+            PositiveTriple{
+             Subject = ResourceOrVariable.Variable "X_1"
+             Predicate = ResourceOrVariable.Resource rdfTypeResource
+             Object = ResourceOrVariable.Resource Eresource
+             }
+            PositiveTriple{
+             Subject = ResourceOrVariable.Variable "X_1"
+             Predicate = ResourceOrVariable.Resource rdfTypeResource
+             Object = ResourceOrVariable.Resource Fresource
+             }]
+    }
+    let Arules = rlProgram |> Seq.filter (fun rule -> rule.Head = ruleHead)
+    Arules.Should().NotBeEmpty() |> ignore
+    Arules.Should().Contain(expectedAxiom)
+    
+//Checks the axiom:
+// >= 1 t (E and F) subClassOf A 
+[<Fact>]
+let ``Min qualified cardinality on intersection works``() =
+    // Arrange
+    let tripleTable = new Datastore(100u)
+    let errorOutput = new System.IO.StringWriter()
+    
+    let Airi = IriReference "https://example.com/class/A"
+    let A = ClassName (FullIri Airi)
+    let Eiri = IriReference "https://example.com/class/E"
+    let E = ClassName (FullIri Eiri)
+    let Firi = IriReference "https://example.com/class/F"
+    let F = ClassName (FullIri Firi)
+    
+    let intersection = ObjectIntersectionOf [E; F]
+    let roleIri = IriReference "https://example.com/property/t"
+    let role = NamedObjectProperty (FullIri roleIri)
+    let restriction = ObjectMinQualifiedCardinality(1, role, intersection)
     let subClassAxiom = AxiomClassAxiom (SubClassOf ([], restriction, A))
     let ontology = OwlOntology.Ontology([], ontologyVersion.UnNamedOntology,[], [subClassAxiom])
     // Act
@@ -123,13 +185,19 @@ let ``Min qualified cardinality on union works``() =
                     Object = ResourceOrVariable.Resource Aresource}
     let expectedAxiom = {
         DagSemTools.Datalog.Head = ruleHead
-        DagSemTools.Datalog.Body = [PositiveTriple {
-            Subject = ResourceOrVariable.Variable "X"
-            Predicate = ResourceOrVariable.Resource roleresource
-            Object = ResourceOrVariable.Variable "X1"
+        DagSemTools.Datalog.Body = [
+            PositiveTriple {
+                Subject = ResourceOrVariable.Variable "X"
+                Predicate = ResourceOrVariable.Resource roleresource
+                Object = ResourceOrVariable.Variable "X_1"
             };
             PositiveTriple{
-             Subject = ResourceOrVariable.Variable "X1"
+             Subject = ResourceOrVariable.Variable "X_1"
+             Predicate = ResourceOrVariable.Resource rdfTypeResource
+             Object = ResourceOrVariable.Resource Fresource
+             };
+            PositiveTriple{
+             Subject = ResourceOrVariable.Variable "X_1"
              Predicate = ResourceOrVariable.Resource rdfTypeResource
              Object = ResourceOrVariable.Resource Eresource
              }]
@@ -137,7 +205,6 @@ let ``Min qualified cardinality on union works``() =
     let Arules = rlProgram |> Seq.filter (fun rule -> rule.Head = ruleHead)
     Arules.Should().NotBeEmpty() |> ignore
     Arules.Should().Contain(expectedAxiom)
-    
     
 
 [<Fact>]
