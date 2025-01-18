@@ -139,6 +139,11 @@ let ``Equivalentclass RL reasoning from rdf works`` () =
 
 //Checks the axiom:
 // >= 1 t (E U F) subClassOf A
+// Should be translated to
+// C_(>= 1 t (E U F) subClassOf C_A
+// >= 1 t C_(E U F) subClassOf C_(>= 1 t (E U F)
+// C_(E U F) subClassOf C_E U C_F
+//
 [<Fact>]
 let ``Min qualified cardinality on union works`` () =
     // Arrange
@@ -179,7 +184,8 @@ let ``Min qualified cardinality on union works`` () =
             { Subject = ResourceOrVariable.Variable "X"
               Predicate = ResourceOrVariable.Resource rdfTypeResource
               Object = ResourceOrVariable.Resource Aresource }
-
+    // C_(>= 1 t (E U F) subClassOf C_A
+    // C_A (X) :- C_(>= 1 t (E U F) (X)
     let Arules = rlProgram |> Seq.filter (fun rule -> rule.Head = ruleHead)
     Arules.Should().NotBeEmpty() |> ignore
 
@@ -194,6 +200,8 @@ let ``Min qualified cardinality on union works`` () =
               Predicate = ResourceOrVariable.Resource rdfTypeResource
               Object = conceptFormula }
 
+    // >= 1 t C_(E U F) subClassOf C_(>= 1 t (E U F)
+    // C_(>= 1 t (E U F) (X) :- >= 1 t C_(E U F)
     let conceptRules =
         rlProgram |> Seq.filter (fun rule -> rule.Head = conceptFormulaHead)
 
@@ -210,6 +218,11 @@ let ``Min qualified cardinality on union works`` () =
               Predicate = ResourceOrVariable.Resource rdfTypeResource
               Object = conceptFormula2 }
 
+
+    // C_(E U F) subClassOf C_E U C_F
+    // C_(E U F) subClassOf C_E  and C_(E U F) subClassOf C_F
+    // C_E (X) :- C_(E U F) (X)
+    // C_F (X) :- C_(E U F) (X)
     let conceptRules2 =
         rlProgram |> Seq.filter (fun rule -> rule.Head = conceptFormulaHead2)
 
