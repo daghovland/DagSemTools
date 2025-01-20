@@ -21,6 +21,7 @@ module TestClassAxioms =
     open Faqt
     open Serilog
     open Serilog.Sinks.InMemory
+    open DagSemTools.ELI.ELIExtractor
 
     let inMemorySink = new InMemorySink()
     let logger =
@@ -109,10 +110,8 @@ module TestClassAxioms =
         let role = NamedObjectProperty (FullIri roleIri)
         let restriction = ObjectMinQualifiedCardinality(1, role, union)
         let classAxiom = (SubClassOf ([], restriction, A))
-        let subClassAxiom = AxiomClassAxiom classAxiom
-        let ontology = OwlOntology.Ontology([], ontologyVersion.UnNamedOntology,[], [subClassAxiom])
         // Act
-        let eliAxioms = ELI.ELIExtractor.SubClassAxiomNormalization logger classAxiom
+        let eliAxioms = SubClassAxiomNormalization logger classAxiom
         let rlProgram = ELI.ELI2RL.GenerateTBoxRL logger tripleTable.Resources eliAxioms 
         
         // Assert
