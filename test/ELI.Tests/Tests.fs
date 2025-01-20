@@ -102,3 +102,43 @@ module TestClassAxioms =
 
         Assert.Equal<Rule seq>(expectedRules, translatedRules)
         inMemorySink.LogEvents.Should().BeEmpty
+
+
+    // >= 1 (E U F) subClassof A
+    // Should lead to
+    // 
+    [<Fact>]
+    let ``Subclass axiom normalization handles qualified union`` () =
+        //Arrange
+        let resources = new GraphElementManager(10u)
+        let subClassIri = (FullIri(IriReference "https://example.com/subclass"))
+        let superClassIri = (FullIri(IriReference "https://example.com/superclass"))
+
+        let axiom =
+            ELI.Axioms.DirectlyTranslatableConceptInclusion(
+                [ ELI.Axioms.ComplexConcept.AtomicConcept subClassIri ],
+                [ superClassIri ]
+            )
+        //Act
+        let translatedRules = ELI.ELI2RL.GenerateTBoxRL logger resources [ axiom ]
+        //Assert
+        let expectedRules: Datalog.Rule seq =
+            [ { Head = NormalHead
+                  { Subject = ResourceOrVariable.Variable "X"
+                    Predicate = ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
+                    Object =
+                      ResourceOrVariable.Resource(
+                          resources.AddNodeResource(Iri(IriReference "https://example.com/superclass"))
+                      ) }
+                Body =
+                  [ PositiveTriple
+                        { Subject = ResourceOrVariable.Variable "X"
+                          Predicate =
+                            ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
+                          Object =
+                            ResourceOrVariable.Resource(
+                                resources.AddNodeResource(Iri(IriReference "https://example.com/subclass"))
+                            ) } ] } ]
+
+        Assert.Equal<Rule seq>(expectedRules, translatedRules)
+        inMemorySink.LogEvents.Should().BeEmpty

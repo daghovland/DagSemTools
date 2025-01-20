@@ -211,8 +211,9 @@ module ELIExtractor =
         inclusionFormulas
         
     
-    (* This is an implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
-    let SubClassAxiomNormalization (logger: ILogger) (axiom: ClassAxiom) =
+    (* This is an implementation of the normalization procedure in https://www.ijcai.org/Proceedings/09/Papers/336.pdf
+       I also used Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
+    let internal SubClassAxiomNormalization (logger: ILogger) (axiom: ClassAxiom) =
         match axiom with
         | SubClassOf (_annot, subClassExpression, superClassExpression) ->
             [Formula.NormalizedConceptInclusion (

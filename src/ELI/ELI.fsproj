@@ -27,6 +27,7 @@
     
     <ItemGroup>
         <InternalsVisibleTo Include="DagSemTools.ELI.Tests" />
+        <InternalsVisibleTo Include="DagSemTools.OWL2RL2Datalog.Tests" />
     </ItemGroup>
 
     <ItemGroup>
