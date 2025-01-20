@@ -38,7 +38,7 @@
                                owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
                                owl:onClass [
                                                rdf:type owl:Class ;
-                                               owl:unionOf (:E [
+                                               owl:intersectionOf (:E [
                                                                    rdf:type owl:Restriction ;
                                                                    owl:onProperty [
                                                                                       rdf:type owl:InverseObjectProperty ;
@@ -65,6 +65,8 @@
 
 # Individual :z1 satisfies E ⊔ ∃u⁻.F
 :z1 rdf:type owl:NamedIndividual, :E .
+:w3 rdf:type owl:NamedIndividual, :F ;
+    :u :z1.
 
 # :notx is an example that should not be inferred to be of type :A
 :notx rdf:type owl:NamedIndividual ;

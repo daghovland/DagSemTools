@@ -19,9 +19,6 @@ open IriTools
 open Serilog
 
 module ELIExtractor =
-
-
-
     let rec ELIClassExtractor classExpression =
         match classExpression with
         | ClassName className -> ComplexConcept.AtomicConcept className |> Some
@@ -64,6 +61,7 @@ module ELIExtractor =
         |> IriReference
         |> FullIri
     (* This is a combination of the function st(C) and the normalization in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
+    (* Originally in https://www.ijcai.org/Proceedings/09/Papers/336.pdf *)
     let rec conceptPositiveOccurenceNormalization (logger : ILogger) (concept : ClassExpression) =
         let (positiveOccurrences, negativeOccurrences, inclusionFormulas) =
             match concept with
@@ -157,12 +155,12 @@ module ELIExtractor =
                      NormalizedConceptInclusion ([classExpression |> conceptRepresentative], mainConceptRepresentative)))
             | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) ->
                 ([], [classExpression],
-                 [NormalizedConceptInclusion ([concept |> conceptRepresentative],
-                                              AllValuesFrom (InverseObjectProperty objectPropertyExpression, classExpression |> conceptRepresentative))])
+                 [NormalizedConceptInclusion ([classExpression |> conceptRepresentative],
+                                              AllValuesFrom (InverseObjectProperty objectPropertyExpression, concept |> conceptRepresentative))])
             | ObjectMinQualifiedCardinality(1, objectPropertyExpression, classExpression) ->
                 ([], [classExpression],
-                 [NormalizedConceptInclusion ([concept |> conceptRepresentative],
-                                              AllValuesFrom (InverseObjectProperty objectPropertyExpression, classExpression |> conceptRepresentative))])
+                 [NormalizedConceptInclusion ([classExpression |> conceptRepresentative],
+                                              AllValuesFrom (InverseObjectProperty objectPropertyExpression, concept |> conceptRepresentative))])
             | ObjectComplementOf classExpression ->
                 ([classExpression], [], [Formula.NormalizedConceptInclusion
                                              ([(conceptRepresentative concept)
@@ -211,12 +209,16 @@ module ELIExtractor =
         inclusionFormulas
         
     
-    (* This is an implementation of the normalization procedure in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
+    (* This is an implementation of the normalization procedure in https://www.ijcai.org/Proceedings/09/Papers/336.pdf
+       I also used Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
     let SubClassAxiomNormalization (logger: ILogger) (axiom: ClassAxiom) =
         match axiom with
         | SubClassOf (_annot, subClassExpression, superClassExpression) ->
-            [Formula.NormalizedConceptInclusion ([(conceptRepresentative subClassExpression)], (superClassExpression |> conceptRepresentative |> AtomicNamedConcept))]
-            @ conceptPositiveOccurenceNormalization logger superClassExpression @ conceptNegativeOccurenceNormalization logger subClassExpression
+            [Formula.NormalizedConceptInclusion (
+                                                 [(conceptRepresentative subClassExpression)],
+                                                 (superClassExpression |> conceptRepresentative |> AtomicNamedConcept))]
+            @ conceptPositiveOccurenceNormalization logger superClassExpression
+            @ conceptNegativeOccurenceNormalization logger subClassExpression
         | DisjointClasses _ -> failwith "todo"
         | EquivalentClasses(tuples, classExpressions) -> failwith "todo"
         | DisjointUnion(tuples, iri, classExpressions) -> 

@@ -1,7 +1,16 @@
+(*
+    Copyright (C) 2024-2025 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*)
+
 namespace DagSemTools.ELI.Tests
 
 open DagSemTools
 open DagSemTools.Datalog
+open DagSemTools.ELI.Axioms
 open DagSemTools.Rdf
 open DagSemTools.Ingress
 open DagSemTools.OwlOntology
@@ -101,4 +110,82 @@ module TestClassAxioms =
                             ) } ] } ]
 
         Assert.Equal<Rule seq>(expectedRules, translatedRules)
+        inMemorySink.LogEvents.Should().BeEmpty
+
+
+    // >= 1 (E U F) subClassof A
+    // E U F occurs negatively, so should lead to
+    // E_C  subClassOf (E U F)_C, and F_C subClassOf (E U F)_C
+    // E subClassOf E_C, F subClassOf F_C
+    // >= 1 (E U F) also occurs neg. so should lead to
+    // (Note re-writing on page 2043)
+    // (E U F)_C subClassOf forall t^-1 (>= 1 (E U F))_C
+    // Finally also
+    // A_C subClassOf A
+    // (>= 1 (E U F))_C subClassOf A_C
+    [<Fact>]
+    let ``Subclass axiom normalization handles qualified union`` () =
+        //Arrange
+        // Arrange
+        let tripleTable = new Datastore(100u)
+        let errorOutput = new System.IO.StringWriter()
+        
+        let Airi = IriReference "https://example.com/class/A"
+        let A = ClassName (FullIri Airi)
+        let Eiri = IriReference "https://example.com/class/E"
+        let E = ClassName (FullIri Eiri)
+        let Firi = IriReference "https://example.com/class/F"
+        let F = ClassName (FullIri Firi)
+        
+        let union = ObjectUnionOf [E; F]
+        let roleIri = IriReference "https://example.com/property/t"
+        let role = NamedObjectProperty (FullIri roleIri)
+        let restriction = ObjectMinQualifiedCardinality(1, role, union)
+        let classAxiom = (SubClassOf ([], restriction, A))
+        //Act
+        let normalizedAxioms = ELI.ELIExtractor.SubClassAxiomNormalization logger classAxiom
+        //Assert
+        normalizedAxioms.Length.Should().Be(7) |> ignore
+        
+        
+        // E subClassOf E_C
+        let ESubClassFormulas =
+            normalizedAxioms
+                  |> List.filter (fun (NormalizedConceptInclusion (union, superclas)) -> union = [FullIri Eiri])
+        ESubClassFormulas.Should().HaveLength(1) |> ignore
+        let E_Concept = ESubClassFormulas
+                            |> List.map (fun (NormalizedConceptInclusion (union, superclas)) -> superclas)
+                            |> List.head
+        let E_C = 
+            match (E_Concept) with
+                | AtomicNamedConcept cls -> cls
+                | _ -> failwith $"Test error on {E_Concept}"
+        
+        
+        
+        // E_C subClassOf (E U F)_C and E_F subClassOf (E U F)_C
+        let unionSubClassFormulas =
+            normalizedAxioms
+                  |> List.filter (fun (NormalizedConceptInclusion (union, superclas)) -> union = [E_C])
+        unionSubClassFormulas.Should().HaveLength(1) |> ignore
+        let E_U_F_C_Concept = unionSubClassFormulas
+                            |> List.map (fun (NormalizedConceptInclusion (union, superclas)) -> superclas)
+                            |> List.head
+        let E_U_F_C = 
+            match (E_U_F_C_Concept) with
+                | AtomicNamedConcept cls -> cls
+                | _ -> failwith $"Test error on {E_U_F_C_Concept}"
+        
+        // (E U F)_C subClassOf forall t^-1 (>= 1 (E U F))_C
+        let expectedRestrictionRule =  normalizedAxioms
+                                        |> List.filter (fun (NormalizedConceptInclusion (subClassList, superClass)) ->
+                                            subClassList = [E_U_F_C])
+        expectedRestrictionRule.Should().HaveLength(1) |> ignore
+        let restrictionFormaula =
+                                match (expectedRestrictionRule|> List.head) with
+                                | NormalizedConceptInclusion (subClassList, superClass) -> superClass
+                                | _ -> failwith "test failure"
+        let restrictionConceptIri =
+            match restrictionFormaula with
+            | AllValuesFrom (role, concept) -> concept 
         inMemorySink.LogEvents.Should().BeEmpty

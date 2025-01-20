@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <PackageId>DagSemTools.OWL2RL2Dtalog.Tests</PackageId>
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
@@ -19,12 +18,12 @@
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
         <PackageReference Include="Serilog" Version="4.2.0" />
         <PackageReference Include="Serilog.Sinks.InMemory" Version="0.11.0" />
-        <PackageReference Include="xunit" Version="2.9.2" />
-        <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0">
+        <PackageReference Include="xunit" Version="2.9.3" />
+        <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="6.0.2">
+        <PackageReference Include="coverlet.collector" Version="6.0.3">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -35,6 +34,7 @@
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
         <ProjectReference Include="..\..\src\Datalog.Parser\Datalog.Parser.csproj" />
         <ProjectReference Include="..\..\src\OWL2RL2Datalog\OWL2RL2Datalog.fsproj" />
+         <ProjectReference Include="..\..\src\ELI\ELI.fsproj" />
         <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
     </ItemGroup>
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
@@ -42,6 +42,7 @@
         <PackageReference Include="DagSemTools.Datalog.Parser" Version="$(Version)" />
         <PackageReference Include="DagSemTools.OWL2RL2Datalog" Version="$(Version)" />
         <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.ELI" Version="$(Version)" />
     </ItemGroup>
 
 

@@ -18,4 +18,6 @@ open Serilog
 module Library =
 
     let Owl2Datalog (logger : ILogger) (resources: GraphElementManager) (axiom: ClassAxiom) =
-        axiom |> ELIAxiomExtractor logger |> Option.map (ELI2RL.GenerateTBoxRL logger resources)
+        axiom
+        |> ELIAxiomExtractor logger
+        |> Option.map (ELI2RL.GenerateTBoxRL logger resources)

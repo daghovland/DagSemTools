@@ -1,0 +1,47 @@
+@prefix : <http://example.org/> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+
+:C rdf:type owl:Class .
+:D rdf:type owl:Class .
+:E rdf:type owl:Class .
+:F rdf:type owl:Class .
+:A rdf:type owl:Class .
+
+:r rdf:type owl:ObjectProperty .
+:s rdf:type owl:ObjectProperty .
+:t rdf:type owl:ObjectProperty .
+:u rdf:type owl:ObjectProperty .
+
+[
+       rdf:type owl:Restriction ;
+       owl:onProperty :t ;
+       owl:minQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+       owl:onClass [
+                       rdf:type owl:Class ;
+                       owl:intersectionOf (:E [
+                                           rdf:type owl:Restriction ;
+                                           owl:onProperty [
+                                                              rdf:type owl:InverseObjectProperty ;
+                                                              owl:inverseOf :u ;
+                                                          ] ;
+                                           owl:someValuesFrom :F ;
+                                       ]) ;
+                   ] ;
+    rdfs:subClassOf :A ;
+] .
+
+# :x is an example individual that should be inferred to be of type :A
+:x rdf:type owl:NamedIndividual ;
+    :t :y.
+:y rdf:type owl:NamedIndividual, :E.
+:z rdf:type owl:NamedIndividual, :F ;
+    :u :y.
+
+# :notx is an example that should not be inferred to be of type :A
+:notx rdf:type owl:NamedIndividual ;
+:r :noty1 .
+:noty1 rdf:type owl:NamedIndividual, :E .
