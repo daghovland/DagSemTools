@@ -2,7 +2,6 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-
         <IsPackable>false</IsPackable>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
@@ -30,8 +29,14 @@
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
-    <ItemGroup>
-      <ProjectReference Include="..\..\src\ELI\ELI.fsproj" />
+    
+    <!-- Use project references for local development -->
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+         <ProjectReference Include="..\..\src\ELI\ELI.fsproj" />
+    </ItemGroup>
+    <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.ELI" Version="$(Version)" />
     </ItemGroup>
 
 </Project>

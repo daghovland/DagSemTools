@@ -19,9 +19,6 @@ open IriTools
 open Serilog
 
 module ELIExtractor =
-
-
-
     let rec ELIClassExtractor classExpression =
         match classExpression with
         | ClassName className -> ComplexConcept.AtomicConcept className |> Some
