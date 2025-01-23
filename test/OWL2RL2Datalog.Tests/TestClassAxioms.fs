@@ -49,7 +49,7 @@ module TestClassAxioms =
         let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
         query.Should().HaveLength(0) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
@@ -83,7 +83,7 @@ module TestClassAxioms =
         let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
         query.Should().HaveLength(0) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
@@ -212,7 +212,7 @@ module TestClassAxioms =
         let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
         query.Should().HaveLength(1) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)

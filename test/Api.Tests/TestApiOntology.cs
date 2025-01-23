@@ -114,7 +114,7 @@ public class TestApiOntology(ITestOutputHelper output)
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    [Fact(Skip = "Not working, github issue: https://github.com/daghovland/DagSemTools/issues/55")]
+    [Fact]
     public void LoadImfOntologyWorks()
     {
         // Arrange

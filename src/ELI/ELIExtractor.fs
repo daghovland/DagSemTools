@@ -60,8 +60,18 @@ module ELIExtractor =
         $"https://github.org/daghovland/DagSemTools/ConceptRepresentative/{concept.GetHashCode()}"
         |> IriReference
         |> FullIri
+   
+   
+    (* Helper function for the case exist R . C in subconcept positions in the function below
+       In  https://www.ijcai.org/Proceedings/09/Papers/336.pdf, this is the last case before section 4.2
+     *)
+    let subConceptSomeValuesFrom  objectPropertyExpression classExpression concept =
+        ([], [classExpression],
+                 [NormalizedConceptInclusion ([classExpression |> conceptRepresentative],
+                                              AllValuesFrom (InverseObjectProperty objectPropertyExpression, concept |> conceptRepresentative))])
+   
     (* This is a combination of the function st(C) and the normalization in Section 4.2 of https://arxiv.org/pdf/2008.02232 *)
-    (* Originally in https://www.ijcai.org/Proceedings/09/Papers/336.pdf *)
+    (* Originally called Structural Transformation (sec 2.3) in https://www.ijcai.org/Proceedings/09/Papers/336.pdf *)
     let rec conceptPositiveOccurenceNormalization (logger : ILogger) (concept : ClassExpression) =
         let (positiveOccurrences, negativeOccurrences, inclusionFormulas) =
             match concept with
@@ -154,13 +164,18 @@ module ELIExtractor =
                 ([], classExpressions, classExpressions |> List.map (fun classExpression ->
                      NormalizedConceptInclusion ([classExpression |> conceptRepresentative], mainConceptRepresentative)))
             | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) ->
-                ([], [classExpression],
-                 [NormalizedConceptInclusion ([classExpression |> conceptRepresentative],
-                                              AllValuesFrom (InverseObjectProperty objectPropertyExpression, concept |> conceptRepresentative))])
+                subConceptSomeValuesFrom objectPropertyExpression classExpression concept
             | ObjectMinQualifiedCardinality(1, objectPropertyExpression, classExpression) ->
-                ([], [classExpression],
-                 [NormalizedConceptInclusion ([classExpression |> conceptRepresentative],
-                                              AllValuesFrom (InverseObjectProperty objectPropertyExpression, concept |> conceptRepresentative))])
+                subConceptSomeValuesFrom objectPropertyExpression classExpression concept
+            | ObjectMinQualifiedCardinality(_card, _objProp, _clExpr) ->
+                logger.Warning "Invalid OWL 2 RL: ObjectMinQualifiedCardinality only allowed with cardinality 1"
+                ([], [], [])
+            | ObjectExactQualifiedCardinality(1, objectPropertyExpression, classExpression) ->
+                logger.Warning "Invalid OWL 2 RL: ObjectExactQualifiedCardinality not allowed. Only treating as ObjectMinQualifiedCardinality"
+                subConceptSomeValuesFrom objectPropertyExpression classExpression concept
+            | ObjectExactQualifiedCardinality(_card, _objProp, _clExpr) ->
+                logger.Warning "Invalid OWL 2 RL: ObjectExactQualifiedCardinality not allowed in OWL 2 RL"
+                ([], [], [])
             | ObjectComplementOf classExpression ->
                 ([classExpression], [], [Formula.NormalizedConceptInclusion
                                              ([(conceptRepresentative concept)
@@ -180,12 +195,12 @@ module ELIExtractor =
                                         ([], classExpressions, [classExpressions |> List.map conceptRepresentative])
                                     | ObjectOneOf individuals -> failwith "TODO"
                                     | ObjectAllValuesFrom(objectPropertyExpression, classExpression) ->
-                                        failwith "ObjectAllValuesFrom is not allowed on the subconcept part of an inclusion in OWL 2 RL"
+                                        logger.Warning "ObjectAllValuesFrom is not allowed on the subconcept part of an inclusion in OWL 2 RL"
+                                        ([],[],[])
                                     | ObjectHasSelf objectPropertyExpression -> failwith "todo"
-                                    | ObjectMinQualifiedCardinality(i, objectPropertyExpression, classExpression) ->
-                                        failwith "todo"
-                                    | ObjectMaxQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
-                                    | ObjectExactQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
+                                    | ObjectMaxQualifiedCardinality(i, objectPropertyExpression, classExpression) ->
+                                        logger.Warning "ObjectMaxQualifiedCardinality is not allowed on the subconcept part of an inclusion in OWL 2 RL"
+                                        ([],[],[])
                                     | ObjectExactCardinality(i, objectPropertyExpression) -> failwith "todo"
                                     | ObjectMinCardinality(i, objectPropertyExpression) -> failwith "todo"
                                     | ObjectMaxCardinality(i, objectPropertyExpression) -> failwith "todo"
@@ -202,6 +217,8 @@ module ELIExtractor =
                                     | ObjectSomeValuesFrom _ -> failwith "this is a bug, shold have been matched above"
                                     | ObjectComplementOf _ -> failwith "this is a bug, shold have been matched above"
                                     | ObjectHasValue _ -> failwith "this is a bug, shold have been matched above"
+                                    | ObjectExactQualifiedCardinality _ -> failwith "this is a bug, shold have been matched above"
+                                    | ObjectMinQualifiedCardinality _ -> failwith "this is a bug, shold have been matched above"
                          (positiveOccurrences, negativeOccurrences,  (subConcepts |> List.map (fun subConcept ->
                             Formula.NormalizedConceptInclusion (subConcept, NormalizedConcept.AtomicNamedConcept (conceptRepresentative concept)))))
         (positiveOccurrences |> Seq.map (conceptPositiveOccurenceNormalization logger) |> List.concat) @

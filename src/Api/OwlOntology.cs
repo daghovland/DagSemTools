@@ -30,7 +30,7 @@ public class OwlOntology
             .WriteTo.Console()
             .CreateLogger();
         _datastore = graph.Datastore;
-        var translator = new Rdf2Owl(_datastore.Triples, _datastore.Resources);
+        var translator = new Rdf2Owl(_datastore.Triples, _datastore.Resources, _logger);
         _owlOntology = translator.extractOntology;
     }
 

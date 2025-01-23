@@ -25,7 +25,8 @@ type AxiomParser (triples : TripleTable,
               anns : GraphElementId -> Annotation list,
               TryGetAnyPropertyAxiom: Annotation list -> GraphElementId -> GraphElementId -> (Annotation list -> GraphElementId -> ObjectPropertyExpression -> Axiom) -> (Annotation list -> GraphElementId -> DataProperty -> Axiom) ->(Annotation list -> GraphElementId -> AnnotationProperty -> Axiom) -> Axiom,
               TryGetDataOrObjectPropertyAxiom: GraphElementId -> (ObjectPropertyExpression -> Axiom) -> (DataProperty -> Axiom) -> Axiom option,
-              TryGetClassOrDataRangeAxiom: GraphElementId -> (ClassExpression -> Axiom) -> (Datatype -> Axiom) -> Axiom
+              TryGetClassAxiom: GraphElementId -> (ClassExpression -> Axiom) -> (Datatype -> Axiom) -> Axiom option,
+              TryGetDataRangeAxiom: GraphElementId -> (ClassExpression -> Axiom) -> (Datatype -> Axiom) -> Axiom option
               ) =
     
     let tripleTable = triples
@@ -38,29 +39,29 @@ type AxiomParser (triples : TripleTable,
     let Annotations = anns
     
     
-    let rdfTypeId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfType)))
-    let owlOntologyId = resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.OwlOntology)))
-    let versionPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlVersionIri)))
-    let importsPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlImport)))
-    let owlClassId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlClass)))
-    let owlRestrictionId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlRestriction)))
-    let owlOnPropertyId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlOnProperty)))
-    let owlOnClassId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlOnClass)))
-    let owlQualifiedCardinalityId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlQualifiedCardinality)))
-    let owlAxiomId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlAxiom)))
-    let owlMembersId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlMembers)))
-    let owlAnnPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
-    let owlAnnSourceId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
-    let owlAnnTargetId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
-    let owlInvObjPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
-    let subClassPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
+    let rdfTypeId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfType)))
+    let owlOntologyId = resources.AddNodeResource(RdfResource.Iri(new IriReference(OwlOntology)))
+    let versionPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlVersionIri)))
+    let importsPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlImport)))
+    let owlClassId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlClass)))
+    let owlRestrictionId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlRestriction)))
+    let owlOnPropertyId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlOnProperty)))
+    let owlOnClassId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlOnClass)))
+    let owlQualifiedCardinalityId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlQualifiedCardinality)))
+    let owlAxiomId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlAxiom)))
+    let owlMembersId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlMembers)))
+    let owlAnnPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlAnnotatedProperty)))
+    let owlAnnSourceId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlAnnotatedSource)))
+    let owlAnnTargetId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlAnnotatedTarget)))
+    let owlInvObjPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlObjectInverseOf)))
+    let subClassPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfsSubClassOf)))
         
     let RequireDataOrObjectProperty resourceId objectPropDecl dataPropDecl =
         match TryGetDataOrObjectPropertyAxiom resourceId objectPropDecl dataPropDecl with
         | Some ax -> ax
         | None -> failwith $"Invalid Owl Ontology {resources.GetGraphElement resourceId} not correctly declared as exactly one data or object property: {GetResourceInfoForErrorMessage tripleTable resources resourceId}"
     
-    let getResourceClass (resourceId : Ingress.GraphElementId) : Class option =
+    let getResourceClass (resourceId : GraphElementId) : Class option =
         resources.GetNamedResource resourceId |> Option.map Class.FullIri
 
     let RequireResourceIri resourceId =
@@ -139,7 +140,7 @@ type AxiomParser (triples : TripleTable,
         |> AxiomAnnotationAxiom
     
     let ObjectPropertyAssertionAxiom  subjectId objId predicate =
-         ObjectPropertyAssertion ([], predicate, Ingress.tryGetIndividual (resources.GetGraphElement subjectId), Ingress.tryGetIndividual (resources.GetGraphElement objId) )
+         ObjectPropertyAssertion ([], predicate, tryGetIndividual (resources.GetGraphElement subjectId), tryGetIndividual (resources.GetGraphElement objId) )
         |> AxiomAssertion
     let DataPropertyAssertionAxiom   subjectId objId predicate =
          DataPropertyAssertion ([], predicate,
@@ -172,81 +173,81 @@ type AxiomParser (triples : TripleTable,
                     
         
     (* This is an implementation of section 3.2.5 in https://www.w3.org/TR/owl2-mapping-to-rdf/#Analyzing_Declarations *)
-    member internal this.extractAxiom   (triple : Ingress.Triple) : Axiom option =
+    member internal this.extractAxiom   (triple : Triple) : Axiom option =
         let axiomAnns = GetAxiomAnnotations triple
         resources.GetNamedResource triple.predicate
         |> Option.map (_.ToString())
         |> Option.bind (fun (predicateIri) -> 
                         match predicateIri with
-                            | Namespaces.RdfType -> resources.GetNamedResource(triple.obj)
+                            | RdfType -> resources.GetNamedResource(triple.obj)
                                                     |> Option.map (_.ToString())
                                                     |> Option.bind (fun classIri -> match classIri with
-                                                                                    | Namespaces.OwlClass -> resources.GetNamedResource (triple.subject)
+                                                                                    | OwlClass -> resources.GetNamedResource (triple.subject)
                                                                                                                 |> Option.map FullIri
                                                                                                                 |> Option.map ClassDeclaration
                                                                                                                 |> Option.map (fun e -> Declaration ([],e))
                                                                                                                 |> Option.map AxiomDeclaration
-                                                                                    | Namespaces.RdfsDatatype -> resources.GetNamedResource (triple.subject)
+                                                                                    | RdfsDatatype -> resources.GetNamedResource (triple.subject)
                                                                                                                     |> Option.map FullIri
                                                                                                                     |> Option.map DatatypeDeclaration
                                                                                                                     |> Option.map (fun e -> Declaration ([],e))
                                                                                                                     |> Option.map AxiomDeclaration
-                                                                                    | Namespaces.OwlObjectProperty -> resources.GetNamedResource (triple.subject)
+                                                                                    | OwlObjectProperty -> resources.GetNamedResource (triple.subject)
                                                                                                                     |> Option.map FullIri
                                                                                                                     |> Option.map ObjectPropertyDeclaration
                                                                                                                     |> Option.map (fun e -> Declaration ([],e))
                                                                                                                     |> Option.map AxiomDeclaration
-                                                                                    | Namespaces.OwlDatatypeProperty -> resources.GetNamedResource (triple.subject)
+                                                                                    | OwlDatatypeProperty -> resources.GetNamedResource (triple.subject)
                                                                                                                         |> Option.map FullIri
                                                                                                                         |> Option.map DataPropertyDeclaration
                                                                                                                         |> Option.map (fun e -> Declaration ([],e))
                                                                                                                         |> Option.map AxiomDeclaration
-                                                                                    | Namespaces.OwlAnnotationProperty -> resources.GetNamedResource (triple.subject)
+                                                                                    | OwlAnnotationProperty -> resources.GetNamedResource (triple.subject)
                                                                                                                         |> Option.map FullIri
                                                                                                                         |> Option.map AnnotationPropertyDeclaration
                                                                                                                         |> Option.map (fun e -> Declaration ([],e))
                                                                                                                         |> Option.map AxiomDeclaration
-                                                                                    | Namespaces.OwlNamedIndividual -> (match resources.GetResource(triple.subject) with
+                                                                                    | OwlNamedIndividual -> (match resources.GetResource(triple.subject) with
                                                                                                                                 | Some (Iri i) -> NamedIndividual (FullIri i)
                                                                                                                                 | Some (AnonymousBlankNode bn) -> AnonymousIndividual bn
                                                                                                                                 | None -> failwith "Invalid individual ")
                                                                                                                         |> NamedIndividualDeclaration |> (fun e -> Declaration ([],e)) |> AxiomDeclaration |> Some
-                                                                                    | Namespaces.OwlAllDisjointClasses -> (match tripleTable.GetTriplesWithSubjectPredicate(triple.subject, owlMembersId) |> Seq.toList with
+                                                                                    | OwlAllDisjointClasses -> (match tripleTable.GetTriplesWithSubjectPredicate(triple.subject, owlMembersId) |> Seq.toList with
                                                                                                                            | [] -> None
                                                                                                                            | [disjointList] ->  ClassAxiom.DisjointClasses (axiomAnns,
                                                                                                                                                                             disjointList.obj
-                                                                                                                                                                                |> Ingress.GetRdfListElements tripleTable resources
+                                                                                                                                                                                |> GetRdfListElements tripleTable resources
                                                                                                                                                                                 |> List.map (ClassExpressions)
                                                                                                                                                                             )
                                                                                                                                                     |> AxiomClassAxiom
                                                                                                                                                     |> Some
                                                                                                                            | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
-                                                                                    | Namespaces.OwlAllDisjointProperties -> (match tripleTable.GetTriplesWithSubjectPredicate(triple.subject, owlMembersId) |> Seq.toList with
+                                                                                    | OwlAllDisjointProperties -> (match tripleTable.GetTriplesWithSubjectPredicate(triple.subject, owlMembersId) |> Seq.toList with
                                                                                                                                | [] -> None
                                                                                                                                | [disjointList] ->  DisjointObjectProperties (axiomAnns, disjointList.obj
-                                                                                                                                                                              |> Ingress.GetRdfListElements tripleTable resources
+                                                                                                                                                                              |> GetRdfListElements tripleTable resources
                                                                                                                                                                               |> List.map (ObjectPropertyExpressions))
                                                                                                                                                         |> AxiomObjectPropertyAxiom
                                                                                                                                                         |> Some
                                                                                                                                | _ -> failwith "Several owl:members triples detected on a owl:AllDisjointClasses axiom. This is not valid int owl")
-                                                                                    | Namespaces.OwlFunctionalProperty -> RequireDataOrObjectProperty triple.subject (FunctionalObjectPropertyAxiom (Annotations triple.subject))  (FunctionalDataPropertyAxiom (Annotations triple.subject) )
+                                                                                    | OwlFunctionalProperty -> RequireDataOrObjectProperty triple.subject (FunctionalObjectPropertyAxiom (Annotations triple.subject))  (FunctionalDataPropertyAxiom (Annotations triple.subject) )
                                                                                                                                                 |> Some
-                                                                                    | Namespaces.OwlInverseFunctionalProperty -> InverseFunctionalObjectProperty ([], ObjectPropertyExpressions triple.subject)
+                                                                                    | OwlInverseFunctionalProperty -> InverseFunctionalObjectProperty ([], ObjectPropertyExpressions triple.subject)
                                                                                                                                 |> AxiomObjectPropertyAxiom
                                                                                                                                 |> Some
-                                                                                    | Namespaces.OwlReflexiveProperty -> ReflexiveObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
+                                                                                    | OwlReflexiveProperty -> ReflexiveObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
                                                                                                                                 |> AxiomObjectPropertyAxiom
                                                                                                                                 |> Some
-                                                                                    | Namespaces.OwlIrreflexiveProperty -> IrreflexiveObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
+                                                                                    | OwlIrreflexiveProperty -> IrreflexiveObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
                                                                                                                                 |> AxiomObjectPropertyAxiom
                                                                                                                                 |> Some
-                                                                                    | Namespaces.OwlSymmetricProperty -> SymmetricObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
+                                                                                    | OwlSymmetricProperty -> SymmetricObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
                                                                                                                                 |> AxiomObjectPropertyAxiom
                                                                                                                                 |> Some
-                                                                                    | Namespaces.OwlAsymmetricProperty -> AsymmetricObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
+                                                                                    | OwlAsymmetricProperty -> AsymmetricObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
                                                                                                                                 |> AxiomObjectPropertyAxiom
                                                                                                                                 |> Some
-                                                                                    | Namespaces.OwlTransitiveProperty -> TransitiveObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
+                                                                                    | OwlTransitiveProperty -> TransitiveObjectProperty (axiomAnns, ObjectPropertyExpressions triple.subject)
                                                                                                                                 |> AxiomObjectPropertyAxiom
                                                                                                                                 |> Some
                                                                                     | _ -> ClassAssertion (axiomAnns,
@@ -254,37 +255,39 @@ type AxiomParser (triples : TripleTable,
                                                                                                            (triple.subject |> resources.GetGraphElement |> tryGetIndividual))
                                                                                                 |> AxiomAssertion |> Some
                                                                                 )
-                            | Namespaces.RdfsSubClassOf -> ClassAxiom.SubClassOf (axiomAnns,
+                            | RdfsSubClassOf -> ClassAxiom.SubClassOf (axiomAnns,
                                                                                   ClassExpressions triple.subject,
                                                                                   ClassExpressions triple.obj)
                                                            |> AxiomClassAxiom |> Some
-                            | Namespaces.OwlEquivalentClass -> TryGetClassOrDataRangeAxiom triple.obj (EquivalentClassAxiom triple.subject) (EquivalentDataRangeAxiom triple.subject)
-                                                                |> Some
-                            | Namespaces.OwlDisjointWith -> ClassAxiom.DisjointClasses (axiomAnns, [ClassExpressions triple.subject; ClassExpressions triple.obj])
+                            | OwlEquivalentClass -> match (TryGetDataRangeAxiom triple.obj (EquivalentClassAxiom triple.subject) (EquivalentDataRangeAxiom triple.subject)) with
+                                                                | Some cl -> Some cl
+                                                                | None -> TryGetClassAxiom triple.obj (EquivalentClassAxiom triple.subject) (EquivalentDataRangeAxiom triple.subject)
+                                                               
+                            | OwlDisjointWith -> ClassAxiom.DisjointClasses (axiomAnns, [ClassExpressions triple.subject; ClassExpressions triple.obj])
                                                                 |> AxiomClassAxiom |> Some
-                            | Namespaces.OwlDisjointUnionOf -> ClassAxiom.DisjointUnion (axiomAnns, RequireResourceClass triple.subject, triple.obj
-                                                                                                                                 |> Ingress.GetRdfListElements tripleTable resources
+                            | OwlDisjointUnionOf -> ClassAxiom.DisjointUnion (axiomAnns, RequireResourceClass triple.subject, triple.obj
+                                                                                                                                 |> GetRdfListElements tripleTable resources
                                                                                                                                  |> List.map (ClassExpressions))
                                                                |> AxiomClassAxiom |> Some
-                            | Namespaces.RdfsSubPropertyOf -> TryGetAnyPropertyAxiom axiomAnns triple.subject triple.obj SubObjectPropertyAxiom SubDataPropertyAxiom SubAnnotationPropertyAxiom
+                            | RdfsSubPropertyOf -> TryGetAnyPropertyAxiom axiomAnns triple.subject triple.obj SubObjectPropertyAxiom SubDataPropertyAxiom SubAnnotationPropertyAxiom
                                                                  |> Some
-                            | Namespaces.OwlPropertyChainAxiom -> SubObjectPropertyOf(axiomAnns,
+                            | OwlPropertyChainAxiom -> SubObjectPropertyOf(axiomAnns,
                                                                                       triple.obj
-                                                                                          |> Ingress.GetRdfListElements tripleTable resources
+                                                                                          |> GetRdfListElements tripleTable resources
                                                                                           |> List.map (ObjectPropertyExpressions)
                                                                                           |> subPropertyExpression.PropertyExpressionChain,
                                                                                       ObjectPropertyExpressions triple.subject)
                                                                 |> AxiomObjectPropertyAxiom |> Some
-                            | Namespaces.OwlEquivalentProperty -> TryGetAnyPropertyAxiom axiomAnns triple.subject triple.obj EquivalentObjectPropertyAxiom EquivalentDataPropertyAxiom EquivalentAnnotationPropertyAxiom
+                            | OwlEquivalentProperty -> TryGetAnyPropertyAxiom axiomAnns triple.subject triple.obj EquivalentObjectPropertyAxiom EquivalentDataPropertyAxiom EquivalentAnnotationPropertyAxiom
                                                                   |> Some
-                            | Namespaces.OwlPropertyDisjointWith -> DisjointObjectProperties(axiomAnns, [ObjectPropertyExpressions triple.subject
-                                                                                                         ObjectPropertyExpressions triple.obj])
+                            | OwlPropertyDisjointWith -> DisjointObjectProperties(axiomAnns, [ObjectPropertyExpressions triple.subject
+                                                                                              ObjectPropertyExpressions triple.obj])
                                                                     |> AxiomObjectPropertyAxiom |> Some
-                            | Namespaces.RdfsDomain -> TryGetAnyPropertyAxiom axiomAnns triple.subject triple.obj ObjectPropertyDomainAxiom DataPropertyDomainAxiom AnnotationPropertyDomainAxiom
+                            | RdfsDomain -> TryGetAnyPropertyAxiom axiomAnns triple.subject triple.obj ObjectPropertyDomainAxiom DataPropertyDomainAxiom AnnotationPropertyDomainAxiom
                                                        |> Some
-                            | Namespaces.RdfsRange -> TryGetAnyPropertyAxiom axiomAnns triple.subject triple.obj ObjectPropertyRangeAxiom DataPropertyRangeAxiom AnnotationPropertyRangeAxiom
+                            | RdfsRange -> TryGetAnyPropertyAxiom axiomAnns triple.subject triple.obj ObjectPropertyRangeAxiom DataPropertyRangeAxiom AnnotationPropertyRangeAxiom
                                                        |> Some
-                            | Namespaces.OwlObjectInverseOf -> InverseObjectProperties (axiomAnns,
+                            | OwlObjectInverseOf -> InverseObjectProperties (axiomAnns,
                                                                                         ObjectPropertyExpressions triple.subject,
                                                                                         ObjectPropertyExpressions triple.obj)
                                                                 |> AxiomObjectPropertyAxiom |> Some
