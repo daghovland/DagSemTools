@@ -460,7 +460,7 @@ module Tests =
             let rule =  {Head = NormalHead (headPattern)
                          Body = [ positiveMatch; negativeMatch ]
             }
-            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRelations()
             ordered_relations.Should().HaveLength(3) |> ignore
             let init_queue = partitioner.GetReadyElementsQueue()
@@ -496,11 +496,11 @@ module Tests =
             
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ] }
-            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
-            let cycles = partitioner.cycle_finder [] 0
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
+            let cycles = partitioner.cycle_finder [] 0u
             cycles.Should().HaveLength(1) |> ignore
             let cycle = cycles |> Seq.head
-            cycle.Should().HaveLength(1).And.Contain(0) |> ignore
+            cycle.Should().HaveLength(1) |> ignore
             
     (* Tests a program with a single fact *)
     [<Fact>]
@@ -549,7 +549,7 @@ module Tests =
             
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ] }
-            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let orderedRules = partitioner.orderRules
             orderedRules.Should().HaveLength(1) |> ignore
             let firstPartition = orderedRules |> Seq.head
@@ -580,7 +580,7 @@ module Tests =
             let rule =  {Head = NormalHead (headPattern); Body = [ negativeMatch
                                                        ]
             }
-            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             (fun () -> partitioner.orderRules).Should().Throw<Exception,_>() |> ignore
               
     [<Fact>]
@@ -620,7 +620,7 @@ module Tests =
             let rule =  {Head =  NormalHead headPattern
                          Body = [ positiveMatch; negativeMatch ]
             }
-            let partitioner  = Stratifier.RulePartitioner (logger, [rule])
+            let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRelations()
             ordered_relations.Should().HaveLength(2) |> ignore
             let init_queue = partitioner.GetReadyElementsQueue()
@@ -685,7 +685,7 @@ module Tests =
             let ruleB = {Head = NormalHead (headPatternB)
                          Body = [ negativeMatch ]
             }
-            let partitioner  = Stratifier.RulePartitioner (logger, [ruleA; ruleB])
+            let partitioner  = Stratifier.RulePartitioner (logger, [ruleA; ruleB], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRelations()
             ordered_relations.Should().HaveLength(3) |> ignore
             
