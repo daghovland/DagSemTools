@@ -79,7 +79,7 @@ module Reasoner =
 
     let evaluate (logger: ILogger, rules: Rule list, triplestore: Datastore) =
             // let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates(rules, triplestore) |> Seq.toList
-            let stratifier = RulePartitioner (logger, rules)
+            let stratifier = RulePartitioner (logger, rules, triplestore.Resources)
             let stratification = stratifier.orderRules
             for partition in stratification do
                 let program = DatalogProgram(Rules = Seq.toList partition, tripleStore = triplestore)
