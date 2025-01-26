@@ -169,7 +169,7 @@ public class TestApiOntology(ITestOutputHelper output)
         // Arrange
         var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
         var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
-        
+
         // Act
         var ont = OwlOntology.Create(rdfImf);
         ont.GetAxioms().Should().NotBeEmpty();
@@ -183,7 +183,7 @@ public class TestApiOntology(ITestOutputHelper output)
 
 
 
-    [Fact(Skip="See https://github.com/daghovland/DagSemTools/issues/60")]
+    [Fact(Skip = "See https://github.com/daghovland/DagSemTools/issues/60")]
     public void LoadIDOOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");
@@ -194,8 +194,8 @@ public class TestApiOntology(ITestOutputHelper output)
         datalogProgram.Should().NotBeEmpty();
         rdf.LoadDatalog(datalogProgram);
     }
-    
-    
+
+
     [Fact(Skip = "Takes too long for normal testing. https://github.com/daghovland/DagSemTools/issues/58"), Category("LongRunning")]
     public void ParseGeneOntologyWorks()
     {
