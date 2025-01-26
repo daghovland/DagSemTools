@@ -36,10 +36,10 @@ jobs:
 
       - name: Download external test files
         run: |
-          parallel ::: \
-            'curl -o test/Api.Tests/TestData/imf.ttl http://ns.imfid.org/20240531/imf-ontology.owl.ttl' \
-            'curl -o test/Api.Tests/TestData/go.owl.xml http://current.geneontology.org/ontology/go.owl' \ 
-            'curl -o "test/Api.Tests/TestData/LIS-14.ttl" "https://rds.posccaesar.org/ontology/lis14/ont/core/4.0/LIS-14.ttl"'
+          curl -o test/Api.Tests/TestData/imf.ttl http://ns.imfid.org/20240531/imf-ontology.owl.ttl &
+          curl -o test/Api.Tests/TestData/go.owl.xml http://current.geneontology.org/ontology/go.owl &
+          curl -o "test/Api.Tests/TestData/LIS-14.ttl" https://rds.posccaesar.org/ontology/lis14/ont/core/4.0/LIS-14.ttl &
+          wait
           ./apache-jena-5.3.0/bin/riot --output=TURTLE test/Api.Tests/TestData/go.owl.xml > test/Api.Tests/TestData/go.ttl
 
       - name: Format code
