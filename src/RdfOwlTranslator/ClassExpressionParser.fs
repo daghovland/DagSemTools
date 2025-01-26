@@ -29,7 +29,7 @@ type ClassExpressionParser (triples : TripleTable,
     let resources = resourceManager
 
     let rdfTypeId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfType)))
-    let rdfLiteralId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfLiteral)))
+    let rdfsLiteralId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfsLiteral)))
     let owlOntologyId = resources.AddNodeResource(RdfResource.Iri(new IriReference(OwlOntology)))
     let versionPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlVersionIri)))
     let importsPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlImport)))
@@ -116,7 +116,7 @@ type ClassExpressionParser (triples : TripleTable,
                                                 |> Option.map (fun iri -> (id, iri)))
     
     let getHardcodedDatarangeDeclarations   =
-        [rdfLiteralId]
+        [rdfsLiteralId]
         |> Seq.choose (fun id -> resources.GetNamedResource id |> Option.map Iri.FullIri 
                                                 |> Option.map (fun iri -> (id, iri)))
     
