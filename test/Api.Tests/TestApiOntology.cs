@@ -1,4 +1,5 @@
 using System.ComponentModel;
+using DagSemTools.Datalog;
 using DagSemTools.Ingress;
 using FluentAssertions;
 using IriTools;
@@ -114,6 +115,24 @@ public class TestApiOntology(ITestOutputHelper output)
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
+
+    [Fact]
+    public void DescriptorFromImfOntologyNonCyclic()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/cycle-imf-test.ttl");
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdfImf);
+        ont.GetAxioms().Should().NotBeEmpty();
+
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        axiomRules.Should().NotBeEmpty();
+        rdfImf.LoadDatalog(axiomRules);
+
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
     [Fact]
     public void LoadImfOntologyWorks()
     {
@@ -127,6 +146,17 @@ public class TestApiOntology(ITestOutputHelper output)
 
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
+
+        var descriptorIri = RdfResource.NewIri(new IriReference("http://ns.imfid.org/imf#Descriptor"));
+        var descriptorNode =
+            rdfImf.Datastore.Resources.GraphElementMap[DagSemTools.Ingress.GraphElement.NewNodeOrEdge(descriptorIri)];
+        var descriptorTerm = Term.NewResource(descriptorNode);
+        var DescriptorRules = axiomRules.Where((rule, i) =>
+                rule.Head is RuleHead.NormalHead tp
+                && tp.pattern.Predicate.Equals(descriptorTerm)
+        ).ToList();
+        DescriptorRules.Should().NotBeEmpty();
+        var descriptorRuleString = DescriptorRules.Select(rule => rule.ToString()).ToList();
         axiomRules.Should().NotBeEmpty();
         rdfImf.LoadDatalog(axiomRules);
 

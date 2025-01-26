@@ -45,7 +45,7 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<TriplePattern>
     public override TriplePattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
     {
         var subject = context.term();
-        var predicate = ResourceOrVariable
+        var predicate = Term
             .NewResource(_predicateVisitor.ResourceVisitor.Datastore
                 .AddNodeResource(RdfResource
                     .NewIri(new IriReference(Namespaces.RdfType))));

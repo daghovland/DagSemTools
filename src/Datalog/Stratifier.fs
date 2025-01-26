@@ -39,10 +39,10 @@ module Stratifier =
         match relation with
         | AllRelations -> true
         | BinaryPredicate res -> match triple.Predicate with
-                                    | ResourceOrVariable.Resource res' -> res = res'
+                                    | Term.Resource res' -> res = res'
                                     | _ -> false
         | UnaryPredicate (res, obj) -> match triple.Predicate, triple.Object with
-                                        | ResourceOrVariable.Resource res', ResourceOrVariable.Resource obj' -> res = res' && obj = obj'
+                                        | Term.Resource res', Term.Resource obj' -> res = res' && obj = obj'
                                         | _ -> false
         
     let MatchRelations (rel1) (rel2) : bool =
@@ -75,10 +75,10 @@ module Stratifier =
     }
     let GetTriplePatternRelation (triple : TriplePattern) : Relation =
             match triple.Predicate with
-                                        | ResourceOrVariable.Variable _ -> AllRelations
-                                        | ResourceOrVariable.Resource res -> match triple.Object with
-                                                                                    | ResourceOrVariable.Variable _ -> (BinaryPredicate res)
-                                                                                    | ResourceOrVariable.Resource obj -> (UnaryPredicate (res, obj))
+                                        | Term.Variable _ -> AllRelations
+                                        | Term.Resource res -> match triple.Object with
+                                                                                    | Term.Variable _ -> (BinaryPredicate res)
+                                                                                    | Term.Resource obj -> (UnaryPredicate (res, obj))
     let GetRuleHeadRelation (triple : RuleHead) : Relation option =
             match triple with
             | Contradiction  -> None
@@ -340,7 +340,7 @@ module Stratifier =
         member this.is_stratified (stratification: Rule seq seq) =
             ready_elements_queue.Count = 0
             && next_elements_queue.Count = 0
-            && (stratification |> Seq.sumBy Seq.length) >= rules.Length
+            // && (stratification |> Seq.sumBy Seq.length) >= rules.Length
             // && ordered_relations |> Array.forall (fun relation -> relation.intensional = false)
 
         (* Used in the while loop in orderRules to test whether stratification is finished *)

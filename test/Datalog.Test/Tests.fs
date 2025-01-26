@@ -42,13 +42,13 @@ module Tests =
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
         let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
         let triplepattern =  {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                             TriplePattern.Object = Term.Resource objdIndex}
         let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
         let tripleFact : Triple = {
                              subject = subjectIndex
@@ -70,13 +70,13 @@ module Tests =
         let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
         let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
         let triplepattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                             TriplePattern.Object = Term.Resource objdIndex}
         let triplepattern2 = PositiveTriple{
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
         let tripleFact : Triple = {
                              subject = subjectIndex
@@ -105,9 +105,9 @@ module Tests =
         let subjectIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/subject"))
         let predIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicate"))
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
-        let triplepattern = {TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+        let triplepattern = {TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                             TriplePattern.Object = Term.Resource objdIndex}
         let wildcards = WildcardTriplePattern triplepattern
         Assert.Equal(4, wildcards.Length)
         
@@ -129,9 +129,9 @@ module Tests =
         let subjectIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/subject"))
         let predIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicate"))
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
-        let triplepattern = {TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+        let triplepattern = {TriplePattern.Subject = Term.Resource subjectIndex
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex}
         let wildcards = WildcardTriplePattern triplepattern
         Assert.Equal(8, wildcards.Length)
         
@@ -157,9 +157,9 @@ module Tests =
         let rule =  {Head =  NormalHead ( ConstantTriplePattern Triple2 )
                      Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple)]}
         let TriplePatter = {
-                            TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
-                            TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                            TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                            TriplePattern.Subject = Term.Resource subjectIndex
+                            TriplePattern.Predicate = Term.Resource predIndex
+                            TriplePattern.Object = Term.Resource objdIndex
                             }
         let partialRule = {Rule = rule; Match =  TriplePatter}
         let matches = GetMatchesForRule Triple partialRule
@@ -190,9 +190,9 @@ module Tests =
             let rule =  {Head =  NormalHead( ConstantTriplePattern Triple2 )
                          Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple) ; RuleAtom.NotTriple (ConstantTriplePattern Triple3)]}
             let TriplePatter = {
-                                TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
-                                TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                                TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                                TriplePattern.Subject = Term.Resource subjectIndex
+                                TriplePattern.Predicate = Term.Resource predIndex
+                                TriplePattern.Object = Term.Resource objdIndex
                                 }
             let partialRule = {Rule = rule; Match =  TriplePatter}
             let matches = GetMatchesForRule Triple partialRule
@@ -217,14 +217,14 @@ module Tests =
             tripleTable.AddTriple(Subject2Obj2)
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex3
                              }
             let positiveMatch = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             let rule =  {Head = headPattern |> NormalHead
                          Body = [ positiveMatch //; negativeMatch
@@ -255,14 +255,14 @@ module Tests =
             tripleTable.AddTriple(Subject2Obj2)
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex3
                              }
             let positiveMatch = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch //; negativeMatch
                                                                      ]}
@@ -290,14 +290,14 @@ module Tests =
             tripleTable.AddTriple(Subject2Obj2)
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex3
                              }
             let positiveMatch = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch //; negativeMatch
@@ -327,19 +327,19 @@ module Tests =
             Assert.Equal(0, matchesBefore.Length)
           
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "?x"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource rdfTypeIndex
-                             TriplePattern.Object = ResourceOrVariable.Variable "?super"
+                             TriplePattern.Subject = Term.Variable "?x"
+                             TriplePattern.Predicate = Term.Resource rdfTypeIndex
+                             TriplePattern.Object = Term.Variable "?super"
                              }
             let subClassTypeAtom = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "?x"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource rdfTypeIndex
-                             TriplePattern.Object = ResourceOrVariable.Variable "?sub"
+                             TriplePattern.Subject = Term.Variable "?x"
+                             TriplePattern.Predicate = Term.Resource rdfTypeIndex
+                             TriplePattern.Object = Term.Variable "?sub"
                              }
             let isSubClassOfAtom = RuleAtom.PositiveTriple {
-                                    TriplePattern.Subject = ResourceOrVariable.Variable "?sub"
-                                    TriplePattern.Predicate = ResourceOrVariable.Resource subClassOfIndex
-                                    TriplePattern.Object = ResourceOrVariable.Variable "?super" 
+                                    TriplePattern.Subject = Term.Variable "?sub"
+                                    TriplePattern.Predicate = Term.Resource subClassOfIndex
+                                    TriplePattern.Object = Term.Variable "?super" 
                                     }
             let rule =  {Head = NormalHead (headPattern); Body = [ subClassTypeAtom; isSubClassOfAtom ]}
             
@@ -370,9 +370,9 @@ module Tests =
             
             
             let triplePattern2 = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s2"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex2
-                             TriplePattern.Object = ResourceOrVariable.Variable "s"
+                             TriplePattern.Subject = Term.Variable "s2"
+                             TriplePattern.Predicate = Term.Resource predIndex2
+                             TriplePattern.Object = Term.Variable "s"
                              }
            
             let typedTriples = tripleTable.GetTriplesWithObject(objdIndex)
@@ -400,20 +400,20 @@ module Tests =
             tripleTable.AddTriple(Subject1Subj2)
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             let positiveMatch1 = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s2"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s2"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let positiveMatch2 = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s2"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex2
-                             TriplePattern.Object = ResourceOrVariable.Variable "s"
+                             TriplePattern.Subject = Term.Variable "s2"
+                             TriplePattern.Predicate = Term.Resource predIndex2
+                             TriplePattern.Object = Term.Variable "s"
                              }
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2
@@ -441,20 +441,20 @@ module Tests =
             tripleTable.AddTriple(Subject2Obj2)
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex3
                              }
             let positiveMatch = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let negativeMatch = RuleAtom.NotTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
             
             let rule =  {Head = NormalHead (headPattern)
@@ -484,14 +484,14 @@ module Tests =
             let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             let positiveMatch = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             
@@ -514,9 +514,9 @@ module Tests =
             query1.Should().HaveLength(0) |> ignore
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjIndex
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Resource subjIndex
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             
@@ -537,14 +537,14 @@ module Tests =
             
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             let positiveMatch = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             
@@ -566,15 +566,15 @@ module Tests =
             let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let negativeMatch = RuleAtom.NotTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let rule =  {Head = NormalHead (headPattern); Body = [ negativeMatch
@@ -601,20 +601,20 @@ module Tests =
             tripleTable.AddTriple(Subject2Obj2)
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex3
                              }
             let positiveMatch = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let negativeMatch = RuleAtom.NotTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex3
                              }
             
             let rule =  {Head =  NormalHead headPattern
@@ -652,31 +652,31 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             
             let headPatternA = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexA
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndexA
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             let headPatternB = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexB
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndexB
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             let positiveMatchA = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexA
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndexA
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let positiveMatchB = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexB
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndexB
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let negativeMatch = RuleAtom.NotTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndexC
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndexC
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
             
             let ruleA =  {Head = NormalHead (headPatternA)
@@ -714,20 +714,20 @@ module Tests =
             tripleTable.AddTriple(Subject2Obj2)
             
             let headPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex3
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex3
                              }
             let positiveMatch = RuleAtom.PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex
+                             TriplePattern.Object = Term.Resource objdIndex
                              }
             
             let negativeMatch = RuleAtom.NotTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource predIndex2
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource predIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
             
             let rule =  {Head = NormalHead (headPattern)
@@ -740,14 +740,14 @@ module Tests =
     [<Fact>]
     let ``Can get substitution``() =
         let resource = 1u
-        let variable = ResourceOrVariable.Variable "s"
+        let variable = Term.Variable "s"
         let subbed = GetSubstitution (resource, variable) (Map.empty)
         Assert.Equal(1u, subbed.Value.["s"])
     
     [<Fact>]
     let ``Can get substitution option``() =
         let resource = 1u
-        let variable = ResourceOrVariable.Variable "s"
+        let variable = Term.Variable "s"
         let subbed = GetSubstitutionOption (Some Map.empty) (resource, variable) 
         Assert.Equal(1u, subbed.Value.["s"])
         
@@ -755,9 +755,9 @@ module Tests =
     let ``Can get substitutions option``() =
         let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u}
         let factPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Variable "o"}
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Variable "p"
+                             TriplePattern.Object = Term.Variable "o"}
         
         let subbed = GetSubstitutions Map.empty fact factPattern 
         Assert.Equal(1u, subbed.Value.["s"])
@@ -769,9 +769,9 @@ module Tests =
     let ``Can get substitutions option map``() =
         let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u}
         let factPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource 2u
-                             TriplePattern.Object = ResourceOrVariable.Variable "o"}
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource 2u
+                             TriplePattern.Object = Term.Variable "o"}
         
         let subbed = GetSubstitutions Map.empty fact factPattern 
         Assert.Equal(1u, subbed.Value.["s"])
@@ -783,9 +783,9 @@ module Tests =
     let ``Can increase substitutions option map``() =
         let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u}
         let factPattern = {
-                             TriplePattern.Subject = ResourceOrVariable.Variable "s"
-                             TriplePattern.Predicate = ResourceOrVariable.Resource 2u
-                             TriplePattern.Object = ResourceOrVariable.Variable "o"}
+                             TriplePattern.Subject = Term.Variable "s"
+                             TriplePattern.Predicate = Term.Resource 2u
+                             TriplePattern.Object = Term.Variable "o"}
         
         let subbed = GetSubstitutions (Map.empty.Add ("t", 2u)) fact factPattern 
         Assert.Equal(1u, subbed.Value.["s"])
@@ -794,7 +794,7 @@ module Tests =
     [<Fact>]
     let ``No subsititution if mismatch``() =
         let resource = 1u
-        let variable = ResourceOrVariable.Variable "s"
+        let variable = Term.Variable "s"
         let subbed = GetSubstitution (resource, variable) (Map.empty.Add("s", 2u))
         Assert.Equal(None, subbed)
     

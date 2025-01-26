@@ -14,7 +14,7 @@ using DagSemTools.Datalog.Parser;
 using static DatalogParser;
 
 /// <inheritdoc />
-internal class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
+internal class PredicateVisitor : DatalogBaseVisitor<Term>
 {
     internal ResourceVisitor ResourceVisitor { get; }
 
@@ -25,10 +25,10 @@ internal class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
     }
 
     /// <inheritdoc />
-    public override ResourceOrVariable VisitPredicateVerb(DatalogParser.PredicateVerbContext context)
+    public override Term VisitPredicateVerb(DatalogParser.PredicateVerbContext context)
     {
         var resource = ResourceVisitor.Visit(context);
-        return ResourceOrVariable.NewResource(resource);
+        return Term.NewResource(resource);
     }
 
 
@@ -37,19 +37,19 @@ internal class PredicateVisitor : DatalogBaseVisitor<ResourceOrVariable>
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override ResourceOrVariable VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context) =>
-        ResourceOrVariable.NewResource(ResourceVisitor.Visit(context));
+    public override Term VisitRdfTypeAbbrVerb(RdfTypeAbbrVerbContext context) =>
+        Term.NewResource(ResourceVisitor.Visit(context));
 
 
     /// <inheritdoc />
-    public override ResourceOrVariable VisitRdfobject(DatalogParser.RdfobjectContext context)
+    public override Term VisitRdfobject(DatalogParser.RdfobjectContext context)
     {
-        return ResourceOrVariable.NewResource(ResourceVisitor.Visit(context));
+        return Term.NewResource(ResourceVisitor.Visit(context));
     }
 
     /// <inheritdoc />
-    public override ResourceOrVariable VisitVariable(DatalogParser.VariableContext context)
+    public override Term VisitVariable(DatalogParser.VariableContext context)
     {
-        return ResourceOrVariable.NewVariable(context.GetText());
+        return Term.NewVariable(context.GetText());
     }
 }

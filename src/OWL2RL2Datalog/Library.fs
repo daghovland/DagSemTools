@@ -49,14 +49,14 @@ module Library =
         let domainClassResource = getClassExpressionResource resources domExp
 
         [ { Rule.Head = NormalHead
-              { TriplePattern.Subject = ResourceOrVariable.Variable "x"
-                TriplePattern.Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
-                TriplePattern.Object = ResourceOrVariable.Resource domainClassResource }
+              { TriplePattern.Subject = Term.Variable "x"
+                TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
+                TriplePattern.Object = Term.Resource domainClassResource }
             Rule.Body =
               [ (RuleAtom.PositiveTriple
-                    { Subject = ResourceOrVariable.Variable "x"
-                      Predicate = ResourceOrVariable.Resource propertyResource
-                      Object = ResourceOrVariable.Variable "y" }) ] } ]
+                    { Subject = Term.Variable "x"
+                      Predicate = Term.Resource propertyResource
+                      Object = Term.Variable "y" }) ] } ]
 
 
 
@@ -70,14 +70,14 @@ module Library =
         let rangeClassResource = getClassExpressionResource resources rangeExp
 
         [ { Rule.Head = NormalHead
-              { TriplePattern.Subject = ResourceOrVariable.Variable "y"
-                TriplePattern.Predicate = ResourceOrVariable.Resource resourceMap.[Namespaces.RdfType]
-                TriplePattern.Object = ResourceOrVariable.Resource rangeClassResource }
+              { TriplePattern.Subject = Term.Variable "y"
+                TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
+                TriplePattern.Object = Term.Resource rangeClassResource }
             Rule.Body =
               [ (RuleAtom.PositiveTriple
-                    { Subject = ResourceOrVariable.Variable "x"
-                      Predicate = ResourceOrVariable.Resource propertyResource
-                      Object = ResourceOrVariable.Variable "y" }) ] } ]
+                    { Subject = Term.Variable "x"
+                      Predicate = Term.Resource propertyResource
+                      Object = Term.Variable "y" }) ] } ]
     (* prp-symp 	T(?p, rdf:type, owl:SymmetricProperty) T(?x, ?p, ?y) ->	T(?y, ?p, ?x)  *)
     let SymmetricObjectProperty2Datalog
         (resourceMap: Map<string, Ingress.GraphElementId>)
@@ -87,14 +87,14 @@ module Library =
         let propertyResource = getObjectPropertyExpressionResource resources objProp
 
         [ { Rule.Head = NormalHead
-              { TriplePattern.Subject = ResourceOrVariable.Variable "y"
-                TriplePattern.Predicate = ResourceOrVariable.Resource propertyResource
-                TriplePattern.Object = ResourceOrVariable.Variable "x" }
+              { TriplePattern.Subject = Term.Variable "y"
+                TriplePattern.Predicate = Term.Resource propertyResource
+                TriplePattern.Object = Term.Variable "x" }
             Rule.Body =
               [ (RuleAtom.PositiveTriple
-                    { Subject = ResourceOrVariable.Variable "x"
-                      Predicate = ResourceOrVariable.Resource propertyResource
-                      Object = ResourceOrVariable.Variable "y" }) ] } ]
+                    { Subject = Term.Variable "x"
+                      Predicate = Term.Resource propertyResource
+                      Object = Term.Variable "y" }) ] } ]
 
 
 

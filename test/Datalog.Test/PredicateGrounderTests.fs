@@ -26,11 +26,11 @@ module PredicateGrounderTests =
         let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
         let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
         let triplepattern =  {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                             TriplePattern.Object = Term.Resource objdIndex}
         let groundRule = PredicateGrounder.instantiateTripleWithVariableMapping triplepattern (Variable "p") predIndex
-        groundRule.Predicate.Should().Be(ResourceOrVariable.Resource predIndex)
+        groundRule.Predicate.Should().Be(Term.Resource predIndex)
 
     [<Fact>]
      let ``Multiplier removes variables from negative triple`` () =
@@ -41,13 +41,13 @@ module PredicateGrounderTests =
             let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
             let triplepattern =  {
-                                 TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                                 TriplePattern.Subject = Term.Resource subjectIndex
                                  TriplePattern.Predicate =  Variable "p"
-                                 TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                                 TriplePattern.Object = Term.Resource objdIndex}
             let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
             let rule = {Head =  NormalHead( triplepattern )
                         Body = [triplepattern2]}
@@ -55,7 +55,7 @@ module PredicateGrounderTests =
             let groundRule = PredicateGrounder.instantiateRuleWithVariableMapping (predIndex, rule, (Variable "p"))
             match groundRule.Head with
             | Contradiction -> failwith "bug"
-            | NormalHead headPattern ->  headPattern.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
+            | NormalHead headPattern ->  headPattern.Predicate.Should().Be(Term.Resource predIndex) |> ignore
             groundRule.Body.Should().HaveLength(1) |> ignore
             let pred = groundRule.Body.[0] |> PredicateGrounder.getAtomPredicate |> Option.get
             pred.Should().Be(predIndex)
@@ -69,20 +69,20 @@ module PredicateGrounderTests =
             let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
             let triplepattern =  {
-                                 TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                                 TriplePattern.Subject = Term.Resource subjectIndex
                                  TriplePattern.Predicate =  Variable "p"
-                                 TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                                 TriplePattern.Object = Term.Resource objdIndex}
             let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let groundRule = PredicateGrounder.instantiateRuleWithVariableMapping (predIndex, rule, (Variable "p"))
             match groundRule.Head with
             | Contradiction -> failwith "bug"
-            | NormalHead headPattern ->  headPattern.Predicate.Should().Be(ResourceOrVariable.Resource predIndex) |> ignore
+            | NormalHead headPattern ->  headPattern.Predicate.Should().Be(Term.Resource predIndex) |> ignore
             groundRule.Body.Should().HaveLength(1) |> ignore
             let pred = groundRule.Body.[0] |> PredicateGrounder.getAtomPredicate |> Option.get
             pred.Should().Be(predIndex)
@@ -104,13 +104,13 @@ module PredicateGrounderTests =
                                  }
             tripleTable.AddTriple triple
             let triplepattern =  {
-                                 TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                                 TriplePattern.Subject = Term.Resource subjectIndex
                                  TriplePattern.Predicate =  Variable "p"
-                                 TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                                 TriplePattern.Object = Term.Resource objdIndex}
             let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
@@ -120,7 +120,7 @@ module PredicateGrounderTests =
                                   |> Seq.choose (fun rule -> match rule.Head with
                                                                 | Contradiction -> None
                                                                 | NormalHead headPattern ->
-                                                                    if headPattern.Predicate = ResourceOrVariable.Resource predIndex then
+                                                                    if headPattern.Predicate = Term.Resource predIndex then
                                                                         Some rule
                                                                     else
                                                                         None)
@@ -138,13 +138,13 @@ module PredicateGrounderTests =
             let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
             let triplepattern =  {
-                                 TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                                 TriplePattern.Subject = Term.Resource subjectIndex
                                  TriplePattern.Predicate =  Variable "p"
-                                 TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                                 TriplePattern.Object = Term.Resource objdIndex}
             let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
@@ -161,13 +161,13 @@ module PredicateGrounderTests =
             let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
             let triplepattern =  {
-                                 TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
-                                 TriplePattern.Predicate =  ResourceOrVariable.Resource predIndex
-                                 TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                                 TriplePattern.Subject = Term.Resource subjectIndex
+                                 TriplePattern.Predicate =  Term.Resource predIndex
+                                 TriplePattern.Object = Term.Resource objdIndex}
             let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                              }
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
@@ -190,13 +190,13 @@ module PredicateGrounderTests =
                                  }
             tripleTable.AddTriple triple
             let triplepattern =  {
-                                 TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                                 TriplePattern.Subject = Term.Resource subjectIndex
                                  TriplePattern.Predicate =  Variable "p"
-                                 TriplePattern.Object = ResourceOrVariable.Resource objdIndex}
+                                 TriplePattern.Object = Term.Resource objdIndex}
             let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = ResourceOrVariable.Resource subjectIndex
+                             TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = ResourceOrVariable.Resource objdIndex2
+                             TriplePattern.Object = Term.Resource objdIndex2
                             }
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             

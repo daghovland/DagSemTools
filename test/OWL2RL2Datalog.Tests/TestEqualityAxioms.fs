@@ -66,9 +66,9 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         tripleTable.AddTriple(Triple)
         let triplePattern varName : TriplePattern =
             {
-                Subject = ResourceOrVariable.Resource subjectIndex
-                Predicate = ResourceOrVariable.Variable varName
-                Object = ResourceOrVariable.Resource objextIndex
+                Subject = Term.Resource subjectIndex
+                Predicate = Term.Variable varName
+                Object = Term.Resource objextIndex
             }
         let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
                            Body = [PositiveTriple (triplePattern "s2")]}
@@ -88,9 +88,9 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         tripleTable.AddTriple(Triple)
         let triplePattern varName : TriplePattern =
             {
-                Subject = ResourceOrVariable.Resource subjectIndex
-                Predicate = ResourceOrVariable.Variable varName
-                Object = ResourceOrVariable.Resource objextIndex
+                Subject = Term.Resource subjectIndex
+                Predicate = Term.Variable varName
+                Object = Term.Resource objextIndex
             }
         let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
                            Body = [PositiveTriple (triplePattern "s2")]}
@@ -111,15 +111,15 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         tripleTable.AddTriple(Triple)
         let headPattern : TriplePattern  =
             {
-                Subject = ResourceOrVariable.Resource subjectIndex
-                Predicate = ResourceOrVariable.Variable "p"
-                Object = ResourceOrVariable.Resource objextIndex2
+                Subject = Term.Resource subjectIndex
+                Predicate = Term.Variable "p"
+                Object = Term.Resource objextIndex2
             }
         let bodyPattern : TriplePattern  =
             {
-                Subject = ResourceOrVariable.Resource subjectIndex
-                Predicate = ResourceOrVariable.Variable "p"
-                Object = ResourceOrVariable.Resource objextIndex
+                Subject = Term.Resource subjectIndex
+                Predicate = Term.Variable "p"
+                Object = Term.Resource objextIndex
             }
         let rule : Rule = {Head = NormalHead headPattern; Body = [PositiveTriple (bodyPattern)]}
         
@@ -162,7 +162,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
             Body = [
                 PositiveTriple {
                     Subject = Variable "p"
-                    Predicate = ResourceOrVariable.Resource sameAsIndex
+                    Predicate = Term.Resource sameAsIndex
                     Object = Variable "p2"
                 }
                 PositiveTriple {
@@ -210,7 +210,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
             Body = [
                 PositiveTriple {
                     Subject = Variable "p"
-                    Predicate = ResourceOrVariable.Resource sameAsIndex
+                    Predicate = Term.Resource sameAsIndex
                     Object = Variable "p2"
                 }
                 PositiveTriple {
@@ -260,7 +260,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
             Body = [
                 PositiveTriple {
                     Subject = Variable "p"
-                    Predicate = ResourceOrVariable.Resource sameAsIndex
+                    Predicate = Term.Resource sameAsIndex
                     Object = Variable "p2"
                 }
                 PositiveTriple {
@@ -278,14 +278,14 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let correctGroundRule =  {
             Head = NormalHead {
                 Subject = Variable "s"
-                Predicate = ResourceOrVariable.Resource predIndex2
+                Predicate = Term.Resource predIndex2
                 Object = Variable "o" 
             }
             Body = [
                 PositiveTriple {
                     Subject = Variable "p"
-                    Predicate = ResourceOrVariable.Resource sameAsIndex
-                    Object = ResourceOrVariable.Resource predIndex2
+                    Predicate = Term.Resource sameAsIndex
+                    Object = Term.Resource predIndex2
                 }
                 PositiveTriple {
                     Subject = Variable "s"

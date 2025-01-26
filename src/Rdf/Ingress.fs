@@ -10,7 +10,7 @@ namespace DagSemTools.Rdf
 open DagSemTools.Ingress
 
 module Ingress =
-    type GraphElementId = uint32
+    type public GraphElementId = uint32
     type TripleListIndex = uint
     type QuadListIndex = uint
         

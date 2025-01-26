@@ -21,28 +21,28 @@ open Serilog
 module ELI2RL =
 
     let internal GetTypeTriplePattern (resources: GraphElementManager) varName className =
-        { TriplePattern.Subject = ResourceOrVariable.Variable varName
-          Predicate = ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
-          Object = ResourceOrVariable.Resource (resources.AddNodeResource(Iri className)) }
+        { TriplePattern.Subject = Term.Variable varName
+          Predicate = Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
+          Object = Term.Resource (resources.AddNodeResource(Iri className)) }
 
     
     let internal GetAnonymousTypeTriplePattern (resources: GraphElementManager) varName=
-        { TriplePattern.Subject = ResourceOrVariable.Variable varName
-          Predicate = ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
-          Object = ResourceOrVariable.Resource (resources.CreateUnnamedAnonResource()) }
+        { TriplePattern.Subject = Term.Variable varName
+          Predicate = Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
+          Object = Term.Resource (resources.CreateUnnamedAnonResource()) }
     
     let internal GetRoleTriplePattern (resources: GraphElementManager) role subjectVar objectVar =
-        { TriplePattern.Subject = ResourceOrVariable.Variable subjectVar
-          Predicate = (ResourceOrVariable.Resource role)
-          Object = ResourceOrVariable.Variable objectVar }
+        { TriplePattern.Subject = Term.Variable subjectVar
+          Predicate = (Term.Resource role)
+          Object = Term.Variable objectVar }
 
     let internal GetRoleValueTriplePattern (resources: GraphElementManager) role subjectVar (objectValue : Individual) =
         let obj = match objectValue with
                     | NamedIndividual (FullIri name) -> resources.AddNodeResource(Iri name) 
                     | AnonymousIndividual anonId -> resources.GetOrCreateNamedAnonResource($"{anonId}")
-        { TriplePattern.Subject = ResourceOrVariable.Variable subjectVar
-          Predicate = (ResourceOrVariable.Resource role)
-          Object = ResourceOrVariable.Resource obj }
+        { TriplePattern.Subject = Term.Variable subjectVar
+          Predicate = (Term.Resource role)
+          Object = Term.Resource obj }
 
     
     (* 
