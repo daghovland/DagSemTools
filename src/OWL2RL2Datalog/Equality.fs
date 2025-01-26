@@ -18,28 +18,28 @@ module Equality =
 
     let internal GetSymmetryAxiom (resources : GraphElementManager) =
         let owlSameAs = (resources.AddNodeResource( Iri(new IriReference (Namespaces.OwlSameAs))))
-        { Head = NormalHead ({Subject = ResourceOrVariable.Variable "x"
-                              Predicate = ResourceOrVariable.Resource owlSameAs
-                              Object = ResourceOrVariable.Variable "y"
+        { Head = NormalHead ({Subject = Term.Variable "x"
+                              Predicate = Term.Resource owlSameAs
+                              Object = Term.Variable "y"
                             })
-          Body =  [PositiveTriple ({Subject = ResourceOrVariable.Variable "y"
-                                    Predicate = ResourceOrVariable.Resource owlSameAs
-                                    Object = ResourceOrVariable.Variable "x"
+          Body =  [PositiveTriple ({Subject = Term.Variable "y"
+                                    Predicate = Term.Resource owlSameAs
+                                    Object = Term.Variable "x"
                      })]}
     
     let internal GetTransitivityAxiom (resources : GraphElementManager) =
         let owlSameAs = (resources.AddNodeResource( Iri(new IriReference (Namespaces.OwlSameAs))))
-        { Head = NormalHead ({Subject = ResourceOrVariable.Variable "x"
-                              Predicate = ResourceOrVariable.Resource owlSameAs
-                              Object = ResourceOrVariable.Variable "z"
+        { Head = NormalHead ({Subject = Term.Variable "x"
+                              Predicate = Term.Resource owlSameAs
+                              Object = Term.Variable "z"
                             })
-          Body =  [PositiveTriple ({Subject = ResourceOrVariable.Variable "x"
-                                    Predicate = ResourceOrVariable.Resource owlSameAs
-                                    Object = ResourceOrVariable.Variable "y"
+          Body =  [PositiveTriple ({Subject = Term.Variable "x"
+                                    Predicate = Term.Resource owlSameAs
+                                    Object = Term.Variable "y"
                      });
-                     PositiveTriple ({Subject = ResourceOrVariable.Variable "y"
-                                                Predicate = ResourceOrVariable.Resource owlSameAs
-                                                Object = ResourceOrVariable.Variable "z"
+                     PositiveTriple ({Subject = Term.Variable "y"
+                                                Predicate = Term.Resource owlSameAs
+                                                Object = Term.Variable "z"
                                  })
           
           ]
@@ -48,33 +48,33 @@ module Equality =
         
     let internal GetSubjectEqualityAxiom (resources : GraphElementManager) =
         let owlSameAs = (resources.AddNodeResource( Iri(new IriReference (Namespaces.OwlSameAs))))
-        { Head = NormalHead ({Subject = ResourceOrVariable.Variable "s2"
-                              Predicate = ResourceOrVariable.Variable "p"
-                              Object = ResourceOrVariable.Variable "o"
+        { Head = NormalHead ({Subject = Term.Variable "s2"
+                              Predicate = Term.Variable "p"
+                              Object = Term.Variable "o"
                             })
-          Body =  [PositiveTriple ({Subject = ResourceOrVariable.Variable "s1"
-                                    Predicate = ResourceOrVariable.Resource owlSameAs
-                                    Object = ResourceOrVariable.Variable "s2"
+          Body =  [PositiveTriple ({Subject = Term.Variable "s1"
+                                    Predicate = Term.Resource owlSameAs
+                                    Object = Term.Variable "s2"
                      }) ;
-                    PositiveTriple {Subject = ResourceOrVariable.Variable "s1"
-                                    Predicate = ResourceOrVariable.Variable "p"
-                                    Object = ResourceOrVariable.Variable "o"
+                    PositiveTriple {Subject = Term.Variable "s1"
+                                    Predicate = Term.Variable "p"
+                                    Object = Term.Variable "o"
                             }
                 ]
           }
     let internal GetObjectEqualityAxiom (resources : GraphElementManager) =
         let owlSameAs = (resources.AddNodeResource( Iri(new IriReference (Namespaces.OwlSameAs))))
-        { Head = NormalHead ({Subject = ResourceOrVariable.Variable "s"
-                              Predicate = ResourceOrVariable.Variable "p"
-                              Object = ResourceOrVariable.Variable "o2"
+        { Head = NormalHead ({Subject = Term.Variable "s"
+                              Predicate = Term.Variable "p"
+                              Object = Term.Variable "o2"
                             })
-          Body =  [PositiveTriple ({Subject = ResourceOrVariable.Variable "o1"
-                                    Predicate = ResourceOrVariable.Resource owlSameAs
-                                    Object = ResourceOrVariable.Variable "o2"
+          Body =  [PositiveTriple ({Subject = Term.Variable "o1"
+                                    Predicate = Term.Resource owlSameAs
+                                    Object = Term.Variable "o2"
                      }) ;
-                    PositiveTriple {Subject = ResourceOrVariable.Variable "s"
-                                    Predicate = ResourceOrVariable.Variable "p"
-                                    Object = ResourceOrVariable.Variable "o1"
+                    PositiveTriple {Subject = Term.Variable "s"
+                                    Predicate = Term.Variable "p"
+                                    Object = Term.Variable "o1"
                             }
                 ]
           }

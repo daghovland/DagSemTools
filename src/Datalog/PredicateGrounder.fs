@@ -19,7 +19,7 @@ module PredicateGrounder =
     let getTriplePredicate (triple: TriplePattern)  =
         match triple.Predicate with
         | Variable _ -> None
-        | ResourceOrVariable.Resource r -> Some r
+        | Term.Resource r -> Some r
 
     let getRuleHeadPredicate (head : RuleHead) =
         match head with
@@ -34,19 +34,19 @@ module PredicateGrounder =
         let dataPredicates = triplestore.Resources.GetIriResourceIds()
         Seq. concat [headPredicates; dataPredicates] |> Seq.distinct
 
-    let instantiateTripleWithVariableMapping (triple : TriplePattern) (variableName : ResourceOrVariable) predicate : TriplePattern =
+    let instantiateTripleWithVariableMapping (triple : TriplePattern) (variableName : Term) predicate : TriplePattern =
         let tripleList =
             [triple.Subject; triple.Predicate; triple.Object]
             |> List.map (fun res -> 
             match res with
-                    | _variableName when _variableName = variableName -> ResourceOrVariable.Resource predicate
+                    | _variableName when _variableName = variableName -> Term.Resource predicate
                     | _ -> res)
         {Subject = tripleList.[0]; Predicate = tripleList.[1]; Object = tripleList.[2]}
         
     let instantiateRuleWithVariableMapping (predicate, rule: Rule, variableName) =
         let newHead = match rule.Head with
                         | Contradiction -> Contradiction
-                        | NormalHead triplePattern -> NormalHead {triplePattern with Predicate = ResourceOrVariable.Resource predicate}
+                        | NormalHead triplePattern -> NormalHead {triplePattern with Predicate = Term.Resource predicate}
         let newBody = rule.Body |> List.map (
             fun atom ->
                 match atom with
@@ -62,12 +62,12 @@ module PredicateGrounder =
                         match ruleHead.Predicate with
                         | Variable s -> predicates
                                         |> Seq.map (fun p -> instantiateRuleWithVariableMapping(p, rule, Variable s))
-                        | ResourceOrVariable.Resource _ -> [rule]
+                        | Term.Resource _ -> [rule]
 
     let getTripleRelationVariable (triple : TriplePattern) =
         match triple.Predicate with
         | Variable s -> Some s
-        | ResourceOrVariable.Resource _ -> None
+        | Term.Resource _ -> None
         
     let getBodyRelationVariables (rule: Rule) =
         rule.Body |> List.choose (fun atom ->

@@ -13,32 +13,34 @@ open DagSemTools.Ingress
 open DagSemTools.OwlOntology
 open DagSemTools.Ingress.Namespaces
 open IriTools
+open Serilog
 
 type Rdf2Owl (triples : TripleTable,
-              resourceManager : GraphElementManager) =
+              resourceManager : GraphElementManager,
+              logger : ILogger) =
     
     let tripleTable = triples
     let resources = resourceManager
     
-    let rdfTypeId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfType)))
-    let owlOntologyId = resources.AddNodeResource(RdfResource.Iri(new IriReference(Namespaces.OwlOntology)))
-    let versionPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlVersionIri)))
-    let importsPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlImport)))
-    let owlClassId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlClass)))
-    let owlRestrictionId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlRestriction)))
-    let owlOnPropertyId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlOnProperty)))
-    let owlOnClassId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlOnClass)))
-    let owlQualifiedCardinalityId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlQualifiedCardinality)))
-    let owlAxiomId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlAxiom)))
-    let owlMembersId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlMembers)))
-    let owlAnnPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlAnnotatedProperty)))
-    let owlAnnSourceId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlAnnotatedSource)))
-    let owlAnnTargetId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlAnnotatedTarget)))
-    let owlInvObjPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.OwlObjectInverseOf)))
-    let subClassPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfsSubClassOf)))
-    let rdfNilId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfNil)))
-    let rdfFirstId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfFirst)))
-    let rdfRestId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfRest)))
+    let rdfTypeId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfType)))
+    let owlOntologyId = resources.AddNodeResource(RdfResource.Iri(new IriReference(OwlOntology)))
+    let versionPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlVersionIri)))
+    let importsPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlImport)))
+    let owlClassId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlClass)))
+    let owlRestrictionId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlRestriction)))
+    let owlOnPropertyId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlOnProperty)))
+    let owlOnClassId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlOnClass)))
+    let owlQualifiedCardinalityId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlQualifiedCardinality)))
+    let owlAxiomId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlAxiom)))
+    let owlMembersId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlMembers)))
+    let owlAnnPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlAnnotatedProperty)))
+    let owlAnnSourceId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlAnnotatedSource)))
+    let owlAnnTargetId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlAnnotatedTarget)))
+    let owlInvObjPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlObjectInverseOf)))
+    let subClassPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfsSubClassOf)))
+    let rdfNilId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfNil)))
+    let rdfFirstId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfFirst)))
+    let rdfRestId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfRest)))
         
     let getResourceClass resourceId : Class option =
         resources.GetNamedResource resourceId |> Option.map Class.FullIri
@@ -61,12 +63,12 @@ type Rdf2Owl (triples : TripleTable,
     (* This is the set RIND in Table 8 of https://www.w3.org/TR/owl2-mapping-to-rdf/ *)
     let getReificationBlankNodes =
         [
-            Namespaces.OwlAxiom
-            Namespaces.OwlAnnotation
-            Namespaces.OwlAllDisjointClasses
-            Namespaces.OwlAllDisjointProperties
-            Namespaces.OwlAllDifferent
-            Namespaces.OwlNegativePropertyAssertion
+            OwlAxiom
+            OwlAnnotation
+            OwlAllDisjointClasses
+            OwlAllDisjointProperties
+            OwlAllDifferent
+            OwlNegativePropertyAssertion
         ]
             |> Seq.map (fun iri -> resources.AddNodeResource(RdfResource.Iri (new IriReference(iri))))
             |> Seq.collect (fun typeId -> tripleTable.GetTriplesWithObjectPredicate(typeId, rdfTypeId)
@@ -76,13 +78,12 @@ type Rdf2Owl (triples : TripleTable,
                                                                          | _ -> None))
    
     
-    let extractOntologyVersionIri (ontologyIri : IriReference) =
+    let extractOntologyVersionIri (ontologyIri : IriReference)  =
         let ontologyIriId = resources.AddNodeResource(RdfResource.Iri ontologyIri)
-        let ontologyVersionTriples = tripleTable.GetTriplesWithSubjectPredicate(ontologyIriId, versionPropId)
+        let ontologyVersionTriples  = tripleTable.GetTriplesWithSubjectPredicate(ontologyIriId, versionPropId)
         if (ontologyVersionTriples |> Seq.length > 1) then
-            failwith "Multiple ontology version IRIs provided in file!"
-        else
-            ontologyVersionTriples |> Seq.tryHead |> Option.bind (fun tr -> (resources.GetNamedResource tr.subject)) 
+            logger.Warning "Multiple ontology version IRIs provided in file!"
+        ontologyVersionTriples |> Seq.tryHead |> Option.bind (fun tr -> (resources.GetNamedResource tr.subject)) 
      
     let extractOntologyImports  (ontologyIri : IriReference) =
         let ontologyIriId = resources.AddNodeResource(RdfResource.Iri ontologyIri)
@@ -92,9 +93,8 @@ type Rdf2Owl (triples : TripleTable,
     let extractOntologyIri =
         let ontologyTypeTriples = tripleTable.GetTriplesWithObjectPredicate(owlOntologyId, rdfTypeId)
         if (ontologyTypeTriples |> Seq.length > 1) then
-            failwith "Multiple ontology IRIs provided in file!"
-        else
-            ontologyTypeTriples |> Seq.tryHead |> Option.bind (fun tr -> (resources.GetNamedResource tr.subject)) 
+            logger.Warning "Multiple ontology IRIs provided in file!"
+        ontologyTypeTriples |> Seq.tryHead |> Option.bind (fun tr -> (resources.GetNamedResource tr.subject)) 
     
      
     let extractOntologyName  =
@@ -113,7 +113,7 @@ type Rdf2Owl (triples : TripleTable,
     member this.extractOntology  =
         let (oName, imports) = extractOntologyName 
         let RIND = getReificationBlankNodes
-        let classExpressionParser = new ClassExpressionParser(tripleTable, resources)
+        let classExpressionParser = new ClassExpressionParser(tripleTable, resources, logger)
         let axiomParser = classExpressionParser.getAxiomParser()
         let tripleAxioms = tripleTable.GetTriples() |> Seq.choose axiomParser.extractAxiom
         let axioms = [tripleAxioms  ] |> Seq.concat |> Seq.toList

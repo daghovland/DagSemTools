@@ -39,10 +39,10 @@ module Stratifier =
         match relation with
         | AllRelations -> true
         | BinaryPredicate res -> match triple.Predicate with
-                                    | ResourceOrVariable.Resource res' -> res = res'
+                                    | Term.Resource res' -> res = res'
                                     | _ -> false
         | UnaryPredicate (res, obj) -> match triple.Predicate, triple.Object with
-                                        | ResourceOrVariable.Resource res', ResourceOrVariable.Resource obj' -> res = res' && obj = obj'
+                                        | Term.Resource res', Term.Resource obj' -> res = res' && obj = obj'
                                         | _ -> false
         
     let MatchRelations (rel1) (rel2) : bool =
@@ -58,8 +58,8 @@ module Stratifier =
     [<StructuralEquality>]
     [<StructuralComparison>]
     type RelationEdge =
-        | PositiveRelationEdge of pedge:  int
-        | NegativeRelationEdge of nedge: int
+        | PositiveRelationEdge of pedge: uint
+        | NegativeRelationEdge of nedge: uint
     
     [<Struct>]
     [<StructuralEquality>]
@@ -75,10 +75,10 @@ module Stratifier =
     }
     let GetTriplePatternRelation (triple : TriplePattern) : Relation =
             match triple.Predicate with
-                                        | ResourceOrVariable.Variable _ -> AllRelations
-                                        | ResourceOrVariable.Resource res -> match triple.Object with
-                                                                                    | ResourceOrVariable.Variable _ -> (BinaryPredicate res)
-                                                                                    | ResourceOrVariable.Resource obj -> (UnaryPredicate (res, obj))
+                                        | Term.Variable _ -> AllRelations
+                                        | Term.Resource res -> match triple.Object with
+                                                                                    | Term.Variable _ -> (BinaryPredicate res)
+                                                                                    | Term.Resource obj -> (UnaryPredicate (res, obj))
     let GetRuleHeadRelation (triple : RuleHead) : Relation option =
             match triple with
             | Contradiction  -> None
@@ -137,10 +137,10 @@ module Stratifier =
         NegativeIntentionalProperties rules |> Seq.isEmpty
   
     (* The RulePartitioner creates a stratification of the program if it is stratifiable, and otherwise fails *)
-    type RulePartitioner (logger: ILogger, rules: Rule list) =
+    type RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
         
         let relations = GetRelations rules |> Seq.toArray
-        let relationMap = relations |> Array.mapi (fun i r -> r, i) |> Map.ofArray
+        let relationMap  = relations |> Array.mapi (fun i r -> r, (uint i)) |> Map.ofArray
         
         (* 
             This is the core of a topoogical sorting of the relations.
@@ -152,7 +152,7 @@ module Stratifier =
             This method is called whenever a relation is removed from the queue of relations ready for ouput
             
         *)
-        let updateAtom (_ordered : OrderedRelation array) relationEdgeType (headRelationNo : int) (bodyTriplePattern : TriplePattern) =
+        let updateAtom (_ordered : OrderedRelation array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern : TriplePattern) =
             let atomRelation = bodyTriplePattern |> GetTriplePatternRelation
             let numRelations = Array.length _ordered
             let atomRelationNo = relationMap.[atomRelation]
@@ -165,12 +165,12 @@ module Stratifier =
             | false, _ -> ()
             | true, wildcardRelationNo ->
                 for i in 0 .. (Array.length _ordered - 1) do
-                    if i <> wildcardRelationNo then
-                        _ordered.[i].Successors <- PositiveRelationEdge wildcardRelationNo :: _ordered.[i].Successors
-                        _ordered.[wildcardRelationNo].num_predecessors <- _ordered.[wildcardRelationNo].num_predecessors + 1u
+                    if (uint i) <> wildcardRelationNo then
+                        _ordered.[i].Successors <- PositiveRelationEdge (uint wildcardRelationNo) :: _ordered.[i].Successors
+                        _ordered.[int wildcardRelationNo].num_predecessors <- _ordered.[int wildcardRelationNo].num_predecessors + 1u
             _ordered
                     
-        let updateRelation (_ordered : OrderedRelation array) (headRelationNo : int) (ruleBodyAtom : RuleAtom) =
+        let updateRelation (_ordered : OrderedRelation array) (headRelationNo : uint) (ruleBodyAtom : RuleAtom) =
                 _ordered.[int headRelationNo].intensional <- true
                 match ruleBodyAtom with
                 | NotTriple t ->
@@ -200,23 +200,23 @@ module Stratifier =
         
         (* The queue contains all relations that are not dependent on any relations (that have not already been output) *)
         let mutable ready_elements_queue =
-            Queue<int>(ordered_relations |> Array.filter (fun concept -> concept.num_predecessors = 0u)
+            Queue<uint>(ordered_relations |> Array.filter (fun concept -> concept.num_predecessors = 0u)
                     |> Array.map (fun concept -> relationMap.[concept.Relation]))
             
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
-        let mutable next_elements_queue = Queue<int>()
+        let mutable next_elements_queue = Queue<uint>()
         let mutable n_unordered = Array.length ordered_relations - ready_elements_queue.Count
         
         let printCycle cycle =
             cycle
-            |> Seq.map (fun n -> $"Cycle element: %i{n}")
+            |> Seq.map (fun n -> $"Cycle element: {resources.GetGraphElement n}")
             |> String.concat ", "
                 
                 
         
         (* Called when the topological sorting cannot proceed, hence assuming the existence of a cycle *)
-        member this.cycle_finder (visited : int seq) (current : int) : int seq seq =
-            let current_element = ordered_relations.[current]
+        member this.cycle_finder (visited : uint seq) (current : uint) : uint seq seq =
+            let current_element = ordered_relations.[int current]
             if (visited |> Seq.contains current) then
                 visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.distinct |> Seq.singleton
             else if current_element.visited then Seq.empty
@@ -253,24 +253,24 @@ module Stratifier =
             
             
         (* Updates a successor of a relation, and if the relation is ready to be output, it is added to the queue *)
-        member this.update_successor (removed_relation_id : int) (successor : RelationEdge) =
+        member this.update_successor (removed_relation_id : uint) (successor : RelationEdge) =
             let relation_id = 
                 match successor with
                 | PositiveRelationEdge relation_id ->
                     relation_id
                 | NegativeRelationEdge relation_id ->
-                    let removed_relation = ordered_relations.[removed_relation_id]
+                    let removed_relation = ordered_relations.[int removed_relation_id]
                     if removed_relation.intensional then
-                        ordered_relations.[relation_id].uses_intensional_negative_edge <- true
+                        ordered_relations.[int relation_id].uses_intensional_negative_edge <- true
                     relation_id
-            let old_relation = ordered_relations.[relation_id]
+            let old_relation = ordered_relations.[int relation_id]
             if not old_relation.output then        
                 if old_relation.num_predecessors < 1u then failwith "Datalog program preprocessing failed. This is a bug, please report that topological ordering failed, num_predecessors < 1"
                 let new_predecessors = old_relation.num_predecessors - 1u
-                ordered_relations.[relation_id] <- { old_relation with num_predecessors = new_predecessors }
-                if ordered_relations.[relation_id].num_predecessors = 0u && not ordered_relations.[relation_id].output then
-                    ordered_relations.[relation_id].output <- true
-                    if ordered_relations.[relation_id].uses_intensional_negative_edge then
+                ordered_relations.[int relation_id] <- { old_relation with num_predecessors = new_predecessors }
+                if ordered_relations.[int relation_id].num_predecessors = 0u && not ordered_relations.[int relation_id].output then
+                    ordered_relations.[int relation_id].output <- true
+                    if ordered_relations.[int relation_id].uses_intensional_negative_edge then
                         next_elements_queue.Enqueue(relation_id)
                     else
                         ready_elements_queue.Enqueue(relation_id)
@@ -283,7 +283,7 @@ module Stratifier =
             let mutable ordered_rules = Seq.empty
             while ready_elements_queue.Count > 0 do
                 let relation_id = ready_elements_queue.Dequeue()
-                let relation = relations.[relation_id]    
+                let relation = relations.[int relation_id]    
                 ordered_relations.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
                 // if ordered_relations.[relation_id].intensional then
                 let relation_rules = rules
@@ -299,7 +299,7 @@ module Stratifier =
         member this.RuleIsCoveredByCycle cycle rule =
                 rule.Body |> Seq.forall (fun atom ->
                                             let atomRelation = atom|> GetRuleAtomRelation 
-                                            ordered_relations.[relationMap.[atomRelation]].intensional = false
+                                            ordered_relations.[int relationMap.[atomRelation]].intensional = false
                                             || (cycle |> Seq.exists (MatchRelations atomRelation))
                                         )
         (* 
@@ -320,16 +320,16 @@ module Stratifier =
                             let cycle_element = cycle |> Seq.head
                             let rules = rules
                                         |> List.filter (fun rule ->
-                                            (rule.Head |> GetRuleHeadRelation) = Some relations.[cycle_element]
+                                            (rule.Head |> GetRuleHeadRelation) = Some relations.[int cycle_element]
                                             )
-                            rules |> List.forall (this.RuleIsCoveredByCycle (cycle |> Seq.map (fun id -> relations.[id])))
+                            rules |> List.forall (this.RuleIsCoveredByCycle (cycle |> Seq.map (fun id -> relations.[int id])))
                             )
                             
                   )
             cycles |> Seq.iter (fun cycle ->
                   cycle |> Seq.distinct |>(Seq.iter (fun rel ->
-                      if not ordered_relations.[rel].output then 
-                        ordered_relations.[rel].output <- true
+                      if not ordered_relations.[int rel].output then 
+                        ordered_relations.[int rel].output <- true
                         ready_elements_queue.Enqueue rel)
                   ))
                 
@@ -340,7 +340,7 @@ module Stratifier =
         member this.is_stratified (stratification: Rule seq seq) =
             ready_elements_queue.Count = 0
             && next_elements_queue.Count = 0
-            && (stratification |> Seq.sumBy Seq.length) >= rules.Length
+            // && (stratification |> Seq.sumBy Seq.length) >= rules.Length
             // && ordered_relations |> Array.forall (fun relation -> relation.intensional = false)
 
         (* Used in the while loop in orderRules to test whether stratification is finished *)

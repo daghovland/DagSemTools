@@ -93,19 +93,19 @@ module TestClassAxioms =
         //Assert
         let expectedRules: Datalog.Rule seq =
             [ { Head = NormalHead
-                  { Subject = ResourceOrVariable.Variable "X"
-                    Predicate = ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
+                  { Subject = Term.Variable "X"
+                    Predicate = Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
                     Object =
-                      ResourceOrVariable.Resource(
+                      Term.Resource(
                           resources.AddNodeResource(Iri(IriReference "https://example.com/superclass"))
                       ) }
                 Body =
                   [ PositiveTriple
-                        { Subject = ResourceOrVariable.Variable "X"
+                        { Subject = Term.Variable "X"
                           Predicate =
-                            ResourceOrVariable.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
+                            Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
                           Object =
-                            ResourceOrVariable.Resource(
+                            Term.Resource(
                                 resources.AddNodeResource(Iri(IriReference "https://example.com/subclass"))
                             ) } ] } ]
 

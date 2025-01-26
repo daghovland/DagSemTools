@@ -49,7 +49,7 @@ module TestClassAxioms =
         let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
         query.Should().HaveLength(0) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
@@ -83,7 +83,7 @@ module TestClassAxioms =
         let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
         query.Should().HaveLength(0) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
@@ -122,9 +122,9 @@ module TestClassAxioms =
         
         let rdfTypeResource = tripleTable.Resources.AddResource (NodeOrEdge (Iri (IriReference Namespaces.RdfType)))
         let ruleHead =
-            NormalHead {Subject = ResourceOrVariable.Variable "X"
-                        Predicate = ResourceOrVariable.Resource rdfTypeResource
-                        Object = ResourceOrVariable.Resource Aresource}
+            NormalHead {Subject = Term.Variable "X"
+                        Predicate = Term.Resource rdfTypeResource
+                        Object = Term.Resource Aresource}
         
         let Arules = rlProgram |> Seq.filter (fun rule -> rule.Head = ruleHead)
         Arules.Should().NotBeEmpty() |> ignore
@@ -161,26 +161,26 @@ module TestClassAxioms =
         
         let rdfTypeResource = tripleTable.Resources.AddResource (NodeOrEdge (Iri (IriReference Namespaces.RdfType)))
         let ruleHead =
-            NormalHead {Subject = ResourceOrVariable.Variable "X"
-                        Predicate = ResourceOrVariable.Resource rdfTypeResource
-                        Object = ResourceOrVariable.Resource Aresource}
+            NormalHead {Subject = Term.Variable "X"
+                        Predicate = Term.Resource rdfTypeResource
+                        Object = Term.Resource Aresource}
         let expectedAxiom = {
             DagSemTools.Datalog.Head = ruleHead
             DagSemTools.Datalog.Body = [
                 PositiveTriple {
-                    Subject = ResourceOrVariable.Variable "X"
-                    Predicate = ResourceOrVariable.Resource roleresource
-                    Object = ResourceOrVariable.Variable "X_1"
+                    Subject = Term.Variable "X"
+                    Predicate = Term.Resource roleresource
+                    Object = Term.Variable "X_1"
                 };
                 PositiveTriple{
-                 Subject = ResourceOrVariable.Variable "X_1"
-                 Predicate = ResourceOrVariable.Resource rdfTypeResource
-                 Object = ResourceOrVariable.Resource Fresource
+                 Subject = Term.Variable "X_1"
+                 Predicate = Term.Resource rdfTypeResource
+                 Object = Term.Resource Fresource
                  };
                 PositiveTriple{
-                 Subject = ResourceOrVariable.Variable "X_1"
-                 Predicate = ResourceOrVariable.Resource rdfTypeResource
-                 Object = ResourceOrVariable.Resource Eresource
+                 Subject = Term.Variable "X_1"
+                 Predicate = Term.Resource rdfTypeResource
+                 Object = Term.Resource Eresource
                  }]
         }
         let Arules = rlProgram |> Seq.filter (fun rule -> rule.Head = ruleHead)
@@ -212,7 +212,7 @@ module TestClassAxioms =
         let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex2)
         query.Should().HaveLength(1) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)

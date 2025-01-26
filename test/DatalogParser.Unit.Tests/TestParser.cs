@@ -114,20 +114,20 @@ public class TestParser
         ruleAtom.Should().NotBeNull();
         ruleAtom.IsPositiveTriple.Should().BeTrue();
         var ruleTriplePattern = ((RuleAtom.PositiveTriple)ruleAtom).Item;
-        ruleTriplePattern.Subject.Should().Be(ResourceOrVariable.NewVariable("?s"));
+        ruleTriplePattern.Subject.Should().Be(Term.NewVariable("?s"));
 
-        var predicateResource = ResourceOrVariable
+        var predicateResource = Term
             .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference("https://example.com/data#predicate2"))));
         ruleTriplePattern.Predicate.Should().Be(predicateResource);
 
-        var objectResource = ResourceOrVariable
+        var objectResource = Term
             .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference("https://example.com/data3#obj"))));
         ruleTriplePattern.Object.Should().Be(objectResource);
 
         ruleAtom.Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
-            ResourceOrVariable.NewVariable("?s"),
+            Term.NewVariable("?s"),
             predicateResource,
             objectResource)));
     }
@@ -144,16 +144,16 @@ public class TestParser
         var parsedDatalogRule = ont.First();
         parsedDatalogRule.Body.Count().Should().Be(2);
         parsedDatalogRule.Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
-            ResourceOrVariable.NewVariable("?x"),
-            ResourceOrVariable.NewVariable("?p"),
-            ResourceOrVariable.NewVariable("?y"))));
-        var rdfTypeResource = ResourceOrVariable
+            Term.NewVariable("?x"),
+            Term.NewVariable("?p"),
+            Term.NewVariable("?y"))));
+        var rdfTypeResource = Term
             .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference(Namespaces.RdfType))));
         var expectedHead = RuleHead.NewNormalHead(new TriplePattern(
-            ResourceOrVariable.NewVariable("?x"),
+            Term.NewVariable("?x"),
             rdfTypeResource,
-            ResourceOrVariable.NewVariable("?c")));
+            Term.NewVariable("?c")));
         expectedHead.Should().NotBeNull();
         parsedDatalogRule.Head.Should().NotBeNull();
         parsedDatalogRule.Head.Should().Be(expectedHead);
@@ -171,19 +171,19 @@ public class TestParser
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(1);
         ont.First().Head.Should().Be(RuleHead.NewNormalHead(new TriplePattern(
-            ResourceOrVariable.NewVariable("?new_node"),
-            ResourceOrVariable
+            Term.NewVariable("?new_node"),
+            Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
-            ResourceOrVariable
+            Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
 
         ont.First().Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
-            ResourceOrVariable.NewVariable("?node"),
-            ResourceOrVariable
+            Term.NewVariable("?node"),
+            Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
-            ResourceOrVariable
+            Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }

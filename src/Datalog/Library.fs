@@ -14,7 +14,7 @@ open DagSemTools.Rdf.Ingress
 
 [<StructuralComparison>]
 [<StructuralEquality>]
-type ResourceOrVariable = 
+type Term = 
     | Resource of GraphElementId
     | Variable of string
 
@@ -28,7 +28,7 @@ type ResourceOrWildcard =
 [<StructuralComparison>]
 [<StructuralEquality>]
 type TriplePattern =
-    {Subject: ResourceOrVariable; Predicate: ResourceOrVariable; Object: ResourceOrVariable}
+    {Subject: Term; Predicate: Term; Object: Term}
 
 
 [<StructuralComparison>]
@@ -78,7 +78,7 @@ module Datalog =
     
     let ResourceOrVariableToString (tripleTable : Datastore) res : string =
         match res with
-        | ResourceOrVariable.Resource r -> (tripleTable.GetGraphElement r).ToString()
+        | Term.Resource r -> (tripleTable.GetGraphElement r).ToString()
         | Variable v -> VariableToString v
     
 
@@ -94,13 +94,13 @@ module Datalog =
         | NotTriple t -> $"not {TriplePatternToString tripleTable t}"
         
     let ConstantTriplePattern (triple : Ingress.Triple) : TriplePattern = 
-        {Subject = ResourceOrVariable.Resource triple.subject; Predicate = ResourceOrVariable.Resource triple.predicate; Object = ResourceOrVariable.Resource triple.obj}
+        {Subject = Term.Resource triple.subject; Predicate = Term.Resource triple.predicate; Object = Term.Resource triple.obj}
     
     /// Generate all 8 possible triple patterns with wildcards for a given triple pattern
     /// Duplicate patterns are ok since these are used as a key in a dictionary
     let WildcardTriplePattern (triple : TriplePattern) : TripleWildcard list = 
         let resourceList = [triple.Subject; triple.Predicate; triple.Object]
-        let rec generatePatterns (triple: ResourceOrVariable list) : ResourceOrWildcard list list = 
+        let rec generatePatterns (triple: Term list) : ResourceOrWildcard list list = 
               match triple with
               | [] -> [[]]
               | head :: tail -> 
@@ -108,7 +108,7 @@ module Datalog =
                 match head with
                 | Variable _ -> 
                      rest |> List.map (fun triplePart -> Wildcard :: triplePart)
-                | ResourceOrVariable.Resource r -> 
+                | Term.Resource r -> 
                     rest |> List.collect (fun triplePart -> [Resource r :: triplePart; Wildcard :: triplePart])
         generatePatterns resourceList |> List.map (fun triplePart ->
             {Subject = List.item 0 triplePart; Predicate = List.item 1 triplePart; Object = List.item 2 triplePart})
@@ -151,9 +151,9 @@ module Datalog =
             let unsafeVarsString = String.concat ", " unsafeHeadVariables
             raise (new ArgumentException($"Unsafe variables {unsafeVarsString} in rule: {rule.ToString()}"))
         
-    let ApplySubstitutionResource (sub : Substitution) (res : ResourceOrVariable) : GraphElementId =
+    let ApplySubstitutionResource (sub : Substitution) (res : Term) : GraphElementId =
         match res with
-        | ResourceOrVariable.Resource r -> r
+        | Term.Resource r -> r
         | Variable v -> match sub.TryGetValue v with
                         | true, r -> r
                         | false, _ -> failwith "Head of rule not fully instantiated. Invalid datalog rule"
@@ -165,14 +165,14 @@ module Datalog =
         }
     
     
-    let GetSubstitution (resource : Ingress.GraphElementId, variable : ResourceOrVariable) (subs : Substitution)  : Substitution option =
+    let GetSubstitution (resource : Ingress.GraphElementId, variable : Term) (subs : Substitution)  : Substitution option =
         match variable, resource with
         | Variable v, _  ->
             match subs.TryGetValue v with
             | true, r when r = resource -> Some subs
             | true, _ -> None
             | false, _ -> Some (subs.Add (v, resource))
-        | ResourceOrVariable.Resource r, s when r = s -> Some subs
+        | Term.Resource r, s when r = s -> Some subs
         | _ -> None
     
     let GetSubstitutionOption (subs : Substitution option) (resource, variable) : Substitution option =
@@ -220,11 +220,11 @@ module Datalog =
                         | true, existing -> Map.add key (value @ existing) acc
                         | false, _ ->  Map.add key value acc)) Map.empty
 
-    let GetMappedResource (sub : Substitution) (resource : ResourceOrVariable ) : ResourceOrVariable  =
+    let GetMappedResource (sub : Substitution) (resource : Term ) : Term  =
               match resource with
-              | ResourceOrVariable.Resource _ -> resource
+              | Term.Resource _ -> resource
               | Variable v -> match sub.TryGetValue v with
-                              | true, r -> ResourceOrVariable.Resource r
+                              | true, r -> Term.Resource r
                               | false, _ -> Variable v
 
     let evaluatePattern (rdf : TripleTable) (triplePattern : TriplePattern) (sub : Substitution)  =
@@ -235,21 +235,21 @@ module Datalog =
                             }
         let matchedTriples = (
             match mappedTriple.Subject, mappedTriple.Predicate, mappedTriple.Object with
-            | ResourceOrVariable.Resource s, Variable _p, Variable _o -> 
+            | Term.Resource s, Variable _p, Variable _o -> 
                     rdf.GetTriplesWithSubject(s)
-            | Variable _s, ResourceOrVariable.Resource p, Variable _o -> 
+            | Variable _s, Term.Resource p, Variable _o -> 
                     rdf.GetTriplesWithPredicate(p)
-            | Variable _s, Variable _p, ResourceOrVariable.Resource o -> 
+            | Variable _s, Variable _p, Term.Resource o -> 
                     rdf.GetTriplesWithObject(o)
-            | ResourceOrVariable.Resource s, ResourceOrVariable.Resource p, Variable _o -> 
+            | Term.Resource s, Term.Resource p, Variable _o -> 
                     rdf.GetTriplesWithSubjectPredicate(s, p)
-            | Variable _s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
+            | Variable _s, Term.Resource p, Term.Resource o -> 
                     rdf.GetTriplesWithObjectPredicate(o, p)
-            | ResourceOrVariable.Resource s, ResourceOrVariable.Resource p, ResourceOrVariable.Resource o -> 
+            | Term.Resource s, Term.Resource p, Term.Resource o -> 
                     match rdf.ThreeKeysIndex.TryGetValue {subject = s; predicate = p; obj = o} with
                     | false,_ -> []
                     | true, v -> [rdf.GetTripleListEntry v]                    
-            | ResourceOrVariable.Resource s, Variable p, ResourceOrVariable.Resource o ->
+            | Term.Resource s, Variable p, Term.Resource o ->
                 rdf.GetTriplesWithSubjectObject (s, o)
             | Variable s, Variable p, Variable o -> rdf.GetTriples()
             ) 

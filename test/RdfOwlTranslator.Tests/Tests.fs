@@ -15,9 +15,16 @@ open DagSemTools.Ingress
 open IriTools
 open DagSemTools.Rdf.Ingress
 open Faqt
+open Serilog
+open Serilog.Sinks.InMemory
 
 module Tests =
-
+    let inMemorySink = new InMemorySink()
+    let logger =
+        LoggerConfiguration()
+                .WriteTo.Sink(inMemorySink)
+                .CreateLogger()
+    
 
     [<Theory>]
     [<InlineData(Namespaces.OwlClass)>]
@@ -59,7 +66,7 @@ module Tests =
             AxiomDeclaration([], typeDeclaration (Iri.FullIri(new IriReference "http://example.com/subject")))
 
         //Act
-        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
         let ontology: Ontology = translator.extractOntology
         //Assert
         let ontologyAxioms = ontology.Axioms
@@ -146,7 +153,7 @@ module Tests =
         tripleTable.AddTriple(subclassOfTriple)
 
         //Act
-        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
         let ontology: Ontology = translator.extractOntology
 
         //Assert
@@ -201,7 +208,7 @@ module Tests =
         tripleTable.AddTriple(subclassOfTriple)
 
         //Act
-        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
         let ontology: Ontology = translator.extractOntology
 
         //Assert
@@ -262,7 +269,7 @@ module Tests =
         tripleTable.AddTriple subClassTriple
 
         //Act
-        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
         let ontology: Ontology = translator.extractOntology
 
         //Assert
@@ -366,8 +373,8 @@ module Tests =
         tripleTable.AddTriple owlIntersectionLastTriple
         
         //Act
-        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
-        let classExpressionParser = new DagSemTools.RdfOwlTranslator.ClassExpressionParser(tripleTable, resources)
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
+        let classExpressionParser = new DagSemTools.RdfOwlTranslator.ClassExpressionParser(tripleTable, resources, logger)
         let anonExpr = classExpressionParser.parseAnonymousClassExpressions()
         anonExpr.Should().HaveLength(1) |> ignore
         let restrExpr = classExpressionParser.parseAnonymousRestrictions()
@@ -458,7 +465,7 @@ module Tests =
         
         
         //Act
-        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources)
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
         let ontology: Ontology = translator.extractOntology
 
         //Assert

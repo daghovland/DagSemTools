@@ -188,7 +188,7 @@ public class Graph : IGraph
     /// <inheritdoc />
     public void EnableOwlReasoning()
     {
-        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Triples.Triples, Triples.Resources).extractOntology;
+        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Triples.Triples, Triples.Resources, _logger).extractOntology;
         var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Triples.Resources, ontology);
         LoadDatalog(ontologyRules);
     }
