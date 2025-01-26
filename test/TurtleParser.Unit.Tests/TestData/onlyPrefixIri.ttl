@@ -1,0 +1,3 @@
+@prefix test: <https://example.com/test#>
+
+test:ex test:definedBy test: .

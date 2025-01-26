@@ -183,7 +183,7 @@ public class TestApiOntology(ITestOutputHelper output)
 
 
 
-    [Fact(Skip = "See https://github.com/daghovland/DagSemTools/issues/60")]
+    [Fact]
     public void LoadIDOOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");

@@ -43,9 +43,16 @@ internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
     /// <returns></returns>
     public override uint VisitIri(IriContext ctxt)
     {
-        var iri = _iriGrammarVisitor.VisitIri(ctxt)
-                  ?? throw new System.Exception($"Assumed IRI in {ctxt.GetText()} at line {ctxt.exception} is null");
-        return GetIriId(iri);
+        try
+        {
+            var iri = _iriGrammarVisitor.VisitIri(ctxt)
+                      ?? throw new System.Exception($"Assumed IRI in {ctxt.GetText()} at line {ctxt.Start.Line}, position {ctxt.Start.Column} is null");
+            return GetIriId(iri);
+        }
+        catch (Exception ex)
+        {
+            throw new Exception($"Error visiting IRI at line {ctxt.Start.Line}, position {ctxt.Start.Column}: {ex.Message}", ex);
+        }
     }
 
     /// <summary>

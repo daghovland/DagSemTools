@@ -77,11 +77,35 @@ public class IriGrammarVisitor : TurtleDocBaseVisitor<IriReference>
         var prefix = components[0];
         if (!_prefixes.TryGetValue(prefix, out var namespaceName))
             throw new Exception($"Prefix {prefix} is not defined.");
-        var localName = components[1];
+        var localName = components.Length > 1 ? (components[1] ?? "") : string.Empty;
         var iriString = $"{namespaceName}{localName}";
         return new IriReference(iriString);
     }
 
+    // Assumes input ends with colon, and removes it
+    private string RemoveTrailingColon(string input)
+    {
+        if (string.IsNullOrEmpty(input) || !input.EndsWith(":"))
+        {
+            throw new ArgumentException("The input string must end with a colon.");
+        }
+
+        return input.TrimEnd(':');
+    }
+    
+    /// <summary>
+    /// Visits an IRI which is just the prefix, f.ex. ex: or rdfs:
+    /// </summary>
+    /// <param name="ctxt"></param>
+    /// <returns></returns>
+    public override IriReference VisitIriPrefix(IriPrefixContext ctxt)
+    {
+        var iriString = ctxt.PNAME_NS().GetText();
+        var prefix = RemoveTrailingColon(iriString);
+        if (!_prefixes.TryGetValue(prefix, out var namespaceName))
+            throw new Exception($"Prefix {prefix} is not defined.");
+        return namespaceName;
+    }
     /// <summary>
     /// Visits a relative IRI in angled brackets, f.ex. &lt;../relative&gt;
     /// </summary>

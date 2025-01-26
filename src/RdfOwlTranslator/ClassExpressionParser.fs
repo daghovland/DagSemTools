@@ -29,6 +29,7 @@ type ClassExpressionParser (triples : TripleTable,
     let resources = resourceManager
 
     let rdfTypeId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfType)))
+    let rdfLiteralId = resources.AddNodeResource(RdfResource.Iri (new IriReference(RdfLiteral)))
     let owlOntologyId = resources.AddNodeResource(RdfResource.Iri(new IriReference(OwlOntology)))
     let versionPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlVersionIri)))
     let importsPropId = resources.AddNodeResource(RdfResource.Iri (new IriReference(OwlImport)))
@@ -113,6 +114,12 @@ type ClassExpressionParser (triples : TripleTable,
         Seq.concat [getBasicDeclarations typeId; getAxiomDeclarations typeId]
         |> Seq.choose (fun id -> resources.GetNamedResource id |> Option.map Iri.FullIri 
                                                 |> Option.map (fun iri -> (id, iri)))
+    
+    let getHardcodedDatarangeDeclarations   =
+        [rdfLiteralId]
+        |> Seq.choose (fun id -> resources.GetNamedResource id |> Option.map Iri.FullIri 
+                                                |> Option.map (fun iri -> (id, iri)))
+    
                                                 
     (* CE *)
     let mutable ClassExpressions : Map<GraphElementId, ClassExpression> =
@@ -127,7 +134,7 @@ type ClassExpressionParser (triples : TripleTable,
     
     (* DR *)
     let mutable DataRanges : Map<GraphElementId, DataRange> =
-        getInitialDeclarations RdfsDatatype
+        Seq.concat [getHardcodedDatarangeDeclarations; getInitialDeclarations RdfsDatatype]
         |> Seq.map (fun (id, iri) ->  (id, NamedDataRange iri))
         |> Map.ofSeq
     (* OPE *)
