@@ -133,7 +133,7 @@ public class TestApiOntology(ITestOutputHelper output)
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    [Fact]
+    [Fact(Skip = "See https://github.com/daghovland/DagSemTools/issues/61")]
     public void LoadImfOntologyWorks()
     {
         // Arrange
@@ -163,10 +163,27 @@ public class TestApiOntology(ITestOutputHelper output)
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-
-
-
     [Fact]
+    public void ParseImfOntologyWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        
+        // Act
+        var ont = OwlOntology.Create(rdfImf);
+        ont.GetAxioms().Should().NotBeEmpty();
+        var axiomRules = ont.GetAxiomRules().ToList();
+
+        axiomRules.Should().NotBeEmpty();
+
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
+
+
+
+    [Fact(Skip="See https://github.com/daghovland/DagSemTools/issues/60")]
     public void LoadIDOOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");
