@@ -164,15 +164,31 @@ public class TestApiOntology(ITestOutputHelper output)
     }
 
 
-    [Fact(Skip = "Takes too long for normal testing. https://github.com/daghovland/DagSemTools/issues/58"), Category("LongRunning")]
-    public void LoadGeneOntologyWorks()
+
+
+    [Fact]
+    public void LoadIDOOntologyWorks()
     {
-        var ontologyFileInfo = new FileInfo("TestData/go.ttl");
+        var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
         var datalogProgram = ont.GetAxiomRules().ToList();
         datalogProgram.Should().NotBeEmpty();
         rdf.LoadDatalog(datalogProgram);
+    }
+    
+    
+    [Fact(Skip = "Takes too long for normal testing. https://github.com/daghovland/DagSemTools/issues/58"), Category("LongRunning")]
+    public void ParseGeneOntologyWorks()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/go.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        rdf.IsEmpty().Should().BeFalse();
+        // var ont = OwlOntology.Create(rdf);
+        // ont.GetAxioms().Should().NotBeEmpty();
+        // var datalogProgram = ont.GetAxiomRules().ToList();
+        // datalogProgram.Should().NotBeEmpty();
+        // rdf.LoadDatalog(datalogProgram);
     }
 }
