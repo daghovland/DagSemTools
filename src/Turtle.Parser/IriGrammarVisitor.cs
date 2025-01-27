@@ -77,7 +77,7 @@ public class IriGrammarVisitor : TurtleDocBaseVisitor<IriReference>
         var prefix = components[0];
         if (!_prefixes.TryGetValue(prefix, out var namespaceName))
             throw new Exception($"Prefix {prefix} is not defined.");
-        var localName = components.Length > 1 ? (components[1] ?? "") : string.Empty;
+        var localName = components[1];
         var iriString = $"{namespaceName}{localName}";
         return new IriReference(iriString);
     }
@@ -92,7 +92,7 @@ public class IriGrammarVisitor : TurtleDocBaseVisitor<IriReference>
 
         return input.TrimEnd(':');
     }
-    
+
     /// <summary>
     /// Visits an IRI which is just the prefix, f.ex. ex: or rdfs:
     /// </summary>

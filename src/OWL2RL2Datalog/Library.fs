@@ -39,7 +39,7 @@ module Library =
                       Predicate = Term.Resource (resources.AddNodeResource(AnonymousBlankNode bNode))
                       Object = Term.Variable "y" } |> Some
         | InverseObjectProperty innerObjProp ->
-                    getObjectPropertyExpressionResource logger resources objProp
+                    getObjectPropertyExpressionResource logger resources innerObjProp
                     |> Option.map (fun innerPattern ->
                     { TriplePattern.Subject = innerPattern.Object
                       Predicate = innerPattern.Predicate
