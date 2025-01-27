@@ -25,76 +25,116 @@ module Library =
             (Namespaces.RdfType, resources.AddNodeResource(RdfResource.Iri(IriReference Namespaces.RdfType))))
         |> Map.ofList
 
-    let getObjectPropertyExpressionResource (resources: GraphElementManager) objProp =
+    let rec getObjectPropertyExpressionResource
+        (logger : Serilog.ILogger)
+        (resources: GraphElementManager)
+        objProp =
         match objProp with
-        | NamedObjectProperty(FullIri iri) -> resources.AddNodeResource(RdfResource.Iri iri)
-        | AnonymousObjectProperty bNode -> resources.AddNodeResource(AnonymousBlankNode bNode)
-        | InverseObjectProperty _ ->
-            failwith "Invalid Owl Ontology: Domain of unnamed inverse object property not supported"
-        | ObjectPropertyChain _ -> failwith "Invalid Owl Ontology: Domain of object property chain not supported"
+        | NamedObjectProperty(FullIri iri) ->
+                    { TriplePattern.Subject = Term.Variable "x"
+                      Predicate = (Term.Resource (resources.AddNodeResource(RdfResource.Iri iri)))
+                      Object = Term.Variable "y" } |> Some
+        | AnonymousObjectProperty bNode ->
+                    { TriplePattern.Subject = Term.Variable "x"
+                      Predicate = Term.Resource (resources.AddNodeResource(AnonymousBlankNode bNode))
+                      Object = Term.Variable "y" } |> Some
+        | InverseObjectProperty innerObjProp ->
+                    getObjectPropertyExpressionResource logger resources innerObjProp
+                    |> Option.map (fun innerPattern ->
+                    { TriplePattern.Subject = innerPattern.Object
+                      Predicate = innerPattern.Predicate
+                      Object = innerPattern.Subject } )
+        | ObjectPropertyChain _ -> logger.Warning "Invalid Owl Ontology: Domain of object property chain not supported"
+                                   None
 
-    let getClassExpressionResource (resources: GraphElementManager) classExpr =
+    let rec getClassExpressionResource (logger : Serilog.ILogger) (resources: GraphElementManager) classExpr =
         match classExpr with
-        | ClassName(FullIri iri) -> resources.AddNodeResource(RdfResource.Iri iri)
-        | AnonymousClass bNode -> resources.AddNodeResource(AnonymousBlankNode bNode)
-        | _ -> failwith "Unnamed class not yet implemented for this operation. Sorry"
+        | ClassName(FullIri iri) -> [resources.AddNodeResource(RdfResource.Iri iri)]
+        | AnonymousClass bNode -> [resources.AddNodeResource(AnonymousBlankNode bNode)]
+        | ObjectIntersectionOf classes -> classes |> List.collect (getClassExpressionResource logger resources)
+        | ObjectUnionOf _ -> logger.Warning $"OWL 2 RL profile does not support union in domain or range expression {classExpr}"
+                             [] 
+        | ObjectComplementOf classExpression -> failwith "todo"
+        | ObjectOneOf individuals -> failwith "todo"
+        | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) -> failwith "todo"
+        | ObjectAllValuesFrom(objectPropertyExpression, classExpression) -> failwith "todo"
+        | ObjectHasValue(objectPropertyExpression, individual) -> failwith "todo"
+        | ObjectHasSelf objectPropertyExpression -> failwith "todo"
+        | ObjectMinQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
+        | ObjectMaxQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
+        | ObjectExactQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "todo"
+        | ObjectExactCardinality(i, objectPropertyExpression) -> failwith "todo"
+        | ObjectMinCardinality(i, objectPropertyExpression) -> failwith "todo"
+        | ObjectMaxCardinality(i, objectPropertyExpression) -> failwith "todo"
+        | DataSomeValuesFrom(iris, dataRange) -> failwith "todo"
+        | DataAllValuesFrom(iris, dataRange) -> failwith "todo"
+        | DataHasValue(iri, graphElement) -> failwith "todo"
+        | DataMinQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+        | DataMaxQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+        | DataExactQualifiedCardinality(i, iri, dataRange) -> failwith "todo"
+        | DataMinCardinality(i, iri) -> failwith "todo"
+        | DataMaxCardinality(i, iri) -> failwith "todo"
+        | DataExactCardinality(i, iri) -> failwith "todo"
+        
 
     let ObjectPropertyDomain2Datalog
+        (logger : Serilog.ILogger)
         (resourceMap: Map<string, Ingress.GraphElementId>)
         (resources: GraphElementManager)
         objProp
         domExp
         =
-        let propertyResource = getObjectPropertyExpressionResource resources objProp
-        let domainClassResource = getClassExpressionResource resources domExp
-
-        [ { Rule.Head = NormalHead
-              { TriplePattern.Subject = Term.Variable "x"
-                TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
-                TriplePattern.Object = Term.Resource domainClassResource }
-            Rule.Body =
-              [ (RuleAtom.PositiveTriple
-                    { Subject = Term.Variable "x"
-                      Predicate = Term.Resource propertyResource
-                      Object = Term.Variable "y" }) ] } ]
-
-
+        match getObjectPropertyExpressionResource logger resources objProp with 
+        | None -> Seq.empty
+        | Some bodyTriple ->
+            getClassExpressionResource logger resources domExp
+            |> Seq.map (fun domainClassResource ->
+                { Rule.Head = NormalHead
+                      { TriplePattern.Subject = Term.Variable "x"
+                        TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
+                        TriplePattern.Object = Term.Resource domainClassResource }
+                  Rule.Body =
+                      [ (RuleAtom.PositiveTriple bodyTriple ) ]
+                }
+            )
 
     let ObjectPropertyRange2Datalog
+        (logger : Serilog.ILogger)
         (resourceMap: Map<string, Ingress.GraphElementId>)
         (resources: GraphElementManager)
         objProp
         rangeExp
         =
-        let propertyResource = getObjectPropertyExpressionResource resources objProp
-        let rangeClassResource = getClassExpressionResource resources rangeExp
-
-        [ { Rule.Head = NormalHead
+        match getObjectPropertyExpressionResource logger resources objProp with 
+        | None -> Seq.empty
+        | Some bodyTriple ->
+        getClassExpressionResource logger resources rangeExp
+        |> Seq.map (fun rangeClassResource ->
+          { Rule.Head = NormalHead
               { TriplePattern.Subject = Term.Variable "y"
                 TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
                 TriplePattern.Object = Term.Resource rangeClassResource }
             Rule.Body =
               [ (RuleAtom.PositiveTriple
-                    { Subject = Term.Variable "x"
-                      Predicate = Term.Resource propertyResource
-                      Object = Term.Variable "y" }) ] } ]
+                    bodyTriple) ] } )
     (* prp-symp 	T(?p, rdf:type, owl:SymmetricProperty) T(?x, ?p, ?y) ->	T(?y, ?p, ?x)  *)
     let SymmetricObjectProperty2Datalog
+        (logger : Serilog.ILogger)
         (resourceMap: Map<string, Ingress.GraphElementId>)
         (resources: GraphElementManager)
         objProp
         =
-        let propertyResource = getObjectPropertyExpressionResource resources objProp
-
+        match getObjectPropertyExpressionResource logger resources objProp with 
+        | None -> Seq.empty
+        | Some bodyTriple ->
+        
         [ { Rule.Head = NormalHead
-              { TriplePattern.Subject = Term.Variable "y"
-                TriplePattern.Predicate = Term.Resource propertyResource
-                TriplePattern.Object = Term.Variable "x" }
+              { TriplePattern.Subject = bodyTriple.Object
+                TriplePattern.Predicate = bodyTriple.Predicate
+                TriplePattern.Object = bodyTriple.Subject }
             Rule.Body =
               [ (RuleAtom.PositiveTriple
-                    { Subject = Term.Variable "x"
-                      Predicate = Term.Resource propertyResource
-                      Object = Term.Variable "y" }) ] } ]
+                    bodyTriple) ] } ]
 
 
 
@@ -104,14 +144,15 @@ module Library =
         cax-eqc2 	T(?c1, owl:equivalentClass, ?c2) T(?x, rdf:type, ?c2) 	T(?x, rdf:type, ?c1) 
     *)
     let ObjectPropertyAxiom2Datalog
+        (logger : Serilog.ILogger)
         (resourceMap: Map<string, Ingress.GraphElementId>)
         (resources: GraphElementManager)
         (axiom: ObjectPropertyAxiom)
         =
         match axiom with
-        | ObjectPropertyDomain(objProp, domExp) -> ObjectPropertyDomain2Datalog resourceMap resources objProp domExp
-        | ObjectPropertyRange(objProp, rangeExp) -> ObjectPropertyRange2Datalog resourceMap resources objProp rangeExp
-        | SymmetricObjectProperty(_, objProp) -> SymmetricObjectProperty2Datalog resourceMap resources objProp
+        | ObjectPropertyDomain(objProp, domExp) -> ObjectPropertyDomain2Datalog logger resourceMap resources objProp domExp
+        | ObjectPropertyRange(objProp, rangeExp) -> ObjectPropertyRange2Datalog logger resourceMap resources objProp rangeExp
+        | SymmetricObjectProperty(_, objProp) -> SymmetricObjectProperty2Datalog logger resourceMap resources objProp
         | _ -> []
 
     let owlAxiom2Datalog logger
@@ -120,7 +161,7 @@ module Library =
         (axiom: Axiom)
         : Rule seq =
         match axiom with
-        | AxiomObjectPropertyAxiom propertyAxiom -> ObjectPropertyAxiom2Datalog resourceMap resources propertyAxiom
+        | AxiomObjectPropertyAxiom propertyAxiom -> ObjectPropertyAxiom2Datalog logger resourceMap resources propertyAxiom
         | AxiomClassAxiom classAxiom ->
             match DagSemTools.ELI.Library.Owl2Datalog logger resources classAxiom with
             | Some rules -> rules

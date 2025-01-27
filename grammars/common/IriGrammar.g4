@@ -10,14 +10,14 @@ grammar IriGrammar; // Kind of IRIs (https://www.rfc-editor.org/rfc/rfc3987#sect
 import CommonTokens, CommonTokens;
 
 rdfiri: LT IRI GT   #fullIri
-      | prefixName=LOCALNAME COLON localName=LOCALNAME  #prefixedIri
+      | prefixName=LOCALNAME COLON localName=LOCALNAME  #PrefixedIri
       | COLON? simpleName = (
             LOCALNAME 
           | DECIMALLITERAL 
           | EXPONENT 
           | INTEGERLITERAL 
           | FLOATINGPOINTLITERAL  
-      ) #emptyPrefixedIri // Numbers are valid localnames in Manchester syntax
+      ) #EmptyPrefixedIri // Numbers are valid localnames in Manchester syntax
       ;
 
 localname: LOCALNAME;

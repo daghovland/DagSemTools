@@ -215,6 +215,13 @@ public class TestParser : IDisposable, IAsyncDisposable
         Assert.NotNull(ont);
     }
 
+    [Fact]
+    public void TestOnlyPrefixIri()
+    {
+        var ontology = File.ReadAllText("TestData/onlyPrefixIri.ttl");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+    }
 
     [Fact]
     public void TestQuotedLiterals()
