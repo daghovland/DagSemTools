@@ -7,9 +7,35 @@
 *)
 namespace DagSemTools.OWL2ALC
 open DagSemTools.AlcTableau
+open DagSemTools.AlcTableau.ALC
+open DagSemTools.OwlOntology
 open OwlOntology
 open ALC
+open Serilog
 
 module Translator =
-    let translate (ontology: DagSemTools.OwlOntology.Ontology) : ALC.OntologyDocument =
-        OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, ([],[]))
+    let internal translateIri (logger : ILogger) owlIri =
+        match owlIri with
+        | FullIri iri -> iri
+    let internal translateClass (logger : ILogger) (cls : ClassExpression) : Concept =
+        match cls with
+        | ClassName clsName -> ConceptName (translateIri logger clsName)
+        | _ -> failwith "todo"
+        
+    let internal translateClassAxiom (logger : ILogger) classAxiom =
+        match classAxiom with
+        | SubClassOf (annot, subclass, superclass) -> Inclusion (translateClass logger subclass,
+                                                                 translateClass logger superclass)
+        | _ -> failwith "todo"
+    let internal translateAxiom (logger : ILogger) (ax : Axiom) =
+        match ax with
+        | AxiomClassAxiom classAxiom -> translateClassAxiom logger classAxiom |> Some
+        | AxiomDeclaration decl -> logger.Warning "Declarations are not yet translated into DL"
+                                   None
+    let translate (logger : ILogger) (ontology: DagSemTools.OwlOntology.Ontology) : ALC.OntologyDocument =
+        let tboxAxioms = ontology.Axioms
+                        |> Seq.choose (translateAxiom logger)
+                        |> Seq.toList
+        OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, (tboxAxioms,[]))
+        
+    

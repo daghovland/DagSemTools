@@ -7,14 +7,56 @@
 *)
 namespace DagSemTools.OWL2ALC
 open DagSemTools.AlcTableau
+open DagSemTools.AlcTableau.ALC
+open DagSemTools.OwlOntology
+open IriTools
 open OwlOntology
 open ALC
-
-module Tests
-
-open System
+open Serilog
+open Serilog.Sinks.InMemory
 open Xunit
+open Faqt
 
-[<Fact>]
-let ``My test`` () =
-    Assert.True(true)
+module Tests =
+
+    let inMemorySink = new InMemorySink()
+    let logger =
+        LoggerConfiguration()
+                .WriteTo.Sink(inMemorySink)
+                .CreateLogger()
+        
+
+    [<Fact>]
+    let ``Empty Owl ontology is translated`` () =
+        let emptyOntology = new DagSemTools.OwlOntology.Ontology([],
+                                                                 DagSemTools.OwlOntology.ontologyVersion.UnNamedOntology,
+                                                                 [],
+                                                                 [])
+        let translatedOntology = DagSemTools.OWL2ALC.Translator.translate logger emptyOntology
+        let expectedOntology = OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, ([],[]))
+        translatedOntology.Should().Be(expectedOntology)
+      
+
+    
+    [<Fact>]
+    let ``Single className is translated`` () =
+        let subclassIri = (IriReference "https://example.com/subclass")
+        let subClass = (ClassName (FullIri subclassIri))
+        let translatedClass = Translator.translateClass logger subClass
+        translatedClass.Should().Be(ConceptName subclassIri)
+    
+    [<Fact>]
+    let ``Single axiom Owl ontology is translated`` () =
+        let subclassIri = (IriReference "https://example.com/subclass")
+        let subClass = (ClassName (FullIri subclassIri))
+        let superclassIri = (IriReference "https://example.com/superclass")
+        let superClass = (ClassName (FullIri superclassIri))
+        let axiom = AxiomClassAxiom (SubClassOf ([],subClass, superClass)) 
+        let emptyOntology = new DagSemTools.OwlOntology.Ontology([],
+                                                                 DagSemTools.OwlOntology.ontologyVersion.UnNamedOntology,
+                                                                 [],
+                                                                 [axiom])
+        let translatedOntology = Translator.translate logger emptyOntology
+        let expectedAxiom = Inclusion (ConceptName subclassIri, ConceptName superclassIri) 
+        let expectedOntology = OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, ([expectedAxiom],[]))
+        translatedOntology.Should().Be(expectedOntology)

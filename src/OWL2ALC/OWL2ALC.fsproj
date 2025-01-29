@@ -29,6 +29,7 @@
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </Content>
+        <Compile Include="AssemblyInfo.fs" />
     </ItemGroup>
 
 
@@ -56,6 +57,10 @@
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </None>
+    </ItemGroup>
+    
+    <ItemGroup>
+        <InternalsVisibleTo Include="DagSemTools.OWL2ALC.Tests" />
     </ItemGroup>
 
 
