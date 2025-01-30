@@ -47,6 +47,41 @@ module Tests =
         let translatedClass = Translator.translateClass logger union
         translatedClass.Should().Be(Disjunction (ConceptName subclassIri, ConceptName superclassIri))
     
+    [<Fact>]
+    let ``Simple class intersection is translated`` () =
+        let subclassIri = (IriReference "https://example.com/subclass")
+        let class1 = (ClassName (FullIri subclassIri))
+        let superclassIri = (IriReference "https://example.com/superclass")
+        let class2 = (ClassName (FullIri superclassIri))
+        let union = ObjectIntersectionOf [class1; class2]
+        let translatedClass = Translator.translateClass logger union
+        translatedClass.Should().Be(Conjunction (ConceptName subclassIri, ConceptName superclassIri))
+    
+    
+    [<Fact>]
+    let ``Triple class union is translated`` () =
+        let subclassIri = (IriReference "https://example.com/subclass")
+        let class1 = (ClassName (FullIri subclassIri))
+        let superclassIri = (IriReference "https://example.com/superclass")
+        let class2 = (ClassName (FullIri superclassIri))
+        let classIri3 = (IriReference "https://example.com/class3")
+        let class3 = (ClassName (FullIri classIri3))
+        let union = ObjectUnionOf [class1; class2; class3]
+        let translatedClass = Translator.translateClass logger union
+        translatedClass.Should().Be(Disjunction (ConceptName subclassIri, Disjunction (ConceptName superclassIri, ConceptName classIri3)))
+    
+    
+    [<Fact>]
+    let ``Triple class intersection is translated`` () =
+        let subclassIri = (IriReference "https://example.com/subclass")
+        let class1 = (ClassName (FullIri subclassIri))
+        let superclassIri = (IriReference "https://example.com/superclass")
+        let class2 = (ClassName (FullIri superclassIri))
+        let classIri3 = (IriReference "https://example.com/class3")
+        let class3 = (ClassName (FullIri classIri3))
+        let union = ObjectIntersectionOf [class1; class2; class3]
+        let translatedClass = Translator.translateClass logger union
+        translatedClass.Should().Be(Conjunction (ConceptName subclassIri, Conjunction (ConceptName superclassIri, ConceptName classIri3)))
     
     [<Fact>]
     let ``Single className is translated`` () =
