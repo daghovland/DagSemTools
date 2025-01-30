@@ -53,6 +53,7 @@ jobs:
             "AlcTableau"
             "Rdf"
             "OwlOntology"
+            "OWL2ALC"
             "RdfOwlTranslator"
             "Parser"
             "Turtle.Parser"
