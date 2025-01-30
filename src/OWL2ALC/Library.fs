@@ -10,6 +10,7 @@ open DagSemTools.AlcTableau
 open DagSemTools.AlcTableau.ALC
 open DagSemTools.AlcTableau.DataRange
 open DagSemTools.OwlOntology
+open IriTools
 open OwlOntology
 open ALC
 open Serilog
@@ -26,6 +27,10 @@ module Translator =
                                                             | Role.Iri iri -> Role.Inverse iri
                                                             | Role.Inverse iri -> Role.Iri iri
         | ObjectPropertyChain objectPropertyExpressions -> failwith "todo"
+    let internal translateIndividual (logger : ILogger) (ind : Individual)  : IriReference =
+        match ind with
+        | NamedIndividual (FullIri iri) -> iri
+        | AnonymousIndividual i -> failwith "todo"
     
     let rec private translateList logger translateElement binaryOperator  clsList =
         match clsList with
@@ -46,6 +51,7 @@ module Translator =
         | ObjectIntersectionOf clsList  -> translateIntersection logger clsList
         | ObjectComplementOf cls -> Negation (translateClass logger cls)
         | ObjectSomeValuesFrom (role, cls) -> Existential (translateRole logger role, translateClass logger cls)  
+        | ObjectAllValuesFrom (role, cls) -> Universal (translateRole logger role, translateClass logger cls)  
         | _ -> failwith "todo"
         
     let rec internal translateClassAxiom (logger : ILogger) classAxiom =
@@ -59,21 +65,44 @@ module Translator =
         | DisjointClasses(tuples, classExpressions) -> failwith "todo"
         | DisjointUnion(tuples, iri, classExpressions) -> failwith "todo"
         
+    let internal translateAssertion (logger : ILogger) assertion =
+        match assertion with
+        | ObjectPropertyAssertion(annotations, objectPropertyExpression, left, right) ->
+            RoleAssertion (translateIndividual logger left,
+                           translateIndividual logger right,
+                           translateRole logger objectPropertyExpression)
+        | SameIndividual(_annots, individuals) -> failwith "todo"
+        | DifferentIndividuals(_annots, individuals) -> failwith "todo"
+        | ClassAssertion(_annots, classExpression, individual) -> failwith "todo"
+        | NegativeObjectPropertyAssertion(_annots, objectPropertyExpression, individual, individual1) -> failwith "todo"
+        | DataPropertyAssertion(_annots, FullIri dprop, individual, graphElement) ->
+          LiteralAssertion (translateIndividual logger individual, dprop, graphElement.ToString())
+        | NegativeDataPropertyAssertion(_annots, dprop, individual, graphElement) -> failwith "todo"
+        
+    type DLAxiom =
+        TBOX of TBoxAxiom
+        | ABOX of ABoxAssertion
     let internal translateAxiom (logger : ILogger) (ax : Axiom) =
         match ax with
-        | AxiomClassAxiom classAxiom -> translateClassAxiom logger classAxiom 
+        | AxiomClassAxiom classAxiom -> translateClassAxiom logger classAxiom |> Seq.map TBOX 
         | AxiomDeclaration decl -> logger.Warning "Declarations are not yet translated into DL"
                                    []
         | AxiomObjectPropertyAxiom objectPropertyAxiom -> failwith "todo"
         | AxiomDataPropertyAxiom dataPropertyAxiom -> failwith "todo"
         | AxiomDatatypeDefinition(tuples, iri, dataRange) -> failwith "todo"
         | AxiomHasKey(tuples, classExpression, objectPropertyExpressions, iris) -> failwith "todo"
-        | AxiomAssertion assertion -> failwith "todo"
+        | AxiomAssertion assertion -> translateAssertion logger assertion |> ABOX |> Seq.singleton
         | AxiomAnnotationAxiom annotationAxiom -> failwith "todo"
     let translate (logger : ILogger) (ontology: DagSemTools.OwlOntology.Ontology) : ALC.OntologyDocument =
-        let tboxAxioms = ontology.Axioms
-                        |> Seq.collect (translateAxiom logger)
-                        |> Seq.toList
-        OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, (tboxAxioms,[]))
+        let (tboxAxioms, aboxAxioms) = ontology.Axioms
+                                        |> Seq.collect (translateAxiom logger)
+                                        |> Seq.toList
+                                        |> List.fold (fun (tboxAcc, aboxAcc) axiom ->
+                                            match axiom with
+                                            | TBOX x -> (x :: tboxAcc, aboxAcc)
+                                            | ABOX x -> (tboxAcc, x :: aboxAcc))
+                                            ([], [])
+
+        OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, (tboxAxioms, aboxAxioms))
         
     

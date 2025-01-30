@@ -8,6 +8,7 @@
 namespace DagSemTools.OWL2ALC
 open DagSemTools.AlcTableau
 open DagSemTools.AlcTableau.ALC
+open DagSemTools.Ingress
 open DagSemTools.OwlOntology
 open IriTools
 open OwlOntology
@@ -46,6 +47,61 @@ module Tests =
         let union = ObjectUnionOf [class1; class2]
         let translatedClass = Translator.translateClass logger union
         translatedClass.Should().Be(Disjunction (ConceptName subclassIri, ConceptName superclassIri))
+    
+    [<Fact>]
+    let ``Simple existential is translated`` () =
+        let subclassIri = (IriReference "https://example.com/subclass")
+        let class1 = (ClassName (FullIri subclassIri))
+        let roleIri = (IriReference "https://example.com/role")
+        let role = NamedObjectProperty (FullIri roleIri)
+        let universal = ObjectSomeValuesFrom (role, class1)
+        let translatedClass = Translator.translateClass logger universal
+        translatedClass.Should().Be(Existential (Role.Iri roleIri  , ConceptName subclassIri))
+    
+    [<Fact>]
+    let ``Simple universal is translated`` () =
+        let subclassIri = (IriReference "https://example.com/subclass")
+        let class1 = (ClassName (FullIri subclassIri))
+        let roleIri = (IriReference "https://example.com/role")
+        let role = NamedObjectProperty (FullIri roleIri)
+        let universal = ObjectAllValuesFrom (role, class1)
+        let translatedClass = Translator.translateClass logger universal
+        translatedClass.Should().Be(Universal (Role.Iri roleIri  , ConceptName subclassIri))
+    
+    [<Fact>]
+    let ``Simple object property fact is translated`` () =
+        let leftIri = (IriReference "https://example.com/left")
+        let rightIri = (IriReference "https://example.com/right")
+        let roleIri = (IriReference "https://example.com/role")
+        let role = NamedObjectProperty (FullIri roleIri)
+        let assertion = ObjectPropertyAssertion ([], role, NamedIndividual (FullIri leftIri),
+                                                 NamedIndividual (FullIri rightIri))
+        let translatedClass = Translator.translateAssertion logger assertion
+        translatedClass.Should().Be(ABoxAssertion.RoleAssertion (leftIri, rightIri, Role.Iri roleIri))
+    
+    
+    [<Fact>]
+    let ``Simple data property fact is translated`` () =
+        let leftIri = (IriReference "https://example.com/left")
+        let data = GraphElement.GraphLiteral (RdfLiteral.LiteralString "data")
+        let roleIri = (IriReference "https://example.com/role")
+        let role = FullIri roleIri
+        let assertion = DataPropertyAssertion ([], role,
+                                               NamedIndividual (FullIri leftIri),
+                                                data)
+        let translatedClass = Translator.translateAssertion logger assertion
+        translatedClass.Should().Be(ABoxAssertion.LiteralAssertion (leftIri, roleIri, "(data)"))
+    
+    [<Fact>]
+    let ``Inverse object property fact is translated`` () =
+        let leftIri = (IriReference "https://example.com/left")
+        let rightIri = (IriReference "https://example.com/right")
+        let roleIri = (IriReference "https://example.com/role")
+        let role = InverseObjectProperty (NamedObjectProperty (FullIri roleIri))
+        let assertion = ObjectPropertyAssertion ([], role, NamedIndividual (FullIri leftIri),
+                                                 NamedIndividual (FullIri rightIri))
+        let translatedClass = Translator.translateAssertion logger assertion
+        translatedClass.Should().Be(ABoxAssertion.RoleAssertion (leftIri, rightIri, Role.Inverse roleIri))
     
     [<Fact>]
     let ``Simple class intersection is translated`` () =
