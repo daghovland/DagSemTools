@@ -17,9 +17,18 @@ module Translator =
     let internal translateIri (logger : ILogger) owlIri =
         match owlIri with
         | FullIri iri -> iri
-    let internal translateClass (logger : ILogger) (cls : ClassExpression) : Concept =
+        
+    let rec private translateUnion logger clsList =
+        match clsList with
+        | [] -> failwith "empty union should not occur. This is a bug I think"
+        | [singleClass] -> translateClass logger singleClass
+        | [class1; class2] -> Disjunction (translateClass logger class1, translateClass logger class2)
+        | classExpressions -> Disjunction (translateClass logger (classExpressions |> List.head),
+                                           translateUnion logger (classExpressions |> List.tail))
+    and internal translateClass (logger : ILogger) (cls : ClassExpression) : Concept =
         match cls with
         | ClassName clsName -> ConceptName (translateIri logger clsName)
+        | ObjectUnionOf clsList  -> translateUnion logger clsList
         | _ -> failwith "todo"
         
     let internal translateClassAxiom (logger : ILogger) classAxiom =

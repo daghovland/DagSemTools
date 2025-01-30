@@ -37,6 +37,16 @@ module Tests =
         translatedOntology.Should().Be(expectedOntology)
       
 
+    [<Fact>]
+    let ``Simple class union is translated`` () =
+        let subclassIri = (IriReference "https://example.com/subclass")
+        let class1 = (ClassName (FullIri subclassIri))
+        let superclassIri = (IriReference "https://example.com/superclass")
+        let class2 = (ClassName (FullIri superclassIri))
+        let union = ObjectUnionOf [class1; class2]
+        let translatedClass = Translator.translateClass logger union
+        translatedClass.Should().Be(Disjunction (ConceptName subclassIri, ConceptName superclassIri))
+    
     
     [<Fact>]
     let ``Single className is translated`` () =
