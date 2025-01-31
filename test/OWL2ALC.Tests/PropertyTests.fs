@@ -35,7 +35,7 @@ module PropertyTests =
         let role = NamedObjectProperty (FullIri roleIri)
         let rangeAxiom = ObjectPropertyRange (role, rangeClass)
         let translatedAxiom = Translator.translateObjectPropertyAxiom logger rangeAxiom
-        translatedAxiom.Should().Be(Inclusion(Universal (Role.Iri roleIri, Top), ConceptName rangeIri))
+        translatedAxiom.Should().Be(Inclusion(Universal (Role.Inverse roleIri, Top), ConceptName rangeIri))
     
     [<Fact>]
     let ``Object Property Domain is translated`` () =
@@ -45,7 +45,7 @@ module PropertyTests =
         let role = NamedObjectProperty (FullIri roleIri)
         let rangeAxiom = ObjectPropertyDomain (role, domainClass)
         let translatedAxiom = Translator.translateObjectPropertyAxiom logger rangeAxiom
-        translatedAxiom.Should().Be(Inclusion(Universal (Role.Inverse roleIri, Top), ConceptName domainIri))
+        translatedAxiom.Should().Be(Inclusion(Universal (Role.Iri roleIri, Top), ConceptName domainIri))
     
     [<Fact>]
     let ``Data Property Domain is translated`` () =
@@ -55,5 +55,5 @@ module PropertyTests =
         let property = FullIri propertyIri
         let axiom = DataPropertyDomain ([], property, domainClass)
         let translatedAxiom = Translator.translateDataPropertyAxiom logger axiom
-        translatedAxiom.Should().Be(Inclusion(Universal (Role.Inverse propertyIri, Top), ConceptName domainIri))
+        translatedAxiom.Should().Be(Inclusion(Universal (Role.Iri propertyIri, Top), ConceptName domainIri))
     

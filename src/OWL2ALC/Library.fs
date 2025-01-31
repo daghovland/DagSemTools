@@ -9,6 +9,7 @@ namespace DagSemTools.OWL2ALC
 open DagSemTools.AlcTableau
 open DagSemTools.AlcTableau.ALC
 open DagSemTools.AlcTableau.DataRange
+open DagSemTools.Ingress
 open DagSemTools.OwlOntology
 open IriTools
 open OwlOntology
@@ -40,6 +41,21 @@ module Translator =
         | classExpressions -> binaryOperator (translateElement logger (classExpressions |> List.head),
                                            translateList logger translateElement binaryOperator (classExpressions |> List.tail))
    
+    let internal translateFacet
+        (logger : ILogger)
+        (prop : IriReference) =
+            match prop.ToString() with
+            | Namespaces.XsdMinExclusive -> facet.GreaterThan
+            | Namespaces.XsdMinInclusive -> facet.GreaterThanOrEqual
+            | Namespaces.XsdMaxExclusive -> facet.LessThan
+            | Namespaces.XsdMaxInclusive -> facet.LessThanOrEqual
+            | Namespaces.XsdLength -> facet.Length
+            | Namespaces.XsdMinLength -> facet.MinLength
+            | Namespaces.XsdMaxLength -> facet.MaxLength
+            | Namespaces.XsdPattern -> facet.Pattern
+            | Namespaces.XsdLangRange -> facet.LangRange
+            | invalidRangeName -> failwith $"Invalid data range {invalidRangeName}"
+
     let rec private translateUnion logger clsList =
         translateList logger translateClass Disjunction clsList
     and private translateIntersection logger clsList =
@@ -96,7 +112,6 @@ module Translator =
         | DataPropertyDomain (_annots, FullIri prop, domain) ->
             let domainExpression = translateClass logger domain
             Inclusion (Universal (Iri prop, Top),domainExpression)
-
         | SubDataPropertyOf(tuples, iri, iri1) -> failwith "todo"
         | EquivalentDataProperties(tuples, iris) -> failwith "todo"
         | DisjointDataProperties(tuples, iris) -> failwith "todo"
@@ -107,12 +122,16 @@ module Translator =
         (logger : ILogger)
         (range : DataRange) =
         match range with
-        | NamedDataRange (FullIri iri) -> DataRange.Datatype iri
+        | NamedDataRange (FullIri iri) -> Datatype iri
         | DataIntersectionOf dataRanges -> translateList logger translateDataRange Intersection dataRanges
         | DataUnionOf dataRanges -> translateList logger translateDataRange Union dataRanges
         | DataComplementOf dataRange -> dataRange |> translateDataRange logger |> Complement
         | DataOneOf graphElements -> graphElements |> List.map (_.ToString()) |> OneOf
-        | DatatypeRestriction(iri, tuples) -> failwith "todo"
+        | DatatypeRestriction(FullIri iri, tuples) ->
+           Restriction (Datatype iri,
+                        tuples |> List.map (fun (FullIri prop, el) ->
+                                           (translateFacet logger prop, el.ToString()) )
+                        )
     
     let rec internal translateAssertion (logger : ILogger) assertion =
         match assertion with
@@ -144,8 +163,9 @@ module Translator =
             translateObjectPropertyAxiom logger objectPropertyAxiom |> TBOX |> Seq.singleton
         | AxiomDataPropertyAxiom dataPropertyAxiom ->
             translateDataPropertyAxiom logger dataPropertyAxiom |> TBOX |> Seq.singleton
-        | AxiomDatatypeDefinition(_annots, iri, dataRange) ->
-            translateDatatypeDefinition logger iri dataRange
+        | AxiomDatatypeDefinition(_annots, (FullIri iri), dataRange) ->
+            // translateDataRange logger dataRange
+            failwith "todo"
         | AxiomHasKey(tuples, classExpression, objectPropertyExpressions, iris) -> failwith "todo"
         | AxiomAssertion assertion -> translateAssertion logger assertion |> ABOX |> Seq.singleton
         | AxiomAnnotationAxiom annotationAxiom -> failwith "todo"
