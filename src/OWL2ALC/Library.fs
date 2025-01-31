@@ -65,7 +65,7 @@ module Translator =
         | DisjointClasses(tuples, classExpressions) -> failwith "todo"
         | DisjointUnion(tuples, iri, classExpressions) -> failwith "todo"
         
-    let internal translateAssertion (logger : ILogger) assertion =
+    let rec internal translateAssertion (logger : ILogger) assertion =
         match assertion with
         | ObjectPropertyAssertion(annotations, objectPropertyExpression, left, right) ->
             RoleAssertion (translateIndividual logger left,
@@ -74,10 +74,14 @@ module Translator =
         | SameIndividual(_annots, individuals) -> failwith "todo"
         | DifferentIndividuals(_annots, individuals) -> failwith "todo"
         | ClassAssertion(_annots, classExpression, individual) -> failwith "todo"
-        | NegativeObjectPropertyAssertion(_annots, objectPropertyExpression, individual, individual1) -> failwith "todo"
+        | NegativeObjectPropertyAssertion(_annots, objectPropertyExpression, left, right) ->
+            NegativeRoleAssertion  (translateIndividual logger left,
+                                   translateIndividual logger right,
+                                   translateRole logger objectPropertyExpression)
         | DataPropertyAssertion(_annots, FullIri dprop, individual, graphElement) ->
           LiteralAssertion (translateIndividual logger individual, dprop, graphElement.ToString())
-        | NegativeDataPropertyAssertion(_annots, dprop, individual, graphElement) -> failwith "todo"
+        | NegativeDataPropertyAssertion(_annots, FullIri dprop, individual, graphElement) ->
+            NegativeAssertion (LiteralAssertion (translateIndividual logger individual, dprop, graphElement.ToString()))
         
     type DLAxiom =
         TBOX of TBoxAxiom

@@ -151,6 +151,7 @@ module ALC =
         | RoleAssertion of Individual: IriReference * Right: IriReference * AssertedRole:  Role
         | NegativeRoleAssertion of Individual: IriReference * Right: IriReference * AssertedRole:  Role
         | LiteralAssertion of Individual: IriReference * Property: IriReference * Value: string
+        | NegativeLiteralAssertion of Individual: IriReference * Property: IriReference * Value: string
         | LiteralAnnotationAssertion of Individual: IriReference * Property: IriReference * Value: string
         | ObjectAnnotationAssertion of Individual:  IriReference * Property: IriReference * Value: IriReference
        

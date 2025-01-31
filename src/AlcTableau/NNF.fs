@@ -35,7 +35,12 @@ module NNF =
         match assertion with
             | ConceptAssertion (individual, concept) -> ConceptAssertion(individual, nnf_concept concept)
             | NegativeAssertion (RoleAssertion (individual, object, role)) -> NegativeRoleAssertion (individual, object, role)
+            | NegativeAssertion (NegativeRoleAssertion (individual, object, role)) -> RoleAssertion (individual, object, role)
             | NegativeAssertion (ConceptAssertion (individual, concept)) -> ConceptAssertion(individual, nnf_concept (ALC.Negation concept))
+            | NegativeAssertion (LiteralAssertion (individual, data, prop)) -> NegativeLiteralAssertion (individual, data, prop)
+            | NegativeAssertion (NegativeAssertion assertion) -> assertion
+            | NegativeAssertion (NegativeLiteralAssertion (individual, data, prop)) -> LiteralAssertion(individual, data, prop)
+            
             | NegativeAssertion _ -> failwith "Arbitrary negative assertions are not yet supported"
             | r -> r
             

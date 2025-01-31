@@ -169,7 +169,7 @@ module Tests =
         let assertion =  NegativeObjectPropertyAssertion ([], role, NamedIndividual (FullIri leftIri),
                                                  NamedIndividual (FullIri rightIri))
         let translatedClass = Translator.translateAssertion logger assertion
-        translatedClass.Should().Be(ABoxAssertion.NegativeAssertion (RoleAssertion (leftIri, rightIri, Role.Inverse roleIri)))
+        translatedClass.Should().Be(ABoxAssertion.NegativeRoleAssertion (leftIri, rightIri, Role.Iri roleIri))
     
     
     [<Fact>]
