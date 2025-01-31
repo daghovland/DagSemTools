@@ -59,5 +59,8 @@
             <PackagePath>README.md</PackagePath>
         </None>
     </ItemGroup>    
+    <ItemGroup>
+      <ProjectReference Include="..\OWL2ALC\OWL2ALC.fsproj" />
+    </ItemGroup>    
     
 </Project>

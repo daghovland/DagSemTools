@@ -141,7 +141,8 @@ module Translator =
                            translateRole logger objectPropertyExpression)
         | SameIndividual(_annots, individuals) -> failwith "todo"
         | DifferentIndividuals(_annots, individuals) -> failwith "todo"
-        | ClassAssertion(_annots, classExpression, individual) -> failwith "todo"
+        | ClassAssertion(_annots, classExpression, individual) ->
+            ConceptAssertion (translateIndividual logger individual, translateClass logger classExpression)
         | NegativeObjectPropertyAssertion(_annots, objectPropertyExpression, left, right) ->
             NegativeRoleAssertion  (translateIndividual logger left,
                                    translateIndividual logger right,

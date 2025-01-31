@@ -12,7 +12,7 @@ namespace DagSemTools.AlcTableau
 open ALC
 
 module NNF = 
-    let rec nnf_concept concept =
+    let rec internal nnf_concept concept =
         match concept with
         | Negation concept1 -> push_negation concept1
         | Conjunction (c1, c2) -> Conjunction(nnf_concept c1, nnf_concept c2)
@@ -20,7 +20,7 @@ module NNF =
         | Existential (r1, c1) -> Existential(r1, nnf_concept c1)
         | Universal (r1, c1) -> Universal(r1, nnf_concept c1)
         | _ -> concept
-    and push_negation c =
+    and internal push_negation c =
         match c with
         | Negation concept1 -> nnf_concept concept1
         | ConceptName iri1 -> Negation c
@@ -31,7 +31,7 @@ module NNF =
         | Top -> Bottom
         | Bottom -> Top
     
-    let nnf_assertion assertion =
+    let internal nnf_assertion assertion =
         match assertion with
             | ConceptAssertion (individual, concept) -> ConceptAssertion(individual, nnf_concept concept)
             | NegativeAssertion (RoleAssertion (individual, object, role)) -> NegativeRoleAssertion (individual, object, role)
@@ -46,6 +46,6 @@ module NNF =
             
             
             
-    let nnf_kb (tbox, abox) =
+    let internal nnf_kb (tbox, abox) =
         (tbox, List.map nnf_assertion abox)
         
