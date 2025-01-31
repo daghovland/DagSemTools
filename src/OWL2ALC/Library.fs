@@ -44,7 +44,8 @@ module Translator =
         translateList logger translateClass Disjunction clsList
     and private translateIntersection logger clsList =
         translateList logger translateClass Conjunction clsList
-    and internal translateClass (logger : ILogger) cls =
+    and internal translateClass
+        (logger : ILogger) cls =
         match cls with
         | ClassName clsName -> ConceptName (translateIri logger clsName)
         | ObjectUnionOf clsList  -> translateUnion logger clsList
@@ -54,7 +55,8 @@ module Translator =
         | ObjectAllValuesFrom (role, cls) -> Universal (translateRole logger role, translateClass logger cls)  
         | _ -> failwith "todo"
         
-    let rec internal translateClassAxiom (logger : ILogger) classAxiom =
+    let rec internal translateClassAxiom
+        (logger : ILogger) classAxiom =
         match classAxiom with
         | SubClassOf (annot, subclass, superclass) -> [Inclusion (translateClass logger subclass,
                                                                  translateClass logger superclass)]
@@ -64,7 +66,54 @@ module Translator =
                                                             |> List.map (fun (cls1, cls2) -> (Equivalence (cls1, cls2)))
         | DisjointClasses(tuples, classExpressions) -> failwith "todo"
         | DisjointUnion(tuples, iri, classExpressions) -> failwith "todo"
-        
+    let rec internal translateObjectPropertyAxiom
+        (logger : ILogger)
+        axiom =
+        match axiom with
+        | ObjectPropertyDomain (prop, dom) ->
+            let domainExpression = translateClass logger dom
+            let role = translateRole logger prop
+            Inclusion (Universal (role, Top),domainExpression)
+        | ObjectPropertyRange(prop, range) ->
+            let rangeExpression = translateClass logger range
+            let role = translateRole logger (InverseObjectProperty prop)
+            Inclusion (Universal (role, Top), rangeExpression)
+        | SubObjectPropertyOf(tuples, subPropertyExpression, objectPropertyExpression) -> failwith "todo"
+        | EquivalentObjectProperties(tuples, objectPropertyExpressions) -> failwith "todo"
+        | DisjointObjectProperties(tuples, objectPropertyExpressions) -> failwith "todo"
+        | InverseObjectProperties(tuples, objectPropertyExpression, propertyExpression) -> failwith "todo"
+        | FunctionalObjectProperty(tuples, objectPropertyExpression) -> failwith "todo"
+        | InverseFunctionalObjectProperty(tuples, objectPropertyExpression) -> failwith "todo"
+        | ReflexiveObjectProperty(tuples, objectPropertyExpression) -> failwith "todo"
+        | IrreflexiveObjectProperty(tuples, objectPropertyExpression) -> failwith "todo"
+        | SymmetricObjectProperty(tuples, objectPropertyExpression) -> failwith "todo"
+        | AsymmetricObjectProperty(tuples, objectPropertyExpression) -> failwith "todo"
+        | TransitiveObjectProperty(tuples, objectPropertyExpression) -> failwith "todo"
+    let internal translateDataPropertyAxiom
+        (logger : ILogger)
+        axiom =
+        match axiom with
+        | DataPropertyDomain (_annots, FullIri prop, domain) ->
+            let domainExpression = translateClass logger domain
+            Inclusion (Universal (Iri prop, Top),domainExpression)
+
+        | SubDataPropertyOf(tuples, iri, iri1) -> failwith "todo"
+        | EquivalentDataProperties(tuples, iris) -> failwith "todo"
+        | DisjointDataProperties(tuples, iris) -> failwith "todo"
+        | DataPropertyRange(tuples, iri, dataRange) -> failwith "todo"
+        | FunctionalDataProperty(tuples, iri) -> failwith "todo"
+    
+    let rec internal translateDataRange
+        (logger : ILogger)
+        (range : DataRange) =
+        match range with
+        | NamedDataRange (FullIri iri) -> DataRange.Datatype iri
+        | DataIntersectionOf dataRanges -> translateList logger translateDataRange Intersection dataRanges
+        | DataUnionOf dataRanges -> translateList logger translateDataRange Union dataRanges
+        | DataComplementOf dataRange -> dataRange |> translateDataRange logger |> Complement
+        | DataOneOf graphElements -> graphElements |> List.map (_.ToString()) |> OneOf
+        | DatatypeRestriction(iri, tuples) -> failwith "todo"
+    
     let rec internal translateAssertion (logger : ILogger) assertion =
         match assertion with
         | ObjectPropertyAssertion(annotations, objectPropertyExpression, left, right) ->
@@ -91,9 +140,12 @@ module Translator =
         | AxiomClassAxiom classAxiom -> translateClassAxiom logger classAxiom |> Seq.map TBOX 
         | AxiomDeclaration decl -> logger.Warning "Declarations are not yet translated into DL"
                                    []
-        | AxiomObjectPropertyAxiom objectPropertyAxiom -> failwith "todo"
-        | AxiomDataPropertyAxiom dataPropertyAxiom -> failwith "todo"
-        | AxiomDatatypeDefinition(tuples, iri, dataRange) -> failwith "todo"
+        | AxiomObjectPropertyAxiom objectPropertyAxiom ->
+            translateObjectPropertyAxiom logger objectPropertyAxiom |> TBOX |> Seq.singleton
+        | AxiomDataPropertyAxiom dataPropertyAxiom ->
+            translateDataPropertyAxiom logger dataPropertyAxiom |> TBOX |> Seq.singleton
+        | AxiomDatatypeDefinition(_annots, iri, dataRange) ->
+            translateDatatypeDefinition logger iri dataRange
         | AxiomHasKey(tuples, classExpression, objectPropertyExpressions, iris) -> failwith "todo"
         | AxiomAssertion assertion -> translateAssertion logger assertion |> ABOX |> Seq.singleton
         | AxiomAnnotationAxiom annotationAxiom -> failwith "todo"
