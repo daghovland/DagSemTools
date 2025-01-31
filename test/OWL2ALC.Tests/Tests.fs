@@ -94,9 +94,6 @@ module Tests =
         let translatedClass = Translator.translateClass logger union
         translatedClass.Should().Be(Conjunction (ConceptName subclassIri, ConceptName superclassIri))
     
-    
-    
-    
     [<Fact>]
     let ``Triple class intersection is translated`` () =
         let subclassIri = (IriReference "https://example.com/subclass")
@@ -108,7 +105,6 @@ module Tests =
         let union = ObjectIntersectionOf [class1; class2; class3]
         let translatedClass = Translator.translateClass logger union
         translatedClass.Should().Be(Conjunction (ConceptName subclassIri, Conjunction (ConceptName superclassIri, ConceptName classIri3)))
-    
     
     [<Fact>]
     let ``Complement of class name is translated`` () =
@@ -183,8 +179,6 @@ module Tests =
                                                 data)
         let translatedClass = Translator.translateAssertion logger assertion
         translatedClass.Should().Be(ABoxAssertion.LiteralAssertion (leftIri, roleIri, "(data)"))
-    
-    
     
     [<Fact>]
     let ``Negative data property fact is translated`` () =
