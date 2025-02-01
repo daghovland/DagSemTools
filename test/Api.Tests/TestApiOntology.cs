@@ -181,7 +181,7 @@ public class TestApiOntology(ITestOutputHelper output)
     }
 
 
-    [Fact]
+    [Fact(Skip="Must wait until number constraints are implemented in tableau. See Issue https://github.com/daghovland/DagSemTools/issues/2")]
     public void Imf2AlcWorks()
     {
         // Arrange

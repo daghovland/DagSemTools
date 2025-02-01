@@ -31,7 +31,7 @@ module Translator =
     let internal translateIndividual (logger : ILogger) (ind : Individual)  : IriReference =
         match ind with
         | NamedIndividual (FullIri iri) -> iri
-        | AnonymousIndividual i -> failwith "todo"
+        | AnonymousIndividual i -> IriReference $"https://example.com/anonymous/{i}"
     
     let rec private translateList logger translateElement binaryOperator  clsList =
         match clsList with
@@ -69,7 +69,25 @@ module Translator =
         | ObjectComplementOf cls -> Negation (translateClass logger cls)
         | ObjectSomeValuesFrom (role, cls) -> Existential (translateRole logger role, translateClass logger cls)  
         | ObjectAllValuesFrom (role, cls) -> Universal (translateRole logger role, translateClass logger cls)  
-        | _ -> failwith "todo"
+        | AnonymousClass i -> failwith "todo"
+        | ObjectOneOf individuals -> failwith "todo"
+        | ObjectHasValue(objectPropertyExpression, individual) -> failwith "todo"
+        | ObjectHasSelf objectPropertyExpression -> failwith "todo"
+        | ObjectMinQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "Qualified cardinalities are not implemented yet"
+        | ObjectMaxQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "Qualified cardinalities are not implemented yet"
+        | ObjectExactQualifiedCardinality(i, objectPropertyExpression, classExpression) -> failwith "Qualified cardinalities are not implemented yet"
+        | ObjectExactCardinality(i, objectPropertyExpression) -> failwith "Number restriction are not implemented yet"
+        | ObjectMinCardinality(i, objectPropertyExpression) -> failwith "Number restriction are not implemented yet"
+        | ObjectMaxCardinality(i, objectPropertyExpression) -> failwith "Number restriction are not implemented yet"
+        | DataSomeValuesFrom(iris, dataRange) -> failwith "Concrete domain is not implemented yet"
+        | DataAllValuesFrom(iris, dataRange) -> failwith "Concrete domain is not implemented yet"
+        | DataHasValue(iri, graphElement) -> failwith "Concrete domain is not implemented yet"
+        | DataMinQualifiedCardinality(i, iri, dataRange) -> failwith "Number restriction are not implemented yet"
+        | DataMaxQualifiedCardinality(i, iri, dataRange) -> failwith "Number restriction are not implemented yet"
+        | DataExactQualifiedCardinality(i, iri, dataRange) -> failwith "Number restriction are not implemented yet"
+        | DataMinCardinality(i, iri) -> failwith "Number restriction are not implemented yet"
+        | DataMaxCardinality(i, iri) -> failwith "Number restriction are not implemented yet"
+        | DataExactCardinality(i, iri) -> failwith "Number restriction are not implemented yet"
         
     let rec internal translateClassAxiom
         (logger : ILogger) classAxiom =
