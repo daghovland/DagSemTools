@@ -48,6 +48,7 @@
 
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Ingress" Version="$(Version)" />
         <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
         <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="$(Version)" />
     </ItemGroup>
