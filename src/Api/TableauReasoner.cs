@@ -8,6 +8,9 @@
 
 using DagSemTools.AlcTableau;
 using DagSemTools.AlcTableau;
+using IriTools;
+using LanguageExt;
+using Microsoft.FSharp.Collections;
 using Serilog;
 
 
@@ -16,17 +19,35 @@ namespace DagSemTools.Api;
 public class TableauReasoner
 {
     private readonly ILogger _logger;
-    private readonly ALC.OntologyDocument _ontologyDocument;
-    private TableauReasoner(ALC.OntologyDocument ontologyDocument, ILogger? logger = null)
+    private readonly Tableau.ReasonerState _reasoningState;
+    private TableauReasoner(Tableau.ReasonerState reasonerState, ILogger? logger = null)
     {
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
-        _ontologyDocument = ontologyDocument;
+        _reasoningState = reasonerState;
     }
 
-    internal static TableauReasoner Create(ALC.OntologyDocument ontologyDocument, ILogger logger) =>
-        new(ontologyDocument, logger);
+    internal static TableauReasoner Create(Tableau.ReasonerState reasonerState, ILogger logger) =>
+        new(reasonerState, logger);
 
-
+    internal static IriResource GetConceptResource(ALC.Concept concept) =>
+        concept switch
+        {
+            ALC.Concept.ConceptName cName => new IriResource(cName.Item),
+            ALC.Concept.Conjunction conjunction => throw new NotImplementedException(),
+            ALC.Concept.Disjunction disjunction => throw new NotImplementedException(),
+            ALC.Concept.Existential existential => throw new NotImplementedException(),
+            ALC.Concept.Negation negation => throw new NotImplementedException(),
+            ALC.Concept.Universal universal => throw new NotImplementedException()
+        };
+    /// <summary>
+    /// Get iris of all types of the individual
+    /// </summary>
+    /// <param name="individual"></param>
+    /// <returns></returns>
+    public IEnumerable<IriResource> GetTypes(IriReference individual) =>
+        SeqModule.ToList(ReasonerService
+            .get_individual_types(_reasoningState, individual)
+            .Select(GetConceptResource));
 }

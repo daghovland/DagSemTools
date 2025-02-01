@@ -185,6 +185,7 @@ let internal expandAssertion state  (assertion : ALC.ABoxAssertion) =
     | LiteralAssertion(_individual, _property, _right) -> NewAssertions.Nothing
     | NegativeRoleAssertion(_individual, _right, _role) -> failwith "Negative roles are not supported"
     | NegativeAssertion(_assertion) -> failwith "Negative abox assertions are not supported"
+    | NegativeLiteralAssertion(individual, property, value) -> failwith "todo"
     
 
 let rec internal expand (state : ReasonerState) (nextAssertions : NewAssertions list) =
