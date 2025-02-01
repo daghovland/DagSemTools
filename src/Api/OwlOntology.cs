@@ -41,7 +41,7 @@ public class OwlOntology
     /// <param name="logger"></param>
     /// <returns></returns>
     public static OwlOntology Create(IGraph graph, ILogger? logger = null) =>
-        new (graph, logger);
+        new(graph, logger);
 
     /// <summary>
     /// Returns all the axioms of the ontology. 

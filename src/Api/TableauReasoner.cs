@@ -15,18 +15,18 @@ namespace DagSemTools.Api;
 
 public class TableauReasoner
 {
-        private readonly ILogger _logger;
-        private readonly ALC.OntologyDocument _ontologyDocument;
-        private TableauReasoner(ALC.OntologyDocument ontologyDocument, ILogger? logger = null)
-        {
-            _logger = logger ?? new LoggerConfiguration()
-                .WriteTo.Console()
-                .CreateLogger();
-            _ontologyDocument = ontologyDocument;
-        }
+    private readonly ILogger _logger;
+    private readonly ALC.OntologyDocument _ontologyDocument;
+    private TableauReasoner(ALC.OntologyDocument ontologyDocument, ILogger? logger = null)
+    {
+        _logger = logger ?? new LoggerConfiguration()
+            .WriteTo.Console()
+            .CreateLogger();
+        _ontologyDocument = ontologyDocument;
+    }
 
-        internal static TableauReasoner Create(ALC.OntologyDocument ontologyDocument, ILogger logger) =>
-            new (ontologyDocument, logger);
-        
+    internal static TableauReasoner Create(ALC.OntologyDocument ontologyDocument, ILogger logger) =>
+        new(ontologyDocument, logger);
+
 
 }
