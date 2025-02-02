@@ -151,10 +151,10 @@ module TestClassAxioms =
         // E subClassOf E_C
         let ESubClassFormulas =
             normalizedAxioms
-                  |> List.filter (fun (NormalizedConceptInclusion (union, superclas)) -> union = [FullIri Eiri])
+                  |> List.filter (fun (NormalizedConceptInclusion (subclassConjunction = union; superclass = superclas)) -> union = [FullIri Eiri])
         ESubClassFormulas.Should().HaveLength(1) |> ignore
         let E_Concept = ESubClassFormulas
-                            |> List.map (fun (NormalizedConceptInclusion (union, superclas)) -> superclas)
+                            |> List.map (fun (NormalizedConceptInclusion (subclassConjunction = union; superclass = superclas)) -> superclas)
                             |> List.head
         let E_C = 
             match (E_Concept) with

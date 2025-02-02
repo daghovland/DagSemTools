@@ -20,19 +20,18 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        
-        
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <!-- Use project references when developing locally  -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-      <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
-      <ProjectReference Include="..\Datalog\Datalog.fsproj" />
+        <ProjectReference Include="..\Datalog.Parser\Datalog.Parser.csproj" />
+        <ProjectReference Include="..\Datalog\Datalog.fsproj" />
         <ProjectReference Include="..\OWL2RL2Datalog\OWL2RL2Datalog.fsproj" />
+        <ProjectReference Include="..\OWL2ALC\OWL2ALC.fsproj" />
         <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
-      <ProjectReference Include="..\Rdf\Rdf.fsproj" />
-      <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
+        <ProjectReference Include="..\Rdf\Rdf.fsproj" />
+        <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
         <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
         <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
     </ItemGroup>
@@ -43,6 +42,7 @@
         <PackageReference Include="DagSemTools.Datalog" Version="$(Version)" />
         <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="$(Version)" />
         <PackageReference Include="DagSemTools.OWL2RL2Datalog" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.OWL2ALC" Version="$(Version)" />
         <PackageReference Include="DagSemTools.Datalog.Parser" Version="$(Version)" />
         <PackageReference Include="DagSemTools.Turtle.Parser" Version="$(Version)" />
         <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
@@ -51,13 +51,14 @@
     <ItemGroup>
         <PackageReference Include="FSharp.Core" Version="8.0.403" />
         <PackageReference Include="IriTools" Version="2.2.0" />
+        <PackageReference Include="LanguageExt.Core" Version="4.4.9" />
         <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>    
+    
     <ItemGroup>
         <None Update="README.md">
             <Pack>true</Pack>
             <PackagePath>README.md</PackagePath>
         </None>
-    </ItemGroup>    
-    
+    </ItemGroup>
 </Project>

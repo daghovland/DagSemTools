@@ -91,7 +91,6 @@ open IriTools
     type ObjectPropertyAxiom =
         | ObjectPropertyDomain of ObjectPropertyExpression * ClassExpression
         | ObjectPropertyRange of ObjectPropertyExpression * ClassExpression
-        | ObjectPropertyAssertion of ObjectPropertyExpression * Individual * Individual
         | SubObjectPropertyOf of Annotation list * subPropertyExpression * ObjectPropertyExpression
         | EquivalentObjectProperties of Annotation list * ObjectPropertyExpression list
         | DisjointObjectProperties of Annotation list * ObjectPropertyExpression list
