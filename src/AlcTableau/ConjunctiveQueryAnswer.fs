@@ -29,6 +29,7 @@ let add_assertion (state : QueryingService.QueryingCache) (assertion : ALC.ABoxA
         | NegativeAssertion aBoxAssertion -> failwith "todo"
         | NegativeRoleAssertion(individual, right, assertedRole) -> failwith "todo"
         | LiteralAssertion(individual, property, value) -> failwith "todo"
+        | NegativeLiteralAssertion(individual, property, value) -> failwith "todo"
         | LiteralAnnotationAssertion(individual, property, value) -> failwith "todo"
         | ObjectAnnotationAssertion(individual, property, value) -> failwith "todo"
 

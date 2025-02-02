@@ -198,3 +198,25 @@ module Namespaces =
     let XsdBase64Binary = Xsd + "base64Binary";
     [<Literal>]
     let XsdAnyUri = Xsd + "anyURI";
+    [<Literal>]
+    let XsdMinLength = Xsd + "minLength";
+    [<Literal>]
+    let XsdMaxLength = Xsd + "maxLength"
+    [<Literal>]
+    let XsdMinInclusive = Xsd + "minInclusive";
+    [<Literal>]
+    let XsdMaxInclusive = Xsd + "maxInclusive";
+    [<Literal>]
+    let XsdMinExclusive = Xsd + "minExclusive";
+    [<Literal>]
+    let XsdMaxExclusive = Xsd + "maxExclusive";
+    [<Literal>]
+    let XsdLength = Xsd + "length";
+    [<Literal>]
+    let XsdPattern = Xsd + "pattern";
+    [<Literal>]
+    let XsdLangRange = Xsd + "langRange";
+    
+    
+    
+    

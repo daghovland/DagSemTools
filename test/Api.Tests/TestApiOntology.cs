@@ -181,6 +181,21 @@ public class TestApiOntology(ITestOutputHelper output)
     }
 
 
+    [Fact(Skip = "Must wait until number constraints are implemented in tableau. See Issue https://github.com/daghovland/DagSemTools/issues/2")]
+    public void Imf2AlcWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var ont = OwlOntology.Create(rdfImf);
+
+        // Act 
+        var alc = ont.GetTableauReasoner();
+        alc.Should().NotBeNull();
+
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
 
 
     [Fact]

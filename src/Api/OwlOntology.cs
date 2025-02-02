@@ -6,11 +6,13 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.AlcTableau;
 using DagSemTools.Datalog;
 using DagSemTools.OwlOntology;
 using DagSemTools.Rdf;
 using DagSemTools.RdfOwlTranslator;
 using Serilog;
+using LanguageExt;
 
 namespace DagSemTools.Api;
 
@@ -20,11 +22,11 @@ namespace DagSemTools.Api;
 /// </summary>
 public class OwlOntology
 {
-    private DagSemTools.OwlOntology.Ontology _owlOntology;
-    private Datastore _datastore;
-    private ILogger _logger;
+    private readonly Ontology _owlOntology;
+    private readonly Datastore _datastore;
+    private readonly ILogger _logger;
 
-    internal OwlOntology(IGraph graph, ILogger? logger = null)
+    private OwlOntology(IGraph graph, ILogger? logger = null)
     {
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
@@ -40,10 +42,8 @@ public class OwlOntology
     /// <param name="graph"></param>
     /// <param name="logger"></param>
     /// <returns></returns>
-    public static OwlOntology Create(IGraph graph, ILogger? logger = null)
-    {
-        return new OwlOntology(graph, logger);
-    }
+    public static OwlOntology Create(IGraph graph, ILogger? logger = null) =>
+        new(graph, logger);
 
     /// <summary>
     /// Returns all the axioms of the ontology. 
@@ -53,9 +53,27 @@ public class OwlOntology
         _owlOntology.Axioms;
 
     /// <summary>
+    /// Creates a reasoner (service) based on a simple Tableau-based algorithm
+    /// </summary>
+    /// <returns></returns>
+    public Either<TableauReasoner, string> GetTableauReasoner()
+    {
+        var alc = OWL2ALC.Translator.translate(_logger, _owlOntology);
+        var (prefixes, x, (tbox, abox)) = alc.TryGetOntology();
+        Tableau.ReasoningResult reasonerstate = ReasonerService.init(tbox, abox);
+        return (reasonerstate) switch
+        {
+            Tableau.ReasoningResult.Consistent consistentState =>
+                Either<TableauReasoner, string>.Left(TableauReasoner.Create(consistentState.Item, _logger)),
+            Tableau.ReasoningResult.InConsistent inConsistent =>
+                Either<TableauReasoner, string>.Right(inConsistent.Item.ToString())
+        };
+
+    }
+    /// <summary>
     /// 
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Rule> GetAxiomRules() =>
-        DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, _datastore.Resources, _owlOntology);
+        OWL2RL2Datalog.Library.owl2Datalog(_logger, _datastore.Resources, _owlOntology);
 }

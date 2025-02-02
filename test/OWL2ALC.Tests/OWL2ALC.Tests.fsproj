@@ -2,24 +2,19 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
-        <AssemblyName>DagSemTools.Alc.Tests</AssemblyName>
         <IsPackable>false</IsPackable>
+        <AssemblyName>DagSemTools.OWL2ALC.Tests</AssemblyName>
         <GenerateProgramFile>false</GenerateProgramFile>
         <IsTestProject>true</IsTestProject>
-        
-        <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 
     <ItemGroup>
-        <Compile Include="Tests.fs"/>
-        <Compile Include="ReasonerTests.fs" />
+        <Compile Include="Tests.fs" />
+        <Compile Include="PropertyTests.fs" />
         <Compile Include="Program.fs"/>
-        <Content Include=".gitignore" />
-        <Folder Include="TestData\" />
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Faqt" Version="4.4.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
         <PackageReference Include="Serilog" Version="4.2.0" />
         <PackageReference Include="Serilog.Sinks.InMemory" Version="0.11.0" />
@@ -28,28 +23,21 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
+        <PackageReference Include="coverlet.collector" Version="6.0.3">
+            <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+            <PrivateAssets>all</PrivateAssets>
+        </PackageReference>
         <PackageReference Update="FSharp.Core" Version="8.0.403" />
-        <PackageReference Include="IriTools" Version="2.2.0" />
-        <PackageReference Include="xunit.abstractions" Version="2.0.3" />
     </ItemGroup>
 
-
-    <ItemGroup>
-        <ProjectReference Include="..\..\src\TestUtils\TestUtils.csproj" />
-    </ItemGroup>
-
-    <!-- Use project references if BuildingProject is true -->
+    <!-- Use project references for local development -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-        <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
-        <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
-        <ProjectReference Include="..\..\src\Manchester\Manchester.fsproj" />
+        <ProjectReference Include="..\..\src\OWL2ALC\OWL2ALC.fsproj" />
     </ItemGroup>
-
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-        <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
-        <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
-        <PackageReference Include="DagSemTools.Manchester" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.OWL2ALC" Version="$(Version)" />
     </ItemGroup>
+
 
 </Project>

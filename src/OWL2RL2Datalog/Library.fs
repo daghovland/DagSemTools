@@ -76,7 +76,18 @@ module Library =
         | DataMaxCardinality(i, iri) -> failwith "todo"
         | DataExactCardinality(i, iri) -> failwith "todo"
         
-
+    let DataRange2Datalog
+        (logger : Serilog.ILogger)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
+        (datarange : DataRange) : Ingress.GraphElementId =
+        match datarange with
+        | NamedDataRange (FullIri datatype) -> resources.AddResource(GraphElement.NodeOrEdge (RdfResource.Iri datatype))
+        | DataIntersectionOf dataRanges -> failwith "todo"
+        | DataUnionOf dataRanges -> failwith "todo"
+        | DataComplementOf dataRange -> failwith "todo"
+        | DataOneOf graphElements -> failwith "todo"
+        | DatatypeRestriction(iri, tuples) -> failwith "todo"
     let ObjectPropertyDomain2Datalog
         (logger : Serilog.ILogger)
         (resourceMap: Map<string, Ingress.GraphElementId>)
@@ -97,6 +108,48 @@ module Library =
                       [ (RuleAtom.PositiveTriple bodyTriple ) ]
                 }
             )
+
+    let DataPropertyDomain2Datalog
+        (logger : Serilog.ILogger)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
+        dProp
+        domExp
+        =
+            getClassExpressionResource logger resources domExp
+            |> Seq.map (fun domainClassResource ->
+                { Rule.Head = NormalHead
+                      { TriplePattern.Subject = Term.Variable "x"
+                        TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
+                        TriplePattern.Object = Term.Resource domainClassResource }
+                  Rule.Body =
+                      [ (RuleAtom.PositiveTriple
+                             { TriplePattern.Subject = Term.Variable "x"
+                               Predicate = (Term.Resource (resources.AddNodeResource(RdfResource.Iri dProp)))
+                               Object = Term.Variable "y" } ) ]
+                }
+            )
+
+    let DataPropertyRange2Datalog
+        (logger : Serilog.ILogger)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
+        dProp
+        (rangeExp : DataRange)
+        =
+            let range = DataRange2Datalog logger resourceMap resources rangeExp 
+            [
+              { Rule.Head = NormalHead
+                  { TriplePattern.Subject = Term.Variable "y"
+                    TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
+                    TriplePattern.Object = Term.Resource range }
+                Rule.Body =
+                  [ (RuleAtom.PositiveTriple
+                         { TriplePattern.Subject = Term.Variable "x"
+                           Predicate = (Term.Resource (resources.AddNodeResource(RdfResource.Iri dProp)))
+                           Object = Term.Variable "y" } ) ]
+            }]
+             
 
     let ObjectPropertyRange2Datalog
         (logger : Serilog.ILogger)
@@ -155,6 +208,23 @@ module Library =
         | SymmetricObjectProperty(_, objProp) -> SymmetricObjectProperty2Datalog logger resourceMap resources objProp
         | _ -> []
 
+    let DataPropertyAxiom2Datalog
+        (logger : Serilog.ILogger)
+        (resourceMap: Map<string, Ingress.GraphElementId>)
+        (resources: GraphElementManager)
+        (axiom: DataPropertyAxiom) =
+        match axiom with
+        | DataPropertyDomain(_annots, FullIri dProp, domain) -> DataPropertyDomain2Datalog logger resourceMap resources dProp domain
+        | DataPropertyRange(_annots, FullIri dProp, range) -> DataPropertyRange2Datalog logger resourceMap resources dProp range
+        | SubDataPropertyOf(tuples, iri, iri1) -> logger.Warning "Data property hierarchy not implemented yet"
+                                                  []
+        | EquivalentDataProperties(tuples, iris) -> logger.Warning "Equivalent data property not implemented yet"
+                                                    []
+        | DisjointDataProperties(tuples, iris) -> logger.Warning "Disjoint data property not implemented yet"
+                                                  []
+        | FunctionalDataProperty(tuples, iri) -> logger.Warning "Functional data property not implemented yet"
+                                                 []
+    
     let owlAxiom2Datalog logger
         (resourceMap: Map<string, Ingress.GraphElementId>)
         (resources: GraphElementManager)
@@ -166,6 +236,7 @@ module Library =
             match DagSemTools.ELI.Library.Owl2Datalog logger resources classAxiom with
             | Some rules -> rules
             | None -> [] //TODO: failwith $"Axiom {axiom} not yet handled. Sorry"
+        | AxiomDataPropertyAxiom propertyAxiom -> DataPropertyAxiom2Datalog logger resourceMap resources propertyAxiom
         | _ -> [] //TODO: failwith $"Axiom {axiom} not yet handled. Sorry"
 
     let owl2Datalog logger resources (owlOntology: Ontology)  =
