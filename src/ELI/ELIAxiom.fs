@@ -33,6 +33,6 @@ module Axioms =
 
     type Formula =
         (* of the form U C_i <= /\ A_i , where U C_i is a disjunction of ELI-concepts and /\ A_i is a conjunction of atomic concept *)
-        | DirectlyTranslatableConceptInclusion of ComplexConcept list * Class list
+        | DirectlyTranslatableConceptInclusion of subclassDisjunction: ComplexConcept list * superclassConjunction: Class list
         (* /\ A_i <= C, where /\ A_i is a conjunction of atomic concepts and C is a concept *)
-        | NormalizedConceptInclusion of Class list * NormalizedConcept
+        | NormalizedConceptInclusion of subclassConjunction: Class list * superclass: NormalizedConcept
