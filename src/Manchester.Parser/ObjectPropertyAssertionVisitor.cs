@@ -9,12 +9,12 @@
 using DagSemTools.ManchesterAntlr;
 using IriTools;
 using Microsoft.FSharp.Collections;
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-internal class ObjectPropertyAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, ALC.TBoxAxiom>>>
+internal class ObjectPropertyAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, OwlOntology.Assertion>>>
 {
     internal ConceptVisitor ConceptVisitor { get; init; }
     public ObjectPropertyAssertionVisitor(ConceptVisitor conceptVisitor)

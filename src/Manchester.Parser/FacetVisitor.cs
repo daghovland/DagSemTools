@@ -6,22 +6,31 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.Ingress;
+using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
 
-internal class FacetVisitor : ManchesterBaseVisitor<DataRange.facet>
+internal class FacetVisitor : ManchesterBaseVisitor<Iri>
 {
-    public override DataRange.facet VisitFacetLength(ManchesterParser.FacetLengthContext context) => DataRange.facet.Length;
-    public override DataRange.facet VisitFacetMinLength(ManchesterParser.FacetMinLengthContext context) => DataRange.facet.MinLength;
-    public override DataRange.facet VisitFacetMaxLength(ManchesterParser.FacetMaxLengthContext context) => DataRange.facet.MaxLength;
+    public override Iri VisitFacetLength(ManchesterParser.FacetLengthContext context) => 
+        Iri.NewFullIri(Namespaces.XsdLength);
+    public override Iri VisitFacetMinLength(ManchesterParser.FacetMinLengthContext context) => 
+        Iri.NewFullIri(Namespaces.XsdMinLength);
+    public override Iri VisitFacetMaxLength(ManchesterParser.FacetMaxLengthContext context) => 
+        Iri.NewFullIri(Namespaces.XsdMaxLength);
 
-    public override DataRange.facet VisitFacetLangRange(ManchesterParser.FacetLangRangeContext context) =>
-        DataRange.facet.LangRange;
-    public override DataRange.facet VisitFacetPattern(ManchesterParser.FacetPatternContext context) => DataRange.facet.Pattern;
-    public override DataRange.facet VisitFacetGreaterThan(ManchesterParser.FacetGreaterThanContext context) => DataRange.facet.GreaterThan;
-    public override DataRange.facet VisitFacetLessThan(ManchesterParser.FacetLessThanContext context) => DataRange.facet.LessThan;
-    public override DataRange.facet VisitFacetGreaterThanEqual(ManchesterParser.FacetGreaterThanEqualContext context) => DataRange.facet.GreaterThanOrEqual;
-    public override DataRange.facet VisitFacetLessThanEqual(ManchesterParser.FacetLessThanEqualContext context) => DataRange.facet.LessThanOrEqual;
+    public override Iri VisitFacetLangRange(ManchesterParser.FacetLangRangeContext context) =>
+        Iri.NewFullIri(Namespaces.XsdLangRange);
+    public override Iri VisitFacetPattern(ManchesterParser.FacetPatternContext context) => 
+        Iri.NewFullIri(Namespaces.XsdPattern);
+    public override Iri VisitFacetGreaterThan(ManchesterParser.FacetGreaterThanContext context) => 
+        Iri.NewFullIri(Namespaces.XsdMinExclusive);
+    public override Iri VisitFacetLessThan(ManchesterParser.FacetLessThanContext context) => 
+        Iri.NewFullIri(Namespaces.XsdMaxExclusive);
+    public override Iri VisitFacetGreaterThanEqual(ManchesterParser.FacetGreaterThanEqualContext context) => 
+        Iri.NewFullIri(Namespaces.XsdMinInclusive);
+    public override Iri VisitFacetLessThanEqual(ManchesterParser.FacetLessThanEqualContext context) => 
+        Iri.NewFullIri(Namespaces.XsdMaxInclusive);
 
 }

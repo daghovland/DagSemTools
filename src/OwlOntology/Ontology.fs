@@ -15,7 +15,7 @@ type ontologyVersion =
     | NamedOntology of OntologyIri: IriReference
     | VersionedOntology of OntologyIri: IriReference * OntologyVersionIri: IriReference
 
-type directlyImportsDocument = IriReference
+type public directlyImportsDocument = IriReference
 
 
 

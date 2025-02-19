@@ -6,6 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
 using DagSemTools.Parser;
 using IriTools;
 using DagSemTools.Manchester.Parser;
@@ -14,36 +15,40 @@ using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.ManchesterAntlr;
 
-internal class DataRangeVisitor : ManchesterBaseVisitor<DataRange>
+internal class DataPrimaryVisitor : ManchesterBaseVisitor<DataRange>
 {
     DatatypeRestrictionVisitor _datatypeRestrictionVisitor = new DatatypeRestrictionVisitor();
     readonly IVisitorErrorListener _errorListener;
     internal IriGrammarVisitor IriGrammarVisitor { get; init; }
-    internal DataPrimaryVisitor DataPrimaryVisitor { get; init; }
     internal DatatypeVisitor DatatypeVisitor { get; init; }
-    public DataRangeVisitor(IVisitorErrorListener errorListener)
-    {
-        IriGrammarVisitor = new IriGrammarVisitor(errorListener);
-        DatatypeVisitor = new DatatypeVisitor(IriGrammarVisitor, errorListener);
-        _errorListener = errorListener;
-    }
-    public DataRangeVisitor(IriGrammarVisitor iriGrammarVisitor, IVisitorErrorListener errorListener)
+    public DataPrimaryVisitor(IriGrammarVisitor iriGrammarVisitor, IVisitorErrorListener errorListener)
     {
         IriGrammarVisitor = iriGrammarVisitor;
-        
+        DatatypeVisitor = new DatatypeVisitor(iriGrammarVisitor, errorListener);
         _errorListener = errorListener;
     }
 
-    public DataRangeVisitor(Dictionary<string, IriReference> prefixes, IVisitorErrorListener errorListener)
+    public DataPrimaryVisitor(Dictionary<string, IriReference> prefixes, IVisitorErrorListener errorListener)
     {
         _errorListener = errorListener;
+        DatatypeVisitor = new DatatypeVisitor(IriGrammarVisitor, errorListener);
         IriGrammarVisitor = new IriGrammarVisitor(prefixes, _errorListener);
     }
     public override DataRange VisitSingleDataDisjunction(ManchesterParser.SingleDataDisjunctionContext context)
     => Visit(context.dataConjunction());
 
-    public override DataRange VisitSingleDataConjunction(ManchesterParser.SingleDataConjunctionContext context)
-        => Visit(context.dataPrimary());
-
+    public override DataRange VisitPositiveDataPrimary(ManchesterParser.PositiveDataPrimaryContext context)
+        => Visit(context.dataAtomic());
     
+    public override DataRange VisitDataTypeAtomic(ManchesterParser.DataTypeAtomicContext context)
+        => DataRange.NewNamedDataRange(DatatypeVisitor.Visit(context.datatype()));
+
+    public override DataRange VisitDatatypeRestriction(ManchesterParser.DatatypeRestrictionContext context)
+    {
+        var groundType =  DatatypeVisitor.Visit(context.datatype());
+        var restrictions = context.datatype_restriction()
+            .Select<ManchesterParser.Datatype_restrictionContext, System.Tuple<Iri, GraphElement>>(_datatypeRestrictionVisitor.Visit);
+        var fsharp_restriction = ListModule.OfSeq(restrictions);
+        return DataRange.NewDatatypeRestriction(groundType, fsharp_restriction);
+    }
 }

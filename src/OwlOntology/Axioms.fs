@@ -16,7 +16,7 @@ namespace DagSemTools.OwlOntology
 open DagSemTools.Ingress
 open IriTools
 
-    type Iri = 
+    type public Iri = 
         | FullIri of IriReference
     
     type Individual =
@@ -26,7 +26,7 @@ open IriTools
     type AnnotationProperty = Iri
     type ObjectProperty = Iri
     type DataProperty = Iri
-    type Datatype = Iri
+    type public Datatype = Iri
     type Class = Iri
     
     type AnnotationValue =
@@ -34,7 +34,7 @@ open IriTools
         | LiteralAnnotation of GraphElement
         | IriAnnotation of Iri
         
-    type Annotation = AnnotationProperty * AnnotationValue
+    type public Annotation = AnnotationProperty * AnnotationValue
         
     type AnnotationAxiom =
         | AnnotationAssertion of Annotation list * AnnotationProperty * GraphElement * GraphElement

@@ -60,11 +60,11 @@
       <ItemGroup>
     </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <ProjectReference Include="..\AlcTableau\AlcTableau.fsproj" />
+    <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
     <ProjectReference Include="..\Parser\Parser.csproj" />
   </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
+    <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
     <PackageReference Include="DagSemTools.Parser" Version="$(Version)" />
   </ItemGroup>
 

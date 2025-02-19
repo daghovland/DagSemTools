@@ -8,14 +8,14 @@
 
 using DagSemTools.ManchesterAntlr;
 using DagSemTools.Parser;
-using DagSemTools.AlcTableau;
 using Antlr4.Runtime;
+using DagSemTools.OwlOntology;
 using IriTools;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-internal class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
+internal class ConceptVisitor : ManchesterBaseVisitor<ClassExpression>
 {
     public IriGrammarVisitor IriGrammarVisitor { get; init; }
     private RoleVisitor _roleVisitor;
@@ -35,39 +35,39 @@ internal class ConceptVisitor : ManchesterBaseVisitor<ALC.Concept>
     : this(new IriGrammarVisitor(prefixes, errorListener))
     { }
 
-    public override ALC.Concept VisitIriPrimaryConcept(ManchesterParser.IriPrimaryConceptContext context)
+    public override ClassExpression VisitIriPrimaryConcept(ManchesterParser.IriPrimaryConceptContext context)
     {
         var iri = IriGrammarVisitor.Visit(context.rdfiri());
-        return ALC.Concept.NewConceptName(iri);
+        return ClassExpression.NewClassName(iri);
     }
 
-    public override ALC.Concept VisitParenthesizedPrimaryConcept(ManchesterParser.ParenthesizedPrimaryConceptContext context) =>
+    public override ClassExpression VisitParenthesizedPrimaryConcept(ManchesterParser.ParenthesizedPrimaryConceptContext context) =>
         Visit(context.description());
-    public override ALC.Concept VisitNegatedPrimaryConcept(ManchesterParser.NegatedPrimaryConceptContext context) =>
-        ALC.Concept.NewNegation(Visit(context.primary()));
+    public override ClassExpression VisitNegatedPrimaryConcept(ManchesterParser.NegatedPrimaryConceptContext context) =>
+        ClassExpression.NewObjectComplementOf(Visit(context.primary()));
 
-    public override ALC.Concept VisitConceptDisjunction(ManchesterParser.ConceptDisjunctionContext context) =>
-        ALC.Concept.NewDisjunction(Visit(context.description()), Visit(context.conjunction()));
+    public override ClassExpression VisitConceptDisjunction(ManchesterParser.ConceptDisjunctionContext context) =>
+        ClassExpression.NewObjectUnionOf(Visit(context.description()), Visit(context.conjunction()));
 
-    public override ALC.Concept VisitConceptSingleDisjunction(ManchesterParser.ConceptSingleDisjunctionContext context) =>
+    public override ClassExpression VisitConceptSingleDisjunction(ManchesterParser.ConceptSingleDisjunctionContext context) =>
         Visit(context.conjunction());
 
-    public override ALC.Concept VisitConceptConjunction(ManchesterParser.ConceptConjunctionContext context)
+    public override ClassExpression VisitConceptConjunction(ManchesterParser.ConceptConjunctionContext context)
     {
         var conjunction = Visit(context.conjunction());
         var primary = Visit(context.primary());
-        return ALC.Concept.NewConjunction(conjunction, primary);
+        return ClassExpression.NewObjectIntersectionOf(conjunction, primary);
     }
-    public override ALC.Concept VisitConceptSingleConjunction(ManchesterParser.ConceptSingleConjunctionContext context) =>
+    public override ClassExpression VisitConceptSingleConjunction(ManchesterParser.ConceptSingleConjunctionContext context) =>
         Visit(context.primary());
 
-    public override ALC.Concept VisitUniversalConceptRestriction(ManchesterParser.UniversalConceptRestrictionContext context) =>
-        ALC.Concept.NewUniversal(
+    public override ClassExpression VisitUniversalConceptRestriction(ManchesterParser.UniversalConceptRestrictionContext context) =>
+        ClassExpression.NewObjectAllValuesFrom(
             _roleVisitor.Visit(context.objectPropertyExpression()),
             Visit(context.primary()));
 
-    public override ALC.Concept VisitExistentialConceptRestriction(ManchesterParser.ExistentialConceptRestrictionContext context) =>
-        ALC.Concept.NewExistential(
+    public override ClassExpression VisitExistentialConceptRestriction(ManchesterParser.ExistentialConceptRestrictionContext context) =>
+        ClassExpression.NewObjectSomeValuesFrom(
             _roleVisitor.Visit(context.objectPropertyExpression()),
             Visit(context.primary()));
 
