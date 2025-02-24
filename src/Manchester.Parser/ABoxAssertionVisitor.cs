@@ -25,7 +25,7 @@ internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<Individual, Ass
     {
         var propertyIri = ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role)));
         var value = Individual.NewNamedIndividual(Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.@object)));
-        return (individual) => Assertion.NewObjectPropertyAssertion(ListModule.Empty< Tuple<Iri, AnnotationValue>>(), propertyIri, individual, value);
+        return (individual) => Assertion.NewObjectPropertyAssertion(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), propertyIri, individual, value);
     }
 
     public override Func<Individual, Assertion> VisitPositiveDataPropertyFact(ManchesterParser.PositiveDataPropertyFactContext context)
@@ -33,13 +33,13 @@ internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<Individual, Ass
         var propertyIri = Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role));
         var value = context.value.GetText();
         var rdfLiteral = GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(value));
-        return (individual) => Assertion.NewDataPropertyAssertion(ListModule.Empty< Tuple<Iri, AnnotationValue>>(), propertyIri, individual, rdfLiteral);
+        return (individual) => Assertion.NewDataPropertyAssertion(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), propertyIri, individual, rdfLiteral);
     }
     public override Func<Individual, Assertion> VisitNegativeObjectPropertyFact(ManchesterParser.NegativeObjectPropertyFactContext context)
     {
         var propertyIri = ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role)));
         var value = Individual.NewNamedIndividual(Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.@object)));
-        return (individual) => Assertion.NewNegativeObjectPropertyAssertion(ListModule.Empty< Tuple<Iri, AnnotationValue>>(), propertyIri, individual, value);
+        return (individual) => Assertion.NewNegativeObjectPropertyAssertion(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), propertyIri, individual, value);
     }
 
     public override Func<Individual, Assertion> VisitNegativeDataPropertyFact(ManchesterParser.NegativeDataPropertyFactContext context)
@@ -47,7 +47,7 @@ internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<Individual, Ass
         var propertyIri = Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role));
         var value = context.value.GetText();
         var rdfLiteral = GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(value));
-        return (individual) => Assertion.NewNegativeDataPropertyAssertion(ListModule.Empty< Tuple<Iri, AnnotationValue>>(), propertyIri, individual, rdfLiteral);
+        return (individual) => Assertion.NewNegativeDataPropertyAssertion(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), propertyIri, individual, rdfLiteral);
     }
 
 }

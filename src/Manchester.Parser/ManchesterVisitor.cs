@@ -89,7 +89,7 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<OwlOntology.OntologyDoc
                 ListModule.Empty<IriReference>(),
                 ontologyVersion.UnNamedOntology,
                 ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
-                 ListModule.OfSeq(axiomList) 
+                 ListModule.OfSeq(axiomList)
                 )
         );
     }

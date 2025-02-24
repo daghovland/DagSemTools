@@ -48,7 +48,7 @@ public class TestConceptParser2Alc
 
         IParseTree tree = parser.description();
         var visitor = new ConceptVisitor(prefixes, customErrorListener);
-        var owlClass =  visitor.Visit(tree);
+        var owlClass = visitor.Visit(tree);
         return OWL2ALC.Translator.translateClass(_logger, owlClass);
     }
 

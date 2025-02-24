@@ -31,7 +31,7 @@ internal class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Fu
             .Select<ClassExpression, Func<Individual, Assertion>>(
                 concept => (
                     (individual) => Assertion.NewClassAssertion(
-                        ListModule.Empty<Tuple<Iri, AnnotationValue>>(), 
+                        ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
                         concept,
                         individual)));
 

@@ -13,24 +13,24 @@ namespace DagSemTools.Manchester.Parser;
 
 internal class FacetVisitor : ManchesterBaseVisitor<Iri>
 {
-    public override Iri VisitFacetLength(ManchesterParser.FacetLengthContext context) => 
+    public override Iri VisitFacetLength(ManchesterParser.FacetLengthContext context) =>
         Iri.NewFullIri(Namespaces.XsdLength);
-    public override Iri VisitFacetMinLength(ManchesterParser.FacetMinLengthContext context) => 
+    public override Iri VisitFacetMinLength(ManchesterParser.FacetMinLengthContext context) =>
         Iri.NewFullIri(Namespaces.XsdMinLength);
-    public override Iri VisitFacetMaxLength(ManchesterParser.FacetMaxLengthContext context) => 
+    public override Iri VisitFacetMaxLength(ManchesterParser.FacetMaxLengthContext context) =>
         Iri.NewFullIri(Namespaces.XsdMaxLength);
 
     public override Iri VisitFacetLangRange(ManchesterParser.FacetLangRangeContext context) =>
         Iri.NewFullIri(Namespaces.XsdLangRange);
-    public override Iri VisitFacetPattern(ManchesterParser.FacetPatternContext context) => 
+    public override Iri VisitFacetPattern(ManchesterParser.FacetPatternContext context) =>
         Iri.NewFullIri(Namespaces.XsdPattern);
-    public override Iri VisitFacetGreaterThan(ManchesterParser.FacetGreaterThanContext context) => 
+    public override Iri VisitFacetGreaterThan(ManchesterParser.FacetGreaterThanContext context) =>
         Iri.NewFullIri(Namespaces.XsdMinExclusive);
-    public override Iri VisitFacetLessThan(ManchesterParser.FacetLessThanContext context) => 
+    public override Iri VisitFacetLessThan(ManchesterParser.FacetLessThanContext context) =>
         Iri.NewFullIri(Namespaces.XsdMaxExclusive);
-    public override Iri VisitFacetGreaterThanEqual(ManchesterParser.FacetGreaterThanEqualContext context) => 
+    public override Iri VisitFacetGreaterThanEqual(ManchesterParser.FacetGreaterThanEqualContext context) =>
         Iri.NewFullIri(Namespaces.XsdMinInclusive);
-    public override Iri VisitFacetLessThanEqual(ManchesterParser.FacetLessThanEqualContext context) => 
+    public override Iri VisitFacetLessThanEqual(ManchesterParser.FacetLessThanEqualContext context) =>
         Iri.NewFullIri(Namespaces.XsdMaxInclusive);
 
 }

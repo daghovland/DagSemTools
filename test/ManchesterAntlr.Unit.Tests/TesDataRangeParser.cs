@@ -75,7 +75,7 @@ public class TestDataRangeParser
         var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
         var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
         var expected =
-            DataRange.NewDatatypeRestriction(xsdInt,  ListModule.OfSeq([Tuple.Create(lt, zero)]));
+            DataRange.NewDatatypeRestriction(xsdInt, ListModule.OfSeq([Tuple.Create(lt, zero)]));
         parsedDataRange.Should().BeEquivalentTo(expected);
     }
 
@@ -88,7 +88,7 @@ public class TestDataRangeParser
         var length = Iri.NewFullIri(Namespaces.XsdLength);
         var five = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(5));
         var expected =
-            DataRange.NewDatatypeRestriction(xsdInt,  ListModule.OfSeq([Tuple.Create(length, five)]));
+            DataRange.NewDatatypeRestriction(xsdInt, ListModule.OfSeq([Tuple.Create(length, five)]));
         parsedDataRange.Should().BeEquivalentTo(expected);
     }
 }

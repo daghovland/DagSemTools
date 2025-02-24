@@ -39,13 +39,13 @@ internal class DataPrimaryVisitor : ManchesterBaseVisitor<DataRange>
 
     public override DataRange VisitPositiveDataPrimary(ManchesterParser.PositiveDataPrimaryContext context)
         => Visit(context.dataAtomic());
-    
+
     public override DataRange VisitDataTypeAtomic(ManchesterParser.DataTypeAtomicContext context)
         => DataRange.NewNamedDataRange(DatatypeVisitor.Visit(context.datatype()));
 
     public override DataRange VisitDatatypeRestriction(ManchesterParser.DatatypeRestrictionContext context)
     {
-        var groundType =  DatatypeVisitor.Visit(context.datatype());
+        var groundType = DatatypeVisitor.Visit(context.datatype());
         var restrictions = context.datatype_restriction()
             .Select<ManchesterParser.Datatype_restrictionContext, System.Tuple<Iri, GraphElement>>(_datatypeRestrictionVisitor.Visit);
         var fsharp_restriction = ListModule.OfSeq(restrictions);

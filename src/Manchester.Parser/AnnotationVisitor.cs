@@ -19,7 +19,7 @@ internal class AnnotationVisitor : ManchesterBaseVisitor<(Iri, AnnotationValue)>
     public AnnotationVisitor(IriGrammarVisitor iriVisitor)
     {
         IriVisitor = iriVisitor;
-    }    
+    }
     public override (Iri, AnnotationValue) VisitObjectAnnotation(ManchesterParser.ObjectAnnotationContext context)
     {
         var propertyIri = IriVisitor.Visit(context.rdfiri(0));

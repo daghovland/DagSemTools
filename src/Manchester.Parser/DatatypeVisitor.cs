@@ -19,7 +19,7 @@ internal class DatatypeVisitor : ManchesterBaseVisitor<Iri>
     DatatypeRestrictionVisitor _datatypeRestrictionVisitor = new DatatypeRestrictionVisitor();
     readonly IVisitorErrorListener _errorListener;
     internal IriGrammarVisitor IriGrammarVisitor { get; init; }
-    
+
     public DatatypeVisitor(IriGrammarVisitor iriGrammarVisitor, IVisitorErrorListener errorListener)
     {
         IriGrammarVisitor = iriGrammarVisitor;

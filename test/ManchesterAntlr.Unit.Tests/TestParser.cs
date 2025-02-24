@@ -30,7 +30,7 @@ public class TestParser
             .WriteTo.Console()
             .CreateLogger();
 
-    
+
     public TestParser(ITestOutputHelper output)
     {
         _output = output;

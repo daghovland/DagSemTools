@@ -45,5 +45,5 @@ internal class DataRangeVisitor : ManchesterBaseVisitor<DataRange>
     public override DataRange VisitSingleDataConjunction(ManchesterParser.SingleDataConjunctionContext context)
         => Visit(context.dataPrimary());
 
-    
+
 }
