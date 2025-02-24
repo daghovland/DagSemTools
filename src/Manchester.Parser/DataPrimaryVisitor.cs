@@ -37,6 +37,8 @@ internal class DataPrimaryVisitor : ManchesterBaseVisitor<DataRange>
     public override DataRange VisitSingleDataDisjunction(ManchesterParser.SingleDataDisjunctionContext context)
     => Visit(context.dataConjunction());
 
+    public override DataRange VisitSingleDataConjunction(ManchesterParser.SingleDataConjunctionContext context)
+        => Visit(context.dataPrimary());
     public override DataRange VisitPositiveDataPrimary(ManchesterParser.PositiveDataPrimaryContext context)
         => Visit(context.dataAtomic());
 

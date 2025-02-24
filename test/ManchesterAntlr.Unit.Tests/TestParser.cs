@@ -39,7 +39,7 @@ public class TestParser
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile(filename, _errorOutput);
-        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translateDocument(_logger, parsedOntology);
         return TestOntology(alcOntology);
     }
 
@@ -65,7 +65,7 @@ public class TestParser
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseString(ontology, _errorOutput);
-        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translateDocument(_logger, parsedOntology);
         return TestOntology(alcOntology);
     }
 
@@ -105,7 +105,7 @@ public class TestParser
     public void TestOntologyWithIri()
     {
         var parsedOwlOntology = Manchester.Parser.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>", _errorOutput);
-        var parsedOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOwlOntology.Ontology);
+        var parsedOntology = DagSemTools.OWL2ALC.Translator.translateDocument(_logger, parsedOwlOntology);
         parsedOntology.Should().NotBeNull();
 
         var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
@@ -117,7 +117,7 @@ public class TestParser
         ontologyIri.Should().NotBeNull();
         ontologyIri.Should().Be(new IriReference("https://example.com/ontology"));
 
-        var namedOntology = (ALC.ontologyVersion.NamedOntology)versionedOntology;
+        var namedOntology = (ontologyVersion.NamedOntology)versionedOntology;
         namedOntology.OntologyIri.Should().Be(new IriReference("https://example.com/ontology"));
     }
     [Fact]
@@ -414,7 +414,7 @@ public class TestParser
                                                                       Facts: r b, s c
                                                                   """, _errorOutput
         );
-        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translateDocument(_logger, parsedOntology);
         var (prefixes, versionedOntology, (tbox, abox)) = alcOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(2);
@@ -430,7 +430,7 @@ public class TestParser
     public void TestDefinitionExample()
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/def_example.owl", _errorOutput);
-        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translateDocument(_logger, parsedOntology);
         var (prefixes, versionedOntology, (tbox, abox)) = alcOntology.TryGetOntology();
         var tboxAxioms = tbox.ToList();
         tboxAxioms.Should().HaveCount(2);
@@ -449,7 +449,7 @@ public class TestParser
                                                                     Annotations: rdfs:comment "Negative Integer"
                                                                     EquivalentTo: integer[< 0]   
                                                                   """, _errorOutput);
-        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translateDocument(_logger, parsedOntology);
         var (prefixes, versionedOntology, (tbox, abox)) = alcOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);
@@ -460,7 +460,7 @@ public class TestParser
     public void TestAnnotationsExample()
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/annotations.owl", _errorOutput);
-        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translateDocument(_logger, parsedOntology);
         var (prefixes, versionedOntology, (tbox, abox)) = alcOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);

@@ -188,16 +188,19 @@ module Translator =
         | AxiomHasKey(tuples, classExpression, objectPropertyExpressions, iris) -> failwith "todo"
         | AxiomAssertion assertion -> translateAssertion logger assertion |> ABOX |> Seq.singleton
         | AxiomAnnotationAxiom annotationAxiom -> failwith "todo"
-    let translate (logger : ILogger) (ontology: DagSemTools.OwlOntology.Ontology) : ALC.OntologyDocument =
-        let (tboxAxioms, aboxAxioms) = ontology.Axioms
-                                        |> Seq.collect (translateAxiom logger)
-                                        |> Seq.toList
-                                        |> List.fold (fun (tboxAcc, aboxAcc) axiom ->
-                                            match axiom with
-                                            | TBOX x -> (x :: tboxAcc, aboxAcc)
-                                            | ABOX x -> (tboxAcc, x :: aboxAcc))
-                                            ([], [])
+        
+    let translateOntology (logger : ILogger) (ontology: DagSemTools.OwlOntology.Ontology)  =
+     ontology.Axioms
+            |> Seq.collect (translateAxiom logger)
+            |> Seq.toList
+            |> List.fold (fun (tboxAcc, aboxAcc) axiom ->
+                match axiom with
+                | TBOX x -> (x :: tboxAcc, aboxAcc)
+                | ABOX x -> (tboxAcc, x :: aboxAcc))
+                ([], [])
 
-        OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, (tboxAxioms, aboxAxioms))
+    let translateDocument (logger : ILogger) (ontology: DagSemTools.OwlOntology.OntologyDocument) : ALC.OntologyDocument =
+        let (tboxAxioms, aboxAxioms) = translateOntology logger ontology.Ontology
+        OntologyDocument.Ontology (ontology.Prefixes, ontology.Ontology.Version, (tboxAxioms, aboxAxioms))
         
     

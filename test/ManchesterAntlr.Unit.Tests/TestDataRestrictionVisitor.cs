@@ -47,7 +47,9 @@ public class TestDataRestrictionVisitor
     public void TestLessThan0()
     {
         var parsedDataRange = testString("< 0");
-        var expexted = new Tuple<DataRange.facet, string>(DataRange.facet.LessThan, "0");
+        var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
+        var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
+        var expexted = Tuple.Create(lt, zero);
         parsedDataRange.Should().BeEquivalentTo(expexted);
     }
 

@@ -87,18 +87,18 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<OwlOntology.OntologyDoc
             CreatePrefixList(),
             new Ontology(
                 ListModule.Empty<IriReference>(),
-                ontologyVersion.UnNamedOntology,
+                version,
                 ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
                  ListModule.OfSeq(axiomList)
                 )
         );
     }
-    private FSharpList<OwlOntology.prefixDeclaration> CreatePrefixList()
+    private FSharpList<prefixDeclaration> CreatePrefixList()
     {
-        var prefixList = new List<OwlOntology.prefixDeclaration>();
+        var prefixList = new List<prefixDeclaration>();
         foreach (var kvp in _prefixes)
         {
-            var prefix = OwlOntology.prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
+            var prefix = prefixDeclaration.NewPrefixDefinition(kvp.Key, kvp.Value);
             prefixList.Add(prefix);
         }
         return ListModule.OfSeq(prefixList);

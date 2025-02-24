@@ -73,3 +73,20 @@ open IriTools
             match x with
             | PrefixDefinition (name, iri) -> (name, iri)
     
+    
+    type ontologyVersion =
+        | UnNamedOntology
+        | NamedOntology of OntologyIri: IriReference
+        | VersionedOntology of OntologyIri: IriReference * OntologyVersionIri: IriReference
+    type ontologyVersion with
+        member x.TryGetOntologyVersionIri() =
+            match x with
+            | NamedOntology iri -> null
+            | VersionedOntology (_, iri) -> iri
+            | _ -> null
+        member x.TryGetOntologyIri() =
+            match x with
+            | NamedOntology iri -> iri
+            | VersionedOntology (iri, _) -> iri
+            | _ -> null
+    

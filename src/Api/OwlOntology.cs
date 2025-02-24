@@ -22,7 +22,7 @@ namespace DagSemTools.Api;
 /// </summary>
 public class OwlOntology
 {
-    private readonly Ontology _owlOntology;
+    private readonly OntologyDocument _owlOntology;
     private readonly Datastore _datastore;
     private readonly ILogger _logger;
 
@@ -50,7 +50,7 @@ public class OwlOntology
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Axiom> GetAxioms() =>
-        _owlOntology.Axioms;
+        _owlOntology.Ontology.Axioms;
 
     /// <summary>
     /// Creates a reasoner (service) based on a simple Tableau-based algorithm
@@ -58,7 +58,7 @@ public class OwlOntology
     /// <returns></returns>
     public Either<TableauReasoner, string> GetTableauReasoner()
     {
-        var alc = OWL2ALC.Translator.translate(_logger, _owlOntology);
+        var alc = OWL2ALC.Translator.translateDocument(_logger, _owlOntology);
         var (prefixes, x, (tbox, abox)) = alc.TryGetOntology();
         Tableau.ReasoningResult reasonerstate = ReasonerService.init(tbox, abox);
         return (reasonerstate) switch
@@ -75,5 +75,5 @@ public class OwlOntology
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Rule> GetAxiomRules() =>
-        OWL2RL2Datalog.Library.owl2Datalog(_logger, _datastore.Resources, _owlOntology);
+        OWL2RL2Datalog.Library.owl2Datalog(_logger, _datastore.Resources, _owlOntology.Ontology);
 }

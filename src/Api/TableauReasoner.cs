@@ -7,7 +7,6 @@
 */
 
 using DagSemTools.AlcTableau;
-using DagSemTools.AlcTableau;
 using IriTools;
 using LanguageExt;
 using Microsoft.FSharp.Collections;
@@ -16,6 +15,9 @@ using Serilog;
 
 namespace DagSemTools.Api;
 
+/// <summary>
+/// C# representation of the simplest DL Tableau Reasoner 
+/// </summary>
 public class TableauReasoner
 {
     private readonly ILogger _logger;

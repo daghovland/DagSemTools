@@ -44,7 +44,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         //Act
         let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
-        let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
+        let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology.Ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
         
         //Assert
@@ -317,7 +317,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         
         let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
-        let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
+        let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology.Ontology
         
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
         let query2 = tripleTable.GetTriplesWithObject(objIndex)

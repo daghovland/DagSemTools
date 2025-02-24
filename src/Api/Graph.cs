@@ -189,7 +189,7 @@ public class Graph : IGraph
     public void EnableOwlReasoning()
     {
         var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Triples.Triples, Triples.Resources, _logger).extractOntology;
-        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Triples.Resources, ontology);
+        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Triples.Resources, ontology.Ontology);
         LoadDatalog(ontologyRules);
     }
     /// <inheritdoc />

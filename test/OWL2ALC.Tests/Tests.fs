@@ -31,11 +31,11 @@ module Tests =
     [<Fact>]
     let ``Empty Owl ontology is translated`` () =
         let emptyOntology = new DagSemTools.OwlOntology.Ontology([],
-                                                                 DagSemTools.OwlOntology.ontologyVersion.UnNamedOntology,
+                                                                 ontologyVersion.UnNamedOntology,
                                                                  [],
                                                                  [])
-        let translatedOntology = DagSemTools.OWL2ALC.Translator.translate logger emptyOntology
-        let expectedOntology = OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, ([],[]))
+        let translatedOntology = DagSemTools.OWL2ALC.Translator.translateOntology logger emptyOntology
+        let expectedOntology = ([],[])
         translatedOntology.Should().Be(expectedOntology)
       
 
@@ -54,12 +54,12 @@ module Tests =
         let superClass = (ClassName (FullIri superclassIri))
         let axiom = AxiomClassAxiom (SubClassOf ([],subClass, superClass)) 
         let emptyOntology = new DagSemTools.OwlOntology.Ontology([],
-                                                                 DagSemTools.OwlOntology.ontologyVersion.UnNamedOntology,
+                                                                 ontologyVersion.UnNamedOntology,
                                                                  [],
                                                                  [axiom])
-        let translatedOntology = Translator.translate logger emptyOntology
+        let translatedOntology = Translator.translateOntology logger emptyOntology
         let expectedAxiom = Inclusion (ConceptName subclassIri, ConceptName superclassIri) 
-        let expectedOntology = OntologyDocument.Ontology ([], ontologyVersion.UnNamedOntology, ([expectedAxiom],[]))
+        let expectedOntology = ([expectedAxiom],[])
         translatedOntology.Should().Be(expectedOntology)
     
     [<Fact>]
