@@ -6,7 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 using DagSemTools.Ingress;
 using TestUtils;
 using Xunit.Abstractions;
@@ -24,32 +24,33 @@ public class TestParser
         _output = output;
         _errorOutput = new TestOutputTextWriter(output);
     }
-    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
+    public List<Axiom> TestOntologyFile(string filename)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile(filename, _errorOutput);
         return TestOntology(parsedOntology);
     }
 
-    private (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(ALC.OntologyDocument parsedOntology)
+    private IEnumerable<Axiom> TestOntology(OntologyDocument parsedOntology)
     {
         parsedOntology.Should().NotBeNull();
 
-        var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
+        
+        
+        
+        parsedOntology.Prefixes.ToList().Should().Contain(OwlOntology.prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
 
-        prefixes.ToList().Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
-
-        var ontologyIri = versionedOntology.TryGetOntologyIri();
+        var ontologyIri = parsedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
         ontologyIri.Should().Be(new IriReference("https://example.com/ontology"));
 
-        var ontologyVersionIri = versionedOntology.TryGetOntologyVersionIri();
+        var ontologyVersionIri = parsedOntology.TryGetOntologyVersionIri();
         ontologyVersionIri.Should().NotBeNull();
         ontologyVersionIri.Should().Be(new IriReference("https://example.com/ontology#1"));
-        return (KB.Item1.ToList(), KB.Item2.ToList());
+        return parsedOntology.Ontology.Axioms;
     }
 
 
-    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
+    public IEnumerable<Axiom> TestOntology(string ontology)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseString(ontology, _errorOutput);
         return TestOntology(parsedOntology);
@@ -93,17 +94,16 @@ public class TestParser
         var parsedOntology = Manchester.Parser.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>", _errorOutput);
         parsedOntology.Should().NotBeNull();
 
-        var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
+        var prefixes = parsedOntology.Prefixes;
+        var ontologyIri = parsedOntology.TryGetOntologyVersionIri();
+        var KB = parsedOntology.Ontology;
 
         var prefixDeclarations = prefixes.ToList();
-        prefixDeclarations.Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
+        prefixDeclarations.Should().Contain(OwlOntology.prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
 
-        var ontologyIri = versionedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
         ontologyIri.Should().Be(new IriReference("https://example.com/ontology"));
 
-        var namedOntology = (ALC.ontologyVersion.NamedOntology)versionedOntology;
-        namedOntology.OntologyIri.Should().Be(new IriReference("https://example.com/ontology"));
     }
     [Fact]
     public void TestOntologyWithVersonIri()
@@ -152,16 +152,16 @@ public class TestParser
     [Fact]
     public void TestOntologyWithSubClass()
     {
-        var (tboxAxiomsList, _) = TestOntology("""
+        var tboxAxiomsList = TestOntology("""
                                             Prefix: ex: <https://example.com/> 
                                             Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                             Class: ex:Class
                                             SubClassOf: ex:SuperClass
                                             """
-                                        );
+                                        ).ToList();
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
+        tboxAxiomsList[0].IsAxiomClassAxiom().Should().BeTrue();
+        
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Sup.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass")));
     }

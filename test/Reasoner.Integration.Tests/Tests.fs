@@ -8,20 +8,29 @@
 
 module Tests
 
+open Serilog
+open Serilog.Sinks.InMemory
 open TestUtils
 open Xunit
 open Xunit.Abstractions
 open DagSemTools.Manchester.Parser
 open DagSemTools.AlcTableau
+open DagSemTools.OWL2ALC
 open ALC
     
 type IntegrationTests(output : ITestOutputHelper) =
     let outputWriter = new TestOutputTextWriter(output)
+    let inMemorySink = new InMemorySink()
+    let logger =
+        LoggerConfiguration()
+            .WriteTo.Sink(inMemorySink)
+            .CreateLogger()
     
     [<Fact>]
     member _.TestOntologyWithSubClassAndExistential() =
         // Arrange
-        let doc = Parser.ParseFile("TestData/subclasses.owl", outputWriter)
+        let owldoc = Parser.ParseFile("TestData/subclasses.owl", outputWriter)
+        let doc = Translator.translate logger owldoc.Ontology
         // Act
         match doc with
         | ALC.Ontology (prefixes, version, kb) ->
@@ -33,6 +42,7 @@ type IntegrationTests(output : ITestOutputHelper) =
     member _.TestSimplestContradiction() =
         // Arrange
         let doc = Parser.ParseFile("TestData/simplest_contradiction.owl", outputWriter)
+        let doc = Translator.translate logger doc.Ontology
         // Act
         match doc with
         | ALC.Ontology (prefixes, version, kb) ->
@@ -44,6 +54,7 @@ type IntegrationTests(output : ITestOutputHelper) =
     member  _.TestAlcBoolExample() =
         // Arrange
         let doc = Parser.ParseFile("TestData/alc_tableau_ex.owl", outputWriter)
+        let doc = Translator.translate logger doc.Ontology
         // Act
         match doc with
         | Ontology (prefixes, version, kb) ->
@@ -56,6 +67,7 @@ type IntegrationTests(output : ITestOutputHelper) =
     member _.TestDisjunction() =
         // Arrange
         let doc = Parser.ParseFile("TestData/simple_disjunction.owl", outputWriter)
+        let doc = Translator.translate logger doc.Ontology
         // Act
         match doc with
         | Ontology (prefixes, version, kb) ->
@@ -66,6 +78,7 @@ type IntegrationTests(output : ITestOutputHelper) =
     member _.TestSubclassContradiction() =
         // Arrange
         let doc = Parser.ParseFile("TestData/subclass_contradiction.owl", outputWriter)
+        let doc = Translator.translate logger doc.Ontology
         // Act
         match doc with
         | Ontology (prefixes, version, kb) ->
@@ -77,6 +90,7 @@ type IntegrationTests(output : ITestOutputHelper) =
     member _.TestUniversalContradiction() =
         // Arrange
         let doc = Parser.ParseFile("TestData/simplest_universal_contradiction.owl", outputWriter)
+        let doc = Translator.translate logger doc.Ontology
         // Act
         match doc with
         | Ontology (prefixes, version, kb) ->
@@ -88,6 +102,7 @@ type IntegrationTests(output : ITestOutputHelper) =
     member _.TestLongOrBranching() =
         // Arrange
         let doc = Parser.ParseFile("TestData/or-branching.owl", outputWriter)
+        let doc = Translator.translate logger doc.Ontology
         // Act
         match doc with
         | Ontology (prefixes, version, kb) ->
@@ -100,6 +115,7 @@ type IntegrationTests(output : ITestOutputHelper) =
     member _.TestCycleCOntradiction() =
         // Arrange
         let doc = Parser.ParseFile("TestData/cycle.owl", outputWriter)
+        let doc = Translator.translate logger doc.Ontology
         // Act
         match doc with
         | Ontology (prefixes, version, kb) ->
@@ -112,6 +128,7 @@ type IntegrationTests(output : ITestOutputHelper) =
     member _.ExistUniv() =
         // Arrange
         let doc = Parser.ParseFile("TestData/exist_univ.owl", outputWriter)
+        let doc = Translator.translate logger doc.Ontology
         // Act
         match doc with
         | Ontology (prefixes, version, kb) ->

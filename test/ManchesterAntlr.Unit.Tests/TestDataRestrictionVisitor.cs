@@ -8,16 +8,18 @@
 
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
-using DagSemTools.AlcTableau;
+using DagSemTools.Ingress;
+using DagSemTools.OwlOntology;
 using FluentAssertions;
 using IriTools;
+using DataRange = DagSemTools.AlcTableau.DataRange;
 
 namespace DagSemTools.Manchester.Parser.Unit.Tests;
 
 public class TestDataRestrictionVisitor
 {
 
-    public Tuple<DataRange.facet, string> testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes)
+    public Tuple<Iri, GraphElement> testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes)
     {
 
         var input = new AntlrInputStream(text_reader);
