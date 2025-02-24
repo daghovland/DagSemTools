@@ -6,6 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
 using DagSemTools.OwlOntology;
 using IriTools;
 using Microsoft.FSharp.Collections;
@@ -30,7 +31,8 @@ internal class AnnotationVisitor : ManchesterBaseVisitor<(Iri, AnnotationValue)>
     {
         var propertyIri = IriVisitor.Visit(context.rdfiri());
         var value = context.literal().GetText();
-        return (Iri.NewFullIri(propertyIri), AnnotationValue.NewLiteralAnnotation(value));
+        var literalValue = GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(value));
+        return (Iri.NewFullIri(propertyIri), AnnotationValue.NewLiteralAnnotation(literalValue));
     }
 
 }

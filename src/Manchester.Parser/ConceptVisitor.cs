@@ -11,6 +11,7 @@ using DagSemTools.Parser;
 using Antlr4.Runtime;
 using DagSemTools.OwlOntology;
 using IriTools;
+using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
@@ -38,7 +39,7 @@ internal class ConceptVisitor : ManchesterBaseVisitor<ClassExpression>
     public override ClassExpression VisitIriPrimaryConcept(ManchesterParser.IriPrimaryConceptContext context)
     {
         var iri = IriGrammarVisitor.Visit(context.rdfiri());
-        return ClassExpression.NewClassName(iri);
+        return ClassExpression.NewClassName(Iri.NewFullIri(iri));
     }
 
     public override ClassExpression VisitParenthesizedPrimaryConcept(ManchesterParser.ParenthesizedPrimaryConceptContext context) =>
@@ -47,7 +48,7 @@ internal class ConceptVisitor : ManchesterBaseVisitor<ClassExpression>
         ClassExpression.NewObjectComplementOf(Visit(context.primary()));
 
     public override ClassExpression VisitConceptDisjunction(ManchesterParser.ConceptDisjunctionContext context) =>
-        ClassExpression.NewObjectUnionOf(Visit(context.description()), Visit(context.conjunction()));
+        ClassExpression.NewObjectUnionOf(ListModule.OfSeq([Visit(context.description()), Visit(context.conjunction())]));
 
     public override ClassExpression VisitConceptSingleDisjunction(ManchesterParser.ConceptSingleDisjunctionContext context) =>
         Visit(context.conjunction());
@@ -56,7 +57,7 @@ internal class ConceptVisitor : ManchesterBaseVisitor<ClassExpression>
     {
         var conjunction = Visit(context.conjunction());
         var primary = Visit(context.primary());
-        return ClassExpression.NewObjectIntersectionOf(conjunction, primary);
+        return ClassExpression.NewObjectIntersectionOf(ListModule.OfSeq([conjunction, primary]));
     }
     public override ClassExpression VisitConceptSingleConjunction(ManchesterParser.ConceptSingleConjunctionContext context) =>
         Visit(context.primary());

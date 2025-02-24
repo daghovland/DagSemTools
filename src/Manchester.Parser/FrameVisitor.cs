@@ -55,11 +55,12 @@ internal class FrameVisitor : ManchesterBaseVisitor<(List<ClassAxiom>, List<Asse
     public override (List<ClassAxiom>, List<Assertion>) VisitIndividualFrame(ManchesterParser.IndividualFrameContext context)
     {
         var individualIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
+        var individual = Individual.NewNamedIndividual(Iri.NewFullIri(individualIri));
         var frameList = context.individualFrameList() ??
                         throw new Exception($"Lacking individual fram list on individual {context.rdfiri().GetText()}");
         List<Assertion> frame = frameList
             .SelectMany(IndividualAssertionVisitor.Visit)
-            .Select<>(assertion => assertion(individualIri))
+            .Select(assertion => assertion(individual))
             .ToList();
         return ([], frame);
     }

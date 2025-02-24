@@ -26,14 +26,16 @@ internal class ClassAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<Ow
             Select(ConceptVisitor.Visit)
             .Select<ClassExpression, Func<ClassExpression, ClassAxiom>>(
                 super => (
-                    (ClassExpression sub) => ClassAxiom.NewSubClassOf(ListModule.Empty<Annotation>(), sub, super)));
+                    (ClassExpression sub) => ClassAxiom.NewSubClassOf(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), sub, super)));
 
     public override IEnumerable<Func<ClassExpression, ClassAxiom>> VisitEquivalentTo(ManchesterParser.EquivalentToContext context)
         =>
             context.descriptionAnnotatedList().description().
                 Select(ConceptVisitor.Visit)
-                .Select<ClassExpression, Func<ClassExpression, ALC.TBoxAxiom>>(
+                .Select<ClassExpression, Func<ClassExpression, ClassAxiom>>(
                     c => (
-                        (ClassExpression frameClass) => ClassAxiom.NewEquivalence(frameClass, c)));
+                        (ClassExpression frameClass) => ClassAxiom.NewEquivalentClasses(
+                            ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
+                            ListModule.OfSeq([frameClass, c]))));
 
 }

@@ -52,7 +52,7 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<OwlOntology.OntologyDoc
                 new Ontology(
                     ListModule.Empty<IriReference>(),
                     ontologyVersion.UnNamedOntology,
-                    ListModule.Empty<Annotation>(),
+                    ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
                     ListModule.Empty<Axiom>()
                 )),
             _ => Visit(ctxt.ontology())
@@ -82,13 +82,14 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<OwlOntology.OntologyDoc
             .Aggregate<(List<ClassAxiom>, List<Assertion>), (IEnumerable<ClassAxiom>, IEnumerable<Assertion>)>
             ((new List<ClassAxiom>(), new List<Assertion>()),
                 (acc, x) => (concateOrKeep(acc.Item1, x.Item1), concateOrKeep(acc.Item2, x.Item2)));
+        var axiomList = knowledgeBase.Item1.Select(claxiom => Axiom.NewAxiomClassAxiom(claxiom));
         return new OntologyDocument(
             CreatePrefixList(),
             new Ontology(
                 ListModule.Empty<IriReference>(),
                 ontologyVersion.UnNamedOntology,
-                ListModule.Empty<Annotation>(),
-                 ListModule.OfSeq(knowledgeBase.Item1.Concat(knowledgeBase.Item2)) 
+                ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
+                 ListModule.OfSeq(axiomList) 
                 )
         );
     }

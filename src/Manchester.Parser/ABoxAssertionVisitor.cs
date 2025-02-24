@@ -6,6 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
 using DagSemTools.OwlOntology;
 using IriTools;
 using Microsoft.FSharp.Collections;
@@ -31,7 +32,8 @@ internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<Individual, Ass
     {
         var propertyIri = Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role));
         var value = context.value.GetText();
-        return (individual) => Assertion.NewDataPropertyAssertion(ListModule.Empty< Tuple<Iri, AnnotationValue>>(), propertyIri, individual, value);
+        var rdfLiteral = GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(value));
+        return (individual) => Assertion.NewDataPropertyAssertion(ListModule.Empty< Tuple<Iri, AnnotationValue>>(), propertyIri, individual, rdfLiteral);
     }
     public override Func<Individual, Assertion> VisitNegativeObjectPropertyFact(ManchesterParser.NegativeObjectPropertyFactContext context)
     {
@@ -44,7 +46,8 @@ internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<Individual, Ass
     {
         var propertyIri = Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role));
         var value = context.value.GetText();
-        return (individual) => Assertion.NewNegativeDataPropertyAssertion(ListModule.Empty< Tuple<Iri, AnnotationValue>>(), propertyIri, individual, value);
+        var rdfLiteral = GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(value));
+        return (individual) => Assertion.NewNegativeDataPropertyAssertion(ListModule.Empty< Tuple<Iri, AnnotationValue>>(), propertyIri, individual, rdfLiteral);
     }
 
 }

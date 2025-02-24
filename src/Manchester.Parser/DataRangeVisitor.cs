@@ -19,7 +19,6 @@ internal class DataRangeVisitor : ManchesterBaseVisitor<DataRange>
     DatatypeRestrictionVisitor _datatypeRestrictionVisitor = new DatatypeRestrictionVisitor();
     readonly IVisitorErrorListener _errorListener;
     internal IriGrammarVisitor IriGrammarVisitor { get; init; }
-    internal DataPrimaryVisitor DataPrimaryVisitor { get; init; }
     internal DatatypeVisitor DatatypeVisitor { get; init; }
     public DataRangeVisitor(IVisitorErrorListener errorListener)
     {
@@ -30,7 +29,7 @@ internal class DataRangeVisitor : ManchesterBaseVisitor<DataRange>
     public DataRangeVisitor(IriGrammarVisitor iriGrammarVisitor, IVisitorErrorListener errorListener)
     {
         IriGrammarVisitor = iriGrammarVisitor;
-        
+        DatatypeVisitor = new DatatypeVisitor(IriGrammarVisitor, errorListener);
         _errorListener = errorListener;
     }
 
@@ -38,6 +37,7 @@ internal class DataRangeVisitor : ManchesterBaseVisitor<DataRange>
     {
         _errorListener = errorListener;
         IriGrammarVisitor = new IriGrammarVisitor(prefixes, _errorListener);
+        DatatypeVisitor = new DatatypeVisitor(IriGrammarVisitor, errorListener);
     }
     public override DataRange VisitSingleDataDisjunction(ManchesterParser.SingleDataDisjunctionContext context)
     => Visit(context.dataConjunction());

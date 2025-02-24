@@ -31,8 +31,8 @@ internal class DataPrimaryVisitor : ManchesterBaseVisitor<DataRange>
     public DataPrimaryVisitor(Dictionary<string, IriReference> prefixes, IVisitorErrorListener errorListener)
     {
         _errorListener = errorListener;
-        DatatypeVisitor = new DatatypeVisitor(IriGrammarVisitor, errorListener);
         IriGrammarVisitor = new IriGrammarVisitor(prefixes, _errorListener);
+        DatatypeVisitor = new DatatypeVisitor(IriGrammarVisitor, errorListener);
     }
     public override DataRange VisitSingleDataDisjunction(ManchesterParser.SingleDataDisjunctionContext context)
     => Visit(context.dataConjunction());
