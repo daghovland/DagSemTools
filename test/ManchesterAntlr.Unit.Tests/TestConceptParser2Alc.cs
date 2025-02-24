@@ -14,11 +14,21 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using FluentAssertions;
 using IriTools;
+using Serilog;
+using Serilog.Sinks.InMemory;
 
 namespace DagSemTools.Manchester.Parser.Unit.Tests;
 
 public class TestConceptParser2Alc
 {
+    private static InMemorySink _inMemorySink = new InMemorySink();
+
+    private ILogger _logger =
+        new LoggerConfiguration()
+            .WriteTo.Sink(_inMemorySink)
+            .WriteTo.Console()
+            .CreateLogger();
+
     private ALC.Concept TestFile(string filename, TextWriter errorOutput)
     {
         using TextReader textReader = File.OpenText(filename);
@@ -38,7 +48,8 @@ public class TestConceptParser2Alc
 
         IParseTree tree = parser.description();
         var visitor = new ConceptVisitor(prefixes, customErrorListener);
-        return visitor.Visit(tree);
+        var owlClass =  visitor.Visit(tree);
+        return OWL2ALC.Translator.translateClass(_logger, owlClass);
     }
 
     public ALC.Concept TestReader(TextReader textReader, TextWriter errorOutput) =>

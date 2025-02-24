@@ -26,7 +26,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <InternalsVisibleTo Include="ManchesterAntlr.Unit.Tests" />
+    <InternalsVisibleTo Include="DagSemTools.ManchesterAntlr.Unit.Tests" />
     <InternalsVisibleTo Include="Reasoner.Integration.Tests" />
   </ItemGroup>
 
@@ -57,8 +57,6 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
 	</ItemGroup>
-      <ItemGroup>
-    </ItemGroup>
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
     <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
     <ProjectReference Include="..\Parser\Parser.csproj" />

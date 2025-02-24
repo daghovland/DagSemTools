@@ -7,7 +7,8 @@
 */
 
 using DagSemTools;
-using DagSemTools.AlcTableau;
+using DagSemTools.Ingress;
+using DagSemTools.OwlOntology;
 using DagSemTools.Manchester.Parser;
 using DagSemTools.Parser;
 using Microsoft.FSharp.Collections;
@@ -26,7 +27,7 @@ using IriTools;
 public class TestDataRangeParser
 {
 
-    public DataRange.Datarange testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    public DataRange testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
 
         var input = new AntlrInputStream(text_reader);
@@ -41,10 +42,10 @@ public class TestDataRangeParser
         return visitor.Visit(tree);
     }
 
-    public DataRange.Datarange testReader(TextReader text_reader, TextWriter errorOutput) =>
+    public DataRange testReader(TextReader text_reader, TextWriter errorOutput) =>
         testReader(text_reader, new Dictionary<string, IriReference>(), errorOutput);
 
-    public DataRange.Datarange testString(string owl, TextWriter errorOutput)
+    public DataRange testString(string owl, TextWriter errorOutput)
     {
         using TextReader text_reader = new StringReader(owl);
         return testReader(text_reader, errorOutput);
@@ -62,7 +63,7 @@ public class TestDataRangeParser
     public void TestDatatypeInt()
     {
         var parsedDataRange = testString("integer", testOutputTextWriter);
-        var expectedDataRange = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#integer");
+        var expectedDataRange = DataRange.NewNamedDataRange(Iri.NewFullIri("https://www.w3.org/2001/XMLSchema#integer"));
         parsedDataRange.Should().BeEquivalentTo(expectedDataRange);
     }
 
@@ -70,11 +71,12 @@ public class TestDataRangeParser
     public void TestRestrictedInt()
     {
         var parsedDataRange = testString("integer[< 0]", testOutputTextWriter);
-        var xsd_int = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#integer");
-        var expected_facet = new Tuple<DataRange.facet, string>(DataRange.facet.LessThan, "0");
-        var expexted =
-            DataRange.Datarange.NewRestriction(xsd_int, new FSharpList<Tuple<DataRange.facet, string>>(expected_facet, FSharpList<Tuple<DataRange.facet, string>>.Empty));
-        parsedDataRange.Should().BeEquivalentTo(expexted);
+        var xsdInt = Iri.NewFullIri(Namespaces.XsdInt);
+        var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
+        var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
+        var expected =
+            DataRange.NewDatatypeRestriction(xsdInt,  ListModule.OfSeq([Tuple.Create(lt, zero)]));
+        parsedDataRange.Should().BeEquivalentTo(expected);
     }
 
 
@@ -82,10 +84,11 @@ public class TestDataRangeParser
     public void TestRestrictedString()
     {
         var parsedDataRange = testString("string[length 5]", testOutputTextWriter);
-        var xsd_int = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#string");
-        var expected_facet = new Tuple<DataRange.facet, string>(DataRange.facet.Length, "5");
-        var expexted =
-            DataRange.Datarange.NewRestriction(xsd_int, new FSharpList<Tuple<DataRange.facet, string>>(expected_facet, FSharpList<Tuple<DataRange.facet, string>>.Empty));
-        parsedDataRange.Should().BeEquivalentTo(expexted);
+        var xsdInt = Iri.NewFullIri(Namespaces.XsdInt);
+        var length = Iri.NewFullIri(Namespaces.XsdLength);
+        var five = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(5));
+        var expected =
+            DataRange.NewDatatypeRestriction(xsdInt,  ListModule.OfSeq([Tuple.Create(length, five)]));
+        parsedDataRange.Should().BeEquivalentTo(expected);
     }
 }

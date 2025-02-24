@@ -33,10 +33,10 @@ public class TestDataRestrictionVisitor
 
     }
 
-    public Tuple<DataRange.facet, string> testReader(TextReader text_reader) =>
+    public Tuple<Iri, GraphElement> testReader(TextReader text_reader) =>
         testReader(text_reader, new Dictionary<string, IriReference>());
 
-    public Tuple<DataRange.facet, string> testString(string owl)
+    public Tuple<Iri, GraphElement> testString(string owl)
     {
         using TextReader text_reader = new StringReader(owl);
         return testReader(text_reader);
@@ -56,7 +56,9 @@ public class TestDataRestrictionVisitor
     public void TestGreaterThan9()
     {
         var parsedDataRange = testString("> 9");
-        var expexted = new Tuple<DataRange.facet, string>(DataRange.facet.GreaterThan, "9");
+        var gt = Iri.NewFullIri(Namespaces.XsdMinExclusive);
+        var nine = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(9));
+        var expexted = Tuple.Create(gt, nine);
         parsedDataRange.Should().BeEquivalentTo(expexted);
     }
 
@@ -65,7 +67,9 @@ public class TestDataRestrictionVisitor
     public void TestLength()
     {
         var parsedDataRange = testString("length 2");
-        var expexted = new Tuple<DataRange.facet, string>(DataRange.facet.Length, "2");
-        parsedDataRange.Should().BeEquivalentTo(expexted);
+        var length = Iri.NewFullIri(Namespaces.XsdLength);
+        var two = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(2));
+        var expected = Tuple.Create(length, two);
+        parsedDataRange.Should().BeEquivalentTo(expected);
     }
 }

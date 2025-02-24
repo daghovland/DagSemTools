@@ -6,12 +6,15 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.OwlOntology;
+using DagSemTools.AlcTableau;
 using DagSemTools.Ingress;
 using TestUtils;
 using Xunit.Abstractions;
 using FluentAssertions;
 using IriTools;
+using Serilog;
+using Serilog.Core;
+using Serilog.Sinks.InMemory;
 
 namespace DagSemTools.Manchester.Parser.Unit.Tests;
 
@@ -19,41 +22,51 @@ public class TestParser
 {
     private readonly ITestOutputHelper _output;
     private TestOutputTextWriter _errorOutput;
+    private static InMemorySink _inMemorySink = new InMemorySink();
+
+    private ILogger _logger =
+        new LoggerConfiguration()
+            .WriteTo.Sink(_inMemorySink)
+            .WriteTo.Console()
+            .CreateLogger();
+
+    
     public TestParser(ITestOutputHelper output)
     {
         _output = output;
         _errorOutput = new TestOutputTextWriter(output);
     }
-    public List<Axiom> TestOntologyFile(string filename)
+    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile(filename, _errorOutput);
-        return TestOntology(parsedOntology);
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        return TestOntology(alcOntology);
     }
 
-    private IEnumerable<Axiom> TestOntology(OntologyDocument parsedOntology)
+    private (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(ALC.OntologyDocument parsedOntology)
     {
         parsedOntology.Should().NotBeNull();
 
-        
-        
-        
-        parsedOntology.Prefixes.ToList().Should().Contain(OwlOntology.prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
+        var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
 
-        var ontologyIri = parsedOntology.TryGetOntologyIri();
+        prefixes.ToList().Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
+
+        var ontologyIri = versionedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
         ontologyIri.Should().Be(new IriReference("https://example.com/ontology"));
 
-        var ontologyVersionIri = parsedOntology.TryGetOntologyVersionIri();
+        var ontologyVersionIri = versionedOntology.TryGetOntologyVersionIri();
         ontologyVersionIri.Should().NotBeNull();
         ontologyVersionIri.Should().Be(new IriReference("https://example.com/ontology#1"));
-        return parsedOntology.Ontology.Axioms;
+        return (KB.Item1.ToList(), KB.Item2.ToList());
     }
 
 
-    public IEnumerable<Axiom> TestOntology(string ontology)
+    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseString(ontology, _errorOutput);
-        return TestOntology(parsedOntology);
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        return TestOntology(alcOntology);
     }
 
     [Fact]
@@ -91,19 +104,21 @@ public class TestParser
     [Fact]
     public void TestOntologyWithIri()
     {
-        var parsedOntology = Manchester.Parser.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>", _errorOutput);
+        var parsedOwlOntology = Manchester.Parser.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>", _errorOutput);
+        var parsedOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOwlOntology.Ontology);
         parsedOntology.Should().NotBeNull();
 
-        var prefixes = parsedOntology.Prefixes;
-        var ontologyIri = parsedOntology.TryGetOntologyVersionIri();
-        var KB = parsedOntology.Ontology;
+        var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
 
         var prefixDeclarations = prefixes.ToList();
-        prefixDeclarations.Should().Contain(OwlOntology.prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
+        prefixDeclarations.Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
 
+        var ontologyIri = versionedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
         ontologyIri.Should().Be(new IriReference("https://example.com/ontology"));
 
+        var namedOntology = (ALC.ontologyVersion.NamedOntology)versionedOntology;
+        namedOntology.OntologyIri.Should().Be(new IriReference("https://example.com/ontology"));
     }
     [Fact]
     public void TestOntologyWithVersonIri()
@@ -152,16 +167,16 @@ public class TestParser
     [Fact]
     public void TestOntologyWithSubClass()
     {
-        var tboxAxiomsList = TestOntology("""
+        var (tboxAxiomsList, _) = TestOntology("""
                                             Prefix: ex: <https://example.com/> 
                                             Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                             Class: ex:Class
                                             SubClassOf: ex:SuperClass
                                             """
-                                        ).ToList();
+                                        );
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].IsAxiomClassAxiom().Should().BeTrue();
-        
+        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
+        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Sup.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass")));
     }
@@ -399,7 +414,8 @@ public class TestParser
                                                                       Facts: r b, s c
                                                                   """, _errorOutput
         );
-        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var (prefixes, versionedOntology, (tbox, abox)) = alcOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(2);
         foreach (var axiom in aboxAxioms)
@@ -414,7 +430,8 @@ public class TestParser
     public void TestDefinitionExample()
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/def_example.owl", _errorOutput);
-        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var (prefixes, versionedOntology, (tbox, abox)) = alcOntology.TryGetOntology();
         var tboxAxioms = tbox.ToList();
         tboxAxioms.Should().HaveCount(2);
 
@@ -432,7 +449,8 @@ public class TestParser
                                                                     Annotations: rdfs:comment "Negative Integer"
                                                                     EquivalentTo: integer[< 0]   
                                                                   """, _errorOutput);
-        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var (prefixes, versionedOntology, (tbox, abox)) = alcOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);
 
@@ -442,7 +460,8 @@ public class TestParser
     public void TestAnnotationsExample()
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/annotations.owl", _errorOutput);
-        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
+        var alcOntology = DagSemTools.OWL2ALC.Translator.translate(_logger, parsedOntology.Ontology);
+        var (prefixes, versionedOntology, (tbox, abox)) = alcOntology.TryGetOntology();
         var aboxAxioms = abox.ToList();
         aboxAxioms.Should().HaveCount(0);
 
