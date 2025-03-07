@@ -95,9 +95,9 @@ public class TestConceptParser
         var conceptString = "(<http://example.com/ex1>) and (<http://example.com/ex2>)";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewConjunction(
-                ClassExpression.NewConceptName(new IriReference("http://example.com/ex1")),
-                ClassExpression.NewConceptName(new IriReference("http://example.com/ex2"))
+            ClassExpression.NewObjectIntersectionOf(
+                ListModule.OfSeq([ ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex1"))),
+                ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex2")))])
             ));
     }
     [Fact]
@@ -106,9 +106,9 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1> or <http://example.com/ex2>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewDisjunction(
-                ClassExpression.NewConceptName(new IriReference("http://example.com/ex1")),
-                ClassExpression.NewConceptName(new IriReference("http://example.com/ex2"))
+            ClassExpression.NewObjectUnionOf(
+                ListModule.OfSeq([ ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])
             ));
     }
 
@@ -118,8 +118,8 @@ public class TestConceptParser
         var conceptString = "not <http://example.com/ex1>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewNegation(
-                ClassExpression.NewConceptName(new IriReference("http://example.com/ex1"))
+            ClassExpression.NewObjectComplementOf(
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1")))
             ));
     }
 
@@ -129,9 +129,9 @@ public class TestConceptParser
         var conceptString = "<http://example.com/name> only <http://foaf.com/name>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewUniversal(
-                ALC.Role.NewIri(new IriReference("http://example.com/name")),
-                ClassExpression.NewConceptName(new IriReference("http://foaf.com/name"))
+            ClassExpression.NewObjectAllValuesFrom(
+                ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("http://example.com/name"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://foaf.com/name")))
             ));
     }
 
@@ -142,10 +142,10 @@ public class TestConceptParser
         var conceptString = "<http://example.com/name> some <http://foaf.com/name>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewExistential(
-                ALC.Role.NewIri(new IriReference("http://example.com/name")),
-                ClassExpression.NewConceptName(new IriReference("http://foaf.com/name"))
-            ));
+            ClassExpression.NewObjectSomeValuesFrom(
+                ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("http://example.com/name"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://foaf.com/name"))
+            )));
     }
 
 
@@ -155,10 +155,10 @@ public class TestConceptParser
         var conceptString = "(<http://example.com/name> some <http://foaf.com/name>)";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewExistential(
-                ALC.Role.NewIri(new IriReference("http://example.com/name")),
-                ClassExpression.NewConceptName(new IriReference("http://foaf.com/name"))
-            ));
+            ClassExpression.NewObjectAllValuesFrom(
+                ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("http://example.com/name"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://foaf.com/name"))
+            )));
     }
 
 
@@ -172,14 +172,16 @@ public class TestConceptParser
         };
         var conceptString = "p some a and p only b";
         var parenthesizedString = "(p some a) and (p only b)";
-        var expected = ClassExpression.NewConjunction(
-            ClassExpression.NewExistential(
-                ALC.Role.NewIri(new IriReference("https://example.com/p")),
-                ClassExpression.NewConceptName(new IriReference("https://example.com/a"))),
-            ClassExpression.NewUniversal(
-                ALC.Role.NewIri(new IriReference("https://example.com/p")),
-                ClassExpression.NewConceptName(new IriReference("https://example.com/b")))
-        );
+        var expected = ClassExpression.NewObjectIntersectionOf(
+                ListModule.OfSeq([ 
+                    ClassExpression.NewObjectSomeValuesFrom(
+                        ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/p"))),
+                        ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/a")))
+                        ),
+                    ClassExpression.NewObjectAllValuesFrom(
+                        ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/p"))),
+                        ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/b")))
+                    )]));
 
         //Act
         var parsedIri = TestString(conceptString, prefixes, _testOutputTextWriter);
@@ -197,13 +199,17 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1> or <http://example.com/ex2> or <http://example.com/ex3>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewDisjunction(
-                ClassExpression.NewDisjunction(
-                    ClassExpression.NewConceptName(new IriReference("http://example.com/ex1")),
-                    ClassExpression.NewConceptName(new IriReference("http://example.com/ex2")))
-                , ClassExpression.NewConceptName(new IriReference("http://example.com/ex3"))
-
-            ));
+            ClassExpression.NewObjectUnionOf(
+                        ListModule.OfSeq([
+                            (
+                                ClassExpression.NewObjectUnionOf(
+                                    ListModule.OfSeq([
+                                        ClassExpression.NewClassName(
+                                            Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                                        ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))
+                                    ]))),
+                                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))
+                        ])));
     }
 
     [Fact]
@@ -212,13 +218,13 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1> and <http://example.com/ex2> and <http://example.com/ex3>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewConjunction(
-                ClassExpression.NewConjunction(
-                ClassExpression.NewConceptName(new IriReference("http://example.com/ex1")),
-                ClassExpression.NewConceptName(new IriReference("http://example.com/ex2")))
-                , ClassExpression.NewConceptName(new IriReference("http://example.com/ex3"))
-
-            ));
+    ClassExpression.NewObjectIntersectionOf(
+              ListModule.OfSeq([ 
+                ClassExpression.NewObjectIntersectionOf(
+                  ListModule.OfSeq([ 
+                    ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                    ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])),
+                 ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))])));
     }
     [Fact]
     public void TestNamedConcept()
@@ -226,7 +232,7 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewConceptName(new IriReference("http://example.com/ex1"))
+            ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1")))
             );
     }
 
@@ -238,7 +244,7 @@ public class TestConceptParser
         var conceptString = "(<http://example.com/ex1>)";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewConceptName(new IriReference("http://example.com/ex1"))
+            ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1")))
         );
     }
 
@@ -265,15 +271,17 @@ public class TestConceptParser
         var conceptString = "owl:Thing that hasFirstName exactly 1 and hasFirstName only string[minLength 1]";
         var parsedConcept = TestString(conceptString, _testOutputTextWriter);
         parsedConcept.Should().NotBeNull();
-        // var expected = ClassExpression.NewConjunction(
-        //     ClassExpression.NewConceptName(new IriReference("http://www.w3.org/2002/07/owl#Thing")),
-        //     ClassExpression.NewConjunction(
+        // var expected = ClassExpression.NewObjectIntersectionOf(
+        //        ListModule.OfSeq([ (
+        //     ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://www.w3.org/2002/07/owl#Thing")),
+        //     ClassExpression.NewObjectIntersectionOf(
+        //        ListModule.OfSeq([ (
         //         ClassExpression.NewCardinality(
         //             new IriReference("http://example.com/hasFirstName"),
         //             1,
-        //             ClassExpression.NewConceptName(new IriReference("http://example.com/hasFirstName"))
+        //             ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/hasFirstName"))
         //         ),
-        //         ClassExpression.NewUniversal(
+        //         ClassExpression.NewObjectAllValuesFrom(ObjectPropertyExpression.NewNamedObjectProperty(
         //             new IriReference("http://example.com/hasFirstName"),
         //              DataRange.Datarange.NewRestriction(
         //                 DataRange.Datarange.NewDatatype(new IriReference("http://www.w3.org/2001/XMLSchema#string")),
