@@ -6,7 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 using DagSemTools.Ingress;
 using TestUtils;
 using Xunit.Abstractions;
@@ -39,15 +39,14 @@ public class TestParser
     public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile(filename, _errorOutput);
-        var alcOntology = DagSemTools.OWL2ALC.Translator.translateDocument(_logger, parsedOntology);
         return TestOntology(alcOntology);
     }
 
-    private (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(ALC.OntologyDocument parsedOntology)
+    private (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(OntologyDocument parsedOntology)
     {
         parsedOntology.Should().NotBeNull();
 
-        var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
+        var (prefixes, versionedOntology, KB) = parsedOntology
 
         prefixes.ToList().Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
 

@@ -57,7 +57,7 @@ internal class FrameVisitor : ManchesterBaseVisitor<(List<ClassAxiom>, List<Asse
         var individualIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
         var individual = Individual.NewNamedIndividual(Iri.NewFullIri(individualIri));
         var frameList = context.individualFrameList() ??
-                        throw new Exception($"Lacking individual fram list on individual {context.rdfiri().GetText()}");
+                        throw new Exception($"Lacking individual frame list on individual {context.rdfiri().GetText()}");
         List<Assertion> frame = frameList
             .SelectMany(IndividualAssertionVisitor.Visit)
             .Select(assertion => assertion(individual))

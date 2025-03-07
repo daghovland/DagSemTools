@@ -1,0 +1,19 @@
+Prefix: : <https://example.com/pizza>
+
+Class: Pizza
+
+Class: NonVegetarianPizza
+
+ObjectProperty: hasTopping
+
+Class: FishTopping
+
+Class: MeatTopping
+
+Class: VegetarianPizza
+EquivalentTo:
+    Pizza and
+    not (hasTopping some FishTopping) and
+    not (hasTopping some MeatTopping)
+DisjointWith:
+    NonVegetarianPizza

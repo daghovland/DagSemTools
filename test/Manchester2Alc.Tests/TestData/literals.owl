@@ -1,0 +1,6 @@
+Prefix: : <http://ex.com/#>
+
+Ontology: 
+    Individual: John
+        Annotations: rdfs:comment "John Doe"
+        Facts: hasName "Jorn", hasAge 33
