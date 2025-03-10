@@ -67,28 +67,28 @@ public class TestDataRangeParser
         parsedDataRange.Should().BeEquivalentTo(expectedDataRange);
     }
 
-    [Fact]
-    public void TestRestrictedInt()
-    {
-        var parsedDataRange = TestString("integer[< 0]", testOutputTextWriter);
-        var xsdInteger = Iri.NewFullIri(Namespaces.XsdInteger);
-        var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
-        var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
-        var expected =
-            DataRange.NewDatatypeRestriction(xsdInteger, ListModule.OfSeq([Tuple.Create(lt, zero)]));
-        parsedDataRange.Should().BeEquivalentTo(expected);
-    }
+[Fact]
+public void TestRestrictedInt()
+{
+    var parsedDataRange = TestString("integer[< 0]", testOutputTextWriter);
+    var xsdInteger = Iri.NewFullIri(Namespaces.XsdInteger);
+    var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
+    var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
+    var expected =
+        DataRange.NewDatatypeRestriction(xsdInteger, ListModule.OfSeq([Tuple.Create(lt, zero)]));
+    parsedDataRange.Should().BeEquivalentTo(expected);
+}
 
 
     [Fact]
     public void TestRestrictedString()
     {
         var parsedDataRange = TestString("string[length 5]", testOutputTextWriter);
-        var xsdInt = Iri.NewFullIri(Namespaces.XsdInt);
+        var xsdString = Iri.NewFullIri(Namespaces.XsdString);
         var length = Iri.NewFullIri(Namespaces.XsdLength);
         var five = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(5));
         var expected =
-            DataRange.NewDatatypeRestriction(xsdInt, ListModule.OfSeq([Tuple.Create(length, five)]));
-        parsedDataRange.Should().BeEquivalentTo(expected);
+            DataRange.NewDatatypeRestriction(xsdString, ListModule.OfSeq([Tuple.Create(length, five)]));
+        parsedDataRange.Should().Be(expected);
     }
 }

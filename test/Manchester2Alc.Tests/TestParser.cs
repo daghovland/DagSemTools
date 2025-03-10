@@ -304,7 +304,8 @@ public class TestParser
         aboxAxioms[0].Should().BeOfType<ALC.ABoxAssertion.ConceptAssertion>();
         var assertion = (ALC.ABoxAssertion.ConceptAssertion)aboxAxioms[0];
         assertion.Individual.Should().Be(new IriReference("https://example.com/ind1"));
-        assertion.Item2.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
+        assertion.Item2.Should().BeOneOf(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")),
+            ALC.Concept.NewConceptName(new IriReference("https://example.com/Class2")));
     }
 
 

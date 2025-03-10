@@ -63,7 +63,7 @@ public class TestDataRangeParser
     public void TestDatatypeInt()
     {
         var parsedDataRange = TestString("integer", testOutputTextWriter);
-        var expectedDataRange = DataRange.NewNamedDataRange(Iri.NewFullIri("https://www.w3.org/2001/XMLSchema#integer"));
+        var expectedDataRange = DataRange.NewNamedDataRange(Iri.NewFullIri(Namespaces.XsdInteger));
         parsedDataRange.Should().BeEquivalentTo(expectedDataRange);
     }
 

@@ -6,6 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
 using DagSemTools.Parser;
 using IriTools;
 using DagSemTools.Manchester.Parser;
@@ -45,16 +46,16 @@ internal class DatatypeVisitor : ManchesterBaseVisitor<Iri>
         => Visit(context.datatype());
 
     public override Iri VisitDatatypeInteger(ManchesterParser.DatatypeIntegerContext context)
-        => Iri.NewFullIri("https://www.w3.org/2001/XMLSchema#integer");
+        => Iri.NewFullIri(Namespaces.XsdInteger);
 
     public override Iri VisitDatatypeString(ManchesterParser.DatatypeStringContext context)
-        => Iri.NewFullIri("https://www.w3.org/2001/XMLSchema#string");
+        => Iri.NewFullIri(Namespaces.XsdString);
 
     public override Iri VisitDatatypeDecimal(ManchesterParser.DatatypeDecimalContext context)
-        => Iri.NewFullIri("https://www.w3.org/2001/XMLSchema#decimal");
+        => Iri.NewFullIri(Namespaces.XsdDecimal);
 
     public override Iri VisitDatatypeFloat(ManchesterParser.DatatypeFloatContext context)
-        => Iri.NewFullIri("https://www.w3.org/2001/XMLSchema#float");
+        => Iri.NewFullIri(Namespaces.XsdFloat);
 
     public override Iri VisitDatatypeIri(ManchesterParser.DatatypeIriContext context)
         => Iri.NewFullIri(IriGrammarVisitor.Visit(context.rdfiri()));

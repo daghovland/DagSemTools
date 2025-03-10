@@ -43,6 +43,8 @@ open IriTools
         | AnnotationPropertyDomain of Annotation list * AnnotationProperty * Iri
         | AnnotationPropertyRange of Annotation list * AnnotationProperty * Iri
         
+    [<StructuralEquality>]
+    [<NoComparison>]
     type DataRange =
         NamedDataRange of Datatype
         | DataIntersectionOf of DataRange list
@@ -51,6 +53,8 @@ open IriTools
         | DataOneOf of GraphElement list
         | DatatypeRestriction of Datatype * (DataProperty * GraphElement) list
         
+    [<StructuralEquality>]
+    [<NoComparison>]    
     type ObjectPropertyExpression =
         | NamedObjectProperty of ObjectProperty
         | AnonymousObjectProperty of uint32

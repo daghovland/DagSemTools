@@ -55,6 +55,7 @@ open IriTools
                 | DateLiteral literalDate -> $"DateLiteral(%A{literalDate})"
                 | LangLiteral (lang, langliteral) -> $"%s{lang}@%s{langliteral})"
                 | TypedLiteral (typeIri, typedLiteral) -> $"%s{typedLiteral}^^%A{typeIri}"
+                
             
     [<StructuralComparison>]
     [<StructuralEquality>]
@@ -66,6 +67,7 @@ open IriTools
                 match this with
                 | NodeOrEdge r -> r.ToString()
                 | GraphLiteral l -> l.ToString()
+            
                 
     type prefixDeclaration =
         | PrefixDefinition of PrefixName: string * PrefixIri: IriReference
