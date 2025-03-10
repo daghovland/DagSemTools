@@ -13,6 +13,7 @@
 
 namespace DagSemTools.OwlOntology
 
+open System.Numerics
 open DagSemTools.Ingress
 open IriTools
 
@@ -72,21 +73,21 @@ open IriTools
         | ObjectAllValuesFrom of ObjectPropertyExpression * ClassExpression
         | ObjectHasValue of ObjectPropertyExpression * Individual
         | ObjectHasSelf of ObjectPropertyExpression
-        | ObjectMinQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
-        | ObjectMaxQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
-        | ObjectExactQualifiedCardinality of int * ObjectPropertyExpression * ClassExpression
-        | ObjectExactCardinality of int * ObjectPropertyExpression 
-        | ObjectMinCardinality of int * ObjectPropertyExpression
-        | ObjectMaxCardinality of int * ObjectPropertyExpression
+        | ObjectMinQualifiedCardinality of BigInteger * ObjectPropertyExpression * ClassExpression
+        | ObjectMaxQualifiedCardinality of BigInteger * ObjectPropertyExpression * ClassExpression
+        | ObjectExactQualifiedCardinality of BigInteger * ObjectPropertyExpression * ClassExpression
+        | ObjectExactCardinality of BigInteger * ObjectPropertyExpression 
+        | ObjectMinCardinality of BigInteger * ObjectPropertyExpression
+        | ObjectMaxCardinality of BigInteger * ObjectPropertyExpression
         | DataSomeValuesFrom of DataProperty list * DataRange
         | DataAllValuesFrom of DataProperty list * DataRange
         | DataHasValue of DataProperty * GraphElement
-        | DataMinQualifiedCardinality of int * DataProperty * DataRange
-        | DataMaxQualifiedCardinality of int * DataProperty * DataRange
-        | DataExactQualifiedCardinality of int * DataProperty * DataRange
-        | DataMinCardinality of int * DataProperty
-        | DataMaxCardinality of int * DataProperty
-        | DataExactCardinality of int * DataProperty
+        | DataMinQualifiedCardinality of BigInteger * DataProperty * DataRange
+        | DataMaxQualifiedCardinality of BigInteger * DataProperty * DataRange
+        | DataExactQualifiedCardinality of BigInteger * DataProperty * DataRange
+        | DataMinCardinality of BigInteger * DataProperty
+        | DataMaxCardinality of BigInteger * DataProperty
+        | DataExactCardinality of BigInteger * DataProperty
 
     type ObjectPropertyAxiom =
         | ObjectPropertyDomain of ObjectPropertyExpression * ClassExpression

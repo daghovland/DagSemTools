@@ -82,7 +82,8 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<OwlOntology.OntologyDoc
             .Aggregate<(List<ClassAxiom>, List<Assertion>), (IEnumerable<ClassAxiom>, IEnumerable<Assertion>)>
             ((new List<ClassAxiom>(), new List<Assertion>()),
                 (acc, x) => (concateOrKeep(acc.Item1, x.Item1), concateOrKeep(acc.Item2, x.Item2)));
-        var axiomList = knowledgeBase.Item1.Select(claxiom => Axiom.NewAxiomClassAxiom(claxiom));
+        var axiomList = knowledgeBase.Item1.Select(claxiom => Axiom.NewAxiomClassAxiom(claxiom))
+            .Concat(knowledgeBase.Item2.Select(ass => Axiom.NewAxiomAssertion(ass)));
         return new OntologyDocument(
             CreatePrefixList(),
             new Ontology(

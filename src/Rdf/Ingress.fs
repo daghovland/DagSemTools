@@ -7,6 +7,7 @@
 *)
 namespace DagSemTools.Rdf
 
+open System.Numerics
 open DagSemTools.Ingress
 
 module Ingress =
@@ -62,15 +63,15 @@ module Ingress =
         Array.blit originalArray 0 newArray 0 originalArray.Length
         newArray    
     
-    (* Assumes the resource is some integer literal, and extracts it if that is the cases *)
-    let tryGetNonNegativeIntegerLiteral (gel : GraphElement) =
+    (* Assumes the resource is some integer literal which fits in an int (since it is used for cardinality constraints), and extracts it if that is the cases *)
+    let tryGetNonNegativeIntegerLiteral (gel : GraphElement) : BigInteger Option =
         match gel with
         | NodeOrEdge _ -> None
         | GraphLiteral res ->
             match res with
                 | IntegerLiteral nn -> Some nn
                 | TypedLiteral (tp, nn) when (List.contains (tp.ToString()) [Namespaces.XsdInt ; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger] ) ->
-                    nn |> int |> Some                              
+                    nn |> BigInteger.Parse |> Some                              
                 | x -> None
     
     (* Assumes the resource is some integer literal, and extracts it if that is the cases *)

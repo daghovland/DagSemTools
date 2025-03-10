@@ -31,7 +31,7 @@ module ELIExtractor =
             cls
             |> ELIClassExtractor
             |> Option.map (fun clsExpr -> ComplexConcept.SomeValuesFrom(role, clsExpr))
-        | ObjectMinQualifiedCardinality(1, role, cls) ->
+        | ObjectMinQualifiedCardinality(cardinality, role, cls) when cardinality = 1I ->
             cls
             |> ELIClassExtractor
             |> Option.map (fun clsExpr -> ComplexConcept.SomeValuesFrom(role, clsExpr))
@@ -112,9 +112,9 @@ module ELIExtractor =
                         | ObjectMinQualifiedCardinality(i, objectPropertyExpression, classExpression) ->
                             logger.Warning("Invalid OWL 2 RL: ObjectMinQualifiedCardinality not allowed on superConcept")
                             ([], [], [])
-                        | ObjectMaxQualifiedCardinality(0, _objectPropertyExpression, classExpression) ->
+                        | ObjectMaxQualifiedCardinality(cardinality, _objectPropertyExpression, classExpression) when cardinality = 0I ->
                             ([], [classExpression], [NormalizedConcept.Bottom])
-                        | ObjectMaxQualifiedCardinality(1, objectPropertyExpression, classExpression) ->
+                        | ObjectMaxQualifiedCardinality(cardinality, objectPropertyExpression, classExpression) when cardinality = 1I ->
                             ([], [classExpression], [NormalizedConcept.AtMostOneValueFromQualified(objectPropertyExpression, classExpression |> conceptRepresentative)])
                         | ObjectMaxQualifiedCardinality(i, _objectPropertyExpression, _classExpression) ->
                             logger.Warning("Invalid OWL 2 RL: ObjectMaxQualifiedCardinality on superConcept only allowed with cardinality 0 or 1")
@@ -128,9 +128,9 @@ module ELIExtractor =
                         | ObjectMinCardinality(i, objectPropertyExpression) -> 
                             logger.Warning("Invalid OWL 2 RL: ObjectMinCardinality not allowed on superConcept")
                             ([], [], [])
-                        | ObjectMaxCardinality(0, objectPropertyExpression) ->
+                        | ObjectMaxCardinality(cardinality, objectPropertyExpression) when cardinality = 0I ->
                             ([], [], [NormalizedConcept.Bottom])
-                        | ObjectMaxCardinality(1, objectPropertyExpression) ->
+                        | ObjectMaxCardinality(cardinality, objectPropertyExpression) when cardinality = 1I ->
                             ([], [], [NormalizedConcept.AtMostOneValueFrom(objectPropertyExpression)])
                         | ObjectMaxCardinality(i, _objectPropertyExpression) ->
                             logger.Warning("Invalid OWL 2 RL: ObjectMaxCardinality on superConcept only allowed with cardinality 0 or 1")
@@ -165,12 +165,12 @@ module ELIExtractor =
                      NormalizedConceptInclusion ([classExpression |> conceptRepresentative], mainConceptRepresentative)))
             | ObjectSomeValuesFrom(objectPropertyExpression, classExpression) ->
                 subConceptSomeValuesFrom objectPropertyExpression classExpression concept
-            | ObjectMinQualifiedCardinality(1, objectPropertyExpression, classExpression) ->
+            | ObjectMinQualifiedCardinality(cardinality, objectPropertyExpression, classExpression) when cardinality = 1I ->
                 subConceptSomeValuesFrom objectPropertyExpression classExpression concept
             | ObjectMinQualifiedCardinality(_card, _objProp, _clExpr) ->
                 logger.Warning "Invalid OWL 2 RL: ObjectMinQualifiedCardinality only allowed with cardinality 1"
                 ([], [], [])
-            | ObjectExactQualifiedCardinality(1, objectPropertyExpression, classExpression) ->
+            | ObjectExactQualifiedCardinality(cardinality, objectPropertyExpression, classExpression) when cardinality = 1I ->
                 logger.Warning "Invalid OWL 2 RL: ObjectExactQualifiedCardinality not allowed. Only treating as ObjectMinQualifiedCardinality"
                 subConceptSomeValuesFrom objectPropertyExpression classExpression concept
             | ObjectExactQualifiedCardinality(_card, _objProp, _clExpr) ->

@@ -8,6 +8,7 @@
 namespace DagSemTools.Ingress
 
 open System
+open System.Numerics
 open IriTools
 
     
@@ -32,7 +33,7 @@ open IriTools
         | FloatLiteral of literalFloat: float
         | DoubleLiteral of literalDouble: double
         | DurationLiteral of literalDuration: TimeSpan
-        | IntegerLiteral of literalInt: int
+        | IntegerLiteral of literalInt: BigInteger
         | DateTimeLiteral of literalDateTime: DateTime
         | TimeLiteral of literalTime: TimeOnly
         | DateLiteral of literalDate: DateOnly
@@ -48,7 +49,7 @@ open IriTools
                 | FloatLiteral literalFloat -> $"FloatLiteral(%f{literalFloat})"
                 | DoubleLiteral literalDouble -> $"DoubleLiteral(%f{literalDouble})"
                 | DurationLiteral literalDuration -> $"DurationLiteral(%A{literalDuration})"
-                | IntegerLiteral literalInt -> $"IntegerLiteral(%d{literalInt})"
+                | IntegerLiteral literalInt -> $"IntegerLiteral({literalInt})"
                 | DateTimeLiteral literalDateTime -> $"DateTimeLiteral(%A{literalDateTime})"
                 | TimeLiteral literalTime -> $"TimeLiteral(%A{literalTime})"
                 | DateLiteral literalDate -> $"DateLiteral(%A{literalDate})"

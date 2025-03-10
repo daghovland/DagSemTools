@@ -12,6 +12,7 @@ using TestUtils;
 using Xunit.Abstractions;
 using FluentAssertions;
 using IriTools;
+using Microsoft.FSharp.Collections;
 using Microsoft.FSharp.Core;
 using Serilog;
 using Serilog.Core;
@@ -171,9 +172,9 @@ public class TestParser
                                             Class: ex:Class
                                             SubClassOf: ex:SuperClass
                                             """
-                                        );
+                                        ).Where(ax => ax.IsAxiomClassAxiom);
         tboxAxiomsList.Should().HaveCount(1);
-        var inclusionAxiom = tboxAxiomsList[0];
+        var inclusionAxiom = tboxAxiomsList.First();
         var (sub, sup) = GetSubClassAxiom(inclusionAxiom);
         sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("https://example.com/Class"))));
         sup.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri((new IriReference("https://example.com/SuperClass")))));
@@ -186,14 +187,24 @@ public class TestParser
         {
             Axiom.AxiomClassAxiom claxs => claxs.Item switch
             {
-                ClassAxiom.SubClassOf subAx => (subAx.Item2, subAx.Item3)
+                ClassAxiom.SubClassOf subAx => (subAx.Item2, subAx.Item3),
+                _ => throw new ArgumentOutOfRangeException($"Test failure: Expected subClassAxiom, found: {claxs}")
             },
             _ => throw new Exception("Test failure")
         };
         return (sub, sup);
     }
-
     
+    private static ClassExpression[] GetEqClassAxiom(Axiom axiom)
+    => axiom switch
+        {
+            Axiom.AxiomClassAxiom claxs => claxs.Item switch
+            {
+                ClassAxiom.EquivalentClasses subAx => ListModule.ToArray(subAx.Item2),
+                _ => throw new ArgumentOutOfRangeException($"Test failure: Expected EquivalentClasses, found: {claxs}")
+            },
+            _ => throw new Exception("Test failure")
+        };
     
     private static (Individual individual, ClassExpression cls) GetClassAssertionAxiom(Axiom axiom)
     =>
@@ -202,7 +213,7 @@ public class TestParser
             Axiom.AxiomAssertion claxs => claxs.Item switch
             {
                 Assertion.ClassAssertion subAx => (subAx.Item3, subAx.Item2),
-                _ => throw new ArgumentOutOfRangeException("Test failure")
+                _ => throw new ArgumentOutOfRangeException($"Test failure: Expected class assertion, but got {claxs}")
             },
             _ => throw new Exception("Test failure")
         };
@@ -227,7 +238,7 @@ public class TestParser
                                                Class: ex:Class
                                                SubClassOf: ex:SuperClass1, ex:SuperClass2
                                                """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(2);
         foreach (var tboxAxiom in tboxAxiomsList)
         {
@@ -247,7 +258,7 @@ public class TestParser
                                                Class: ex:Class
                                                SubClassOf: not ex:SuperClass
                                                """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(1);
         var (sub, sup) = GetSubClassAxiom(tboxAxiomsList[0]);
         sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
@@ -263,9 +274,9 @@ public class TestParser
                                                Class: ex:Class
                                                SubClassOf: ex:Role some ex:SuperClass
                                                """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(1);
-        var (sub, sup) = GetSubClassAxiom( tboxAxiomsList[0]);
+        var (sub, sup) = GetSubClassAxiom( tboxAxiomsList.First() );
         sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
         sup.Should().Be(ClassExpression.NewObjectSomeValuesFrom(ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri( new IriReference("https://example.com/Role"))), 
             ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/SuperClass")))));
@@ -280,7 +291,7 @@ public class TestParser
                                                Class: ex:Class
                                                SubClassOf: ex:Role only ex:SuperClass
                                                """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(1);
         var (sub, sup) = GetSubClassAxiom( tboxAxiomsList[0]);
         sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
@@ -299,12 +310,12 @@ public class TestParser
                                         Class: ex:Class
                                         EquivalentTo: ex:EqClass
                                         """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom);
 
         tboxAxiomsList.Should().HaveCount(1);
-        var (sub, sup) = GetSubClassAxiom(tboxAxiomsList[0]);
-        sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
-        sup.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/EqClass"))));
+        var eqClasses = GetEqClassAxiom(tboxAxiomsList.First());
+        eqClasses.Should().Contain(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
+        eqClasses.Should().Contain(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/EqClass"))));
     }
 
 
@@ -332,10 +343,10 @@ public class TestParser
                                                         Individual: ex:ind1 
                                                             Types: ex:Class , ex:Class2
                                                         """
-        );
+        ).Where(ax => ax.IsAxiomAssertion);
 
         aboxAxioms.Should().HaveCount(2);
-        var (individual, cls) = GetClassAssertionAxiom(aboxAxioms[0]);
+        var (individual, cls) = GetClassAssertionAxiom(aboxAxioms.First());
         individual.Should().Be(Individual.NewNamedIndividual( Iri.NewFullIri( new IriReference("https://example.com/ind1"))));
         cls.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
     }
@@ -352,10 +363,10 @@ public class TestParser
                                            Individual: ex:ind1 
                                                Facts: ex:Role ex:ind2
                                            """
-        );
+        ).Where(ax => ax.IsAxiomAssertion);
 
         aboxAxioms.Should().HaveCount(1);
-        var (role, left, right) = GetRoleAssertionAxiom( aboxAxioms[0]);
+        var (role, left, right) = GetRoleAssertionAxiom( aboxAxioms.First() );
         left.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/ind1"))));
         right.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/ind2"))));
         role.Should().Be(ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/Role"))));
@@ -375,9 +386,9 @@ public class TestParser
                                             Individual: ex:Ind2
                                                 Types: ex:Class
                                            """
-        );
+        ).Where(ax => ax.IsAxiomAssertion);
 
-        aboxAxioms.Should().HaveCount(3);
+        aboxAxioms.Should().HaveCount(2);
     }
     
     [Fact]
@@ -444,12 +455,14 @@ public class TestParser
                                                                   """, _errorOutput
         );
 
-        var aboxAxioms = parsedOntology.Ontology.Axioms;
+        var aboxAxioms = parsedOntology.Ontology.Axioms.Where(ax => ax.IsAxiomAssertion);
         aboxAxioms.Should().HaveCount(2);
         foreach (var axiom in aboxAxioms)
         {
-            var (individual, cls) = GetClassAssertionAxiom(axiom);
-            individual.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/a"))));
+            var (role, left, right) = GetRoleAssertionAxiom(axiom);
+            left.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/a"))));
+            right.Should().BeOneOf(Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/b"))),
+                Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/c"))));
         }
     }
 
@@ -484,7 +497,8 @@ public class TestParser
     public void TestAnnotationsExample()
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/annotations.owl", _errorOutput);
-        var aboxAxioms = parsedOntology.Ontology.Axioms;
+        var aboxAxioms = parsedOntology.Ontology.Axioms.Where(
+            axiom => axiom.IsAxiomAssertion).ToList();
         aboxAxioms.Should().HaveCount(0);
 
     }

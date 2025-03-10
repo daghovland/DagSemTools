@@ -71,11 +71,11 @@ public class TestDataRangeParser
     public void TestRestrictedInt()
     {
         var parsedDataRange = TestString("integer[< 0]", testOutputTextWriter);
-        var xsdInt = Iri.NewFullIri(Namespaces.XsdInt);
+        var xsdInteger = Iri.NewFullIri(Namespaces.XsdInteger);
         var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
         var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
         var expected =
-            DataRange.NewDatatypeRestriction(xsdInt, ListModule.OfSeq([Tuple.Create(lt, zero)]));
+            DataRange.NewDatatypeRestriction(xsdInteger, ListModule.OfSeq([Tuple.Create(lt, zero)]));
         parsedDataRange.Should().BeEquivalentTo(expected);
     }
 

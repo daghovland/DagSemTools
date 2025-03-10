@@ -155,7 +155,7 @@ public class TestConceptParser
         var conceptString = "(<http://example.com/name> some <http://foaf.com/name>)";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ClassExpression.NewObjectAllValuesFrom(
+            ClassExpression.NewObjectSomeValuesFrom(
                 ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("http://example.com/name"))),
                 ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://foaf.com/name"))
             )));
