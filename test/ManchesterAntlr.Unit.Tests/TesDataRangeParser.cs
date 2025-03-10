@@ -63,21 +63,21 @@ public class TestDataRangeParser
     public void TestDatatypeInt()
     {
         var parsedDataRange = TestString("integer", testOutputTextWriter);
-        var expectedDataRange = DataRange.NewNamedDataRange(Iri.NewFullIri("https://www.w3.org/2001/XMLSchema#integer"));
+        var expectedDataRange = DataRange.NewNamedDataRange(Iri.NewFullIri(Namespaces.XsdInteger));
         parsedDataRange.Should().BeEquivalentTo(expectedDataRange);
     }
 
-[Fact]
-public void TestRestrictedInt()
-{
-    var parsedDataRange = TestString("integer[< 0]", testOutputTextWriter);
-    var xsdInteger = Iri.NewFullIri(Namespaces.XsdInteger);
-    var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
-    var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
-    var expected =
-        DataRange.NewDatatypeRestriction(xsdInteger, ListModule.OfSeq([Tuple.Create(lt, zero)]));
-    parsedDataRange.Should().BeEquivalentTo(expected);
-}
+    [Fact]
+    public void TestRestrictedInt()
+    {
+        var parsedDataRange = TestString("integer[< 0]", testOutputTextWriter);
+        var xsdInteger = Iri.NewFullIri(Namespaces.XsdInteger);
+        var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
+        var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
+        var expected =
+            DataRange.NewDatatypeRestriction(xsdInteger, ListModule.OfSeq([Tuple.Create(lt, zero)]));
+        parsedDataRange.Should().BeEquivalentTo(expected);
+    }
 
 
     [Fact]

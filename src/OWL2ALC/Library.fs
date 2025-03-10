@@ -97,7 +97,7 @@ module Translator =
         | EquivalentClasses(tuples, classExpressions) -> classExpressions
                                                             |> Seq.map (translateClass logger)
                                                             |> DagSemTools.Ingress.Monad.pairs 
-                                                            |> List.map (fun (cls1, cls2) -> (Equivalence (cls1, cls2)))
+                                                            |> List.map (fun (cls1, cls2) -> (Inclusion (cls1, cls2)))
         | DisjointClasses(tuples, classExpressions) -> failwith "todo"
         | DisjointUnion(tuples, iri, classExpressions) -> failwith "todo"
     let rec internal translateObjectPropertyAxiom

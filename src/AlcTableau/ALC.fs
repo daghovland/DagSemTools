@@ -127,22 +127,22 @@ module ALC =
     
     type TBoxAxiom =
         | Inclusion of Sub: Concept * Sup: Concept
-        | Equivalence of Left: Concept * Right: Concept
+        //| Equivalence of Left: Concept * Right: Concept
     
     let GetAxiomConcepts (axiom: TBoxAxiom) : Concept list =
         match axiom with
         | Inclusion (sub, sup) -> GetConcepts sub @ GetConcepts sup
-        | Equivalence (left, right) -> GetConcepts left @ GetConcepts right
+        //| Equivalence (left, right) -> GetConcepts left @ GetConcepts right
     let GetAxiomExistentials (axiom: TBoxAxiom)  =
         match axiom with
         | Inclusion (sub, sup) -> GetExistentials sub @ GetExistentials sup
-        | Equivalence (left, right) -> GetExistentials left @ GetExistentials right
+        //| Equivalence (left, right) -> GetExistentials left @ GetExistentials right
         
         
     let GetAxiomConceptNames (axiom: TBoxAxiom) : IriReference list =
         match axiom with
         | Inclusion (sub, sup) -> GetConceptNames sub @ GetConceptNames sup
-        | Equivalence (left, right) -> GetConceptNames left @ GetConceptNames right
+        //| Equivalence (left, right) -> GetConceptNames left @ GetConceptNames right
     type TBox = TBoxAxiom list
     
     type ABoxAssertion =

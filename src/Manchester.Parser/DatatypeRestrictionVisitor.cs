@@ -22,5 +22,5 @@ internal class DatatypeRestrictionVisitor : ManchesterBaseVisitor<System.Tuple<I
         var (facet, literalTranslator) = _facetVisitor.Visit(context.facet());
         return new(facet, literalTranslator(context.literal()));
     }
-    
+
 }

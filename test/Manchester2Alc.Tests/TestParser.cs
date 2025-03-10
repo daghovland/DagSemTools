@@ -175,8 +175,8 @@ public class TestParser
                                             """
                                         );
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
+        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom>();
+        var inclusion = (ALC.TBoxAxiom)tboxAxiomsList[0];
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Sup.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass")));
     }
@@ -195,8 +195,8 @@ public class TestParser
         tboxAxiomsList.Should().HaveCount(2);
         foreach (var tboxAxiom in tboxAxiomsList)
         {
-            tboxAxiom.Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-            var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiom;
+            tboxAxiom.Should().BeOfType<ALC.TBoxAxiom>();
+            var inclusion = (ALC.TBoxAxiom)tboxAxiom;
             inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
             inclusion.Sup.Should().BeOneOf(
                 ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass1")),
@@ -214,8 +214,8 @@ public class TestParser
                                                """
         );
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
+        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom>();
+        var inclusion = (ALC.TBoxAxiom)tboxAxiomsList[0];
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Sup.Should().Be(ALC.Concept.NewNegation(ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
     }
@@ -231,8 +231,8 @@ public class TestParser
                                                """
         );
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
+        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom>();
+        var inclusion = (ALC.TBoxAxiom)tboxAxiomsList[0];
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Sup.Should().Be(ALC.Concept.NewExistential(ALC.Role.NewIri(new IriReference("https://example.com/Role")), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
     }
@@ -248,8 +248,8 @@ public class TestParser
                                                """
         );
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
+        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom>();
+        var inclusion = tboxAxiomsList[0];
         inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
         inclusion.Sup.Should().Be(ALC.Concept.NewUniversal(ALC.Role.NewIri(new IriReference("https://example.com/Role")), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
     }
@@ -266,11 +266,13 @@ public class TestParser
                                         """
         );
 
-        tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Equivalence>();
-        var inclusion = (ALC.TBoxAxiom.Equivalence)tboxAxiomsList[0];
-        inclusion.Left.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-        inclusion.Right.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/EqClass")));
+        tboxAxiomsList.Should().HaveCount(2);
+        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom>();
+        var inclusion1 = tboxAxiomsList[0];
+        inclusion1.Sub.Should().BeOneOf(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")),
+            ALC.Concept.NewConceptName(new IriReference("https://example.com/EqClass")));
+        inclusion1.Sub.Should().BeOneOf(ALC.Concept.NewConceptName(new IriReference("https://example.com/EqClass")),
+            ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
     }
 
 

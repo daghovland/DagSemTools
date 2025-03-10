@@ -14,10 +14,10 @@ namespace DagSemTools.Manchester.Parser;
 
 internal class FacetVisitor : ManchesterBaseVisitor<(Iri, Func<ManchesterParser.LiteralContext, GraphElement>)>
 {
-    internal static GraphElement IntegerLiteral(ManchesterParser.LiteralContext ctxt) 
+    internal static GraphElement IntegerLiteral(ManchesterParser.LiteralContext ctxt)
     => GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(Int32.Parse(ctxt.children.First().GetText())));
-    
-    internal static GraphElement StringLiteral(ManchesterParser.LiteralContext ctxt) 
+
+    internal static GraphElement StringLiteral(ManchesterParser.LiteralContext ctxt)
         => GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(ctxt.children.First().GetText()));
     public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetLength(ManchesterParser.FacetLengthContext context) =>
         (Iri.NewFullIri(Namespaces.XsdLength), IntegerLiteral);

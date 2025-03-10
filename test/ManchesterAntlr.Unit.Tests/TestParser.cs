@@ -176,7 +176,7 @@ public class TestParser
         tboxAxiomsList.Should().HaveCount(1);
         var inclusionAxiom = tboxAxiomsList.First();
         var (sub, sup) = GetSubClassAxiom(inclusionAxiom);
-        sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("https://example.com/Class"))));
+        sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
         sup.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri((new IriReference("https://example.com/SuperClass")))));
     }
 
@@ -194,18 +194,18 @@ public class TestParser
         };
         return (sub, sup);
     }
-    
+
     private static ClassExpression[] GetEqClassAxiom(Axiom axiom)
     => axiom switch
+    {
+        Axiom.AxiomClassAxiom claxs => claxs.Item switch
         {
-            Axiom.AxiomClassAxiom claxs => claxs.Item switch
-            {
-                ClassAxiom.EquivalentClasses subAx => ListModule.ToArray(subAx.Item2),
-                _ => throw new ArgumentOutOfRangeException($"Test failure: Expected EquivalentClasses, found: {claxs}")
-            },
-            _ => throw new Exception("Test failure")
-        };
-    
+            ClassAxiom.EquivalentClasses subAx => ListModule.ToArray(subAx.Item2),
+            _ => throw new ArgumentOutOfRangeException($"Test failure: Expected EquivalentClasses, found: {claxs}")
+        },
+        _ => throw new Exception("Test failure")
+    };
+
     private static (Individual individual, ClassExpression cls) GetClassAssertionAxiom(Axiom axiom)
     =>
         axiom switch
@@ -217,7 +217,7 @@ public class TestParser
             },
             _ => throw new Exception("Test failure")
         };
-    private static (ObjectPropertyExpression role, Individual left,  Individual right) GetRoleAssertionAxiom(Axiom axiom)
+    private static (ObjectPropertyExpression role, Individual left, Individual right) GetRoleAssertionAxiom(Axiom axiom)
         =>
             axiom switch
             {
@@ -276,9 +276,9 @@ public class TestParser
                                                """
         ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(1);
-        var (sub, sup) = GetSubClassAxiom( tboxAxiomsList.First() );
+        var (sub, sup) = GetSubClassAxiom(tboxAxiomsList.First());
         sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
-        sup.Should().Be(ClassExpression.NewObjectSomeValuesFrom(ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri( new IriReference("https://example.com/Role"))), 
+        sup.Should().Be(ClassExpression.NewObjectSomeValuesFrom(ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/Role"))),
             ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/SuperClass")))));
     }
 
@@ -293,10 +293,10 @@ public class TestParser
                                                """
         ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(1);
-        var (sub, sup) = GetSubClassAxiom( tboxAxiomsList[0]);
+        var (sub, sup) = GetSubClassAxiom(tboxAxiomsList[0]);
         sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
         sup.Should().Be(ClassExpression.NewObjectAllValuesFrom(
-            ObjectPropertyExpression.NewNamedObjectProperty(  Iri.NewFullIri(new IriReference("https://example.com/Role"))), 
+            ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/Role"))),
             ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/SuperClass")))));
     }
 
@@ -347,7 +347,7 @@ public class TestParser
 
         aboxAxioms.Should().HaveCount(2);
         var (individual, cls) = GetClassAssertionAxiom(aboxAxioms.First());
-        individual.Should().Be(Individual.NewNamedIndividual( Iri.NewFullIri( new IriReference("https://example.com/ind1"))));
+        individual.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/ind1"))));
         cls.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
     }
 
@@ -366,8 +366,8 @@ public class TestParser
         ).Where(ax => ax.IsAxiomAssertion);
 
         aboxAxioms.Should().HaveCount(1);
-        var (role, left, right) = GetRoleAssertionAxiom( aboxAxioms.First() );
-        left.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/ind1"))));
+        var (role, left, right) = GetRoleAssertionAxiom(aboxAxioms.First());
+        left.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/ind1"))));
         right.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/ind2"))));
         role.Should().Be(ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/Role"))));
     }
@@ -390,7 +390,7 @@ public class TestParser
 
         aboxAxioms.Should().HaveCount(2);
     }
-    
+
     [Fact]
     public void TestEmptyPrefix()
     {
@@ -402,7 +402,7 @@ public class TestParser
                                            """
         );
     }
-    
+
     [Fact]
     public void TestAlcExample()
     {
@@ -460,9 +460,9 @@ public class TestParser
         foreach (var axiom in aboxAxioms)
         {
             var (role, left, right) = GetRoleAssertionAxiom(axiom);
-            left.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/a"))));
-            right.Should().BeOneOf(Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/b"))),
-                Individual.NewNamedIndividual(Iri.NewFullIri( new IriReference("https://example.com/c"))));
+            left.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/a"))));
+            right.Should().BeOneOf(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/b"))),
+                Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/c"))));
         }
     }
 

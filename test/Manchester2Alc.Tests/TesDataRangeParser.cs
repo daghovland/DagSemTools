@@ -71,7 +71,7 @@ public class TestDataRangeParser
     public void TestRestrictedInt()
     {
         var parsedDataRange = TestString("integer[< 0]", testOutputTextWriter);
-        var xsdInt = Iri.NewFullIri(Namespaces.XsdInt);
+        var xsdInt = Iri.NewFullIri(Namespaces.XsdInteger);
         var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
         var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
         var expected =
@@ -84,7 +84,7 @@ public class TestDataRangeParser
     public void TestRestrictedString()
     {
         var parsedDataRange = TestString("string[length 5]", testOutputTextWriter);
-        var xsdInt = Iri.NewFullIri(Namespaces.XsdInt);
+        var xsdInt = Iri.NewFullIri(Namespaces.XsdString);
         var length = Iri.NewFullIri(Namespaces.XsdLength);
         var five = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(5));
         var expected =

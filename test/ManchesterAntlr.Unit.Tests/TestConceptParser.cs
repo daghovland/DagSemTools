@@ -173,7 +173,7 @@ public class TestConceptParser
         var conceptString = "p some a and p only b";
         var parenthesizedString = "(p some a) and (p only b)";
         var expected = ClassExpression.NewObjectIntersectionOf(
-                ListModule.OfSeq([ 
+                ListModule.OfSeq([
                     ClassExpression.NewObjectSomeValuesFrom(
                         ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/p"))),
                         ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/a")))
@@ -219,9 +219,9 @@ public class TestConceptParser
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
     ClassExpression.NewObjectIntersectionOf(
-              ListModule.OfSeq([ 
+              ListModule.OfSeq([
                 ClassExpression.NewObjectIntersectionOf(
-                  ListModule.OfSeq([ 
+                  ListModule.OfSeq([
                     ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
                     ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])),
                  ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))])));
