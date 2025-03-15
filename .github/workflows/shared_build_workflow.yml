@@ -1,5 +1,7 @@
 name: Shared Build Workflow
-
+permissions: 
+  contents: read
+  pull-requests: read
 on:
   workflow_call:
     inputs:
