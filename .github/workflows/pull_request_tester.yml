@@ -1,5 +1,6 @@
 name: Validate Pull Request
-
+permissions:
+  { }
 on:
   pull_request:
     types:

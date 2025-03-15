@@ -1,5 +1,6 @@
 name: Release Build and Deploy
-
+permissions:
+  {}
 on:
   release:
     types:

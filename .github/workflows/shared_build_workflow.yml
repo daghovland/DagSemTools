@@ -1,5 +1,6 @@
 name: Shared Build Workflow
-
+permissions:
+  {  }
 on:
   workflow_call:
     inputs:
