@@ -1,0 +1,6 @@
+Prefix: : <http://ex.com/#>
+
+Ontology: 
+    Annotations: creator John, 
+                Annotations: rdfs:comment "Creation Year"
+                 creationYear "2008"

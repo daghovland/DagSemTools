@@ -10,6 +10,7 @@ module Tests
 
 
 open System
+open DagSemTools.Ingress
 open Xunit
 open DagSemTools.Ingress.DependencyGraph
 open Faqt
@@ -72,3 +73,17 @@ let ``Graph with a cycle should raise an exception`` () =
     ]
     let ex = Assert.Throws<Exception>(fun () -> TopologicalSort graph |> ignore)
     Assert.Contains("cycle", ex.Message.ToLower())
+    
+    
+[<Fact>]
+let ``Integer graph literals can be equal``() =
+    let lit1 = GraphElement.GraphLiteral (IntegerLiteral 0I) 
+    let lit2 = GraphLiteral (IntegerLiteral 0I)
+    lit1.Should().Be(lit2)
+    
+    
+[<Fact>]
+let ``Integer graph literals can be unequal``() =
+    let lit1 = GraphElement.GraphLiteral (IntegerLiteral 1I) 
+    let lit2 = GraphLiteral (IntegerLiteral 2I)
+    lit1.Should().NotBe(lit2)

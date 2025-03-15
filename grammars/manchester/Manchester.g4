@@ -89,9 +89,8 @@ annotation:
     | rdfiri literal #LiteralAnnotation
     ;
     
-fact: propertyFact #PositiveFact
-    | NOT propertyFact #NegativeFact
+fact: role=rdfiri object=rdfiri #PositiveObjectPropertyFact
+    | NOT role=rdfiri object=rdfiri #NegativeObjectPropertyFact
+    | role=rdfiri value=literal #PositiveDataPropertyFact
+    | NOT role=rdfiri value=literal #NegativeDataPropertyFact
     ;
-propertyFact: role=rdfiri object=rdfiri #ObjectPropertyFact 
-    | property=rdfiri value=literal #DataPropertyFact
-;

@@ -117,5 +117,5 @@ type Rdf2Owl (triples : TripleTable,
         let axiomParser = classExpressionParser.getAxiomParser()
         let tripleAxioms = tripleTable.GetTriples() |> Seq.choose axiomParser.extractAxiom
         let axioms = [tripleAxioms  ] |> Seq.concat |> Seq.toList
-        Ontology (imports, oName, [], axioms)
+        OntologyDocument ([], (Ontology (imports, oName, [], axioms)))
     

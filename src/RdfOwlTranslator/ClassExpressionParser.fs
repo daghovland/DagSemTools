@@ -539,7 +539,7 @@ type ClassExpressionParser (triples : TripleTable,
     *)
     member internal this.parseQualifiedCardinality
         tryGetProperty tryGetObjectType qualifierPropertyId
-        (restrictionTriples : Triple seq) (cardinalityQualifierResourceId : GraphElementId)  (cardinalityExpressionConstructor : (int * 'a *'b) -> ClassExpression) =
+        (restrictionTriples : Triple seq) (cardinalityQualifierResourceId : GraphElementId)  (cardinalityExpressionConstructor ) =
         let x = restrictionTriples |> Seq.head |> (_.subject)
         let y = restrictionTriples |> Seq.find (fun tr -> tr.predicate = owlOnPropertyId) |> (_.obj)
         let z = restrictionTriples |> Seq.find (fun tr -> tr.predicate = qualifierPropertyId) |> (_.obj)

@@ -6,12 +6,14 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.Ingress;
+using DagSemTools.OwlOntology;
 using IriTools;
+using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Manchester.Parser;
 
-internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<IriReference, ALC.ABoxAssertion>>
+internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<Individual, Assertion>>
 {
     public ConceptVisitor ConceptVisitor { get; init; }
     public ABoxAssertionVisitor(ConceptVisitor conceptVisitor)
@@ -19,39 +21,33 @@ internal class ABoxAssertionVisitor : ManchesterBaseVisitor<Func<IriReference, A
         ConceptVisitor = conceptVisitor;
     }
 
-    public override Func<IriReference, ALC.ABoxAssertion> VisitObjectAnnotation(ManchesterParser.ObjectAnnotationContext context)
+    public override Func<Individual, Assertion> VisitPositiveObjectPropertyFact(ManchesterParser.PositiveObjectPropertyFactContext context)
     {
-        var propertyIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri(0));
-        var value = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri(1));
-        return (individual) => ALC.ABoxAssertion.NewObjectAnnotationAssertion(individual, propertyIri, value);
+        var propertyIri = ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role)));
+        var value = Individual.NewNamedIndividual(Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.@object)));
+        return (individual) => Assertion.NewObjectPropertyAssertion(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), propertyIri, individual, value);
     }
 
-    public override Func<IriReference, ALC.ABoxAssertion> VisitLiteralAnnotation(ManchesterParser.LiteralAnnotationContext context)
+    public override Func<Individual, Assertion> VisitPositiveDataPropertyFact(ManchesterParser.PositiveDataPropertyFactContext context)
     {
-        var propertyIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
-        var value = context.literal().GetText();
-        return (individual) => ALC.ABoxAssertion.NewLiteralAnnotationAssertion(individual, propertyIri, value);
-    }
-
-    public override Func<IriReference, ALC.ABoxAssertion> VisitPositiveFact(
-        ManchesterParser.PositiveFactContext context) =>
-        Visit(context.propertyFact());
-    public override Func<IriReference, ALC.ABoxAssertion> VisitNegativeFact(
-        ManchesterParser.NegativeFactContext context) =>
-        individual => ALC.ABoxAssertion.NewNegativeAssertion(Visit(context.propertyFact())(individual));
-
-    public override Func<IriReference, ALC.ABoxAssertion> VisitObjectPropertyFact(ManchesterParser.ObjectPropertyFactContext context)
-    {
-        var propertyIri = ALC.Role.NewIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role));
-        var value = ConceptVisitor.IriGrammarVisitor.Visit(context.@object);
-        return (individual) => ALC.ABoxAssertion.NewRoleAssertion(individual, value, propertyIri);
-    }
-
-    public override Func<IriReference, ALC.ABoxAssertion> VisitDataPropertyFact(ManchesterParser.DataPropertyFactContext context)
-    {
-        var propertyIri = ConceptVisitor.IriGrammarVisitor.Visit(context.property);
+        var propertyIri = Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role));
         var value = context.value.GetText();
-        return (individual) => ALC.ABoxAssertion.NewLiteralAssertion(individual, propertyIri, value);
+        var rdfLiteral = GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(value));
+        return (individual) => Assertion.NewDataPropertyAssertion(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), propertyIri, individual, rdfLiteral);
+    }
+    public override Func<Individual, Assertion> VisitNegativeObjectPropertyFact(ManchesterParser.NegativeObjectPropertyFactContext context)
+    {
+        var propertyIri = ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role)));
+        var value = Individual.NewNamedIndividual(Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.@object)));
+        return (individual) => Assertion.NewNegativeObjectPropertyAssertion(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), propertyIri, individual, value);
+    }
+
+    public override Func<Individual, Assertion> VisitNegativeDataPropertyFact(ManchesterParser.NegativeDataPropertyFactContext context)
+    {
+        var propertyIri = Iri.NewFullIri(ConceptVisitor.IriGrammarVisitor.Visit(context.role));
+        var value = context.value.GetText();
+        var rdfLiteral = GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(value));
+        return (individual) => Assertion.NewNegativeDataPropertyAssertion(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), propertyIri, individual, rdfLiteral);
     }
 
 }

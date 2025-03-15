@@ -7,14 +7,20 @@
 */
 
 
-using DagSemTools.AlcTableau;
+using DagSemTools.Ingress;
+using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
 
-internal class DatatypeRestrictionVisitor : ManchesterBaseVisitor<System.Tuple<DataRange.facet, string>>
+internal class DatatypeRestrictionVisitor : ManchesterBaseVisitor<System.Tuple<Iri, GraphElement>>
 {
     private FacetVisitor _facetVisitor = new FacetVisitor();
-    public override Tuple<DataRange.facet, string> VisitDatatype_restriction(ManchesterParser.Datatype_restrictionContext context)
-        => new(_facetVisitor.Visit(context.facet()), context.literal().GetText());
+
+    public override Tuple<Iri, GraphElement> VisitDatatype_restriction(
+        ManchesterParser.Datatype_restrictionContext context)
+    {
+        var (facet, literalTranslator) = _facetVisitor.Visit(context.facet());
+        return new(facet, literalTranslator(context.literal()));
+    }
 
 }

@@ -67,9 +67,9 @@ module Tests =
 
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
-        let ontology: Ontology = translator.extractOntology
+        let ontology = translator.extractOntology
         //Assert
-        let ontologyAxioms = ontology.Axioms
+        let ontologyAxioms = ontology.Ontology.Axioms
         ontologyAxioms.Should().Contain(expectedAxiom)
 
 
@@ -154,7 +154,7 @@ module Tests =
 
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
-        let ontology: Ontology = translator.extractOntology
+        let ontology = translator.extractOntology
 
         //Assert
         let expectedAxiom =
@@ -167,7 +167,7 @@ module Tests =
             )
 
         let ontologyAxioms =
-            ontology.Axioms
+            ontology.Ontology.Axioms
             |> Seq.filter (fun ax ->
                 match ax with
                 | AxiomClassAxiom x -> true
@@ -209,7 +209,7 @@ module Tests =
 
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
-        let ontology: Ontology = translator.extractOntology
+        let ontology = translator.extractOntology
 
         //Assert
         let expectedAxiom =
@@ -224,7 +224,7 @@ module Tests =
             )
 
         let ontologyAxioms =
-            ontology.Axioms
+            ontology.Ontology.Axioms
             |> Seq.filter (fun ax ->
                 match ax with
                 | AxiomObjectPropertyAxiom x -> true
@@ -270,7 +270,7 @@ module Tests =
 
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
-        let ontology: Ontology = translator.extractOntology
+        let ontology = translator.extractOntology
 
         //Assert
         let subClass: ClassExpression =
@@ -282,7 +282,7 @@ module Tests =
         let expectedAxioms = AxiomClassAxiom(SubClassOf([], subClass, superClass))
 
         let ontologyAxioms =
-            ontology.Axioms
+            ontology.Ontology.Axioms
             |> Seq.where (fun ax ->
                 match ax with
                 | Axiom.AxiomClassAxiom _ -> true
@@ -466,7 +466,7 @@ module Tests =
         
         //Act
         let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(tripleTable, resources, logger)
-        let ontology: Ontology = translator.extractOntology
+        let ontology = translator.extractOntology
 
         //Assert
         let subClass: ClassExpression =
@@ -482,7 +482,7 @@ module Tests =
         let expectedAxioms = AxiomClassAxiom(SubClassOf([], subClass, intersection))
 
         let ontologyAxioms =
-            ontology.Axioms
+            ontology.Ontology.Axioms
             |> Seq.where (fun ax ->
                 match ax with
                 | Axiom.AxiomClassAxiom _ -> true

@@ -6,12 +6,17 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 using DagSemTools.Ingress;
 using TestUtils;
 using Xunit.Abstractions;
 using FluentAssertions;
 using IriTools;
+using Microsoft.FSharp.Collections;
+using Microsoft.FSharp.Core;
+using Serilog;
+using Serilog.Core;
+using Serilog.Sinks.InMemory;
 
 namespace DagSemTools.Manchester.Parser.Unit.Tests;
 
@@ -19,23 +24,32 @@ public class TestParser
 {
     private readonly ITestOutputHelper _output;
     private TestOutputTextWriter _errorOutput;
+    private static InMemorySink _inMemorySink = new InMemorySink();
+
+    private ILogger _logger =
+        new LoggerConfiguration()
+            .WriteTo.Sink(_inMemorySink)
+            .WriteTo.Console()
+            .CreateLogger();
+
+
     public TestParser(ITestOutputHelper output)
     {
         _output = output;
         _errorOutput = new TestOutputTextWriter(output);
     }
-    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntologyFile(string filename)
+    public List<Axiom> TestOntologyFile(string filename)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile(filename, _errorOutput);
         return TestOntology(parsedOntology);
     }
 
-    private (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(ALC.OntologyDocument parsedOntology)
+    private List<Axiom> TestOntology(OntologyDocument parsedOntology)
     {
         parsedOntology.Should().NotBeNull();
 
-        var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
-
+        var prefixes = parsedOntology.Prefixes;
+        var versionedOntology = parsedOntology.Ontology;
         prefixes.ToList().Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
 
         var ontologyIri = versionedOntology.TryGetOntologyIri();
@@ -45,11 +59,11 @@ public class TestParser
         var ontologyVersionIri = versionedOntology.TryGetOntologyVersionIri();
         ontologyVersionIri.Should().NotBeNull();
         ontologyVersionIri.Should().Be(new IriReference("https://example.com/ontology#1"));
-        return (KB.Item1.ToList(), KB.Item2.ToList());
+        return parsedOntology.Ontology.Axioms.ToList();
     }
 
 
-    public (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) TestOntology(string ontology)
+    public List<Axiom> TestOntology(string ontology)
     {
         var parsedOntology = Manchester.Parser.Parser.ParseString(ontology, _errorOutput);
         return TestOntology(parsedOntology);
@@ -93,17 +107,17 @@ public class TestParser
         var parsedOntology = Manchester.Parser.Parser.ParseString("Prefix: ex: <https://example.com/> Ontology: <https://example.com/ontology>", _errorOutput);
         parsedOntology.Should().NotBeNull();
 
-        var (prefixes, versionedOntology, KB) = parsedOntology.TryGetOntology();
+        var prefixes = parsedOntology.Prefixes;
 
         var prefixDeclarations = prefixes.ToList();
         prefixDeclarations.Should().Contain(prefixDeclaration.NewPrefixDefinition("ex", new IriReference("https://example.com/")));
 
+        var versionedOntology = parsedOntology.Ontology;
         var ontologyIri = versionedOntology.TryGetOntologyIri();
         ontologyIri.Should().NotBeNull();
         ontologyIri.Should().Be(new IriReference("https://example.com/ontology"));
 
-        var namedOntology = (ALC.ontologyVersion.NamedOntology)versionedOntology;
-        namedOntology.OntologyIri.Should().Be(new IriReference("https://example.com/ontology"));
+        versionedOntology.TryGetOntologyIri().Should().Be(new IriReference("https://example.com/ontology"));
     }
     [Fact]
     public void TestOntologyWithVersonIri()
@@ -152,117 +166,163 @@ public class TestParser
     [Fact]
     public void TestOntologyWithSubClass()
     {
-        var (tboxAxiomsList, _) = TestOntology("""
+        var tboxAxiomsList = TestOntology("""
                                             Prefix: ex: <https://example.com/> 
                                             Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                             Class: ex:Class
                                             SubClassOf: ex:SuperClass
                                             """
-                                        );
+                                        ).Where(ax => ax.IsAxiomClassAxiom);
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
-        inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-        inclusion.Sup.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass")));
+        var inclusionAxiom = tboxAxiomsList.First();
+        var (sub, sup) = GetSubClassAxiom(inclusionAxiom);
+        sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
+        sup.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri((new IriReference("https://example.com/SuperClass")))));
     }
 
+    private static (ClassExpression sub, ClassExpression sup) GetSubClassAxiom(Axiom axiom)
+    {
+        axiom.IsAxiomClassAxiom.Should().BeTrue();
+        var (sub, sup) = axiom switch
+        {
+            Axiom.AxiomClassAxiom claxs => claxs.Item switch
+            {
+                ClassAxiom.SubClassOf subAx => (subAx.Item2, subAx.Item3),
+                _ => throw new ArgumentOutOfRangeException($"Test failure: Expected subClassAxiom, found: {claxs}")
+            },
+            _ => throw new Exception("Test failure")
+        };
+        return (sub, sup);
+    }
+
+    private static ClassExpression[] GetEqClassAxiom(Axiom axiom)
+    => axiom switch
+    {
+        Axiom.AxiomClassAxiom claxs => claxs.Item switch
+        {
+            ClassAxiom.EquivalentClasses subAx => ListModule.ToArray(subAx.Item2),
+            _ => throw new ArgumentOutOfRangeException($"Test failure: Expected EquivalentClasses, found: {claxs}")
+        },
+        _ => throw new Exception("Test failure")
+    };
+
+    private static (Individual individual, ClassExpression cls) GetClassAssertionAxiom(Axiom axiom)
+    =>
+        axiom switch
+        {
+            Axiom.AxiomAssertion claxs => claxs.Item switch
+            {
+                Assertion.ClassAssertion subAx => (subAx.Item3, subAx.Item2),
+                _ => throw new ArgumentOutOfRangeException($"Test failure: Expected class assertion, but got {claxs}")
+            },
+            _ => throw new Exception("Test failure")
+        };
+    private static (ObjectPropertyExpression role, Individual left, Individual right) GetRoleAssertionAxiom(Axiom axiom)
+        =>
+            axiom switch
+            {
+                Axiom.AxiomAssertion claxs => claxs.Item switch
+                {
+                    Assertion.ObjectPropertyAssertion subAx => (subAx.Item2, subAx.Item3, subAx.Item4),
+                    _ => throw new ArgumentOutOfRangeException("Test failure")
+                },
+                _ => throw new Exception("Test failure")
+            };
 
     [Fact]
     public void TestOntologyWithSubClasses()
     {
-        var (tboxAxiomsList, _) = TestOntology("""
+        var tboxAxiomsList = TestOntology("""
                                                Prefix: ex: <https://example.com/> 
                                                Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                                Class: ex:Class
                                                SubClassOf: ex:SuperClass1, ex:SuperClass2
                                                """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(2);
         foreach (var tboxAxiom in tboxAxiomsList)
         {
-            tboxAxiom.Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-            var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiom;
-            inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-            inclusion.Sup.Should().BeOneOf(
-                ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass1")),
-                ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass2")));
+            var (sub, sup) = GetSubClassAxiom(tboxAxiom);
+            sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
+            sup.Should().BeOneOf(
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/SuperClass1"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/SuperClass2"))));
         }
     }
     [Fact]
     public void TestOntologyWithSubClassAndNegation()
     {
-        var (tboxAxiomsList, _) = TestOntology("""
+        var tboxAxiomsList = TestOntology("""
                                                Prefix: ex: <https://example.com/> 
                                                Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                                Class: ex:Class
                                                SubClassOf: not ex:SuperClass
                                                """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
-        inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-        inclusion.Sup.Should().Be(ALC.Concept.NewNegation(ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
+        var (sub, sup) = GetSubClassAxiom(tboxAxiomsList[0]);
+        sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
+        sup.Should().Be(ClassExpression.NewObjectComplementOf(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/SuperClass")))));
     }
 
     [Fact]
     public void TestOntologyWithSubClassAndExistential()
     {
-        var (tboxAxiomsList, _) = TestOntology("""
+        var tboxAxiomsList = TestOntology("""
                                                Prefix: ex: <https://example.com/> 
                                                Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                                Class: ex:Class
                                                SubClassOf: ex:Role some ex:SuperClass
                                                """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
-        inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-        inclusion.Sup.Should().Be(ALC.Concept.NewExistential(ALC.Role.NewIri(new IriReference("https://example.com/Role")), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
+        var (sub, sup) = GetSubClassAxiom(tboxAxiomsList.First());
+        sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
+        sup.Should().Be(ClassExpression.NewObjectSomeValuesFrom(ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/Role"))),
+            ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/SuperClass")))));
     }
 
     [Fact]
     public void TestOntologyWithSubClassAndUniversal()
     {
-        var (tboxAxiomsList, _) = TestOntology("""
+        var tboxAxiomsList = TestOntology("""
                                                Prefix: ex: <https://example.com/> 
                                                Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                                Class: ex:Class
                                                SubClassOf: ex:Role only ex:SuperClass
                                                """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom).ToList();
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Inclusion>();
-        var inclusion = (ALC.TBoxAxiom.Inclusion)tboxAxiomsList[0];
-        inclusion.Sub.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-        inclusion.Sup.Should().Be(ALC.Concept.NewUniversal(ALC.Role.NewIri(new IriReference("https://example.com/Role")), ALC.Concept.NewConceptName(new IriReference("https://example.com/SuperClass"))));
+        var (sub, sup) = GetSubClassAxiom(tboxAxiomsList[0]);
+        sub.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
+        sup.Should().Be(ClassExpression.NewObjectAllValuesFrom(
+            ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/Role"))),
+            ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/SuperClass")))));
     }
 
 
     [Fact]
     public void TestOntologyWithEquivalentClass()
     {
-        var (tboxAxiomsList, aboxAxioms) = TestOntology("""
+        var tboxAxiomsList = TestOntology("""
                                         Prefix: ex: <https://example.com/> 
                                         Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                         Class: ex:Class
                                         EquivalentTo: ex:EqClass
                                         """
-        );
+        ).Where(ax => ax.IsAxiomClassAxiom);
 
         tboxAxiomsList.Should().HaveCount(1);
-        tboxAxiomsList[0].Should().BeOfType<ALC.TBoxAxiom.Equivalence>();
-        var inclusion = (ALC.TBoxAxiom.Equivalence)tboxAxiomsList[0];
-        inclusion.Left.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
-        inclusion.Right.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/EqClass")));
+        var eqClasses = GetEqClassAxiom(tboxAxiomsList.First());
+        eqClasses.Should().Contain(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
+        eqClasses.Should().Contain(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/EqClass"))));
     }
 
 
     [Fact]
     public void TestOntologyWithobjectProperty()
     {
-        var (_, aboxAxioms) = TestOntology("""
+        var tboxAxioms = TestOntology("""
                                            Prefix: ex: <https://example.com/> 
                                            Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                            ObjectProperty: ex:Role
@@ -275,7 +335,7 @@ public class TestParser
     [Fact]
     public void TestOntologyWithAboxAssertion()
     {
-        var (_, aboxAxioms) = TestOntology("""
+        var aboxAxioms = TestOntology("""
                                                         Prefix: ex: <https://example.com/> 
                                                         Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                                         Class: ex:Class
@@ -283,20 +343,19 @@ public class TestParser
                                                         Individual: ex:ind1 
                                                             Types: ex:Class , ex:Class2
                                                         """
-        );
+        ).Where(ax => ax.IsAxiomAssertion);
 
         aboxAxioms.Should().HaveCount(2);
-        aboxAxioms[0].Should().BeOfType<ALC.ABoxAssertion.ConceptAssertion>();
-        var assertion = (ALC.ABoxAssertion.ConceptAssertion)aboxAxioms[0];
-        assertion.Individual.Should().Be(new IriReference("https://example.com/ind1"));
-        assertion.Item2.Should().Be(ALC.Concept.NewConceptName(new IriReference("https://example.com/Class")));
+        var (individual, cls) = GetClassAssertionAxiom(aboxAxioms.First());
+        individual.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/ind1"))));
+        cls.Should().Be(ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/Class"))));
     }
 
 
     [Fact]
     public void TestOntologyWithRoleAssertion()
     {
-        var (_, aboxAxioms) = TestOntology("""
+        var aboxAxioms = TestOntology("""
                                            Prefix: ex: <https://example.com/> 
                                            Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                            Class: ex:Class
@@ -304,21 +363,20 @@ public class TestParser
                                            Individual: ex:ind1 
                                                Facts: ex:Role ex:ind2
                                            """
-        );
+        ).Where(ax => ax.IsAxiomAssertion);
 
         aboxAxioms.Should().HaveCount(1);
-        aboxAxioms[0].Should().BeOfType<ALC.ABoxAssertion.RoleAssertion>();
-        var assertion = (ALC.ABoxAssertion.RoleAssertion)aboxAxioms[0];
-        assertion.Individual.Should().Be(new IriReference("https://example.com/ind1"));
-        assertion.Right.Should().Be(new IriReference("https://example.com/ind2"));
-        assertion.AssertedRole.Should().Be(ALC.Role.NewIri(new IriReference("https://example.com/Role")));
+        var (role, left, right) = GetRoleAssertionAxiom(aboxAxioms.First());
+        left.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/ind1"))));
+        right.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/ind2"))));
+        role.Should().Be(ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/Role"))));
     }
 
 
     [Fact]
     public void TestOntologyWithRoleandTypeAssertions()
     {
-        var (_, aboxAxioms) = TestOntology("""
+        var aboxAxioms = TestOntology("""
                                            Prefix: ex: <https://example.com/> 
                                            Ontology: <https://example.com/ontology> <https://example.com/ontology#1> 
                                            Class: ex:Class
@@ -328,17 +386,15 @@ public class TestParser
                                             Individual: ex:Ind2
                                                 Types: ex:Class
                                            """
-        );
+        ).Where(ax => ax.IsAxiomAssertion);
 
         aboxAxioms.Should().HaveCount(2);
-
     }
-
 
     [Fact]
     public void TestEmptyPrefix()
     {
-        var (_, _) = TestOntology("""
+        var _ = TestOntology("""
                                            Prefix: : <https://example.com/empty/>
                                            Prefix: ex: <https://example.com/> 
                                            Ontology: <https://example.com/ontology> <https://example.com/ontology#1>   
@@ -347,11 +403,10 @@ public class TestParser
         );
     }
 
-
     [Fact]
     public void TestAlcExample()
     {
-        var (_, _) = TestOntology("""
+        var _ = TestOntology("""
                                   Prefix: : <https://example.com/empty/>
                                   Prefix: ex: <https://example.com/> 
                                   Ontology: <https://example.com/ontology> <https://example.com/ontology#1>   
@@ -385,7 +440,7 @@ public class TestParser
     [Fact]
     public void TestAlcTableauFromFile()
     {
-        var (_, _) = TestOntologyFile("TestData/alctableauex.owl");
+        var _ = TestOntologyFile("TestData/alctableauex.owl");
     }
 
 
@@ -399,14 +454,15 @@ public class TestParser
                                                                       Facts: r b, s c
                                                                   """, _errorOutput
         );
-        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
-        var aboxAxioms = abox.ToList();
+
+        var aboxAxioms = parsedOntology.Ontology.Axioms.Where(ax => ax.IsAxiomAssertion);
         aboxAxioms.Should().HaveCount(2);
         foreach (var axiom in aboxAxioms)
         {
-            axiom.Should().BeOfType<ALC.ABoxAssertion.RoleAssertion>();
-            var assertion = (ALC.ABoxAssertion.RoleAssertion)axiom;
-            assertion.Individual.Should().Be(new IriReference("https://example.com/a"));
+            var (role, left, right) = GetRoleAssertionAxiom(axiom);
+            left.Should().Be(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/a"))));
+            right.Should().BeOneOf(Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/b"))),
+                Individual.NewNamedIndividual(Iri.NewFullIri(new IriReference("https://example.com/c"))));
         }
     }
 
@@ -414,8 +470,7 @@ public class TestParser
     public void TestDefinitionExample()
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/def_example.owl", _errorOutput);
-        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
-        var tboxAxioms = tbox.ToList();
+        var tboxAxioms = parsedOntology.Ontology.Axioms;
         tboxAxioms.Should().HaveCount(2);
 
     }
@@ -432,8 +487,8 @@ public class TestParser
                                                                     Annotations: rdfs:comment "Negative Integer"
                                                                     EquivalentTo: integer[< 0]   
                                                                   """, _errorOutput);
-        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
-        var aboxAxioms = abox.ToList();
+        var aboxAxioms = parsedOntology.Ontology.Axioms.Where(
+            axiom => axiom.IsAxiomAssertion).ToList();
         aboxAxioms.Should().HaveCount(0);
 
     }
@@ -442,8 +497,8 @@ public class TestParser
     public void TestAnnotationsExample()
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/annotations.owl", _errorOutput);
-        var (prefixes, versionedOntology, (tbox, abox)) = parsedOntology.TryGetOntology();
-        var aboxAxioms = abox.ToList();
+        var aboxAxioms = parsedOntology.Ontology.Axioms.Where(
+            axiom => axiom.IsAxiomAssertion).ToList();
         aboxAxioms.Should().HaveCount(0);
 
     }

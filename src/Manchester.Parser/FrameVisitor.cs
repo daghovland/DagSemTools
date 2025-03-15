@@ -10,12 +10,12 @@ using System.Collections;
 using DagSemTools.ManchesterAntlr;
 using IriTools;
 using Microsoft.FSharp.Collections;
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-internal class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>)>
+internal class FrameVisitor : ManchesterBaseVisitor<(List<ClassAxiom>, List<Assertion>)>
 {
     internal ConceptVisitor ConceptVisitor { get; init; }
     private ClassAssertionVisitor ClassAssertionVisitor { get; init; }
@@ -31,20 +31,20 @@ internal class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<A
     }
 
 
-    public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitObjectPropertyFrame(ManchesterParser.ObjectPropertyFrameContext context)
+    public override (List<ClassAxiom>, List<Assertion>) VisitObjectPropertyFrame(ManchesterParser.ObjectPropertyFrameContext context)
     {
         var objectPropertyIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
         var frame = context.objectPropertyFrameList()
             .SelectMany(ObjectPropertyAssertionVisitor.Visit)
             .Select(classProperty => classProperty(objectPropertyIri))
             .ToList();
-        return (frame, []);
+        return ([], frame);
     }
 
-    public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitClassFrame(ManchesterParser.ClassFrameContext context)
+    public override (List<ClassAxiom>, List<Assertion>) VisitClassFrame(ManchesterParser.ClassFrameContext context)
     {
         var classIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
-        var classConcept = ALC.Concept.NewConceptName(classIri);
+        var classConcept = ClassExpression.NewClassName(Iri.NewFullIri(classIri));
         var frame = context.annotatedList()
             .SelectMany(ClassAssertionVisitor.Visit)
             .Select(classProperty => classProperty(classConcept))
@@ -52,14 +52,15 @@ internal class FrameVisitor : ManchesterBaseVisitor<(List<ALC.TBoxAxiom>, List<A
         return (frame, []);
     }
 
-    public override (List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>) VisitIndividualFrame(ManchesterParser.IndividualFrameContext context)
+    public override (List<ClassAxiom>, List<Assertion>) VisitIndividualFrame(ManchesterParser.IndividualFrameContext context)
     {
         var individualIri = ConceptVisitor.IriGrammarVisitor.Visit(context.rdfiri());
+        var individual = Individual.NewNamedIndividual(Iri.NewFullIri(individualIri));
         var frameList = context.individualFrameList() ??
-                        throw new Exception($"Lacking individual fram list on individual {context.rdfiri().GetText()}");
-        var frame = frameList
+                        throw new Exception($"Lacking individual frame list on individual {context.rdfiri().GetText()}");
+        List<Assertion> frame = frameList
             .SelectMany(IndividualAssertionVisitor.Visit)
-            .Select(assertion => assertion(individualIri))
+            .Select(assertion => assertion(individual))
             .ToList();
         return ([], frame);
     }

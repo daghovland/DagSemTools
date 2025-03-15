@@ -12,19 +12,19 @@ using DagSemTools.Parser;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using IriTools;
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
 
 internal static class Parser
 {
-    public static ALC.OntologyDocument ParseFile(string filename, TextWriter errorOutput)
+    public static OntologyDocument ParseFile(string filename, TextWriter errorOutput)
     {
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader, errorOutput);
     }
 
-    public static ALC.OntologyDocument ParseReader(TextReader textReader, TextWriter errorOutput)
+    public static OntologyDocument ParseReader(TextReader textReader, TextWriter errorOutput)
     {
         var input = new AntlrInputStream(textReader);
         var lexer = new ManchesterLexer(input);
@@ -38,7 +38,7 @@ internal static class Parser
         return visitor.Visit(tree);
     }
 
-    public static ALC.OntologyDocument ParseString(string owl, TextWriter errorOutput)
+    public static OntologyDocument ParseString(string owl, TextWriter errorOutput)
     {
         using TextReader textReader = new StringReader(owl);
         return ParseReader(textReader, errorOutput);

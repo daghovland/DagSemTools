@@ -6,7 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 using DagSemTools.Manchester.Parser;
 using DagSemTools.Parser;
 using Antlr4.Runtime;
@@ -14,7 +14,7 @@ using IriTools;
 
 namespace DagSemTools.Manchester.Parser;
 
-internal class RoleVisitor : ManchesterBaseVisitor<ALC.Role>
+internal class RoleVisitor : ManchesterBaseVisitor<ObjectPropertyExpression>
 {
     private IriGrammarVisitor _iriGrammarVisitor;
     private IVisitorErrorListener _errorListener;
@@ -24,8 +24,8 @@ internal class RoleVisitor : ManchesterBaseVisitor<ALC.Role>
         _errorListener = errorListener;
     }
 
-    public override ALC.Role VisitObjectPropertyExpression(ManchesterParser.ObjectPropertyExpressionContext context) =>
+    public override ObjectPropertyExpression VisitObjectPropertyExpression(ManchesterParser.ObjectPropertyExpressionContext context) =>
         context.INVERSE() == null
-            ? ALC.Role.NewIri(new IriReference(_iriGrammarVisitor.Visit(context.rdfiri())))
-            : ALC.Role.NewInverse(new IriReference(_iriGrammarVisitor.Visit(context.rdfiri())));
+            ? ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference(_iriGrammarVisitor.Visit(context.rdfiri()))))
+            : ObjectPropertyExpression.NewInverseObjectProperty(ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference(_iriGrammarVisitor.Visit(context.rdfiri())))));
 }

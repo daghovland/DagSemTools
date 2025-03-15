@@ -6,22 +6,37 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.Ingress;
+using DagSemTools.OwlOntology;
+using DagSemTools.Manchester.Parser;
 
 namespace DagSemTools.Manchester.Parser;
 
-internal class FacetVisitor : ManchesterBaseVisitor<DataRange.facet>
+internal class FacetVisitor : ManchesterBaseVisitor<(Iri, Func<ManchesterParser.LiteralContext, GraphElement>)>
 {
-    public override DataRange.facet VisitFacetLength(ManchesterParser.FacetLengthContext context) => DataRange.facet.Length;
-    public override DataRange.facet VisitFacetMinLength(ManchesterParser.FacetMinLengthContext context) => DataRange.facet.MinLength;
-    public override DataRange.facet VisitFacetMaxLength(ManchesterParser.FacetMaxLengthContext context) => DataRange.facet.MaxLength;
+    internal static GraphElement IntegerLiteral(ManchesterParser.LiteralContext ctxt)
+    => GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(Int32.Parse(ctxt.children.First().GetText())));
 
-    public override DataRange.facet VisitFacetLangRange(ManchesterParser.FacetLangRangeContext context) =>
-        DataRange.facet.LangRange;
-    public override DataRange.facet VisitFacetPattern(ManchesterParser.FacetPatternContext context) => DataRange.facet.Pattern;
-    public override DataRange.facet VisitFacetGreaterThan(ManchesterParser.FacetGreaterThanContext context) => DataRange.facet.GreaterThan;
-    public override DataRange.facet VisitFacetLessThan(ManchesterParser.FacetLessThanContext context) => DataRange.facet.LessThan;
-    public override DataRange.facet VisitFacetGreaterThanEqual(ManchesterParser.FacetGreaterThanEqualContext context) => DataRange.facet.GreaterThanOrEqual;
-    public override DataRange.facet VisitFacetLessThanEqual(ManchesterParser.FacetLessThanEqualContext context) => DataRange.facet.LessThanOrEqual;
+    internal static GraphElement StringLiteral(ManchesterParser.LiteralContext ctxt)
+        => GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString(ctxt.children.First().GetText()));
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetLength(ManchesterParser.FacetLengthContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdLength), IntegerLiteral);
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetMinLength(ManchesterParser.FacetMinLengthContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdMinLength), IntegerLiteral);
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetMaxLength(ManchesterParser.FacetMaxLengthContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdMaxLength), IntegerLiteral);
+
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetLangRange(ManchesterParser.FacetLangRangeContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdLangRange), StringLiteral);
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetPattern(ManchesterParser.FacetPatternContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdPattern), StringLiteral);
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetGreaterThan(ManchesterParser.FacetGreaterThanContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdMinExclusive), IntegerLiteral);
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetLessThan(ManchesterParser.FacetLessThanContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdMaxExclusive), IntegerLiteral);
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetGreaterThanEqual(ManchesterParser.FacetGreaterThanEqualContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdMinInclusive), IntegerLiteral);
+    public override (Iri, Func<ManchesterParser.LiteralContext, GraphElement>) VisitFacetLessThanEqual(ManchesterParser.FacetLessThanEqualContext context) =>
+        (Iri.NewFullIri(Namespaces.XsdMaxInclusive), IntegerLiteral);
 
 }

@@ -9,20 +9,16 @@
 namespace DagSemTools.OwlOntology
 
 open IriTools
+open DagSemTools.Ingress
 
-type ontologyVersion =
-    | UnNamedOntology
-    | NamedOntology of OntologyIri: IriReference
-    | VersionedOntology of OntologyIri: IriReference * OntologyVersionIri: IriReference
-
-type directlyImportsDocument = IriReference
+type public directlyImportsDocument = IriReference
 
 
 
 type Ontology
     (
         directlyImportsDocuments: directlyImportsDocument list,
-        version: ontologyVersion,
+        version: DagSemTools.Ingress.ontologyVersion,
         annotations: Annotation list,
         axioms: Axiom list
     ) =
@@ -122,14 +118,8 @@ type Ontology
         | VersionedOntology(iri, _) -> iri
         | _ -> null
 
-type prefixDeclaration = PrefixDefinition of PrefixName: string * PrefixIri: IriReference
 
-type prefixDeclaration with
-    member x.TryGetPrefixName() =
-        match x with
-        | PrefixDefinition(name, iri) -> (name, iri)
-
-type OntologyDocument(prefixes: prefixDeclaration list, ontology: Ontology) =
+type OntologyDocument(prefixes: DagSemTools.Ingress.prefixDeclaration list, ontology: Ontology) =
     member this.Prefixes = prefixes
     member this.Ontology = ontology
 

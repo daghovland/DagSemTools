@@ -6,13 +6,10 @@
     Contact: hovlanddag@gmail.com
 */
 
-using System.Runtime.Loader;
-using Antlr4.Runtime;
 using DagSemTools.Parser;
-using DagSemTools.Manchester.Parser;
 using Microsoft.FSharp.Collections;
-using DagSemTools.AlcTableau;
 using DagSemTools.Ingress;
+using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
@@ -21,7 +18,7 @@ using System.Collections.Generic;
 using IriTools;
 using static ManchesterParser;
 
-internal class ManchesterVisitor : ManchesterBaseVisitor<ALC.OntologyDocument>
+internal class ManchesterVisitor : ManchesterBaseVisitor<OwlOntology.OntologyDocument>
 {
     private ConceptVisitor? _conceptVisitor;
     private FrameVisitor? _frameVisitor;
@@ -34,7 +31,7 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<ALC.OntologyDocument>
 
     private readonly Dictionary<string, IriReference> _prefixes = new Dictionary<string, IriReference>();
 
-    public override ALC.OntologyDocument VisitOntologyDocument(OntologyDocumentContext ctxt)
+    public override OntologyDocument VisitOntologyDocument(OntologyDocumentContext ctxt)
     {
         foreach (var prefixDecl in ctxt.prefixDeclaration())
         {
@@ -50,11 +47,14 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<ALC.OntologyDocument>
         _frameVisitor = new FrameVisitor(_conceptVisitor);
         return ctxt.ontology() switch
         {
-            null => ALC.OntologyDocument.NewOntology(
+            null => new OntologyDocument(
                 CreatePrefixList(),
-                ALC.ontologyVersion.UnNamedOntology,
-                System.Tuple.Create(ListModule.Empty<ALC.TBoxAxiom>(), ListModule.Empty<ALC.ABoxAssertion>())
-            ),
+                new Ontology(
+                    ListModule.Empty<IriReference>(),
+                    ontologyVersion.UnNamedOntology,
+                    ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
+                    ListModule.Empty<Axiom>()
+                )),
             _ => Visit(ctxt.ontology())
         };
     }
@@ -63,15 +63,15 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<ALC.OntologyDocument>
         b == null ? a : a.Concat(b);
 
 
-    public override ALC.OntologyDocument VisitOntology(OntologyContext ctxt)
+    public override OntologyDocument VisitOntology(OntologyContext ctxt)
     {
         if (_frameVisitor == null || _conceptVisitor == null)
             throw new Exception("Smoething strange happened. Please report. FrameVisitor and ConceptVisitor should have been initialized in VisitOntologyDocument before visiting ontology");
-        ALC.ontologyVersion version = (ctxt.rdfiri(0), ctxt.rdfiri(1)) switch
+        ontologyVersion version = (ctxt.rdfiri(0), ctxt.rdfiri(1)) switch
         {
-            (null, null) => ALC.ontologyVersion.UnNamedOntology,
-            (not null, null) => ALC.ontologyVersion.NewNamedOntology(_conceptVisitor.IriGrammarVisitor.Visit(ctxt.rdfiri(0))),
-            (not null, not null) => ALC.ontologyVersion.NewVersionedOntology(
+            (null, null) => ontologyVersion.UnNamedOntology,
+            (not null, null) => ontologyVersion.NewNamedOntology(_conceptVisitor.IriGrammarVisitor.Visit(ctxt.rdfiri(0))),
+            (not null, not null) => ontologyVersion.NewVersionedOntology(
                 _conceptVisitor.IriGrammarVisitor.Visit(ctxt.rdfiri(0)),
                 _conceptVisitor.IriGrammarVisitor.Visit(ctxt.rdfiri(1))
             ),
@@ -79,13 +79,19 @@ internal class ManchesterVisitor : ManchesterBaseVisitor<ALC.OntologyDocument>
         };
         var knowledgeBase = ctxt.frame()
             .Select(_frameVisitor.Visit)
-            .Aggregate<(List<ALC.TBoxAxiom>, List<ALC.ABoxAssertion>), (IEnumerable<ALC.TBoxAxiom>, IEnumerable<ALC.ABoxAssertion>)>
-            ((new List<ALC.TBoxAxiom>(), new List<ALC.ABoxAssertion>()),
+            .Aggregate<(List<ClassAxiom>, List<Assertion>), (IEnumerable<ClassAxiom>, IEnumerable<Assertion>)>
+            ((new List<ClassAxiom>(), new List<Assertion>()),
                 (acc, x) => (concateOrKeep(acc.Item1, x.Item1), concateOrKeep(acc.Item2, x.Item2)));
-        return ALC.OntologyDocument.NewOntology(
+        var axiomList = knowledgeBase.Item1.Select(claxiom => Axiom.NewAxiomClassAxiom(claxiom))
+            .Concat(knowledgeBase.Item2.Select(ass => Axiom.NewAxiomAssertion(ass)));
+        return new OntologyDocument(
             CreatePrefixList(),
-            version,
-            System.Tuple.Create(ListModule.OfSeq(knowledgeBase.Item1), ListModule.OfSeq(knowledgeBase.Item2))
+            new Ontology(
+                ListModule.Empty<IriReference>(),
+                version,
+                ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
+                 ListModule.OfSeq(axiomList)
+                )
         );
     }
     private FSharpList<prefixDeclaration> CreatePrefixList()

@@ -34,5 +34,5 @@ and ontologyToString (tbox: TBoxAxiom list) : string =
 and axiomToString (axiom: TBoxAxiom) : string = 
     match axiom with
     | Inclusion (sup, sub) -> $"%s{toString sub} <= {toString sup}"
-    | Equivalence (left, right) -> $"%s{toString left} >= {toString right}"
+    //| Equivalence (left, right) -> $"%s{toString left} >= {toString right}"
     

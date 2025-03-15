@@ -127,22 +127,17 @@ module ALC =
     
     type TBoxAxiom =
         | Inclusion of Sub: Concept * Sup: Concept
-        | Equivalence of Left: Concept * Right: Concept
     
     let GetAxiomConcepts (axiom: TBoxAxiom) : Concept list =
         match axiom with
         | Inclusion (sub, sup) -> GetConcepts sub @ GetConcepts sup
-        | Equivalence (left, right) -> GetConcepts left @ GetConcepts right
     let GetAxiomExistentials (axiom: TBoxAxiom)  =
         match axiom with
         | Inclusion (sub, sup) -> GetExistentials sub @ GetExistentials sup
-        | Equivalence (left, right) -> GetExistentials left @ GetExistentials right
-        
         
     let GetAxiomConceptNames (axiom: TBoxAxiom) : IriReference list =
         match axiom with
         | Inclusion (sub, sup) -> GetConceptNames sub @ GetConceptNames sup
-        | Equivalence (left, right) -> GetConceptNames left @ GetConceptNames right
     type TBox = TBoxAxiom list
     
     type ABoxAssertion =
@@ -159,21 +154,6 @@ module ALC =
     
     type knowledgeBase = TBox * ABox
     
-    type ontologyVersion =
-        | UnNamedOntology
-        | NamedOntology of OntologyIri: IriReference
-        | VersionedOntology of OntologyIri: IriReference * OntologyVersionIri: IriReference
-    type ontologyVersion with
-        member x.TryGetOntologyVersionIri() =
-            match x with
-            | NamedOntology iri -> null
-            | VersionedOntology (_, iri) -> iri
-            | _ -> null
-        member x.TryGetOntologyIri() =
-            match x with
-            | NamedOntology iri -> iri
-            | VersionedOntology (iri, _) -> iri
-            | _ -> null
             
     type OntologyDocument =
         | Ontology of prefixDeclaration list * ontologyVersion * knowledgeBase

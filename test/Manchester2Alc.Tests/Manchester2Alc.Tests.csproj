@@ -1,0 +1,80 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <AssemblyName>DagSemTools.Manchester2Alc.Tests</AssemblyName>
+    <IsPackable>false</IsPackable>
+    <IsTestProject>true</IsTestProject>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+
+    <Platforms>AnyCPU</Platforms>
+  </PropertyGroup>
+
+  <ItemGroup>
+        <Content Include="TestData\owl2spec.man.owl" >
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+        <Content Include="TestData\pizza.man.owl">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Content>
+    
+    </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="FluentAssertions" Version="7.0.0" />
+    <PackageReference Include="FSharp.Core" Version="8.0.403" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.InMemory" Version="0.15.0" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
+    <PackageReference Include="IriTools" Version="2.2.0" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.0.1">
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+      <PrivateAssets>all</PrivateAssets>
+    </PackageReference>
+  </ItemGroup>
+
+
+  <!-- Use project references for local development -->
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+    <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
+    <ProjectReference Include="..\..\src\OWL2ALC\OWL2ALC.fsproj" />
+        <ProjectReference Include="..\..\src\Manchester.Parser\Manchester.Parser.csproj" />
+    <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
+    <ProjectReference Include="..\..\src\Parser\Parser.csproj" />
+    </ItemGroup>
+
+  <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
+  <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+    <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
+    <PackageReference Include="DagSemTools.OWL2ALC" Version="$(Version)" />
+    <PackageReference Include="DagSemTools.Manchester.Parser" Version="$(Version)" />
+    <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
+    <PackageReference Include="DagSemTools.Parser" Version="$(Version)" />
+  </ItemGroup>
+  
+  <ItemGroup>
+        <ProjectReference Include="..\..\src\TestUtils\TestUtils.csproj" />
+  </ItemGroup>
+
+
+    <ItemGroup>
+      <None Update="TestData\alctableauex.owl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\def_example.owl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\annotations.owl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+    </ItemGroup>
+
+
+</Project>

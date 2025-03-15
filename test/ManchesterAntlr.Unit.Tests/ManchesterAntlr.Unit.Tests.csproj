@@ -4,7 +4,7 @@
     <TargetFramework>net8.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
+    <AssemblyName>DagSemTools.ManchesterAntlr.Unit.Tests</AssemblyName>
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
     <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
@@ -28,6 +28,8 @@
     <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
     <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.InMemory" Version="0.15.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
     <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
@@ -41,7 +43,7 @@
 
   <!-- Use project references for local development -->
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <ProjectReference Include="..\..\src\AlcTableau\AlcTableau.fsproj" />
+    <ProjectReference Include="..\..\src\OwlOntology\OwlOntology.fsproj" />
         <ProjectReference Include="..\..\src\Manchester.Parser\Manchester.Parser.csproj" />
     <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
     <ProjectReference Include="..\..\src\Parser\Parser.csproj" />
@@ -49,7 +51,7 @@
 
   <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
   <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
-    <PackageReference Include="DagSemTools.AlcTableau" Version="$(Version)" />
+    <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
     <PackageReference Include="DagSemTools.Manchester.Parser" Version="$(Version)" />
     <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
     <PackageReference Include="DagSemTools.Parser" Version="$(Version)" />

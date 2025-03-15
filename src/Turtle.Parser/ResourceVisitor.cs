@@ -8,6 +8,7 @@
 
 
 using System.Globalization;
+using System.Numerics;
 using DagSemTools.Rdf;
 using DagSemTools.Ingress;
 
@@ -183,7 +184,7 @@ internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
             Namespaces.XsdString => RdfLiteral.NewLiteralString(literalString),
             Namespaces.XsdDouble => RdfLiteral.NewDoubleLiteral(double.Parse(literalString, CultureInfo.InvariantCulture)),
             Namespaces.XsdDecimal => RdfLiteral.NewDecimalLiteral(decimal.Parse(literalString, CultureInfo.InvariantCulture)),
-            Namespaces.XsdInteger => RdfLiteral.NewIntegerLiteral(int.Parse(literalString)),
+            Namespaces.XsdInteger => RdfLiteral.NewIntegerLiteral(BigInteger.Parse(literalString)),
             Namespaces.XsdFloat => RdfLiteral.NewFloatLiteral(float.Parse(literalString, CultureInfo.InvariantCulture)),
             Namespaces.XsdBoolean => RdfLiteral.NewBooleanLiteral(bool.Parse(literalString)),
             Namespaces.XsdDateTime => RdfLiteral.NewDateTimeLiteral(DateTime.Parse(literalString)),

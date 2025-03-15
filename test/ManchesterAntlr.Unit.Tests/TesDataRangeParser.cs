@@ -7,7 +7,8 @@
 */
 
 using DagSemTools;
-using DagSemTools.AlcTableau;
+using DagSemTools.Ingress;
+using DagSemTools.OwlOntology;
 using DagSemTools.Manchester.Parser;
 using DagSemTools.Parser;
 using Microsoft.FSharp.Collections;
@@ -15,7 +16,7 @@ using TestUtils;
 using Xunit.Abstractions;
 
 
-namespace DagSemTools.Manchester.Parser.Unit.Tests;
+namespace DagSemTools.ManchesterAntlr.Unit.Tests;
 using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
@@ -26,7 +27,7 @@ using IriTools;
 public class TestDataRangeParser
 {
 
-    public DataRange.Datarange testReader(TextReader text_reader, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    public DataRange TestReader(TextReader text_reader, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
 
         var input = new AntlrInputStream(text_reader);
@@ -37,17 +38,17 @@ public class TestDataRangeParser
         parser.RemoveErrorListeners();
         parser.AddErrorListener(customErrorListener);
         IParseTree tree = parser.dataRange();
-        var visitor = new DataRangeVisitor(prefixes, customErrorListener);
+        var visitor = new DataPrimaryVisitor(prefixes, customErrorListener);
         return visitor.Visit(tree);
     }
 
-    public DataRange.Datarange testReader(TextReader text_reader, TextWriter errorOutput) =>
-        testReader(text_reader, new Dictionary<string, IriReference>(), errorOutput);
+    private DataRange TestReader(TextReader text_reader, TextWriter errorOutput) =>
+        TestReader(text_reader, new Dictionary<string, IriReference>(), errorOutput);
 
-    public DataRange.Datarange testString(string owl, TextWriter errorOutput)
+    private DataRange TestString(string owl, TextWriter errorOutput)
     {
         using TextReader text_reader = new StringReader(owl);
-        return testReader(text_reader, errorOutput);
+        return TestReader(text_reader, errorOutput);
     }
 
     private ITestOutputHelper output;
@@ -61,31 +62,33 @@ public class TestDataRangeParser
     [Fact]
     public void TestDatatypeInt()
     {
-        var parsedDataRange = testString("integer", testOutputTextWriter);
-        var expectedDataRange = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#integer");
+        var parsedDataRange = TestString("integer", testOutputTextWriter);
+        var expectedDataRange = DataRange.NewNamedDataRange(Iri.NewFullIri(Namespaces.XsdInteger));
         parsedDataRange.Should().BeEquivalentTo(expectedDataRange);
     }
 
     [Fact]
     public void TestRestrictedInt()
     {
-        var parsedDataRange = testString("integer[< 0]", testOutputTextWriter);
-        var xsd_int = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#integer");
-        var expected_facet = new Tuple<DataRange.facet, string>(DataRange.facet.LessThan, "0");
-        var expexted =
-            DataRange.Datarange.NewRestriction(xsd_int, new FSharpList<Tuple<DataRange.facet, string>>(expected_facet, FSharpList<Tuple<DataRange.facet, string>>.Empty));
-        parsedDataRange.Should().BeEquivalentTo(expexted);
+        var parsedDataRange = TestString("integer[< 0]", testOutputTextWriter);
+        var xsdInteger = Iri.NewFullIri(Namespaces.XsdInteger);
+        var lt = Iri.NewFullIri(Namespaces.XsdMaxExclusive);
+        var zero = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(0));
+        var expected =
+            DataRange.NewDatatypeRestriction(xsdInteger, ListModule.OfSeq([Tuple.Create(lt, zero)]));
+        parsedDataRange.Should().BeEquivalentTo(expected);
     }
 
 
     [Fact]
     public void TestRestrictedString()
     {
-        var parsedDataRange = testString("string[length 5]", testOutputTextWriter);
-        var xsd_int = DataRange.Datarange.NewDatatype("https://www.w3.org/2001/XMLSchema#string");
-        var expected_facet = new Tuple<DataRange.facet, string>(DataRange.facet.Length, "5");
-        var expexted =
-            DataRange.Datarange.NewRestriction(xsd_int, new FSharpList<Tuple<DataRange.facet, string>>(expected_facet, FSharpList<Tuple<DataRange.facet, string>>.Empty));
-        parsedDataRange.Should().BeEquivalentTo(expexted);
+        var parsedDataRange = TestString("string[length 5]", testOutputTextWriter);
+        var xsdString = Iri.NewFullIri(Namespaces.XsdString);
+        var length = Iri.NewFullIri(Namespaces.XsdLength);
+        var five = GraphElement.NewGraphLiteral(RdfLiteral.NewIntegerLiteral(5));
+        var expected =
+            DataRange.NewDatatypeRestriction(xsdString, ListModule.OfSeq([Tuple.Create(length, five)]));
+        parsedDataRange.Should().Be(expected);
     }
 }

@@ -8,6 +8,7 @@
 namespace DagSemTools.Ingress
 
 open System
+open System.Numerics
 open IriTools
 
     
@@ -32,7 +33,7 @@ open IriTools
         | FloatLiteral of literalFloat: float
         | DoubleLiteral of literalDouble: double
         | DurationLiteral of literalDuration: TimeSpan
-        | IntegerLiteral of literalInt: int
+        | IntegerLiteral of literalInt: BigInteger
         | DateTimeLiteral of literalDateTime: DateTime
         | TimeLiteral of literalTime: TimeOnly
         | DateLiteral of literalDate: DateOnly
@@ -48,12 +49,13 @@ open IriTools
                 | FloatLiteral literalFloat -> $"FloatLiteral(%f{literalFloat})"
                 | DoubleLiteral literalDouble -> $"DoubleLiteral(%f{literalDouble})"
                 | DurationLiteral literalDuration -> $"DurationLiteral(%A{literalDuration})"
-                | IntegerLiteral literalInt -> $"IntegerLiteral(%d{literalInt})"
+                | IntegerLiteral literalInt -> $"IntegerLiteral({literalInt})"
                 | DateTimeLiteral literalDateTime -> $"DateTimeLiteral(%A{literalDateTime})"
                 | TimeLiteral literalTime -> $"TimeLiteral(%A{literalTime})"
                 | DateLiteral literalDate -> $"DateLiteral(%A{literalDate})"
                 | LangLiteral (lang, langliteral) -> $"%s{lang}@%s{langliteral})"
                 | TypedLiteral (typeIri, typedLiteral) -> $"%s{typedLiteral}^^%A{typeIri}"
+                
             
     [<StructuralComparison>]
     [<StructuralEquality>]
@@ -65,6 +67,7 @@ open IriTools
                 match this with
                 | NodeOrEdge r -> r.ToString()
                 | GraphLiteral l -> l.ToString()
+            
                 
     type prefixDeclaration =
         | PrefixDefinition of PrefixName: string * PrefixIri: IriReference
@@ -72,4 +75,21 @@ open IriTools
         member x.TryGetPrefixName() =
             match x with
             | PrefixDefinition (name, iri) -> (name, iri)
+    
+    
+    type ontologyVersion =
+        | UnNamedOntology
+        | NamedOntology of OntologyIri: IriReference
+        | VersionedOntology of OntologyIri: IriReference * OntologyVersionIri: IriReference
+    type ontologyVersion with
+        member x.TryGetOntologyVersionIri() =
+            match x with
+            | NamedOntology iri -> null
+            | VersionedOntology (_, iri) -> iri
+            | _ -> null
+        member x.TryGetOntologyIri() =
+            match x with
+            | NamedOntology iri -> iri
+            | VersionedOntology (iri, _) -> iri
+            | _ -> null
     

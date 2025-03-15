@@ -6,7 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 using DagSemTools.Parser;
 using TestUtils;
 using Xunit.Abstractions;
@@ -14,18 +14,29 @@ using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;
 using FluentAssertions;
 using IriTools;
+using Microsoft.FSharp.Collections;
+using Serilog;
+using Serilog.Sinks.InMemory;
 
 namespace DagSemTools.Manchester.Parser.Unit.Tests;
 
 public class TestConceptParser
 {
-    private ALC.Concept TestFile(string filename, TextWriter errorOutput)
+    private static InMemorySink _inMemorySink = new InMemorySink();
+
+    private ILogger _logger =
+        new LoggerConfiguration()
+            .WriteTo.Sink(_inMemorySink)
+            .WriteTo.Console()
+            .CreateLogger();
+
+    private ClassExpression TestFile(string filename, TextWriter errorOutput)
     {
         using TextReader textReader = File.OpenText(filename);
         return TestReader(textReader, errorOutput);
     }
 
-    private ALC.Concept TestReader(TextReader textReader, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    private ClassExpression TestReader(TextReader textReader, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
 
         var input = new AntlrInputStream(textReader);
@@ -41,15 +52,15 @@ public class TestConceptParser
         return visitor.Visit(tree);
     }
 
-    public ALC.Concept TestReader(TextReader textReader, TextWriter errorOutput) =>
+    public ClassExpression TestReader(TextReader textReader, TextWriter errorOutput) =>
         TestReader(textReader, new Dictionary<string, IriReference>(), errorOutput);
-    public ALC.Concept TestString(string owl, TextWriter errorOutput)
+    public ClassExpression TestString(string owl, TextWriter errorOutput)
     {
         using TextReader textReader = new StringReader(owl);
         return TestReader(textReader, errorOutput);
     }
 
-    public ALC.Concept TestString(string owl, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    public ClassExpression TestString(string owl, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
         using TextReader textReader = new StringReader(owl);
         return TestReader(textReader, prefixes, errorOutput);
@@ -71,9 +82,9 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1> and <http://example.com/ex2>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewConjunction(
-                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1")),
-            ALC.Concept.NewConceptName(new IriReference("http://example.com/ex2"))
+            ClassExpression.NewObjectIntersectionOf(
+                ListModule.OfSeq([ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex1"))),
+            ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex2")))])
                 ));
     }
 
@@ -84,9 +95,9 @@ public class TestConceptParser
         var conceptString = "(<http://example.com/ex1>) and (<http://example.com/ex2>)";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewConjunction(
-                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1")),
-                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex2"))
+            ClassExpression.NewObjectIntersectionOf(
+                ListModule.OfSeq([ ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex1"))),
+                ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex2")))])
             ));
     }
     [Fact]
@@ -95,9 +106,9 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1> or <http://example.com/ex2>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewDisjunction(
-                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1")),
-                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex2"))
+            ClassExpression.NewObjectUnionOf(
+                ListModule.OfSeq([ ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])
             ));
     }
 
@@ -107,8 +118,8 @@ public class TestConceptParser
         var conceptString = "not <http://example.com/ex1>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewNegation(
-                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1"))
+            ClassExpression.NewObjectComplementOf(
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1")))
             ));
     }
 
@@ -118,9 +129,9 @@ public class TestConceptParser
         var conceptString = "<http://example.com/name> only <http://foaf.com/name>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewUniversal(
-                ALC.Role.NewIri(new IriReference("http://example.com/name")),
-                ALC.Concept.NewConceptName(new IriReference("http://foaf.com/name"))
+            ClassExpression.NewObjectAllValuesFrom(
+                ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("http://example.com/name"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://foaf.com/name")))
             ));
     }
 
@@ -131,10 +142,10 @@ public class TestConceptParser
         var conceptString = "<http://example.com/name> some <http://foaf.com/name>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewExistential(
-                ALC.Role.NewIri(new IriReference("http://example.com/name")),
-                ALC.Concept.NewConceptName(new IriReference("http://foaf.com/name"))
-            ));
+            ClassExpression.NewObjectSomeValuesFrom(
+                ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("http://example.com/name"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://foaf.com/name"))
+            )));
     }
 
 
@@ -144,10 +155,10 @@ public class TestConceptParser
         var conceptString = "(<http://example.com/name> some <http://foaf.com/name>)";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewExistential(
-                ALC.Role.NewIri(new IriReference("http://example.com/name")),
-                ALC.Concept.NewConceptName(new IriReference("http://foaf.com/name"))
-            ));
+            ClassExpression.NewObjectSomeValuesFrom(
+                ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("http://example.com/name"))),
+                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://foaf.com/name"))
+            )));
     }
 
 
@@ -161,14 +172,16 @@ public class TestConceptParser
         };
         var conceptString = "p some a and p only b";
         var parenthesizedString = "(p some a) and (p only b)";
-        var expected = ALC.Concept.NewConjunction(
-            ALC.Concept.NewExistential(
-                ALC.Role.NewIri(new IriReference("https://example.com/p")),
-                ALC.Concept.NewConceptName(new IriReference("https://example.com/a"))),
-            ALC.Concept.NewUniversal(
-                ALC.Role.NewIri(new IriReference("https://example.com/p")),
-                ALC.Concept.NewConceptName(new IriReference("https://example.com/b")))
-        );
+        var expected = ClassExpression.NewObjectIntersectionOf(
+                ListModule.OfSeq([
+                    ClassExpression.NewObjectSomeValuesFrom(
+                        ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/p"))),
+                        ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/a")))
+                        ),
+                    ClassExpression.NewObjectAllValuesFrom(
+                        ObjectPropertyExpression.NewNamedObjectProperty(Iri.NewFullIri(new IriReference("https://example.com/p"))),
+                        ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("https://example.com/b")))
+                    )]));
 
         //Act
         var parsedIri = TestString(conceptString, prefixes, _testOutputTextWriter);
@@ -186,13 +199,17 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1> or <http://example.com/ex2> or <http://example.com/ex3>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewDisjunction(
-                ALC.Concept.NewDisjunction(
-                    ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1")),
-                    ALC.Concept.NewConceptName(new IriReference("http://example.com/ex2")))
-                , ALC.Concept.NewConceptName(new IriReference("http://example.com/ex3"))
-
-            ));
+            ClassExpression.NewObjectUnionOf(
+                        ListModule.OfSeq([
+                            (
+                                ClassExpression.NewObjectUnionOf(
+                                    ListModule.OfSeq([
+                                        ClassExpression.NewClassName(
+                                            Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                                        ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))
+                                    ]))),
+                                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))
+                        ])));
     }
 
     [Fact]
@@ -201,13 +218,13 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1> and <http://example.com/ex2> and <http://example.com/ex3>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewConjunction(
-                ALC.Concept.NewConjunction(
-                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1")),
-                ALC.Concept.NewConceptName(new IriReference("http://example.com/ex2")))
-                , ALC.Concept.NewConceptName(new IriReference("http://example.com/ex3"))
-
-            ));
+    ClassExpression.NewObjectIntersectionOf(
+              ListModule.OfSeq([
+                ClassExpression.NewObjectIntersectionOf(
+                  ListModule.OfSeq([
+                    ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                    ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])),
+                 ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))])));
     }
     [Fact]
     public void TestNamedConcept()
@@ -215,7 +232,7 @@ public class TestConceptParser
         var conceptString = "<http://example.com/ex1>";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1"))
+            ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1")))
             );
     }
 
@@ -227,7 +244,7 @@ public class TestConceptParser
         var conceptString = "(<http://example.com/ex1>)";
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
-            ALC.Concept.NewConceptName(new IriReference("http://example.com/ex1"))
+            ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1")))
         );
     }
 
@@ -254,15 +271,17 @@ public class TestConceptParser
         var conceptString = "owl:Thing that hasFirstName exactly 1 and hasFirstName only string[minLength 1]";
         var parsedConcept = TestString(conceptString, _testOutputTextWriter);
         parsedConcept.Should().NotBeNull();
-        // var expected = ALC.Concept.NewConjunction(
-        //     ALC.Concept.NewConceptName(new IriReference("http://www.w3.org/2002/07/owl#Thing")),
-        //     ALC.Concept.NewConjunction(
-        //         ALC.Concept.NewCardinality(
+        // var expected = ClassExpression.NewObjectIntersectionOf(
+        //        ListModule.OfSeq([ (
+        //     ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://www.w3.org/2002/07/owl#Thing")),
+        //     ClassExpression.NewObjectIntersectionOf(
+        //        ListModule.OfSeq([ (
+        //         ClassExpression.NewCardinality(
         //             new IriReference("http://example.com/hasFirstName"),
         //             1,
-        //             ALC.Concept.NewConceptName(new IriReference("http://example.com/hasFirstName"))
+        //             ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/hasFirstName"))
         //         ),
-        //         ALC.Concept.NewUniversal(
+        //         ClassExpression.NewObjectAllValuesFrom(ObjectPropertyExpression.NewNamedObjectProperty(
         //             new IriReference("http://example.com/hasFirstName"),
         //              DataRange.Datarange.NewRestriction(
         //                 DataRange.Datarange.NewDatatype(new IriReference("http://www.w3.org/2001/XMLSchema#string")),

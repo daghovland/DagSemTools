@@ -9,12 +9,12 @@
 using DagSemTools.ManchesterAntlr;
 using IriTools;
 using Microsoft.FSharp.Collections;
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-internal class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, ALC.ABoxAssertion>>>
+internal class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<Individual, Assertion>>>
 {
     public ConceptVisitor ConceptVisitor { get; init; }
     internal ABoxAssertionVisitor ABoxAssertionVisitor { get; init; }
@@ -24,23 +24,25 @@ internal class IndividualAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Fu
         ABoxAssertionVisitor = new ABoxAssertionVisitor(conceptVisitor);
     }
 
-    public override IEnumerable<Func<IriReference, ALC.ABoxAssertion>> VisitIndividualTypes(ManchesterParser.IndividualTypesContext context)
+    public override IEnumerable<Func<Individual, Assertion>> VisitIndividualTypes(
+        ManchesterParser.IndividualTypesContext context)
     =>
         context.descriptionAnnotatedList().description().Select(ConceptVisitor.Visit)
-            .Select<ALC.Concept, Func<IriReference, ALC.ABoxAssertion>>(
+            .Select<ClassExpression, Func<Individual, Assertion>>(
                 concept => (
-                    (individual) => ALC.ABoxAssertion.NewConceptAssertion(individual, concept)));
+                    (individual) => Assertion.NewClassAssertion(
+                        ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
+                        concept,
+                        individual)));
 
-    public override IEnumerable<Func<IriReference, ALC.ABoxAssertion>> VisitIndividualFacts(ManchesterParser.IndividualFactsContext context)
+    public override IEnumerable<Func<Individual, Assertion>> VisitIndividualFacts(ManchesterParser.IndividualFactsContext context)
     =>
         context.factAnnotatedList().fact()
-            .Select<ManchesterParser.FactContext, Func<IriReference, ALC.ABoxAssertion>>(
-                    ABoxAssertionVisitor.Visit);
+            .Select(ABoxAssertionVisitor.Visit);
 
-    public override IEnumerable<Func<IriReference, ALC.ABoxAssertion>> VisitIndividualAnnotations(ManchesterParser.IndividualAnnotationsContext context)
+    public override IEnumerable<Func<Individual, Assertion>> VisitIndividualAnnotations(ManchesterParser.IndividualAnnotationsContext context)
         =>
             context.annotations().annotation()
-                .Select<ManchesterParser.AnnotationContext, Func<IriReference, ALC.ABoxAssertion>>(
-                    ABoxAssertionVisitor.Visit);
+                .Select(ABoxAssertionVisitor.Visit);
 
 }

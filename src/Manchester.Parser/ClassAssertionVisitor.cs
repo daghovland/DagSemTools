@@ -6,12 +6,13 @@
     Contact: hovlanddag@gmail.com
 */
 
-using DagSemTools.AlcTableau;
+using DagSemTools.OwlOntology;
+using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Manchester.Parser;
 using DagSemTools;
 
-internal class ClassAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<ALC.Concept, ALC.TBoxAxiom>>>
+internal class ClassAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<OwlOntology.ClassExpression, ClassAxiom>>>
 {
     public ConceptVisitor ConceptVisitor { get; init; }
     public ClassAssertionVisitor(ConceptVisitor conceptVisitor)
@@ -19,20 +20,22 @@ internal class ClassAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<AL
         ConceptVisitor = conceptVisitor;
     }
 
-    public override IEnumerable<Func<ALC.Concept, ALC.TBoxAxiom>> VisitSubClassOf(ManchesterParser.SubClassOfContext context)
+    public override IEnumerable<Func<ClassExpression, ClassAxiom>> VisitSubClassOf(ManchesterParser.SubClassOfContext context)
     =>
         context.descriptionAnnotatedList().description().
             Select(ConceptVisitor.Visit)
-            .Select<ALC.Concept, Func<ALC.Concept, ALC.TBoxAxiom>>(
+            .Select<ClassExpression, Func<ClassExpression, ClassAxiom>>(
                 super => (
-                    (ALC.Concept sub) => ALC.TBoxAxiom.NewInclusion(sub, super)));
+                    (ClassExpression sub) => ClassAxiom.NewSubClassOf(ListModule.Empty<Tuple<Iri, AnnotationValue>>(), sub, super)));
 
-    public override IEnumerable<Func<ALC.Concept, ALC.TBoxAxiom>> VisitEquivalentTo(ManchesterParser.EquivalentToContext context)
+    public override IEnumerable<Func<ClassExpression, ClassAxiom>> VisitEquivalentTo(ManchesterParser.EquivalentToContext context)
         =>
             context.descriptionAnnotatedList().description().
                 Select(ConceptVisitor.Visit)
-                .Select<ALC.Concept, Func<ALC.Concept, ALC.TBoxAxiom>>(
+                .Select<ClassExpression, Func<ClassExpression, ClassAxiom>>(
                     c => (
-                        (ALC.Concept frameClass) => ALC.TBoxAxiom.NewEquivalence(frameClass, c)));
+                        (ClassExpression frameClass) => ClassAxiom.NewEquivalentClasses(
+                            ListModule.Empty<Tuple<Iri, AnnotationValue>>(),
+                            ListModule.OfSeq([frameClass, c]))));
 
 }
