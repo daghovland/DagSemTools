@@ -133,7 +133,7 @@ public class TestApiOntology(ITestOutputHelper output)
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    [Fact(Skip = "See https://github.com/daghovland/DagSemTools/issues/61")]
+    [Fact]
     public void LoadImfOntologyWorks()
     {
         // Arrange
@@ -142,18 +142,19 @@ public class TestApiOntology(ITestOutputHelper output)
         var aboxFileInfo = new FileInfo("TestData/imf-data.ttl");
         var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdfImf);
-        ont.GetAxioms().Should().NotBeEmpty();
-
+        
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
-
+        
+        // Assert
+        axiomRules.Should().NotBeEmpty();
         var descriptorIri = RdfResource.NewIri(new IriReference("http://ns.imfid.org/imf#Descriptor"));
         var descriptorNode =
             rdfImf.Datastore.Resources.GraphElementMap[DagSemTools.Ingress.GraphElement.NewNodeOrEdge(descriptorIri)];
         var descriptorTerm = Term.NewResource(descriptorNode);
         var DescriptorRules = axiomRules.Where((rule, i) =>
                 rule.Head is RuleHead.NormalHead tp
-                && tp.pattern.Predicate.Equals(descriptorTerm)
+                && tp.pattern.Object.Equals(descriptorTerm)
         ).ToList();
         DescriptorRules.Should().NotBeEmpty();
         var descriptorRuleString = DescriptorRules.Select(rule => rule.ToString()).ToList();
