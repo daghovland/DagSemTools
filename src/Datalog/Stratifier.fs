@@ -32,24 +32,24 @@ module Stratifier =
         | BinaryPredicate of GraphElementId
         | UnaryPredicate of predicate : GraphElementId * obj : GraphElementId 
     *)
-    let VariableConstantUnifiable v res (m : Map<string, GraphElementId>)  =
-        match m.TryGetValue v with
-        | false, _ -> Some (Map.add v res m)
-        | true, res2 -> if res = res2 then Some m else None
+    let VariableConstantUnifiable v res (constantMap : Map<string, GraphElementId>)  (variableMap : Map<string, string>)=
+        match constantMap.TryGetValue (variableMap.GetValueOrDefault (v, v)) with
+        | false, _ -> Some (Map.add v res constantMap, variableMap)
+        | true, res2 ->  if res = res2 then Some (constantMap, variableMap) else None
         
     (* Two terms are unifiable if they can be mapped to the same constant *)
-    let TermsUnifiable (term1 : Term) (term2 : Term) (m : Map<string, GraphElementId>) : Map<string, GraphElementId> option =
+    let TermsUnifiable (term1 : Term) (term2 : Term) (constantMap : Map<string, GraphElementId>, variableMap : Map<string, string>)=
         match term1, term2 with
         | Term.Variable v, Term.Resource res1 ->
-           VariableConstantUnifiable v res1 m
+           VariableConstantUnifiable v res1 constantMap variableMap
         | Term.Resource res, Term.Variable v ->
-            VariableConstantUnifiable v res m
-        | Term.Resource res1, Term.Resource res2 -> if res1 = res2 then (Some m) else None
-        | Term.Variable v1, Term.Variable v2 -> Some (Map.add v1 (m.[v2]) m)
+           VariableConstantUnifiable v res constantMap variableMap
+        | Term.Resource res1, Term.Resource res2 -> if res1 = res2 then (Some (constantMap, variableMap)) else None
+        | Term.Variable v1, Term.Variable v2 -> (Some (constantMap, (Map.add v1 (v2) variableMap)))
     
     (* Two triple patterns are unifiable if there exists a mapping of the variables such that they are equal *)
-    let triplePatternsUnifiable (triple1 : TriplePattern) (triple2 : TriplePattern)  : bool =
-        TermsUnifiable triple1.Subject triple2.Subject Map.empty
+    let triplePatternsUnifiable (triple1 : TriplePattern) (triple2 : TriplePattern)  =
+        TermsUnifiable triple1.Subject triple2.Subject (Map.empty, Map.empty)
         |> Option.bind (TermsUnifiable triple1.Predicate triple2.Predicate)
         |> Option.bind (TermsUnifiable triple1.Object triple2.Object)
         |> Option.isSome
