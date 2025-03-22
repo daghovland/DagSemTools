@@ -33,14 +33,14 @@ module Reasoner =
                                 |> List.map GetPartialMatches
                                 |> mergeMaps
                                    
-        member this.AddRule(rule: Rule)  =
+        member internal this.AddRule(rule: Rule)  =
             if not (isSafeRule rule) then
                 raise (new System.ArgumentException("Rule is not safe"))
             Rules <- rule :: Rules
             RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
                 
             
-        member this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq = 
+        member internal this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq = 
             ConstantTriplePattern fact
                 |> WildcardTriplePattern
                 |> Seq.map (fun wildcardFact ->
@@ -51,7 +51,7 @@ module Reasoner =
                 |> Seq.collect (Seq.collect (GetMatchesForRule fact))
         
         
-        member this.GetFacts() =
+        member internal this.GetFacts() =
             Rules
                 |> Seq.filter isFact
                 |> Seq.map (fun rule -> rule.Head)

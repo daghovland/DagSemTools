@@ -223,7 +223,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         // Act
         let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates([sameAsRule2], tripleTable) |> Seq.toList
         let stratifier = Stratifier.RulePartitioner (logger, rules_with_iri_predicates, tripleTable.Resources)
-        let relationInfos = stratifier.GetOrderedRelations()
+        let relationInfos = stratifier.GetOrderedTriplePatterns()
         
         //Assert
         let predRelsInfo = relationInfos.[(int) predIndex]
