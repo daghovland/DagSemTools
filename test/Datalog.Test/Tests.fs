@@ -460,8 +460,8 @@ module Tests =
             let rule =  {Head = NormalHead (headPattern)
                          Body = [ positiveMatch; negativeMatch ]
             }
-            let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
-            let ordered_relations = partitioner.GetOrderedRelations()
+            let partitioner  = DagSemTools.Datalog.Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
+            let ordered_relations = partitioner.GetOrderedTriplePatterns()
             ordered_relations.Should().HaveLength(3) |> ignore
             let init_queue = partitioner.GetReadyElementsQueue()
             init_queue.Should().HaveLength(2) |> ignore
@@ -621,7 +621,7 @@ module Tests =
                          Body = [ positiveMatch; negativeMatch ]
             }
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
-            let ordered_relations = partitioner.GetOrderedRelations()
+            let ordered_relations = partitioner.GetOrderedTriplePatterns()
             ordered_relations.Should().HaveLength(2) |> ignore
             let init_queue = partitioner.GetReadyElementsQueue()
             init_queue.Should().HaveLength(1) |> ignore
@@ -686,7 +686,7 @@ module Tests =
                          Body = [ negativeMatch ]
             }
             let partitioner  = Stratifier.RulePartitioner (logger, [ruleA; ruleB], tripleTable.Resources)
-            let ordered_relations = partitioner.GetOrderedRelations()
+            let ordered_relations = partitioner.GetOrderedTriplePatterns()
             ordered_relations.Should().HaveLength(3) |> ignore
             
             let init_queue = partitioner.GetReadyElementsQueue()

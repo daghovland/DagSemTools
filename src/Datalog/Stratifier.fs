@@ -18,7 +18,7 @@ open Serilog
     The Stratifier module intends to create a stratification of a datalog program, such that negation can be supported
     The algorithm is meant to follow the one from the chapters on negation in  Abiteboul, Hull, Vianu: "Foundations of Databases" (1995)
  *)
-module Stratifier =
+module internal Stratifier =
 
     (*
         A binary relation represents a triple atom where the object place is a variable
@@ -129,7 +129,7 @@ module Stratifier =
         NegativeIntentionalProperties rules |> Seq.isEmpty
   
     (* The RulePartitioner creates a stratification of the program if it is stratifiable, and otherwise fails *)
-    type RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
+    type internal RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
         
         let triplePatterns = GetTriplePatterns rules |> Seq.toArray
         let triplePatternMap  = triplePatterns |> Array.mapi (fun i r -> r, (uint i)) |> Map.ofArray
@@ -231,8 +231,8 @@ module Stratifier =
                                                     )
             
             
-        member this.GetReadyElementsQueue() = ready_elements_queue    
-        member this.GetOrderedRelations() = orderedTriplePatterns
+        member internal this.GetReadyElementsQueue() = ready_elements_queue    
+        member internal this.GetOrderedTriplePatterns() = orderedTriplePatterns
             
         (* Between iterations, the switch about using negative edge must be reset,
             and all elements marked for next stratifications must be moved into the queue for the current stratification *)    

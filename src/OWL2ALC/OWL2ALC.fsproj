@@ -61,6 +61,7 @@
     
     <ItemGroup>
         <InternalsVisibleTo Include="DagSemTools.OWL2ALC.Tests" />
+        <InternalsVisibleTo Include="Manchester2Alc.Tests" />
     </ItemGroup>
 
 

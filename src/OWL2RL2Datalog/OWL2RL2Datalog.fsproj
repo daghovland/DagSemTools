@@ -30,6 +30,7 @@
             <PackagePath>README.md</PackagePath>
         </Content>
         <Compile Include="Equality.fs" />
+        <Compile Include="AssemblyInfo.fs" />
     </ItemGroup>
 
 
@@ -61,5 +62,9 @@
         </None>
     </ItemGroup>
 
+    <ItemGroup>
+        <InternalsVisibleTo Include="DagSemTools.Datalog.Test" />
+        <InternalsVisibleTo Include="DagSemTools.OWL2RL2Datalog.Tests" />
+    </ItemGroup>
 
 </Project>
