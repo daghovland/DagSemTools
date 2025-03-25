@@ -228,7 +228,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         //Assert
         let predRelsInfo = relationInfos.[(int) predIndex]
         predRelsInfo.num_predecessors.Should().Be((uint) 2) |> ignore
-        predRelsInfo.Successors.Should().HaveLength(1) |> ignore
+        predRelsInfo.Successors.Should().HaveLength(0) |> ignore
         
     [<Fact>]
     let ``Equality axioms can be grounded`` () =

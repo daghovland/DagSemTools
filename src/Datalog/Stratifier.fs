@@ -1,5 +1,5 @@
 (*
-    Copyright (C) 2024 Dag Hovland
+    Copyright (C) 2024,2025 Dag Hovland
     This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
@@ -11,7 +11,6 @@ namespace DagSemTools.Datalog
 
 open System.Collections.Generic
 open DagSemTools.Rdf.Ingress
-open DagSemTools.Datalog.Datalog
 open Serilog
 
 (* 
@@ -38,7 +37,7 @@ module internal Stratifier =
         | true, res2 ->  if res = res2 then Some (constantMap, variableMap) else None
         
     (* Two terms are unifiable if they can be mapped to the same constant *)
-    let TermsUnifiable (term1 : Term) (term2 : Term) (constantMap : Map<string, GraphElementId>, variableMap : Map<string, string>)=
+    let internal TermsUnifiable (term1 : Term) (term2 : Term) (constantMap : Map<string, GraphElementId>, variableMap : Map<string, string>)=
         match term1, term2 with
         | Term.Variable v, Term.Resource res1 ->
            VariableConstantUnifiable v res1 constantMap variableMap
@@ -48,7 +47,7 @@ module internal Stratifier =
         | Term.Variable v1, Term.Variable v2 -> (Some (constantMap, (Map.add v1 (v2) variableMap)))
     
     (* Two triple patterns are unifiable if there exists a mapping of the variables such that they are equal *)
-    let triplePatternsUnifiable (triple1 : TriplePattern) (triple2 : TriplePattern)  =
+    let internal triplePatternsUnifiable (triple1 : TriplePattern) (triple2 : TriplePattern)  =
         TermsUnifiable triple1.Subject triple2.Subject (Map.empty, Map.empty)
         |> Option.bind (TermsUnifiable triple1.Predicate triple2.Predicate)
         |> Option.bind (TermsUnifiable triple1.Object triple2.Object)
