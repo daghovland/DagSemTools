@@ -63,19 +63,26 @@ module internal Stratifier =
         | BinaryPredicate res1, UnaryPredicate (res2p, res2o) -> res1 = res2p
     *)
     
+    (*
+        These are the edges in the dependency graph of triple patterns
+        There is an edge from the pattern in the head of a rule to every atom in the body
+        The edge is negative if the body atom is negative
+        The stratification checks for cycles with negative edges
+        See the Alice book for more info
+    *)
     [<Struct>]
     [<StructuralEquality>]
     [<StructuralComparison>]
-    type RelationEdge =
-        | PositiveRelationEdge of pedge: uint
-        | NegativeRelationEdge of nedge: uint
+    type PatternEdge =
+        | PositivePatternEdge of pedge: uint
+        | NegativePatternEdge of nedge: uint
     
     [<Struct>]
     [<StructuralEquality>]
     [<StructuralComparison>]
     type OrderedTriplePattern = {
         Relation : TriplePattern
-        mutable Successors : RelationEdge list
+        mutable Successors : PatternEdge list
         mutable num_predecessors : uint
         mutable uses_intensional_negative_edge : bool
         mutable intensional : bool
@@ -134,14 +141,10 @@ module internal Stratifier =
         let triplePatternMap  = triplePatterns |> Array.mapi (fun i r -> r, (uint i)) |> Map.ofArray
         
         (* 
-            This is the core of a topoogical sorting of the relations.
+            This is the core of a topoogical sorting of the triple-patterns.
             Based on the algorithm in Knuths Art of Computer Programming, chapter 2
             
-            The treatment of the "wildcard" triplepattern (ternary relation?) AllVariables is my addition
-            I have not proved this addition correct
-            
-            This method is called whenever a relation is removed from the queue of relations ready for ouput
-            
+            This method is called whenever a triple-pattern is removed from the queue of patterns ready for ouput
         *)
         let updateAtom (_ordered : OrderedTriplePattern array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern : TriplePattern) =
             let numRelations = Array.length _ordered
@@ -164,9 +167,9 @@ module internal Stratifier =
                 _ordered.[int headRelationNo].intensional <- true
                 match ruleBodyAtom with
                 | NotTriple t ->
-                    updateAtom _ordered NegativeRelationEdge headRelationNo t
+                    updateAtom _ordered NegativePatternEdge headRelationNo t
                 | PositiveTriple t ->
-                    updateAtom _ordered PositiveRelationEdge headRelationNo t
+                    updateAtom _ordered PositivePatternEdge headRelationNo t
         
         (* This is only run once on initialization to set up the data structure for topologial sorting of relations *)
         let mutable orderedTriplePatterns = 
@@ -191,14 +194,15 @@ module internal Stratifier =
         
         (* The queue contains all relations that are not dependent on any relations (that have not already been output) *)
         let mutable ready_elements_queue =
-            Queue<uint>(orderedTriplePatterns |> Array.filter (fun concept -> concept.num_predecessors = 0u)
+            Queue<uint>(orderedTriplePatterns
+                    |> Array.filter (fun concept -> concept.num_predecessors = 0u)
                     |> Array.map (fun concept -> triplePatternMap.[concept.Relation]))
             
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
         let mutable next_elements_queue = Queue<uint>()
         let mutable n_unordered = Array.length orderedTriplePatterns - ready_elements_queue.Count
         
-        let printCycle cycle =
+        member internal this.printCycle cycle =
             cycle
             |> Seq.map (fun n -> $"Cycle element: {resources.GetGraphElement n}")
             |> String.concat ", "
@@ -206,7 +210,7 @@ module internal Stratifier =
                 
         
         (* Called when the topological sorting cannot proceed, hence assuming the existence of a cycle *)
-        member this.cycle_finder (visited : uint seq) (current : uint) : uint seq seq =
+        member internal this.cycle_finder (visited : uint seq) (current : uint) : uint seq seq =
             let current_element = orderedTriplePatterns.[int current]
             if (visited |> Seq.contains current) then
                 visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.distinct |> Seq.singleton
@@ -217,12 +221,12 @@ module internal Stratifier =
                 current_element.Successors |> Seq.collect
                                                     (fun edge ->
                                                         match edge with
-                                                        | PositiveRelationEdge relation_id -> 
+                                                        | PositivePatternEdge relation_id -> 
                                                             (this.cycle_finder (Seq.append visited [current]) relation_id)
-                                                        | NegativeRelationEdge relation_id ->
+                                                        | NegativePatternEdge relation_id ->
                                                             let cycleFinder = this.cycle_finder (Seq.append visited [current]) relation_id
                                                             if (cycleFinder |> Seq.isEmpty |> not) then
-                                                                let cycleString = cycleFinder |> Seq.head |> printCycle
+                                                                let cycleString = cycleFinder |> Seq.head |> this.printCycle
                                                                 logger.Error($"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}")
                                                                 failwith $"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}"
                                                             else
@@ -244,12 +248,12 @@ module internal Stratifier =
             
             
         (* Updates a successor of a relation, and if the relation is ready to be output, it is added to the queue *)
-        member this.update_successor (removed_relation_id : uint) (successor : RelationEdge) =
+        member this.update_successor (removed_relation_id : uint) (successor : PatternEdge) =
             let relation_id = 
                 match successor with
-                | PositiveRelationEdge relation_id ->
+                | PositivePatternEdge relation_id ->
                     relation_id
-                | NegativeRelationEdge relation_id ->
+                | NegativePatternEdge relation_id ->
                     let removed_relation = orderedTriplePatterns.[int removed_relation_id]
                     if removed_relation.intensional then
                         orderedTriplePatterns.[int relation_id].uses_intensional_negative_edge <- true

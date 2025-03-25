@@ -7,6 +7,7 @@
 *)
 namespace DagSemTools.Datalog.Tests
 
+open DagSemTools.Datalog.Stratifier
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools
@@ -199,3 +200,4 @@ module TriplePatternsUnifiableTests =
 
         // Assert
         Assert.True(result, "Triple patterns with variable and resource should be unifiable")
+
