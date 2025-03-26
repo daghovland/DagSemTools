@@ -90,7 +90,7 @@ type Rule =
         let bodyString = this.Body
                             |> List.map (fun el -> el.ToString(manager))
                             |> String.concat ","
-        $"{this.Head.ToString(manager)} :- {bodyString} ."
+        $"{this.Head.ToString(manager)} :- {bodyString} .\n"
 type Substitution = 
     Map<string, Ingress.GraphElementId>
 type PartialRule = 
