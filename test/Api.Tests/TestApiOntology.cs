@@ -157,10 +157,12 @@ public class TestApiOntology(ITestOutputHelper output)
                 && tp.pattern.Object.Equals(descriptorTerm)
         ).ToList();
         DescriptorRules.Should().NotBeEmpty();
-        var descriptorRuleString = DescriptorRules.Select(rule => rule.ToString()).ToList();
+        var descriptorRuleString = String.Join("\n", DescriptorRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources)).ToList());
+        rdfImf.LoadDatalog(DescriptorRules);
         axiomRules.Should().NotBeEmpty();
         var ruleStringList =  axiomRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources));
         var ruleString = String.Join("\n\n", ruleStringList.Concat());
+        outputWriter.WriteLine(ruleString);
         rdfImf.LoadDatalog(axiomRules);
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
