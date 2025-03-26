@@ -159,6 +159,8 @@ public class TestApiOntology(ITestOutputHelper output)
         DescriptorRules.Should().NotBeEmpty();
         var descriptorRuleString = DescriptorRules.Select(rule => rule.ToString()).ToList();
         axiomRules.Should().NotBeEmpty();
+        var ruleStringList =  axiomRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources));
+        var ruleString = String.Join("\n", ruleStringList.Concat());
         rdfImf.LoadDatalog(axiomRules);
 
         _inMemorySink.LogEvents.Should().HaveCount(0);

@@ -8,7 +8,8 @@ rule :
     | head PERIOD #Fact
     ;
 
-head : positiveRuleAtom ;
+head : positiveRuleAtom 
+    | "FALSE";
 
 body : ruleAtom (COMMA ruleAtom)* ;
 

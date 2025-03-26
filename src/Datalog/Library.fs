@@ -10,6 +10,7 @@ namespace DagSemTools.Datalog
 open System
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
+open DagSemTools.Rdf
 
 
 [<StructuralComparison>]
@@ -17,6 +18,11 @@ open DagSemTools.Rdf.Ingress
 type Term = 
     | Resource of GraphElementId
     | Variable of string
+    member this.ToString (manager : GraphElementManager) : string=
+                match this with
+                | Resource res -> (manager.GetGraphElement res).ToString()
+                | Variable vName -> vName
+    
 
 [<StructuralComparison>]
 [<StructuralEquality>]
@@ -24,12 +30,14 @@ type ResourceOrWildcard =
     | Resource of GraphElementId
     | Wildcard
 
-
 [<StructuralComparison>]
 [<StructuralEquality>]
 type TriplePattern =
     {Subject: Term; Predicate: Term; Object: Term}
-
+    override this.ToString() =
+        $"[{this.Subject.ToString()}, {this.Predicate.ToString()}, {this.Object.ToString()}]"
+    member this.ToString(manager) =
+        $"[{this.Subject.ToString(manager)}, {this.Predicate.ToString(manager)}, {this.Object.ToString(manager)}]"
 
 [<StructuralComparison>]
 [<StructuralEquality>]
@@ -40,14 +48,28 @@ type RuleHead =
         match this with
         | NormalHead triplePattern -> [triplePattern.Subject; triplePattern.Predicate; triplePattern.Object]
         | Contradiction -> []
-        
-            
+    override this.ToString() =
+        match this with
+        | NormalHead tp -> tp.ToString()
+        | Contradiction -> "FALSE"
+    member this.ToString(manager) =
+        match this with
+        | NormalHead tp -> tp.ToString(manager)
+        | Contradiction -> "FALSE"
         
 [<StructuralComparison>]
 [<StructuralEquality>]
 type RuleAtom = 
     | PositiveTriple of TriplePattern
     | NotTriple of TriplePattern
+    override this.ToString () =
+        match this with
+        | PositiveTriple tp -> tp.ToString()
+        | NotTriple tp -> $"NOT {tp.ToString()}"
+    member this.ToString (manager) =
+        match this with
+        | PositiveTriple tp -> tp.ToString(manager)
+        | NotTriple tp -> $"NOT {tp.ToString(manager)}"
 
 
 [<StructuralComparison>]
@@ -59,7 +81,16 @@ type TripleWildcard =
 [<StructuralEquality>]
 type Rule = 
     {Head: RuleHead; Body: RuleAtom list}
-
+    override this.ToString () =
+        let bodyString = this.Body
+                            |> List.map (fun el -> el.ToString())
+                            |> String.concat ","
+        $"{this.Head.ToString()} :- {bodyString}"
+    member this.ToString (manager) =
+        let bodyString = this.Body
+                            |> List.map (fun el -> el.ToString(manager))
+                            |> String.concat ","
+        $"{this.Head.ToString(manager)} :- {bodyString} ."
 type Substitution = 
     Map<string, Ingress.GraphElementId>
 type PartialRule = 
