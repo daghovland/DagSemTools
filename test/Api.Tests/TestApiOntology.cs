@@ -161,7 +161,7 @@ public class TestApiOntology(ITestOutputHelper output)
         rdfImf.LoadDatalog(DescriptorRules);
         axiomRules.Should().NotBeEmpty();
         var ruleStringList =  axiomRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources));
-        var ruleString = String.Join("\n\n", ruleStringList.Concat());
+        var ruleString = String.Join("\n", ruleStringList.Concat());
         outputWriter.WriteLine(ruleString);
         rdfImf.LoadDatalog(axiomRules);
 
