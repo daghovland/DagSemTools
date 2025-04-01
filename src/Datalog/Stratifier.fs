@@ -78,9 +78,9 @@ module internal Stratifier =
         | NegativePatternEdge of nedge: uint
     
     [<Struct>]
-    [<StructuralEquality>]
-    [<StructuralComparison>]
-    type OrderedTriplePattern = {
+    [<CustomEquality>]
+    [<CustomComparison>]
+    type TriplePatternEquivalenceClass = {
         Relation : TriplePattern
         mutable Successors : PatternEdge list
         mutable num_predecessors : uint
@@ -88,7 +88,14 @@ module internal Stratifier =
         mutable intensional : bool
         mutable visited: bool
         mutable output: bool
-    }
+    } with override this.Equals (other) =
+               match other with
+               | :? TriplePatternEquivalenceClass as other ->
+                   this.Relation = other.Relation
+               | _ -> false
+           
+    
+    
     let GetRuleHeadPattern (triple : RuleHead)  =
             match triple with
             | Contradiction  -> None
@@ -146,7 +153,7 @@ module internal Stratifier =
             
             This method is called whenever a triple-pattern is removed from the queue of patterns ready for ouput
         *)
-        let updateAtom (_ordered : OrderedTriplePattern array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern : TriplePattern) =
+        let updateAtom (_ordered : TriplePatternEquivalenceClass array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern : TriplePattern) =
             let numRelations = Array.length _ordered
             let patternNo = triplePatternMap.[bodyTriplePattern]
             _ordered.[int patternNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int patternNo].Successors
@@ -163,7 +170,7 @@ module internal Stratifier =
                         _ordered.[int wildcardRelationNo].num_predecessors <- _ordered.[int wildcardRelationNo].num_predecessors + 1u
             _ordered
                     *)
-        let updateRelation (_ordered : OrderedTriplePattern array) (headRelationNo : uint) (ruleBodyAtom : RuleAtom) =
+        let updateRelation (_ordered : TriplePatternEquivalenceClass array) (headRelationNo : uint) (ruleBodyAtom : RuleAtom) =
                 _ordered.[int headRelationNo].intensional <- true
                 match ruleBodyAtom with
                 | NotTriple t ->
@@ -206,7 +213,15 @@ module internal Stratifier =
             cycle
             |> Seq.map (fun n -> $"Cycle element: {resources.GetGraphElement n}")
             |> String.concat ", "
-                
+            
+        member internal this.find_cycle (visited : uint seq) (current : uint) (relation_id : uint) (is_negative : bool) : uint seq seq =
+                let cycleFinder = this.cycle_finder (Seq.append visited [current]) relation_id
+                if is_negative && (cycleFinder |> Seq.isEmpty |> not) then
+                    let cycleString = cycleFinder |> Seq.head |> this.printCycle
+                    logger.Error($"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}")
+                    failwith $"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}"
+                else
+                    cycleFinder                
                 
         
         (* Called when the topological sorting cannot proceed, hence assuming the existence of a cycle *)
@@ -222,18 +237,11 @@ module internal Stratifier =
                                                     (fun edge ->
                                                         match edge with
                                                         | PositivePatternEdge relation_id -> 
-                                                            (this.cycle_finder (Seq.append visited [current]) relation_id)
+                                                            this.find_cycle visited current relation_id false
                                                         | NegativePatternEdge relation_id ->
-                                                            let cycleFinder = this.cycle_finder (Seq.append visited [current]) relation_id
-                                                            if (cycleFinder |> Seq.isEmpty |> not) then
-                                                                let cycleString = cycleFinder |> Seq.head |> this.printCycle
-                                                                logger.Error($"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}")
-                                                                failwith $"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}"
-                                                            else
-                                                                Seq.empty
+                                                            this.find_cycle visited current relation_id true
                                                     )
-            
-            
+           
         member internal this.GetReadyElementsQueue() = ready_elements_queue    
         member internal this.GetOrderedTriplePatterns() = orderedTriplePatterns
             
