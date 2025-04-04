@@ -88,14 +88,23 @@ module internal Stratifier =
         mutable intensional : bool
         mutable visited: bool
         mutable output: bool
-    } with override this.Equals (other) =
-               match other with
-               | :? TriplePatternEquivalenceClass as other ->
-                   this.Relation = other.Relation
-               | _ -> false
-           
-    
-    
+    }
+    with
+        override this.Equals (other) =
+                       match other with
+                       | :? TriplePatternEquivalenceClass as other ->
+                           this.Relation.Equals other.Relation
+                       | _ -> false
+         override this.GetHashCode () =
+               this.Relation.GetHashCode()
+
+        interface System.IComparable with
+            member this.CompareTo (obj: obj): int =
+                            match obj with
+                             | :? TriplePatternEquivalenceClass as other ->
+                                 compare this.Relation other.Relation
+                             | _ -> invalidArg "obj" "Cannot compare values of different types."
+       
     let GetRuleHeadPattern (triple : RuleHead)  =
             match triple with
             | Contradiction  -> None
@@ -119,10 +128,22 @@ module internal Stratifier =
     
     (* The extensional relations (properties) are those that only occur in the body of rules *)       
     let GetExtentionalTriplePatterns (rules : Rule list)  =
-        GetBodyTriplePatterns rules |> Seq.except (GetHeadPattern rules) |> Seq.distinct
+        GetBodyTriplePatterns rules
+        |> Seq.except (GetHeadPattern rules)
+        |> Seq.distinct
   
     let GetTriplePatterns (rules : Rule list) =
-        Seq.concat [GetHeadPattern rules ; GetBodyTriplePatterns rules] |> Seq.distinct
+        Seq.concat [GetHeadPattern rules ; GetBodyTriplePatterns rules]
+        |> Seq.map (fun r -> {
+                                                                 Relation = r
+                                                                 Successors = []
+                                                                 num_predecessors = 0u
+                                                                 uses_intensional_negative_edge = false
+                                                                 intensional = false
+                                                                 visited = false
+                                                                 output = false
+                                                             })
+        |> Seq.distinct
     
     (* Returns any rules containing negations of intentional properties. These relations make the program not semipositive *)
     let NegativeIntentionalProperties (rules : Rule list) =
@@ -153,7 +174,7 @@ module internal Stratifier =
             
             This method is called whenever a triple-pattern is removed from the queue of patterns ready for ouput
         *)
-        let updateAtom (_ordered : TriplePatternEquivalenceClass array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern : TriplePattern) =
+        let updateAtom (_ordered : TriplePatternEquivalenceClass array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern) =
             let numRelations = Array.length _ordered
             let patternNo = triplePatternMap.[bodyTriplePattern]
             _ordered.[int patternNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int patternNo].Successors
@@ -170,7 +191,7 @@ module internal Stratifier =
                         _ordered.[int wildcardRelationNo].num_predecessors <- _ordered.[int wildcardRelationNo].num_predecessors + 1u
             _ordered
                     *)
-        let updateRelation (_ordered : TriplePatternEquivalenceClass array) (headRelationNo : uint) (ruleBodyAtom : RuleAtom) =
+        let updateRelation (_ordered : 'a array) (headRelationNo : uint) (ruleBodyAtom : RuleAtom) =
                 _ordered.[int headRelationNo].intensional <- true
                 match ruleBodyAtom with
                 | NotTriple t ->
@@ -178,17 +199,9 @@ module internal Stratifier =
                 | PositiveTriple t ->
                     updateAtom _ordered PositivePatternEdge headRelationNo t
         
-        (* This is only run once on initialization to set up the data structure for topologial sorting of relations *)
+        (* This is only run once on initialization to set up the data structure for topologial sorting of rules *)
         let mutable orderedTriplePatterns = 
-            let _ordered = triplePatterns |> Array.map (fun r -> {
-                                                                 Relation = r
-                                                                 Successors = []
-                                                                 num_predecessors = 0u
-                                                                 uses_intensional_negative_edge = false
-                                                                 intensional = false
-                                                                 visited = false
-                                                                 output = false
-                                                             })
+            let _ordered = triplePatterns 
             rules |> Seq.iter (fun rule ->
                                         match rule.Head |> GetRuleHeadPattern with
                                             | None -> ()

@@ -22,8 +22,11 @@ type Term =
                 match this with
                 | Resource res -> (manager.GetGraphElement res).ToString()
                 | Variable vName -> vName
-    
-
+    member internal this.GetHashCodeForUnification : int =
+        match this with
+        | Resource res -> res.GetHashCode()
+        | Variable vName -> 100
+        
 [<StructuralComparison>]
 [<StructuralEquality>]
 type ResourceOrWildcard = 
@@ -34,10 +37,13 @@ type ResourceOrWildcard =
 [<StructuralEquality>]
 type TriplePattern =
     {Subject: Term; Predicate: Term; Object: Term}
+    member private this.GeneralToString(termToStringFunction : Term -> string ) : string  =
+        $"[{termToStringFunction this.Subject}, {termToStringFunction this.Predicate}, {termToStringFunction this.Object}]"
     override this.ToString() =
-        $"[{this.Subject.ToString()}, {this.Predicate.ToString()}, {this.Object.ToString()}]"
-    member this.ToString(manager) =
-        $"[{this.Subject.ToString(manager)}, {this.Predicate.ToString(manager)}, {this.Object.ToString(manager)}]"
+        this.GeneralToString(fun t -> t.ToString())
+    member this.ToString(manager : GraphElementManager) =
+        this.GeneralToString(fun (t : Term) ->t.ToString(manager))
+    
 
 [<StructuralComparison>]
 [<StructuralEquality>]
