@@ -43,19 +43,6 @@ module internal Stratifier =
         | BinaryPredicate res1, UnaryPredicate (res2p, res2o) -> res1 = res2p
     *)
     
-    (*
-        These are the edges in the dependency graph of triple patterns
-        There is an edge from the pattern in the head of a rule to every atom in the body
-        The edge is negative if the body atom is negative
-        The stratification checks for cycles with negative edges
-        See the Alice book for more info
-    *)
-    [<Struct>]
-    [<StructuralEquality>]
-    [<StructuralComparison>]
-    type PatternEdge =
-        | PositivePatternEdge of pedge: uint
-        | NegativePatternEdge of nedge: uint
     
     [<Struct>]
     [<CustomEquality>]
@@ -65,7 +52,6 @@ module internal Stratifier =
         mutable Successors : PatternEdge list
         mutable num_predecessors : uint
         mutable uses_intensional_negative_edge : bool
-        mutable intensional : bool
         mutable visited: bool
         mutable output: bool
     }
@@ -85,6 +71,16 @@ module internal Stratifier =
                                  compare this.Relation other.Relation
                              | _ -> invalidArg "obj" "Cannot compare values of different types."
        
+    let createOrderedRules rules  =
+        rules 
+        |> Array.map (fun rule -> 
+            { Relation = rule
+              num_predecessors = 0u
+              Successors = List.empty
+              uses_intensional_negative_edge = false
+              visited = false
+              output = false })
+           
     let GetRuleHeadPattern (triple : RuleHead)  =
             match triple with
             | Contradiction  -> None
@@ -112,18 +108,6 @@ module internal Stratifier =
         |> Seq.except (GetHeadPattern rules)
         |> Seq.distinct
   
-    let GetTriplePatterns (rules : Rule list) =
-        Seq.concat [GetHeadPattern rules ; GetBodyTriplePatterns rules]
-        |> Seq.map (fun r -> {
-                                                                 Relation = r
-                                                                 Successors = []
-                                                                 num_predecessors = 0u
-                                                                 uses_intensional_negative_edge = false
-                                                                 intensional = false
-                                                                 visited = false
-                                                                 output = false
-                                                             })
-        |> Seq.distinct
     
     (* Returns any rules containing negations of intentional properties. These relations make the program not semipositive *)
     let NegativeIntentionalProperties (rules : Rule list) =
@@ -142,63 +126,53 @@ module internal Stratifier =
     let IsSemiPositiveProgram (rules : Rule list) =
         NegativeIntentionalProperties rules |> Seq.isEmpty
   
-    (* The RulePartitioner creates a stratification of the program if it is stratifiable, and otherwise fails *)
-    type internal RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
+    (* 
+        The RulePartitioner creates a stratification of the program if it is stratifiable, and otherwise fails
+        Based on the Alice book by Abiteboul, Hull and Vianu, the chapters on datalog with negation
         
-        _ordered = rules.
+        The main difference is that the rules, and not the relations are ordered. 
+        This was inspired by a sentence in "Maintenance of datalog materialisations revisited" by Motik, Nenov, Piro and Horrocks
+     *)
+    type internal RulePartitioner (logger: ILogger, rules: Rule array, resources: DagSemTools.Rdf.GraphElementManager) =
+        
+        let ruleMap  = rules |> Seq.mapi (fun i r -> r, (uint i)) |> Map.ofSeq
+        
         (* 
-            This is the core of a topoogical sorting of the triple-patterns.
+            This is the core of a topological sorting of the rules.
             Based on the algorithm in Knuths Art of Computer Programming, chapter 2
             
-            This method is called whenever a triple-pattern is removed from the queue of patterns ready for ouput
+            This method is called on startup for each rule
         *)
-        let updateAtom (_ordered : OrderedRule array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern) =
-            let numRelations = Array.length _ordered
-            let patternNo = triplePatternMap.[bodyTriplePattern]
-            _ordered.[int patternNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int patternNo].Successors
-            _ordered.[int headRelationNo].num_predecessors <- _ordered.[int headRelationNo].num_predecessors + 1u
+        let updateRuleOrdering (_ordered : OrderedRule array) rule (edge : PatternEdge)   =
+            let ruleNo = ruleMap.[rule]
+            let depRule = edge.GetRule()
+            let depRuleNo = ruleMap.[depRule]
+            _ordered.[int ruleNo].Successors <- edge :: _ordered.[int ruleNo].Successors
+            _ordered.[int depRuleNo].num_predecessors <- _ordered.[int depRuleNo].num_predecessors + 1u
             
-        (* Adds a dependency to and from the wildcard-relation 
-        let updateWildcardRelation (_ordered: OrderedTriplePattern array) =
-            match triplePatternMap.TryGetValue AllRelations with
-            | false, _ -> ()
-            | true, wildcardRelationNo ->
-                for i in 0 .. (Array.length _ordered - 1) do
-                    if (uint i) <> wildcardRelationNo then
-                        _ordered.[i].Successors <- PositiveRelationEdge (uint wildcardRelationNo) :: _ordered.[i].Successors
-                        _ordered.[int wildcardRelationNo].num_predecessors <- _ordered.[int wildcardRelationNo].num_predecessors + 1u
-            _ordered
-                    *)
-        let updateRelation (_ordered : 'a array) (headRelationNo : uint) (ruleBodyAtom : RuleAtom) =
-                _ordered.[int headRelationNo].intensional <- true
-                match ruleBodyAtom with
-                | NotTriple t ->
-                    updateAtom _ordered NegativePatternEdge headRelationNo t
-                | PositiveTriple t ->
-                    updateAtom _ordered PositivePatternEdge headRelationNo t
-        
-        (* This is only run once on initialization to set up the data structure for topologial sorting of rules *)
-        let mutable orderedTriplePatterns = 
-            let _ordered = triplePatterns 
-            rules |> Seq.iter (fun rule ->
-                                        match rule.Head |> GetRuleHeadPattern with
-                                            | None -> ()
-                                            | Some headRelation ->
-                                                let headRelationNo = triplePatternMap.[headRelation]
-                                                rule.Body
-                                                   |> Seq.iter (updateRelation _ordered headRelationNo)
-                                )
+        (* This is only run once on initialization to set up the data structure for topologial sorting of rules
+           Mainly this means, for each rule, set it to intentional if  *)
+        let mutable orderedRules = 
+            let _ordered = rules |> createOrderedRules
+            rules
+            |> Seq.choose (fun rule ->
+                match rule.Head |> GetRuleHeadPattern with
+                | None -> None
+                | Some headPattern -> Some (rule, headPattern))
+            |> Seq.iter (fun (rule, headPattern) ->
+                Unification.DependingRules rules headPattern
+                |> Seq.iter (updateRuleOrdering _ordered rule))
             _ordered
         
         (* The queue contains all relations that are not dependent on any relations (that have not already been output) *)
         let mutable ready_elements_queue =
-            Queue<uint>(orderedTriplePatterns
+            Queue<uint>(orderedRules
                     |> Array.filter (fun concept -> concept.num_predecessors = 0u)
                     |> Array.map (fun concept -> triplePatternMap.[concept.Relation]))
             
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
         let mutable next_elements_queue = Queue<uint>()
-        let mutable n_unordered = Array.length orderedTriplePatterns - ready_elements_queue.Count
+        let mutable n_unordered = Array.length orderedRules - ready_elements_queue.Count
         
         member internal this.printCycle cycle =
             cycle
@@ -217,7 +191,7 @@ module internal Stratifier =
         
         (* Called when the topological sorting cannot proceed, hence assuming the existence of a cycle *)
         member internal this.cycle_finder (visited : uint seq) (current : uint) : uint seq seq =
-            let current_element = orderedTriplePatterns.[int current]
+            let current_element = orderedRules.[int current]
             if (visited |> Seq.contains current) then
                 visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.distinct |> Seq.singleton
             else if current_element.visited then Seq.empty
@@ -234,14 +208,14 @@ module internal Stratifier =
                                                     )
            
         member internal this.GetReadyElementsQueue() = ready_elements_queue    
-        member internal this.GetOrderedTriplePatterns() = orderedTriplePatterns
+        member internal this.GetOrderedTriplePatterns() = orderedRules
             
         (* Between iterations, the switch about using negative edge must be reset,
             and all elements marked for next stratifications must be moved into the queue for the current stratification *)    
         member this.reset_stratification =
-            for i in 0 .. (Array.length orderedTriplePatterns - 1) do
-                orderedTriplePatterns.[i].uses_intensional_negative_edge <- false
-                orderedTriplePatterns.[i].visited <- false
+            for i in 0 .. (Array.length orderedRules - 1) do
+                orderedRules.[i].uses_intensional_negative_edge <- false
+                orderedRules.[i].visited <- false
             while next_elements_queue.Count > 0 do
                 ready_elements_queue.Enqueue(next_elements_queue.Dequeue())
             
@@ -253,18 +227,18 @@ module internal Stratifier =
                 | PositivePatternEdge relation_id ->
                     relation_id
                 | NegativePatternEdge relation_id ->
-                    let removed_relation = orderedTriplePatterns.[int removed_relation_id]
+                    let removed_relation = orderedRules.[int removed_relation_id]
                     if removed_relation.intensional then
-                        orderedTriplePatterns.[int relation_id].uses_intensional_negative_edge <- true
+                        orderedRules.[int relation_id].uses_intensional_negative_edge <- true
                     relation_id
-            let old_relation = orderedTriplePatterns.[int relation_id]
+            let old_relation = orderedRules.[int relation_id]
             if not old_relation.output then        
                 if old_relation.num_predecessors < 1u then failwith "Datalog program preprocessing failed. This is a bug, please report that topological ordering failed, num_predecessors < 1"
                 let new_predecessors = old_relation.num_predecessors - 1u
-                orderedTriplePatterns.[int relation_id] <- { old_relation with num_predecessors = new_predecessors }
-                if orderedTriplePatterns.[int relation_id].num_predecessors = 0u && not orderedTriplePatterns.[int relation_id].output then
-                    orderedTriplePatterns.[int relation_id].output <- true
-                    if orderedTriplePatterns.[int relation_id].uses_intensional_negative_edge then
+                orderedRules.[int relation_id] <- { old_relation with num_predecessors = new_predecessors }
+                if orderedRules.[int relation_id].num_predecessors = 0u && not orderedRules.[int relation_id].output then
+                    orderedRules.[int relation_id].output <- true
+                    if orderedRules.[int relation_id].uses_intensional_negative_edge then
                         next_elements_queue.Enqueue(relation_id)
                     else
                         ready_elements_queue.Enqueue(relation_id)
@@ -278,14 +252,14 @@ module internal Stratifier =
             while ready_elements_queue.Count > 0 do
                 let relation_id = ready_elements_queue.Dequeue()
                 let relation = triplePatterns.[int relation_id]    
-                orderedTriplePatterns.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
+                orderedRules.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
                 // if ordered_relations.[relation_id].intensional then
                 let relation_rules = rules
                                         |> List.filter (fun rule ->
                                             (rule.Head |> GetRuleHeadPattern) = Some relation
                                             )
                 ordered_rules <- Seq.append relation_rules ordered_rules
-                orderedTriplePatterns.[int relation_id].intensional <- false
+                orderedRules.[int relation_id].intensional <- false
             Seq.distinct ordered_rules
         
         (* Checks whether a rule is completely covered by a cycle (given the already output relations, which are treated as extensional/edb
@@ -293,7 +267,7 @@ module internal Stratifier =
         member this.RuleIsCoveredByCycle cycle rule =
                 rule.Body |> Seq.forall (fun atom ->
                                             let atomRelation = atom|> GetRuleAtomPattern 
-                                            orderedTriplePatterns.[int triplePatternMap.[atomRelation]].intensional = false
+                                            orderedRules.[int triplePatternMap.[atomRelation]].intensional = false
                                             || (cycle |> Seq.exists (triplePatternsUnifiable atomRelation))
                                         )
         (* 
@@ -305,7 +279,7 @@ module internal Stratifier =
             The proof that these cycles / strongly connected components always exist is in the Alice book
          *)
         member this.handle_cycle()  =
-            let cycles = (orderedTriplePatterns
+            let cycles = (orderedRules
                   |> Array.filter (fun relation -> relation.num_predecessors > 0u
                                                     && relation.output = false)
                   |> Array.map (fun relation -> triplePatternMap.[relation.Relation])
@@ -322,8 +296,8 @@ module internal Stratifier =
                   )
             cycles |> Seq.iter (fun cycle ->
                   cycle |> Seq.distinct |>(Seq.iter (fun rel ->
-                      if not orderedTriplePatterns.[int rel].output then 
-                        orderedTriplePatterns.[int rel].output <- true
+                      if not orderedRules.[int rel].output then 
+                        orderedRules.[int rel].output <- true
                         ready_elements_queue.Enqueue rel)
                   ))
                 
@@ -339,7 +313,7 @@ module internal Stratifier =
 
         (* Used in the while loop in orderRules to test whether stratification is finished *)
         member this.topological_sort_finished() =
-            orderedTriplePatterns |> Array.forall (fun relation -> relation.output || relation.num_predecessors = 0u)
+            orderedRules |> Array.forall (fun relation -> relation.output || relation.num_predecessors = 0u)
                 
         (* Order the rules topologically based on dependency. Used for stratification
             Each Rule seq in the outermost seq is a partition, and these partitions must be handled sequentially during materialization *)

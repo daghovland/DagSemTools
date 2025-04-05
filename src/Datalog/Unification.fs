@@ -9,6 +9,7 @@
 
 namespace DagSemTools.Datalog
 
+open DagSemTools.Datalog.Stratifier
 open DagSemTools.Rdf.Ingress
 
 (* 
@@ -41,17 +42,47 @@ module internal Unification =
         |> Option.bind (TermsUnifiable triple1.Object triple2.Object)
         |> Option.isSome
     
+      (*
+        These are the edges in the dependency graph of triple patterns
+        There is an edge from the pattern in the head of a rule to every atom in the body
+        The edge is negative if the body atom is negative
+        The stratification checks for cycles with negative edges
+        See the Alice book for more info
+    *)
+    [<Struct>]
+    [<StructuralEquality>]
+    [<StructuralComparison>]
+    type PatternEdge =
+        | PositivePatternEdge of pedge: Rule
+        | NegativePatternEdge of nedge: Rule
+    with member this.GetRule() =
+            match this with
+                | PositivePatternEdge pedge -> pedge
+                | NegativePatternEdge nedge -> nedge
+    
+    type UnificationResult =
+        | PositiveRelation
+        | NegativeRelation
+        
     let internal triplePatternAtomUnifiable (triple1 : TriplePattern) (atom : RuleAtom) =
         match atom with
-        | NotTriple pattern -> triplePatternsUnifiable triple1 pattern
-        | PositiveTriple pattern -> triplePatternsUnifiable triple1 pattern
+        | NotTriple pattern -> if triplePatternsUnifiable triple1 pattern then Some NegativeRelation else None
+        | PositiveTriple pattern -> if triplePatternsUnifiable triple1 pattern then Some PositiveRelation else None
     
     (* Returns all rules where there is a body atom that is unifiable with the triple pattern
-      TODO: This shold probably be cached or indexed in a better way
+      TODO: This should probably be cached or indexed in a better way
      *)
     let internal DependingRules rules triplePattern =
-        rules |> Array.where (fun rule ->
-            rule.Body |> Seq.exists (triplePatternAtomUnifiable triplePattern))
+        rules |> Array.choose (fun rule ->
+            let edges = rule.Body
+                        |> Seq.choose (triplePatternAtomUnifiable triplePattern)
+            if edges |> Seq.isEmpty then
+                None
+            elif edges |> Seq.contains NegativeRelation then
+                Some (NegativePatternEdge rule)
+            else
+                Some (PositivePatternEdge rule))
+                
 
     (* Returns all rules where the Head is unifiable with the given pattern *)
     let internal IntentionalRules rules triplePattern =
