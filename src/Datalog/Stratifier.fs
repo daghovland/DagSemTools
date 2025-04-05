@@ -168,7 +168,7 @@ module internal Stratifier =
         let mutable ready_elements_queue =
             Queue<uint>(orderedRules
                     |> Array.filter (fun concept -> concept.num_predecessors = 0u)
-                    |> Array.map (fun concept -> triplePatternMap.[concept.Relation]))
+                    |> Array.map (fun concept -> ruleMap.[concept.Relation]))
             
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
         let mutable next_elements_queue = Queue<uint>()
@@ -179,7 +179,8 @@ module internal Stratifier =
             |> Seq.map (fun n -> $"Cycle element: {resources.GetGraphElement n}")
             |> String.concat ", "
             
-        member internal this.find_cycle (visited : uint seq) (current : uint) (relation_id : uint) (is_negative : bool) : uint seq seq =
+        member internal this.find_cycle (visited : uint seq) (current : uint) (relation : Rule) (is_negative : bool) : uint seq seq =
+                let relation_id = ruleMap.[relation]
                 let cycleFinder = this.cycle_finder (Seq.append visited [current]) relation_id
                 if is_negative && (cycleFinder |> Seq.isEmpty |> not) then
                     let cycleString = cycleFinder |> Seq.head |> this.printCycle
@@ -221,27 +222,27 @@ module internal Stratifier =
             
             
         (* Updates a successor of a relation, and if the relation is ready to be output, it is added to the queue *)
-        member this.update_successor (removed_relation_id : uint) (successor : PatternEdge) =
-            let relation_id = 
+        member this.update_successor (removedRuleId : uint) (successor : PatternEdge) =
+            let successorRuleId = 
                 match successor with
-                | PositivePatternEdge relation_id ->
+                | PositivePatternEdge rule ->
+                    ruleMap.[rule]
+                | NegativePatternEdge rule ->
+                    let removed_relation = orderedRules.[int removedRuleId]
+                    let relation_id = ruleMap.[rule]
+                    orderedRules.[int relation_id].uses_intensional_negative_edge <- true
                     relation_id
-                | NegativePatternEdge relation_id ->
-                    let removed_relation = orderedRules.[int removed_relation_id]
-                    if removed_relation.intensional then
-                        orderedRules.[int relation_id].uses_intensional_negative_edge <- true
-                    relation_id
-            let old_relation = orderedRules.[int relation_id]
+            let old_relation = orderedRules.[int successorRuleId]
             if not old_relation.output then        
                 if old_relation.num_predecessors < 1u then failwith "Datalog program preprocessing failed. This is a bug, please report that topological ordering failed, num_predecessors < 1"
                 let new_predecessors = old_relation.num_predecessors - 1u
-                orderedRules.[int relation_id] <- { old_relation with num_predecessors = new_predecessors }
-                if orderedRules.[int relation_id].num_predecessors = 0u && not orderedRules.[int relation_id].output then
-                    orderedRules.[int relation_id].output <- true
-                    if orderedRules.[int relation_id].uses_intensional_negative_edge then
-                        next_elements_queue.Enqueue(relation_id)
+                orderedRules.[int successorRuleId] <- { old_relation with num_predecessors = new_predecessors }
+                if orderedRules.[int successorRuleId].num_predecessors = 0u && not orderedRules.[int successorRuleId].output then
+                    orderedRules.[int successorRuleId].output <- true
+                    if orderedRules.[int successorRuleId].uses_intensional_negative_edge then
+                        next_elements_queue.Enqueue(successorRuleId)
                     else
-                        ready_elements_queue.Enqueue(relation_id)
+                        ready_elements_queue.Enqueue(successorRuleId)
                 
             
         (* Gets all rules that are not part of a cycle. This will become a partition of the stratification
@@ -250,16 +251,12 @@ module internal Stratifier =
         member this.get_rule_partition() : Rule seq  =
             let mutable ordered_rules = Seq.empty
             while ready_elements_queue.Count > 0 do
-                let relation_id = ready_elements_queue.Dequeue()
-                let relation = triplePatterns.[int relation_id]    
-                orderedRules.[int relation_id].Successors |> Seq.iter (this.update_successor relation_id)
+                let ruleId = ready_elements_queue.Dequeue()
+                let rule = rules.[int ruleId]    
+                orderedRules.[int ruleId].Successors |> Seq.iter (this.update_successor ruleId)
                 // if ordered_relations.[relation_id].intensional then
-                let relation_rules = rules
-                                        |> List.filter (fun rule ->
-                                            (rule.Head |> GetRuleHeadPattern) = Some relation
-                                            )
-                ordered_rules <- Seq.append relation_rules ordered_rules
-                orderedRules.[int relation_id].intensional <- false
+                ordered_rules <- seq { rule; yield! ordered_rules }
+                //orderedRules.[int ruleId].intensional <- false
             Seq.distinct ordered_rules
         
         (* Checks whether a rule is completely covered by a cycle (given the already output relations, which are treated as extensional/edb
@@ -268,7 +265,7 @@ module internal Stratifier =
                 rule.Body |> Seq.forall (fun atom ->
                                             let atomRelation = atom|> GetRuleAtomPattern 
                                             orderedRules.[int triplePatternMap.[atomRelation]].intensional = false
-                                            || (cycle |> Seq.exists (triplePatternsUnifiable atomRelation))
+                                             (cycle |> Seq.exists (triplePatternsUnifiable atomRelation))
                                         )
         (* 
             Only called when topological sorting stops, so there is a cycle

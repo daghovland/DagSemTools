@@ -9,7 +9,6 @@
 
 namespace DagSemTools.Datalog
 
-open DagSemTools.Datalog.Stratifier
 open DagSemTools.Rdf.Ingress
 
 (* 
