@@ -21,7 +21,7 @@ type Term =
     member this.ToString (manager : GraphElementManager) : string=
                 match this with
                 | Resource res -> (manager.GetGraphElement res).ToString()
-                | Variable vName -> vName
+                | Variable vName -> $"?{vName}"
     member internal this.GetHashCodeForUnification : int =
         match this with
         | Resource res -> res.GetHashCode()
@@ -57,11 +57,11 @@ type RuleHead =
     override this.ToString() =
         match this with
         | NormalHead tp -> tp.ToString()
-        | Contradiction -> "FALSE"
+        | Contradiction -> "false"
     member this.ToString(manager) =
         match this with
         | NormalHead tp -> tp.ToString(manager)
-        | Contradiction -> "FALSE"
+        | Contradiction -> "false"
         
 [<StructuralComparison>]
 [<StructuralEquality>]
@@ -71,11 +71,11 @@ type RuleAtom =
     override this.ToString () =
         match this with
         | PositiveTriple tp -> tp.ToString()
-        | NotTriple tp -> $"NOT {tp.ToString()}"
+        | NotTriple tp -> $"not {tp.ToString()}"
     member this.ToString (manager) =
         match this with
         | PositiveTriple tp -> tp.ToString(manager)
-        | NotTriple tp -> $"NOT {tp.ToString(manager)}"
+        | NotTriple tp -> $"not {tp.ToString(manager)}"
 
 
 [<StructuralComparison>]
@@ -108,28 +108,7 @@ type PartialRuleMatch =
 module Datalog =
     let emptySubstitution : Substitution = Map.empty
     let isFact (rule) = rule.Body |> List.isEmpty
-    let VariableToString (v : string) : string = $"?{v}"
     
-    let ResourceToString (tripleTable: Datastore) r : string =
-        (tripleTable.GetGraphElement r).ToString()
-    
-    let ResourceOrVariableToString (tripleTable : Datastore) res : string =
-        match res with
-        | Term.Resource r -> (tripleTable.GetGraphElement r).ToString()
-        | Variable v -> VariableToString v
-    
-
-    let TriplePatternToString (tripleTable : Datastore) (triplePattern : TriplePattern) : string =
-        $"[{ResourceOrVariableToString tripleTable triplePattern.Subject},
-        {ResourceOrVariableToString tripleTable triplePattern.Predicate},
-        {ResourceOrVariableToString tripleTable triplePattern.Object} ]"
-    
-    
-    let ResourceAtom (tripleTable : Datastore) (ruleAtom : RuleAtom) : string =
-        match ruleAtom with
-        | PositiveTriple t -> TriplePatternToString tripleTable t
-        | NotTriple t -> $"not {TriplePatternToString tripleTable t}"
-        
     let ConstantTriplePattern (triple : Ingress.Triple) : TriplePattern = 
         {Subject = Term.Resource triple.subject; Predicate = Term.Resource triple.predicate; Object = Term.Resource triple.obj}
     
@@ -149,16 +128,6 @@ module Datalog =
                     rest |> List.collect (fun triplePart -> [Resource r :: triplePart; Wildcard :: triplePart])
         generatePatterns resourceList |> List.map (fun triplePart ->
             {Subject = List.item 0 triplePart; Predicate = List.item 1 triplePart; Object = List.item 2 triplePart})
-        
-    let RuleHeadToString (tripleTable : Datastore) ruleHead : string =
-        match ruleHead with
-        | NormalHead triplePattern -> TriplePatternToString tripleTable triplePattern
-        | Contradiction -> "false"
-    let RuleToString (tripleTable : Datastore) (rule : Rule) : string =
-        let mutable headString = rule.Head |> RuleHeadToString tripleTable
-        headString <- headString + " :- "
-        rule.Body |> List.iter (fun atom -> headString <- headString + ResourceAtom tripleTable atom + ", ")
-        headString
         
     (* Safe rules are those where the head only has variable that are in the body *)
     let GetUnsafeHeadVariables (rule) =
@@ -321,4 +290,31 @@ module Datalog =
                                 )
             )
             (evaluatePositive rdf ruleMatch)
+    
+    let VariableConstantUnifiable v res (constantMap : Map<string, GraphElementId>)  (variableMap : Map<string, string>)=
+            match constantMap.TryGetValue (variableMap.GetValueOrDefault (v, v)) with
+            | false, _ -> Some (Map.add v res constantMap, variableMap)
+            | true, res2 ->  if res = res2 then Some (constantMap, variableMap) else None
+        
+    (* Two terms are unifiable if they can be mapped to the same constant *)
+    let internal TermsUnifiable (term1 : Term) (term2 : Term) (constantMap : Map<string, GraphElementId>, variableMap : Map<string, string>)=
+        match term1, term2 with
+        | Term.Variable v, Term.Resource res1 ->
+           VariableConstantUnifiable v res1 constantMap variableMap
+        | Term.Resource res, Term.Variable v ->
+           VariableConstantUnifiable v res constantMap variableMap
+        | Term.Resource res1, Term.Resource res2 -> if res1 = res2 then (Some (constantMap, variableMap)) else None
+        | Term.Variable v1, Term.Variable v2 -> (Some (constantMap, (Map.add v1 (v2) variableMap)))
+    
+    (* Two triple patterns are unifiable if there exists a mapping of the variables such that they are equal *)
+    let internal triplePatternsUnifiable (triple1 : TriplePattern) (triple2 : TriplePattern)  =
+        TermsUnifiable triple1.Subject triple2.Subject (Map.empty, Map.empty)
+        |> Option.bind (TermsUnifiable triple1.Predicate triple2.Predicate)
+        |> Option.bind (TermsUnifiable triple1.Object triple2.Object)
+        |> Option.isSome
+    
+    let internal triplePatternsUnifiable (triple1 : TriplePattern) (atom : RuleAtom) =
+        match atom with
+        | NotTriple pattern -> triplePatternsUnifiable triple1 pattern
+        | PositiveTriple pattern -> triplePatternsUnifiable triple1 pattern
     

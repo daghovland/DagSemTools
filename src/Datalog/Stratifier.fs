@@ -31,27 +31,6 @@ module internal Stratifier =
         | BinaryPredicate of GraphElementId
         | UnaryPredicate of predicate : GraphElementId * obj : GraphElementId 
     *)
-    let VariableConstantUnifiable v res (constantMap : Map<string, GraphElementId>)  (variableMap : Map<string, string>)=
-        match constantMap.TryGetValue (variableMap.GetValueOrDefault (v, v)) with
-        | false, _ -> Some (Map.add v res constantMap, variableMap)
-        | true, res2 ->  if res = res2 then Some (constantMap, variableMap) else None
-        
-    (* Two terms are unifiable if they can be mapped to the same constant *)
-    let internal TermsUnifiable (term1 : Term) (term2 : Term) (constantMap : Map<string, GraphElementId>, variableMap : Map<string, string>)=
-        match term1, term2 with
-        | Term.Variable v, Term.Resource res1 ->
-           VariableConstantUnifiable v res1 constantMap variableMap
-        | Term.Resource res, Term.Variable v ->
-           VariableConstantUnifiable v res constantMap variableMap
-        | Term.Resource res1, Term.Resource res2 -> if res1 = res2 then (Some (constantMap, variableMap)) else None
-        | Term.Variable v1, Term.Variable v2 -> (Some (constantMap, (Map.add v1 (v2) variableMap)))
-    
-    (* Two triple patterns are unifiable if there exists a mapping of the variables such that they are equal *)
-    let internal triplePatternsUnifiable (triple1 : TriplePattern) (triple2 : TriplePattern)  =
-        TermsUnifiable triple1.Subject triple2.Subject (Map.empty, Map.empty)
-        |> Option.bind (TermsUnifiable triple1.Predicate triple2.Predicate)
-        |> Option.bind (TermsUnifiable triple1.Object triple2.Object)
-        |> Option.isSome
         
     (*let MatchRelations (rel1) (rel2) : bool =
         match rel1, rel2 with
@@ -165,8 +144,6 @@ module internal Stratifier =
     (* The RulePartitioner creates a stratification of the program if it is stratifiable, and otherwise fails *)
     type internal RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
         
-        let triplePatterns = GetTriplePatterns rules |> Seq.toArray
-        let triplePatternMap  = triplePatterns |> Array.mapi (fun i r -> r, (uint i)) |> Map.ofArray
         
         (* 
             This is the core of a topoogical sorting of the triple-patterns.
