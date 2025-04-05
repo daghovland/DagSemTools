@@ -12,6 +12,7 @@ namespace DagSemTools.Datalog
 open System.Collections.Generic
 open DagSemTools.Rdf.Ingress
 open Serilog
+open DagSemTools.Datalog.Unification
 
 (* 
     The Stratifier module intends to create a stratification of a datalog program, such that negation can be supported
@@ -59,8 +60,8 @@ module internal Stratifier =
     [<Struct>]
     [<CustomEquality>]
     [<CustomComparison>]
-    type TriplePatternEquivalenceClass = {
-        Relation : TriplePattern
+    type OrderedRule = {
+        Relation : Rule
         mutable Successors : PatternEdge list
         mutable num_predecessors : uint
         mutable uses_intensional_negative_edge : bool
@@ -71,7 +72,7 @@ module internal Stratifier =
     with
         override this.Equals (other) =
                        match other with
-                       | :? TriplePatternEquivalenceClass as other ->
+                       | :? OrderedRule as other ->
                            this.Relation.Equals other.Relation
                        | _ -> false
          override this.GetHashCode () =
@@ -80,7 +81,7 @@ module internal Stratifier =
         interface System.IComparable with
             member this.CompareTo (obj: obj): int =
                             match obj with
-                             | :? TriplePatternEquivalenceClass as other ->
+                             | :? OrderedRule as other ->
                                  compare this.Relation other.Relation
                              | _ -> invalidArg "obj" "Cannot compare values of different types."
        
@@ -132,7 +133,7 @@ module internal Stratifier =
         rules |> Seq.filter (fun rule ->
                             rule.Body |> Seq.exists (fun atom ->
                                 match atom with
-                                    | NotTriple t -> intentionalTriplePatterns |> Seq.exists (triplePatternsUnifiable t)
+                                    | NotTriple t -> intentionalTriplePatterns |> Seq.exists ( triplePatternsUnifiable t)
                                     | _ -> false
                                 ) 
                             )
@@ -144,14 +145,14 @@ module internal Stratifier =
     (* The RulePartitioner creates a stratification of the program if it is stratifiable, and otherwise fails *)
     type internal RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
         
-        
+        _ordered = rules.
         (* 
             This is the core of a topoogical sorting of the triple-patterns.
             Based on the algorithm in Knuths Art of Computer Programming, chapter 2
             
             This method is called whenever a triple-pattern is removed from the queue of patterns ready for ouput
         *)
-        let updateAtom (_ordered : TriplePatternEquivalenceClass array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern) =
+        let updateAtom (_ordered : OrderedRule array) relationEdgeType (headRelationNo : uint) (bodyTriplePattern) =
             let numRelations = Array.length _ordered
             let patternNo = triplePatternMap.[bodyTriplePattern]
             _ordered.[int patternNo].Successors <- relationEdgeType headRelationNo :: _ordered.[int patternNo].Successors

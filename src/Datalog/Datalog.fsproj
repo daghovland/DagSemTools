@@ -31,7 +31,7 @@
     
     <ItemGroup>
         <Compile Include="Library.fs"/>
-        <Compile Include="RuleCollection.fs" />
+        <Compile Include="Unification.fs" />
         <Compile Include="PredicateGrounder.fs" />
         <Compile Include="Stratifier.fs" />
         <Compile Include="Reasoner.fs" />
