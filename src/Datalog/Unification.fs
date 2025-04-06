@@ -72,7 +72,7 @@ module internal Unification =
       TODO: This should probably be cached or indexed in a better way
      *)
     let internal DependingRules rules triplePattern =
-        rules |> Array.choose (fun rule ->
+        rules |> List.choose (fun rule ->
             let edges = rule.Body
                         |> Seq.choose (triplePatternAtomUnifiable triplePattern)
             if edges |> Seq.isEmpty then
@@ -85,7 +85,7 @@ module internal Unification =
 
     (* Returns all rules where the Head is unifiable with the given pattern *)
     let internal IntentionalRules rules triplePattern =
-        rules |> Array.where (fun rule ->
+        rules |> Seq.where (fun rule ->
             match rule.Head with
             | Contradiction -> false
             | NormalHead headPattern -> triplePatternsUnifiable triplePattern headPattern)

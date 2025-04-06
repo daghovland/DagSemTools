@@ -73,13 +73,14 @@ module internal Stratifier =
        
     let createOrderedRules rules  =
         rules 
-        |> Array.map (fun rule -> 
+        |> List.map (fun rule -> 
             { Relation = rule
               num_predecessors = 0u
               Successors = List.empty
               uses_intensional_negative_edge = false
               visited = false
               output = false })
+        |> Seq.toArray
            
     let GetRuleHeadPattern (triple : RuleHead)  =
             match triple with
@@ -133,7 +134,7 @@ module internal Stratifier =
         The main difference is that the rules, and not the relations are ordered. 
         This was inspired by a sentence in "Maintenance of datalog materialisations revisited" by Motik, Nenov, Piro and Horrocks
      *)
-    type internal RulePartitioner (logger: ILogger, rules: Rule array, resources: DagSemTools.Rdf.GraphElementManager) =
+    type internal RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
         
         let ruleMap  = rules |> Seq.mapi (fun i r -> r, (uint i)) |> Map.ofSeq
         
@@ -160,7 +161,7 @@ module internal Stratifier =
                 | None -> None
                 | Some headPattern -> Some (rule, headPattern))
             |> Seq.iter (fun (rule, headPattern) ->
-                Unification.DependingRules rules headPattern
+                DependingRules rules headPattern
                 |> Seq.iter (updateRuleOrdering _ordered rule))
             _ordered
         
@@ -191,7 +192,7 @@ module internal Stratifier =
                 
         
         (* Called when the topological sorting cannot proceed, hence assuming the existence of a cycle *)
-        member internal this.cycle_finder (visited : uint seq) (current : uint) : uint seq seq =
+        member internal this.cycle_finder (visited : uint seq) current : uint seq seq =
             let current_element = orderedRules.[int current]
             if (visited |> Seq.contains current) then
                 visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.distinct |> Seq.singleton
@@ -221,7 +222,8 @@ module internal Stratifier =
                 ready_elements_queue.Enqueue(next_elements_queue.Dequeue())
             
             
-        (* Updates a successor of a relation, and if the relation is ready to be output, it is added to the queue *)
+        (* Called on all successors of a rule that is being output.
+          Updates the successor rules, and if the relation is ready to be output, it is added to the queue *)
         member this.update_successor (removedRuleId : uint) (successor : PatternEdge) =
             let successorRuleId = 
                 match successor with
@@ -249,47 +251,52 @@ module internal Stratifier =
             After this is run, the remaining elements in "ordered" contain at least one cycle, and all elements are either in
             a cycle or depend on an element in a cycle *)
         member this.get_rule_partition() : Rule seq  =
-            let mutable ordered_rules = Seq.empty
+            let mutable outputPartition = Seq.empty
             while ready_elements_queue.Count > 0 do
-                let ruleId = ready_elements_queue.Dequeue()
-                let rule = rules.[int ruleId]    
-                orderedRules.[int ruleId].Successors |> Seq.iter (this.update_successor ruleId)
+                let ruleToOutputId = ready_elements_queue.Dequeue()
+                let ruleToOutput = rules.[int ruleToOutputId]    
+                orderedRules.[int ruleToOutputId].Successors |> Seq.iter (this.update_successor ruleToOutputId)
                 // if ordered_relations.[relation_id].intensional then
-                ordered_rules <- seq { rule; yield! ordered_rules }
+                outputPartition <- seq { ruleToOutput; yield! outputPartition }
                 //orderedRules.[int ruleId].intensional <- false
-            Seq.distinct ordered_rules
+            Seq.distinct outputPartition
         
         (* Checks whether a rule is completely covered by a cycle (given the already output relations, which are treated as extensional/edb
-            In other words, whether all elements of the body are in the cycle, or are extensional*)
-        member this.RuleIsCoveredByCycle cycle rule =
-                rule.Body |> Seq.forall (fun atom ->
-                                            let atomRelation = atom|> GetRuleAtomPattern 
-                                            orderedRules.[int triplePatternMap.[atomRelation]].intensional = false
-                                             (cycle |> Seq.exists (triplePatternsUnifiable atomRelation))
-                                        )
+            In other words, whether none of the remaining rules not output or not in a cycle can affect the rule body
+        *)
+        member this.RuleIsCoveredByCycle (cycle : uint seq) rule =
+                let remainingRules =
+                    orderedRules
+                    |> Array.filter (fun rule ->
+                        (not rule.output)
+                        && (Seq.contains (ruleMap.[rule.Relation]) cycle))
+                    |> Array.map (fun rule -> rule.Relation)
+                rule.Body
+                |> Seq.forall (fun atom ->
+                    let atomRelation = atom|> GetRuleAtomPattern 
+                    IntentionalRules remainingRules atomRelation
+                    |> Seq.isEmpty
+                )
         (* 
             Only called when topological sorting stops, so there is a cycle
             Finds one cycle, if that contains a negative edge, reports error, otherwise,
             checks whether the first relation in the cycle is ready to be output, and if so, outputs it
             An example of where it is not ready, is if it depends on another cycle, which needs to be output first. 
-            
+            TODO: Checking for negative edge in cycle is gone
             The proof that these cycles / strongly connected components always exist is in the Alice book
          *)
         member this.handle_cycle()  =
             let cycles = (orderedRules
-                  |> Array.filter (fun relation -> relation.num_predecessors > 0u
-                                                    && relation.output = false)
-                  |> Array.map (fun relation -> triplePatternMap.[relation.Relation])
+                  |> Array.filter (fun rule -> rule.num_predecessors > 0u
+                                                    && rule.output = false)
+                  |> Array.map (fun rule -> ruleMap.[rule.Relation])
                   |> Seq.collect (this.cycle_finder [])
                   |> Seq.filter (fun cycle ->
-                            let cycle_element = cycle |> Seq.head
-                            let rules = rules
-                                        |> List.filter (fun rule ->
-                                            (rule.Head |> GetRuleHeadPattern) = Some triplePatterns.[int cycle_element]
-                                            )
-                            rules |> List.forall (this.RuleIsCoveredByCycle (cycle |> Seq.map (fun id -> triplePatterns.[int id])))
-                            )
-                            
+                            cycle
+                            |> Seq.map (fun ruleIndex ->
+                                rules.[int ruleIndex] )
+                            |> Seq.forall (this.RuleIsCoveredByCycle cycle)
+                            )         
                   )
             cycles |> Seq.iter (fun cycle ->
                   cycle |> Seq.distinct |>(Seq.iter (fun rel ->

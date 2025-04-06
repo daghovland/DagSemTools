@@ -29,7 +29,7 @@ module TermsUnifiableTests =
         let variableMap = Map.empty
 
         // Act
-        let result = Stratifier.TermsUnifiable term1 term2 (constantMap, variableMap)
+        let result = Unification.TermsUnifiable term1 term2 (constantMap, variableMap)
 
         // Assert
         match result with
@@ -48,7 +48,7 @@ module TermsUnifiableTests =
         let variableMap = Map.empty
 
         // Act
-        let result = Stratifier.TermsUnifiable term1 term2 (constantMap, variableMap)
+        let result = Unification.TermsUnifiable term1 term2 (constantMap, variableMap)
 
         // Assert
         match result with
@@ -66,7 +66,7 @@ module TermsUnifiableTests =
         let variableMap = Map.empty
 
         // Act
-        let result = Stratifier.TermsUnifiable term1 term2 (constantMap, variableMap)
+        let result = Unification.TermsUnifiable term1 term2 (constantMap, variableMap)
 
         // Assert
         Assert.True(result.IsSome, "Terms should be unifiable, but are not")
@@ -82,7 +82,7 @@ module TermsUnifiableTests =
         let variableMap = Map.empty
 
         // Act
-        let result = Stratifier.TermsUnifiable term1 term2 (constantMap, variableMap)
+        let result = Unification.TermsUnifiable term1 term2 (constantMap, variableMap)
 
         // Assert
         Assert.True(result.IsNone, "Terms should not be unifiable, but are")
@@ -98,7 +98,7 @@ module TermsUnifiableTests =
         let variableMap = Map.empty
 
         // Act
-        let result = Stratifier.TermsUnifiable term1 term2 (constantMap, variableMap)
+        let result = Unification.TermsUnifiable term1 term2 (constantMap, variableMap)
 
         // Assert
         match result with
@@ -120,7 +120,7 @@ module TriplePatternsUnifiableTests =
         let triple2 = { TriplePattern.Subject = subject; Predicate = predicate; Object = obj }
 
         // Act
-        let result = Stratifier.triplePatternsUnifiable triple1 triple2
+        let result = Unification.triplePatternsUnifiable triple1 triple2
 
         // Assert
         Assert.True(result, "Triple patterns should be unifiable but are not")
@@ -139,7 +139,7 @@ module TriplePatternsUnifiableTests =
             Object = Term.Resource((3u)) }
 
         // Act
-        let result = Stratifier.triplePatternsUnifiable triple1 triple2
+        let result = Unification.triplePatternsUnifiable triple1 triple2
 
         // Assert
         Assert.False(result, "Triple patterns should not be unifiable due to different subjects")
@@ -158,7 +158,7 @@ module TriplePatternsUnifiableTests =
             Object = Term.Resource((3u)) }
 
         // Act
-        let result = Stratifier.triplePatternsUnifiable triple1 triple2
+        let result = Unification.triplePatternsUnifiable triple1 triple2
 
         // Assert
         Assert.False(result, "Triple patterns should not be unifiable due to different predicates")
@@ -177,7 +177,7 @@ module TriplePatternsUnifiableTests =
             Object = Term.Resource((99u)) } // Different object
 
         // Act
-        let result = Stratifier.triplePatternsUnifiable triple1 triple2
+        let result = Unification.triplePatternsUnifiable triple1 triple2
 
         // Assert
         Assert.False(result, "Triple patterns should not be unifiable due to different objects")
@@ -196,7 +196,7 @@ module TriplePatternsUnifiableTests =
             Object = Term.Resource((3u)) } // Matching resource for object variable
 
         // Act
-        let result = Stratifier.triplePatternsUnifiable triple1 triple2
+        let result = Unification.triplePatternsUnifiable triple1 triple2
 
         // Assert
         Assert.True(result, "Triple patterns with variable and resource should be unifiable")
