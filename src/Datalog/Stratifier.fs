@@ -204,9 +204,9 @@ module internal Stratifier =
                                                     (fun edge ->
                                                         match edge with
                                                         | PositivePatternEdge relation_id -> 
-                                                            this.find_cycle visited current relation_id false
+                                                            this.find_cycle (Seq.append visited [current]) current relation_id false
                                                         | NegativePatternEdge relation_id ->
-                                                            this.find_cycle visited current relation_id true
+                                                            this.find_cycle (Seq.append visited [current]) current relation_id true
                                                     )
            
         member internal this.GetReadyElementsQueue() = ready_elements_queue    
@@ -214,7 +214,7 @@ module internal Stratifier =
             
         (* Between iterations, the switch about using negative edge must be reset,
             and all elements marked for next stratifications must be moved into the queue for the current stratification *)    
-        member this.reset_stratification =
+        member internal this.reset_stratification =
             for i in 0 .. (Array.length orderedRules - 1) do
                 orderedRules.[i].uses_intensional_negative_edge <- false
                 orderedRules.[i].visited <- false
@@ -224,7 +224,7 @@ module internal Stratifier =
             
         (* Called on all successors of a rule that is being output.
           Updates the successor rules, and if the relation is ready to be output, it is added to the queue *)
-        member this.update_successor (removedRuleId : uint) (successor : PatternEdge) =
+        member internal this.update_successor (removedRuleId : uint) (successor : PatternEdge) =
             let successorRuleId = 
                 match successor with
                 | PositivePatternEdge rule ->
@@ -250,7 +250,7 @@ module internal Stratifier =
         (* Gets all rules that are not part of a cycle. This will become a partition of the stratification
             After this is run, the remaining elements in "ordered" contain at least one cycle, and all elements are either in
             a cycle or depend on an element in a cycle *)
-        member this.get_rule_partition() : Rule seq  =
+        member internal this.get_rule_partition() : Rule seq  =
             let mutable outputPartition = Seq.empty
             while ready_elements_queue.Count > 0 do
                 let ruleToOutputId = ready_elements_queue.Dequeue()
@@ -264,12 +264,12 @@ module internal Stratifier =
         (* Checks whether a rule is completely covered by a cycle (given the already output relations, which are treated as extensional/edb
             In other words, whether none of the remaining rules not output or not in a cycle can affect the rule body
         *)
-        member this.RuleIsCoveredByCycle (cycle : uint seq) rule =
+        member internal this.RuleIsCoveredByCycle (cycle : uint seq) rule =
                 let remainingRules =
                     orderedRules
                     |> Array.filter (fun rule ->
                         (not rule.output)
-                        && (Seq.contains (ruleMap.[rule.Relation]) cycle))
+                        && (not (Seq.contains (ruleMap.[rule.Relation]) cycle)))
                     |> Array.map (fun rule -> rule.Relation)
                 rule.Body
                 |> Seq.forall (fun atom ->
@@ -285,20 +285,24 @@ module internal Stratifier =
             TODO: Checking for negative edge in cycle is gone
             The proof that these cycles / strongly connected components always exist is in the Alice book
          *)
-        member this.handle_cycle()  =
-            let cycles = (orderedRules
+        member internal this.handle_cycle()  =
+              let predecessorsNotOutput =
+                  orderedRules
                   |> Array.filter (fun rule -> rule.num_predecessors > 0u
                                                     && rule.output = false)
+              
                   |> Array.map (fun rule -> ruleMap.[rule.Relation])
-                  |> Seq.collect (this.cycle_finder [])
+              let foundCycles = predecessorsNotOutput |> Seq.collect (this.cycle_finder [])
+              let coveredCycles =
+                  foundCycles
                   |> Seq.filter (fun cycle ->
-                            cycle
-                            |> Seq.map (fun ruleIndex ->
-                                rules.[int ruleIndex] )
-                            |> Seq.forall (this.RuleIsCoveredByCycle cycle)
-                            )         
-                  )
-            cycles |> Seq.iter (fun cycle ->
+                      cycle
+                        |> Seq.map (fun ruleIndex ->
+                            rules.[int ruleIndex] )
+                        |> Seq.forall (this.RuleIsCoveredByCycle cycle)
+                )         
+              let cycles = coveredCycles
+              cycles |> Seq.iter (fun cycle ->
                   cycle |> Seq.distinct |>(Seq.iter (fun rel ->
                       if not orderedRules.[int rel].output then 
                         orderedRules.[int rel].output <- true
@@ -309,14 +313,14 @@ module internal Stratifier =
         (*  Catches some errors in stratification, to avoid a wrong stratification being returned
             TODO: Remove when stratification is stable and tests cover all corners
         *)
-        member this.is_stratified (stratification: Rule seq seq) =
+        member internal this.is_stratified (stratification: Rule seq seq) =
             ready_elements_queue.Count = 0
             && next_elements_queue.Count = 0
             // && (stratification |> Seq.sumBy Seq.length) >= rules.Length
             // && ordered_relations |> Array.forall (fun relation -> relation.intensional = false)
 
         (* Used in the while loop in orderRules to test whether stratification is finished *)
-        member this.topological_sort_finished() =
+        member internal this.topological_sort_finished() =
             orderedRules |> Array.forall (fun relation -> relation.output || relation.num_predecessors = 0u)
                 
         (* Order the rules topologically based on dependency. Used for stratification
