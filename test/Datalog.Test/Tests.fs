@@ -773,7 +773,6 @@ module Tests =
     [<Fact>]
     let rec ``Stratifier outputs first partition`` () =
             let tripleTable = Rdf.Datastore(60u)
-            let subjectIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/subject"))
             let predIndexA = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicateA"))
             let predIndexB = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicateB"))
             let predIndexC = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicateC"))
