@@ -83,8 +83,8 @@ public class TestConceptParser
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
             ClassExpression.NewObjectIntersectionOf(
-                ListModule.OfSeq([ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex1"))),
-            ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex2")))])
+                ListModule.OfSeq([ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                    ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])
                 ));
     }
 
@@ -96,8 +96,8 @@ public class TestConceptParser
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
             ClassExpression.NewObjectIntersectionOf(
-                ListModule.OfSeq([ ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex1"))),
-                ClassExpression.NewClassName(Iri.NewFullIri( new IriReference("http://example.com/ex2")))])
+                ListModule.OfSeq([ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                    ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])
             ));
     }
     [Fact]
@@ -107,8 +107,8 @@ public class TestConceptParser
         var parsedIri = TestString(conceptString, _testOutputTextWriter);
         parsedIri.Should().BeEquivalentTo(
             ClassExpression.NewObjectUnionOf(
-                ListModule.OfSeq([ ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
-                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])
+                ListModule.OfSeq([ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
+                    ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])
             ));
     }
 
@@ -208,7 +208,7 @@ public class TestConceptParser
                                             Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
                                         ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))
                                     ]))),
-                                ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))
+                            ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))
                         ])));
     }
 
@@ -223,8 +223,8 @@ public class TestConceptParser
                 ClassExpression.NewObjectIntersectionOf(
                   ListModule.OfSeq([
                     ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex1"))),
-                    ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])),
-                 ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))])));
+                      ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex2")))])),
+                  ClassExpression.NewClassName(Iri.NewFullIri(new IriReference("http://example.com/ex3")))])));
     }
     [Fact]
     public void TestNamedConcept()

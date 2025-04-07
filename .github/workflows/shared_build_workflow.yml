@@ -11,6 +11,7 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    timeout-minutes: 10
 
     steps:
       - name: Checkout code
@@ -74,6 +75,7 @@ jobs:
           done
 
       - name: Build and run test projects
+        timeout-minutes: 5
         run: |
           for project in test/*; do
               echo "Building test project: $project"
@@ -83,6 +85,7 @@ jobs:
 
           
       - name: Run nuget package tests
+        timeout-minutes: 5
         run: dotnet test /p:Version=${{ inputs.version }} test/NugetTest/NugetTest.sln
         
       - name: Upload NuGet packages

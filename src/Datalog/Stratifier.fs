@@ -168,7 +168,7 @@ module internal Stratifier =
         (* The queue contains all relations that are not dependent on any relations (that have not already been output) *)
         let mutable ready_elements_queue =
             Queue<uint>(orderedRules
-                    |> Array.filter (fun concept -> concept.num_predecessors = 0u)
+                    |> Array.filter (fun rule -> rule.num_predecessors = 0u)
                     |> Array.map (fun concept -> ruleMap.[concept.Relation]))
             
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
@@ -210,7 +210,7 @@ module internal Stratifier =
                                                     )
            
         member internal this.GetReadyElementsQueue() = ready_elements_queue    
-        member internal this.GetOrderedTriplePatterns() = orderedRules
+        member internal this.GetOrderedRules() = orderedRules
             
         (* Between iterations, the switch about using negative edge must be reset,
             and all elements marked for next stratifications must be moved into the queue for the current stratification *)    

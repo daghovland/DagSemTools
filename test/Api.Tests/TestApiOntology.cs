@@ -142,10 +142,10 @@ public class TestApiOntology(ITestOutputHelper output)
         var aboxFileInfo = new FileInfo("TestData/imf-data.ttl");
         var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, outputWriter);
         var ont = OwlOntology.Create(rdfImf);
-        
+
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
-        
+
         // Assert
         axiomRules.Should().NotBeEmpty();
         var descriptorIri = RdfResource.NewIri(new IriReference("http://ns.imfid.org/imf#Descriptor"));
@@ -160,7 +160,7 @@ public class TestApiOntology(ITestOutputHelper output)
         var descriptorRuleString = String.Join("\n", DescriptorRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources)).ToList());
         rdfImf.LoadDatalog(DescriptorRules);
         axiomRules.Should().NotBeEmpty();
-        var ruleStringList =  axiomRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources));
+        var ruleStringList = axiomRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources));
         var ruleString = String.Join("\n", ruleStringList.Concat());
         outputWriter.WriteLine(ruleString);
         rdfImf.LoadDatalog(axiomRules);

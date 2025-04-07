@@ -9,7 +9,7 @@ rule :
     ;
 
 head : positiveRuleAtom 
-    | "FALSE";
+    | 'false';
 
 body : ruleAtom (COMMA ruleAtom)* ;
 
