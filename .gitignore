@@ -87,3 +87,4 @@ test/*/obj/
 test/Api.Tests/TestData/imf.ttl
 test/Api.Tests/TestData/go.ttl
 test/Api.Tests/TestData/go.owl.xml
+DagSemTools.sln.DotSettings.user
