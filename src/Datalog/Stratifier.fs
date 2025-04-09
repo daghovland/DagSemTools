@@ -10,6 +10,7 @@
 namespace DagSemTools.Datalog
 
 open System.Collections.Generic
+open System.Collections.Immutable
 open DagSemTools.Rdf.Ingress
 open Serilog
 open DagSemTools.Datalog.Unification
@@ -165,15 +166,20 @@ module internal Stratifier =
                 |> Seq.iter (updateRuleOrdering _ordered rule))
             _ordered
         
+        let GetInitialPartition =
+            orderedRules
+                    |> Seq.filter (fun rule -> rule.num_predecessors < 1u)
+            //        |> Array.map (fun concept -> ruleMap.[concept.Relation])
+                   
+        
         (* The queue contains all relations that are not dependent on any relations (that have not already been output) *)
         let mutable ready_elements_queue =
-            Queue<uint>(orderedRules
-                    |> Array.filter (fun rule -> rule.num_predecessors = 0u)
-                    |> Array.map (fun concept -> ruleMap.[concept.Relation]))
+            
+            Array.fold (fun (queue : ImmutableQueue<OrderedRule>) element -> queue.Enqueue element) ImmutableQueue<OrderedRule>.Empty  orderedRules
             
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
-        let mutable next_elements_queue = Queue<uint>()
-        let mutable n_unordered = Array.length orderedRules - ready_elements_queue.Count
+        let mutable next_elements_queue = ImmutableQueue<OrderedRule>.Empty
+        //let mutable n_unordered = Array.length orderedRules - ready_elements_queue.
         
         member internal this.printCycle cycle =
             cycle
@@ -218,8 +224,10 @@ module internal Stratifier =
             for i in 0 .. (Array.length orderedRules - 1) do
                 orderedRules.[i].uses_intensional_negative_edge <- false
                 orderedRules.[i].visited <- false
-            while next_elements_queue.Count > 0 do
-                ready_elements_queue.Enqueue(next_elements_queue.Dequeue())
+            while not next_elements_queue.IsEmpty do
+                let mutable next_element  = 0
+                next_elements_queue <- next_elements_queue.Dequeue(&next_element)
+                ready_elements_queue<- ready_elements_queue.Enqueue(next_element)
             
             
         (* Called on all successors of a rule that is being output.
@@ -242,9 +250,9 @@ module internal Stratifier =
                 if orderedRules.[int successorRuleId].num_predecessors = 0u && not orderedRules.[int successorRuleId].output then
                     orderedRules.[int successorRuleId].output <- true
                     if orderedRules.[int successorRuleId].uses_intensional_negative_edge then
-                        next_elements_queue.Enqueue(successorRuleId)
+                        next_elements_queue = next_elements_queue.Enqueue(orderedRules[int successorRuleId])
                     else
-                        ready_elements_queue.Enqueue(successorRuleId)
+                        ready_elements_queue = ready_elements_queue.Enqueue(orderedRules[int successorRuleId])
                 
             
         (* Gets all rules that are not part of a cycle. This will become a partition of the stratification
@@ -253,11 +261,11 @@ module internal Stratifier =
         member internal this.get_rule_partition() : Rule seq  =
             let mutable outputPartition = Seq.empty
             while ready_elements_queue.Count > 0 do
-                let ruleToOutputId = ready_elements_queue.Dequeue()
-                let ruleToOutput = rules.[int ruleToOutputId]    
+                let ruleToOutput = ready_elements_queue.Dequeue()
+                let ruleToOutputId = ruleMap.[ruleToOutput.Relation]    
                 orderedRules.[int ruleToOutputId].Successors |> Seq.iter (this.update_successor ruleToOutputId)
                 // if ordered_relations.[relation_id].intensional then
-                outputPartition <- seq { ruleToOutput; yield! outputPartition }
+                outputPartition <- seq { ruleToOutput.Relation ; yield! outputPartition }
                 //orderedRules.[int ruleId].intensional <- false
             Seq.distinct outputPartition
         
@@ -306,7 +314,7 @@ module internal Stratifier =
                   cycle |> Seq.distinct |>(Seq.iter (fun rel ->
                       if not orderedRules.[int rel].output then 
                         orderedRules.[int rel].output <- true
-                        ready_elements_queue.Enqueue rel)
+                        ready_elements_queue.Enqueue orderedRules.[int rel])
                   ))
                 
             
