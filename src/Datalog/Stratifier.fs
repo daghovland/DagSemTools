@@ -339,7 +339,7 @@ module internal Stratifier =
             let mutable stratification = []
             if ready_elements_queue.IsEmpty then
                     this.handle_cycle()
-            while ready_elements_queue.IsEmpty do
+            while not ready_elements_queue.IsEmpty do
                 stratification <- stratification @ [this.get_rule_partition()]
                 this.reset_stratification
                 if ready_elements_queue.IsEmpty  && (not (this.topological_sort_finished ()))  then
