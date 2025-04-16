@@ -225,9 +225,10 @@ module internal Stratifier =
                 orderedRules.[i].uses_intensional_negative_edge <- false
                 orderedRules.[i].visited <- false
             while not next_elements_queue.IsEmpty do
-                let mutable next_element  = 0
-                next_elements_queue <- next_elements_queue.Dequeue(&next_element)
-                ready_elements_queue<- ready_elements_queue.Enqueue(next_element)
+                let mutable next_element = 0
+                let (next_elements_queue_new, next_element_val) = next_elements_queue.Dequeue()
+                next_elements_queue <- next_elements_queue_new
+                ready_elements_queue <- ready_elements_queue.Enqueue(next_element_val)
             
             
         (* Called on all successors of a rule that is being output.
@@ -250,9 +251,9 @@ module internal Stratifier =
                 if orderedRules.[int successorRuleId].num_predecessors = 0u && not orderedRules.[int successorRuleId].output then
                     orderedRules.[int successorRuleId].output <- true
                     if orderedRules.[int successorRuleId].uses_intensional_negative_edge then
-                        next_elements_queue = next_elements_queue.Enqueue(orderedRules[int successorRuleId])
+                        next_elements_queue <- next_elements_queue.Enqueue(orderedRules[int successorRuleId])
                     else
-                        ready_elements_queue = ready_elements_queue.Enqueue(orderedRules[int successorRuleId])
+                        ready_elements_queue <- ready_elements_queue.Enqueue(orderedRules[int successorRuleId])
                 
             
         (* Gets all rules that are not part of a cycle. This will become a partition of the stratification
@@ -260,8 +261,9 @@ module internal Stratifier =
             a cycle or depend on an element in a cycle *)
         member internal this.get_rule_partition() : Rule seq  =
             let mutable outputPartition = Seq.empty
-            while ready_elements_queue.Count > 0 do
-                let ruleToOutput = ready_elements_queue.Dequeue()
+            while not ready_elements_queue.IsEmpty do
+                let (ready_elements_queue_new, ruleToOutput) = ready_elements_queue.Dequeue()
+                ready_elements_queue <- ready_elements_queue_new
                 let ruleToOutputId = ruleMap.[ruleToOutput.Relation]    
                 orderedRules.[int ruleToOutputId].Successors |> Seq.iter (this.update_successor ruleToOutputId)
                 // if ordered_relations.[relation_id].intensional then
@@ -314,7 +316,7 @@ module internal Stratifier =
                   cycle |> Seq.distinct |>(Seq.iter (fun rel ->
                       if not orderedRules.[int rel].output then 
                         orderedRules.[int rel].output <- true
-                        ready_elements_queue.Enqueue orderedRules.[int rel])
+                        ready_elements_queue <- ready_elements_queue.Enqueue orderedRules.[int rel])
                   ))
                 
             
@@ -322,8 +324,8 @@ module internal Stratifier =
             TODO: Remove when stratification is stable and tests cover all corners
         *)
         member internal this.is_stratified (stratification: Rule seq seq) =
-            ready_elements_queue.Count = 0
-            && next_elements_queue.Count = 0
+            ready_elements_queue.IsEmpty
+            && next_elements_queue.IsEmpty
             // && (stratification |> Seq.sumBy Seq.length) >= rules.Length
             // && ordered_relations |> Array.forall (fun relation -> relation.intensional = false)
 
@@ -335,12 +337,12 @@ module internal Stratifier =
             Each Rule seq in the outermost seq is a partition, and these partitions must be handled sequentially during materialization *)
         member this.orderRules  :  Rule seq seq =
             let mutable stratification = []
-            if ready_elements_queue.Count = 0 then
+            if ready_elements_queue.IsEmpty then
                     this.handle_cycle()
-            while ready_elements_queue.Count > 0 do
+            while ready_elements_queue.IsEmpty do
                 stratification <- stratification @ [this.get_rule_partition()]
                 this.reset_stratification
-                if ready_elements_queue.Count = 0  && (not (this.topological_sort_finished ()))  then
+                if ready_elements_queue.IsEmpty  && (not (this.topological_sort_finished ()))  then
                     this.handle_cycle()
                     
             if not (this.is_stratified stratification) then
