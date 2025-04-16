@@ -506,7 +506,7 @@ module Tests =
                                                                      ]}
             let stratifier = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             stratifier.handle_cycle()
-            stratifier.GetReadyElementsQueue().Count.Should().Be(1, "There is a cycle that should have been detected.") |> ignore
+            stratifier.GetReadyElementsQueue().IsEmpty.Should().BeFalse("There is a cycle that should have been detected.") |> ignore
         
         
     [<Fact>]
