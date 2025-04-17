@@ -259,14 +259,14 @@ module internal Stratifier =
             After this is run, the remaining elements in "ordered" contain at least one cycle, and all elements are either in
             a cycle or depend on an element in a cycle *)
         member internal this.get_rule_partition()   =
-            let mutable outputPartition = Seq.empty
+            let mutable outputPartition = List.empty
             while not ready_elements_queue.IsEmpty do
                 let (ready_elements_queue_new, ruleToOutput) = ready_elements_queue.Dequeue()
                 ready_elements_queue <- ready_elements_queue_new
                 let ruleToOutputId = ruleMap.[ruleToOutput.Relation]    
                 orderedRules.[int ruleToOutputId].Successors |> Seq.iter (this.update_successor ruleToOutputId)
                 // if ordered_relations.[relation_id].intensional then
-                outputPartition <- seq { ruleToOutput.Relation ; yield! outputPartition }
+                outputPartition <- [ ruleToOutput.Relation ] @  outputPartition 
                 //orderedRules.[int ruleId].intensional <- false
             (outputPartition |> Seq.toList)
         

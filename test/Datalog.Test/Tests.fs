@@ -591,9 +591,9 @@ module Tests =
             }
             let partitioner  = DagSemTools.Datalog.Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRules()
-            ordered_relations.Should().HaveLength(3) |> ignore
+            ordered_relations.Should().HaveLength(1) |> ignore
             let init_queue = partitioner.GetReadyElementsQueue()
-            init_queue.Should().HaveLength(2) |> ignore
+            init_queue.Should().HaveLength(1) |> ignore
             let first_partition = partitioner.get_rule_partition()
             first_partition.Should().Contain(rule).And.HaveLength(1) |> ignore
             
@@ -712,6 +712,7 @@ module Tests =
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             (fun () -> partitioner.orderRules()).Should().Throw<Exception,_>() |> ignore
               
+    (* [?s, p, o3] :- [?s, p, o], not [?s, p, o3] . *)
     [<Fact>]
     let ``Non-semipositive programs are rejected`` () =
             let tripleTable = Rdf.Datastore(60u)
@@ -751,9 +752,9 @@ module Tests =
             }
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRules()
-            ordered_relations.Should().HaveLength(2) |> ignore
+            ordered_relations.Should().HaveLength(1) |> ignore
             let init_queue = partitioner.GetReadyElementsQueue()
-            init_queue.Should().HaveLength(1) |> ignore
+            init_queue.Should().HaveLength(0) |> ignore
             let first_partition = partitioner.get_rule_partition()
             first_partition.Should().HaveLength(0) |> ignore
             
