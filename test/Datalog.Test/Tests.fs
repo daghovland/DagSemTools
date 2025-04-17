@@ -679,13 +679,13 @@ module Tests =
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ] }
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
-            let orderedRules = partitioner.orderRules
+            let orderedRules = partitioner.orderRules()
             orderedRules.Should().HaveLength(1) |> ignore
             let firstPartition = orderedRules |> Seq.head
             firstPartition.Should().Contain(rule) |> ignore
             
     
-    (* Tests the simplest cyclic program
+    (* Tests the simplest program with a negative cycle
         [?s,:A,:o] :- not [?s,:A,:o] .
     *)        
     [<Fact>]
@@ -710,7 +710,7 @@ module Tests =
                                                        ]
             }
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
-            (fun () -> partitioner.orderRules).Should().Throw<Exception,_>() |> ignore
+            (fun () -> partitioner.orderRules()).Should().Throw<Exception,_>() |> ignore
               
     [<Fact>]
     let ``Non-semipositive programs are rejected`` () =

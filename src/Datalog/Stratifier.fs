@@ -186,7 +186,7 @@ module internal Stratifier =
             |> Seq.map (fun n -> $"Cycle element: {resources.GetGraphElement n}")
             |> String.concat ", "
             
-        member internal this.find_cycle (visited : uint seq) (current : uint) (relation : Rule) (is_negative : bool) : uint seq seq =
+        member internal this.find_cycle visited current relation is_negative =
                 let relation_id = ruleMap.[relation]
                 let cycleFinder = this.cycle_finder (Seq.append visited [current]) relation_id
                 if is_negative && (cycleFinder |> Seq.isEmpty |> not) then
@@ -198,7 +198,7 @@ module internal Stratifier =
                 
         
         (* Called when the topological sorting cannot proceed, hence assuming the existence of a cycle *)
-        member internal this.cycle_finder (visited : uint seq) current : uint seq seq =
+        member internal this.cycle_finder visited current  =
             let current_element = orderedRules.[int current]
             if (visited |> Seq.contains current) then
                 visited |> Seq.skipWhile (fun id -> id <> current) |> Seq.distinct |> Seq.singleton
@@ -220,7 +220,7 @@ module internal Stratifier =
             
         (* Between iterations, the switch about using negative edge must be reset,
             and all elements marked for next stratifications must be moved into the queue for the current stratification *)    
-        member internal this.reset_stratification =
+        member internal this.reset_stratification () =
             for i in 0 .. (Array.length orderedRules - 1) do
                 orderedRules.[i].uses_intensional_negative_edge <- false
                 orderedRules.[i].visited <- false
@@ -335,13 +335,13 @@ module internal Stratifier =
                 
         (* Order the rules topologically based on dependency. Used for stratification
             Each Rule seq in the outermost seq is a partition, and these partitions must be handled sequentially during materialization *)
-        member this.orderRules  :  Rule seq seq =
+        member this.orderRules()  :  Rule seq seq =
             let mutable stratification = []
             if ready_elements_queue.IsEmpty then
                     this.handle_cycle()
             while not ready_elements_queue.IsEmpty do
                 stratification <- stratification @ [this.get_rule_partition()]
-                this.reset_stratification
+                this.reset_stratification()
                 if ready_elements_queue.IsEmpty  && (not (this.topological_sort_finished ()))  then
                     this.handle_cycle()
                     

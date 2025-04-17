@@ -73,7 +73,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
                            Body = [PositiveTriple (triplePattern "s2")]}
         let partitioner = DagSemTools.Datalog.Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
-        let stratification = partitioner.orderRules
+        let stratification = partitioner.orderRules()
         stratification.Should().HaveLength(1) |> ignore
 
     [<Fact>]
