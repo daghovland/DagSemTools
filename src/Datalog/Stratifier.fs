@@ -152,8 +152,7 @@ module internal Stratifier =
             _ordered.[int ruleNo].Successors <- edge :: _ordered.[int ruleNo].Successors
             _ordered.[int depRuleNo].num_predecessors <- _ordered.[int depRuleNo].num_predecessors + 1u
             
-        (* This is only run once on initialization to set up the data structure for topologial sorting of rules
-           Mainly this means, for each rule, set it to intentional if  *)
+        (* This is only run once on initialization to set up the data structure for topologial sorting of rules  *)
         let mutable orderedRules = 
             let _ordered = rules |> createOrderedRules
             rules
@@ -168,14 +167,14 @@ module internal Stratifier =
         
         let GetInitialPartition =
             orderedRules
-                    |> Seq.filter (fun rule -> rule.num_predecessors < 1u)
+                    |> Array.filter (fun rule -> rule.num_predecessors < 1u)
             //        |> Array.map (fun concept -> ruleMap.[concept.Relation])
                    
         
         (* The queue contains all relations that are not dependent on any relations (that have not already been output) *)
         let mutable ready_elements_queue =
             
-            Array.fold (fun (queue : ImmutableQueue<OrderedRule>) element -> queue.Enqueue element) ImmutableQueue<OrderedRule>.Empty  orderedRules
+            Array.fold (fun (queue : ImmutableQueue<OrderedRule>) element -> queue.Enqueue element) ImmutableQueue<OrderedRule>.Empty  GetInitialPartition
             
         (* The concepts that depended on a negation of a concept that is being output in the current stratification must wait till the next layer *)
         let mutable next_elements_queue = ImmutableQueue<OrderedRule>.Empty
@@ -259,7 +258,7 @@ module internal Stratifier =
         (* Gets all rules that are not part of a cycle. This will become a partition of the stratification
             After this is run, the remaining elements in "ordered" contain at least one cycle, and all elements are either in
             a cycle or depend on an element in a cycle *)
-        member internal this.get_rule_partition() : Rule seq  =
+        member internal this.get_rule_partition()   =
             let mutable outputPartition = Seq.empty
             while not ready_elements_queue.IsEmpty do
                 let (ready_elements_queue_new, ruleToOutput) = ready_elements_queue.Dequeue()
@@ -269,7 +268,7 @@ module internal Stratifier =
                 // if ordered_relations.[relation_id].intensional then
                 outputPartition <- seq { ruleToOutput.Relation ; yield! outputPartition }
                 //orderedRules.[int ruleId].intensional <- false
-            Seq.distinct outputPartition
+            (outputPartition |> Seq.toList)
         
         (* Checks whether a rule is completely covered by a cycle (given the already output relations, which are treated as extensional/edb
             In other words, whether none of the remaining rules not output or not in a cycle can affect the rule body
@@ -323,7 +322,7 @@ module internal Stratifier =
         (*  Catches some errors in stratification, to avoid a wrong stratification being returned
             TODO: Remove when stratification is stable and tests cover all corners
         *)
-        member internal this.is_stratified (stratification: Rule seq seq) =
+        member internal this.is_stratified (stratification) =
             ready_elements_queue.IsEmpty
             && next_elements_queue.IsEmpty
             // && (stratification |> Seq.sumBy Seq.length) >= rules.Length
@@ -340,12 +339,12 @@ module internal Stratifier =
             if ready_elements_queue.IsEmpty then
                     this.handle_cycle()
             while not ready_elements_queue.IsEmpty do
-                stratification <- stratification @ [this.get_rule_partition()]
+                stratification <- stratification @ [this.get_rule_partition() |> List.toSeq]
                 this.reset_stratification()
                 if ready_elements_queue.IsEmpty  && (not (this.topological_sort_finished ()))  then
                     this.handle_cycle()
                     
             if not (this.is_stratified stratification) then
                  failwith "Datalog program preprocessing created wrong stratification! This is a bug, please report"
-            stratification
+            stratification |> List.toSeq
             

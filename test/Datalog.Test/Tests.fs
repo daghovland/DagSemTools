@@ -766,7 +766,7 @@ module Tests =
             :A predecessors 2, successors A
             :B predecessors 1, successors A
             :C predecessors 0, successors B
-            First stratification should only include UnaryPredicate :C, :o2
+            First stratification should include one rule, [?s,:B,:o] :- not [?s,:C,:o2]
             
             ?s 1u 4u
      *)
