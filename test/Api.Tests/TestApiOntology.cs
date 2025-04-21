@@ -1,6 +1,7 @@
 using System.ComponentModel;
 using DagSemTools.Datalog;
 using DagSemTools.Ingress;
+using DagSemTools.Rdf;
 using FluentAssertions;
 using IriTools;
 using Microsoft.FSharp.Collections;
@@ -13,7 +14,7 @@ using DagSemTools.Api;
 
 public class TestApiOntology(ITestOutputHelper output)
 {
-    TestUtils.TestOutputTextWriter outputWriter = new TestUtils.TestOutputTextWriter(output);
+    TestUtils.TestOutputTextWriter _outputWriter = new TestUtils.TestOutputTextWriter(output);
 
     private static InMemorySink _inMemorySink = new InMemorySink();
 
@@ -27,7 +28,7 @@ public class TestApiOntology(ITestOutputHelper output)
     public void LoadEmptyOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/empty.owl");
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
 
@@ -37,7 +38,7 @@ public class TestApiOntology(ITestOutputHelper output)
     public void LoadSubClassFromRestriction()
     {
         var ontologyFileInfo = new FileInfo("TestData/subclass_of_restriction.owl");
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
 
@@ -49,7 +50,7 @@ public class TestApiOntology(ITestOutputHelper output)
     {
         //Arrange 
         var ontologyFileInfo = new FileInfo("TestData/equality.owl");
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdf, _logger);
         ont.GetAxioms().Should().NotBeEmpty();
         var datalogProgram = ont.GetAxiomRules().ToList();
@@ -74,7 +75,7 @@ public class TestApiOntology(ITestOutputHelper output)
     public void LoadIntersection()
     {
         var ontologyFileInfo = new FileInfo("TestData/intersection.owl.ttl");
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().ToList().Should().NotBeEmpty();
 
@@ -95,7 +96,7 @@ public class TestApiOntology(ITestOutputHelper output)
     {
         // Arrange
         var ontologyFileInfo = new FileInfo(filename);
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdf);
         var axioms = ont.GetAxioms().ToList();
         axioms.Should().NotBeEmpty();
@@ -121,7 +122,7 @@ public class TestApiOntology(ITestOutputHelper output)
     {
         // Arrange
         var ontologyFileInfo = new FileInfo("TestData/cycle-imf-test.ttl");
-        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdfImf);
         ont.GetAxioms().Should().NotBeEmpty();
 
@@ -138,9 +139,9 @@ public class TestApiOntology(ITestOutputHelper output)
     {
         // Arrange
         var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
-        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var aboxFileInfo = new FileInfo("TestData/imf-data.ttl");
-        var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, outputWriter);
+        var imfData = DagSemTools.Api.TurtleParser.Parse(aboxFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdfImf);
 
         // Act
@@ -162,18 +163,36 @@ public class TestApiOntology(ITestOutputHelper output)
         axiomRules.Should().NotBeEmpty();
         var ruleStringList = axiomRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources));
         var ruleString = String.Join("\n", ruleStringList.Concat());
-        outputWriter.WriteLine(ruleString);
-        rdfImf.LoadDatalog(axiomRules);
+        _outputWriter.WriteLine(ruleString);
+        imfData.LoadDatalog(axiomRules);
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
     [Fact]
+    public void LoadGeneratedDatalogWorks()
+    {
+        // Arrange
+        var datalogString = File.ReadAllText("TestData/loop.datalog");
+        var datastore = new Datastore(1000);
+        var rules = DagSemTools.Datalog.Parser.Parser.ParseString(datalogString, _outputWriter, datastore);
+        var ruleList = ListModule.OfSeq(rules);
+        var stratifier = new Stratifier.RulePartitioner(_logger,  ruleList, datastore.Resources);
+        
+        // Act
+        var ordered = stratifier.orderRules();
+        
+        // Assert
+        ordered.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+    
+    [Fact]
     public void ParseImfOntologyWorks()
     {
         // Arrange
         var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
-        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
 
         // Act
         var ont = OwlOntology.Create(rdfImf);
@@ -191,7 +210,7 @@ public class TestApiOntology(ITestOutputHelper output)
     {
         // Arrange
         var ontologyFileInfo = new FileInfo("TestData/imf.ttl");
-        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdfImf);
 
         // Act 
@@ -207,7 +226,7 @@ public class TestApiOntology(ITestOutputHelper output)
     public void LoadIDOOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         var ont = OwlOntology.Create(rdf);
         ont.GetAxioms().Should().NotBeEmpty();
         var datalogProgram = ont.GetAxiomRules().ToList();
@@ -220,7 +239,7 @@ public class TestApiOntology(ITestOutputHelper output)
     public void ParseGeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");
-        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, outputWriter);
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         rdf.IsEmpty().Should().BeFalse();
         // var ont = OwlOntology.Create(rdf);
         // ont.GetAxioms().Should().NotBeEmpty();
