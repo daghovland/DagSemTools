@@ -86,7 +86,7 @@ public class Parser
 
         if (customErrorListener.HasError)
         {
-            throw new Exception("Syntax errors in Turtle file");
+            throw new Exception("Syntax errors in Datalog file");
         }
         return listener.DatalogProgram;
     }

@@ -189,7 +189,7 @@ module internal Stratifier =
                 let relation_id = ruleMap.[relation]
                 let cycleFinder = this.cycle_finder (Seq.append visited [current]) relation_id
                 if is_negative && (cycleFinder |> Seq.isEmpty |> not) then
-                    let cycleString = cycleFinder |> Seq.head |> this.printCycle
+                    let cycleString = cycleFinder |> Seq.head |>  this.printCycle
                     logger.Error($"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}")
                     failwith $"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}"
                 else

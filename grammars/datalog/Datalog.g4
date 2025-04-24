@@ -13,9 +13,11 @@ head : positiveRuleAtom
 
 body : ruleAtom (COMMA ruleAtom)* ;
 
-ruleAtom : 'NOT' positiveRuleAtom #NegativeRuleAtom
+ruleAtom : NOT positiveRuleAtom #NegativeRuleAtom
     | positiveRuleAtom #YesRuleAtom 
     ;
+
+NOT: 'NOT'|'not';
 
 positiveRuleAtom : tripleAtom | typeAtom  ;
 
