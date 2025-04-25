@@ -9,6 +9,7 @@
 
 namespace DagSemTools.Datalog
 
+open System
 open System.Collections.Generic
 open System.Collections.Immutable
 open DagSemTools.Rdf.Ingress
@@ -136,8 +137,10 @@ module internal Stratifier =
         This was inspired by a sentence in "Maintenance of datalog materialisations revisited" by Motik, Nenov, Piro and Horrocks
      *)
     type internal RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
-        
-        let ruleMap  = rules |> Seq.mapi (fun i r -> r, (uint i)) |> Map.ofSeq
+        let ruleMap=
+           rules
+           |> Seq.mapi (fun i r -> r, (uint i))
+           |> Map.ofSeq
         
         (* 
             This is the core of a topological sorting of the rules.

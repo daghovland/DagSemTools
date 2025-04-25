@@ -13,19 +13,42 @@ open DagSemTools.Rdf.Ingress
 open DagSemTools.Rdf
 
 
-[<StructuralComparison>]
-[<StructuralEquality>]
+[<CustomComparison>]
+[<CustomEquality>]
 type Term = 
     | Resource of GraphElementId
     | Variable of string
-    member this.ToString (manager : GraphElementManager) : string=
-                match this with
-                | Resource res -> (manager.GetGraphElement res).ToString()
-                | Variable vName -> $"?{vName}"
+    member this.ToString (manager : GraphElementManager) : string =
+        match this with
+        | Resource res -> (manager.GetGraphElement res).ToString()
+        | Variable vName -> $"?{vName}"
     member internal this.GetHashCodeForUnification : int =
         match this with
         | Resource res -> res.GetHashCode()
         | Variable vName -> 100
+        
+    interface System.IComparable with
+        member this.CompareTo(obj) =
+            match obj with
+            | null -> 1  // null is less than any value
+            | :? Term as other -> 
+                match this, other with
+                | Resource r1, Resource r2 -> compare r1 r2
+                | Variable v1, Variable v2 -> compare v1 v2
+                | Resource _, Variable _ -> -1  // Resources come before variables
+                | Variable _, Resource _ -> 1
+            | _ -> 1
+
+    override this.Equals(obj) =
+        match obj with
+        | null -> false
+        | :? Term as other -> (this :> System.IComparable).CompareTo(other) = 0
+        | _ -> false
+        
+    override this.GetHashCode() =
+        match this with
+        | Resource res -> hash res
+        | Variable v -> hash v
         
 [<StructuralComparison>]
 [<StructuralEquality>]
@@ -45,10 +68,10 @@ type TriplePattern =
         this.GeneralToString(fun (t : Term) ->t.ToString(manager))
     
 
-[<StructuralComparison>]
-[<StructuralEquality>]
+[<CustomComparison>]
+[<CustomEquality>]
 type RuleHead =
-    NormalHead of pattern: TriplePattern
+    | NormalHead of pattern: TriplePattern
     | Contradiction
     member this.GetVariables() =
         match this with
@@ -62,7 +85,29 @@ type RuleHead =
         match this with
         | NormalHead tp -> tp.ToString(manager)
         | Contradiction -> "false"
+    interface System.IComparable with
+        member this.CompareTo(obj) =
+            match obj with
+            | :? RuleHead as other ->
+                match this, other with
+                | Contradiction, Contradiction -> 0
+                | Contradiction, _ -> -1
+                | _, Contradiction -> 1
+                | NormalHead p1, NormalHead p2 -> 
+                    compare (p1.Subject, p1.Predicate, p1.Object)
+                           (p2.Subject, p2.Predicate, p2.Object)
+            | _ -> 1  
+            
+    override this.Equals(obj) =
+        match obj with
+        | :? RuleHead as other -> (this :> System.IComparable).CompareTo(other) = 0
+        | _ -> false
         
+    override this.GetHashCode() =
+        match this with
+        | Contradiction -> -1
+        | NormalHead p -> hash (p.Subject, p.Predicate, p.Object)
+
 [<StructuralComparison>]
 [<StructuralEquality>]
 type RuleAtom = 

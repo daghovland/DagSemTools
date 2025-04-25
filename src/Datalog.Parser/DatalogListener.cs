@@ -93,8 +93,11 @@ internal class DatalogListener : DatalogBaseListener
 
     public override void ExitProperRule(DatalogParser.ProperRuleContext context)
     {
-        var headCtxt = context.head();
-        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt);
+        var headCtxt = context.head() ?? 
+                       throw new Exception($"Head is missing in rule at line {context.Start.Line}, position {context.Start.Column}");
+
+        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt) ?? 
+                       throw new Exception($"Head is missing in proper rule  at line {context.Start.Line}, position {context.Start.Column}");
 
         var body =
             context.body().ruleAtom()
@@ -105,8 +108,10 @@ internal class DatalogListener : DatalogBaseListener
 
     public override void ExitFact(DatalogParser.FactContext context)
     {
-        var headCtxt = context.head();
-        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt);
+        var headCtxt = context.head() ?? 
+                       throw new Exception($"Head is missing in fact  at line {context.Start.Line}, position {context.Start.Column}");;;
+        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt) ?? 
+                       throw new Exception($"Head is missing in fact  at line {context.Start.Line}, position {context.Start.Column}");;
         var ruleHead = RuleHead.NewNormalHead(headAtom);
         DatalogProgram = DatalogProgram.Append(new Rule(ruleHead, ListModule.Empty<RuleAtom>()));
     }
