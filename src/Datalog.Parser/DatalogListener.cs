@@ -22,6 +22,8 @@ internal class DatalogListener : DatalogBaseListener
 
     private readonly IriGrammarVisitor _iriGrammarVisitor;
     private readonly RuleAtomVisitor _ruleAtomVisitor;
+    private readonly RuleHeadVisitor _ruleHeadVisitor;
+
     public IEnumerable<Rule> DatalogProgram { get; private set; }
 
     internal DatalogListener(Datastore datastore, IVisitorErrorListener errorListener)
@@ -32,6 +34,7 @@ internal class DatalogListener : DatalogBaseListener
         var resourceVisitor = new ResourceVisitor(datastore, _iriGrammarVisitor);
         var predicateVisitor = new PredicateVisitor(resourceVisitor);
         _ruleAtomVisitor = new RuleAtomVisitor(predicateVisitor);
+        _ruleHeadVisitor = new RuleHeadVisitor(predicateVisitor);
     }
 
 
@@ -95,24 +98,17 @@ internal class DatalogListener : DatalogBaseListener
     {
         var headCtxt = context.head() ?? 
                        throw new Exception($"Head is missing in rule at line {context.Start.Line}, position {context.Start.Column}");
-
-        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt) ?? 
-                       throw new Exception($"Head is missing in proper rule  at line {context.Start.Line}, position {context.Start.Column}");
+        RuleHead ruleHead = _ruleHeadVisitor.Visit(headCtxt);
 
         var body =
             context.body().ruleAtom()
                 .Select(b => _ruleAtomVisitor.Visit(b));
-        RuleHead ruleHead = RuleHead.NewNormalHead(headAtom);
         DatalogProgram = DatalogProgram.Append(new Rule(ruleHead, ListModule.OfSeq(body)));
     }
 
     public override void ExitFact(DatalogParser.FactContext context)
     {
-        var headCtxt = context.head() ?? 
-                       throw new Exception($"Head is missing in fact  at line {context.Start.Line}, position {context.Start.Column}");;;
-        var headAtom = _ruleAtomVisitor.TriplePatternVisitor.Visit(headCtxt) ?? 
-                       throw new Exception($"Head is missing in fact  at line {context.Start.Line}, position {context.Start.Column}");;
-        var ruleHead = RuleHead.NewNormalHead(headAtom);
+        var ruleHead = _ruleHeadVisitor.Visit(context.head());
         DatalogProgram = DatalogProgram.Append(new Rule(ruleHead, ListModule.Empty<RuleAtom>()));
     }
 

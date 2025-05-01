@@ -10,6 +10,9 @@ using DagSemTools.Datalog;
 using DagSemTools.Rdf;
 using FluentAssertions;
 using IriTools;
+using Serilog;
+using Serilog.Core;
+using Serilog.Sinks.InMemory;
 using TestUtils;
 using Xunit.Abstractions;
 
@@ -20,11 +23,23 @@ public class TestParser
 
     private ITestOutputHelper _output;
     private TextWriter _outputWriter;
+    private InMemorySink _inMemorySink;
+
+    private Logger _logger;
+
 
     public TestParser(ITestOutputHelper output)
     {
         _output = output;
         _outputWriter = new TestOutputTextWriter(_output);
+        _inMemorySink = new InMemorySink();
+
+        _logger =
+        new LoggerConfiguration()
+            .WriteTo.Sink(_inMemorySink)
+            .CreateLogger();
+
+
     }
 
     public IEnumerable<Rule> TestProgram(string datalog)
@@ -188,6 +203,17 @@ public class TestParser
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }
 
+    
+    [Fact]
+    public void TestContradictionRule()
+    {
+        var fInfo = File.ReadAllText("TestData/contradiction.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+
+    }
+
 
     [Fact]
     public void TestLargeFile()
@@ -195,7 +221,7 @@ public class TestParser
         var fInfo = File.ReadAllText("TestData/loop.datalog");
         var ont = TestProgram(fInfo).ToList();
         ont.Should().NotBeNull();
-        
+        ont.Should().HaveCountGreaterThan(100);    
     }
 
 }

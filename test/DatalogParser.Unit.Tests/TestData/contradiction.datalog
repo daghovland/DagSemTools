@@ -1,0 +1,2 @@
+false :- 
+    [?X, a, <https://example.com/AnotherInvalidClass>] .

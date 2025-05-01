@@ -1,6 +1,9 @@
 grammar Datalog;
 import TurtleResource;
 
+
+NOT: 'NOT'|'not';
+
 datalogProgram : (directive | rule)* EOF ;
 
 rule : 
@@ -8,8 +11,9 @@ rule :
     | head PERIOD #Fact
     ;
 
-head : positiveRuleAtom 
-    | 'false';
+head : positiveRuleAtom #NormalRuleHead
+    | 'false' #ContradictionHead;
+
 
 body : ruleAtom (COMMA ruleAtom)* ;
 
@@ -17,7 +21,7 @@ ruleAtom : NOT positiveRuleAtom #NegativeRuleAtom
     | positiveRuleAtom #YesRuleAtom 
     ;
 
-NOT: 'NOT'|'not';
+
 
 positiveRuleAtom : tripleAtom | typeAtom  ;
 
