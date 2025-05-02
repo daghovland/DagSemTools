@@ -12,19 +12,26 @@ using Xunit.Abstractions;
 namespace Api.Tests;
 using DagSemTools.Api;
 
-public class TestApiOntology(ITestOutputHelper output)
+public class TestApiOntology
 {
-    TestUtils.TestOutputTextWriter _outputWriter = new TestUtils.TestOutputTextWriter(output);
+    private ITestOutputHelper _output;
+    private TestUtils.TestOutputTextWriter _outputWriter;
+    private InMemorySink _inMemorySink;
+    private ILogger _logger;
 
-    private static InMemorySink _inMemorySink = new InMemorySink();
-
-    private ILogger _logger =
+    public TestApiOntology(ITestOutputHelper output)
+    {
+        _output = output;
+        _outputWriter = new TestUtils.TestOutputTextWriter(output);
+        _inMemorySink = new InMemorySink();
+        _logger =
         new LoggerConfiguration()
             .WriteTo.Sink(_inMemorySink)
             .WriteTo.Console()
             .CreateLogger();
+    }
 
-    [Fact]
+[Fact]
     public void LoadEmptyOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/empty.owl");
