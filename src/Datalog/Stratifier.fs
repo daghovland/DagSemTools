@@ -188,9 +188,9 @@ module internal Stratifier =
             |> Seq.map (fun n -> $"Cycle element: {resources.GetGraphElement n}")
             |> String.concat ", "
             
-        member internal this.find_cycle visited current relation is_negative =
-                let relation_id = ruleMap.[relation]
-                let cycleFinder = this.cycle_finder (Seq.append visited [current]) relation_id
+        member internal this.find_cycle visited current rule is_negative =
+                let ruleId = ruleMap.[rule]
+                let cycleFinder = this.cycle_finder (Seq.append visited [current]) ruleId
                 if is_negative && (cycleFinder |> Seq.isEmpty |> not) then
                     let cycleString = cycleFinder |> Seq.head |>  this.printCycle
                     logger.Error($"Datalog program contains a cycle with negation and is not stratifiable! {cycleString}")
