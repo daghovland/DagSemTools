@@ -136,7 +136,8 @@ module internal Stratifier =
         The main difference is that the rules, and not the relations are ordered. 
         This was inspired by a sentence in "Maintenance of datalog materialisations revisited" by Motik, Nenov, Piro and Horrocks
      *)
-    type internal RulePartitioner (logger: ILogger, rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
+    type internal RulePartitioner (logger: ILogger, _rules: Rule list, resources: DagSemTools.Rdf.GraphElementManager) =
+        let rules = _rules |> List.distinct
         let ruleMap=
            rules
            |> Seq.mapi (fun i r -> r, (uint i))

@@ -141,6 +141,24 @@ public class TestApiOntology
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
+
+    [Fact]
+    public void MinimalImfSubsetCyclic()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/minimal-loop-test.ttl");
+        var rdfImf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
+        var ont = OwlOntology.Create(rdfImf);
+        ont.GetAxioms().Should().NotBeEmpty();
+
+        // Act
+        var axiomRules = ont.GetAxiomRules().ToList();
+        rdfImf.LoadDatalog(axiomRules);
+
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
+    
     [Fact]
     public void LoadImfOntologyWorks()
     {
@@ -212,6 +230,46 @@ public class TestApiOntology
         ordered.Should().NotBeEmpty();
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
+    
+    
+    [Fact]
+    public void MinimalWrongLoopWorks()
+    {
+        // Arrange
+        var datalogString = File.ReadAllText("TestData/minimal_wrong_loop.datalog");
+        var datastore = new Datastore(1000);
+        var rules = DagSemTools.Datalog.Parser.Parser.ParseString(datalogString, _outputWriter, datastore);
+        var ruleList = ListModule.OfSeq(rules);
+        var stratifier = new Stratifier.RulePartitioner(_logger,  ruleList, datastore.Resources);
+        
+        // Act
+        var ordered = stratifier.orderRules();
+        
+        // Assert
+        ordered.Should().NotBeEmpty();
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+    
+    
+    [Fact]
+    public void DuplicateRulesWorks()
+    {
+        // Arrange
+        var datalogString = File.ReadAllText("TestData/duplicate_rules.datalog");
+        var datastore = new Datastore(1000);
+        var rules = DagSemTools.Datalog.Parser.Parser.ParseString(datalogString, _outputWriter, datastore);
+        var ruleList = ListModule.OfSeq(rules);
+        var stratifier = new Stratifier.RulePartitioner(_logger,  ruleList, datastore.Resources);
+        
+        // Act
+        var ordered = stratifier.orderRules().ToList();;
+        
+        // Assert
+        ordered.Should().HaveCount(1);
+        ordered.First().Should().HaveCount(1);
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
     
     [Fact]
     public void ParseImfOntologyWorks()

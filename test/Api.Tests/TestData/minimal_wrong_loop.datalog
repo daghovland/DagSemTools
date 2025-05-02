@@ -1,0 +1,9 @@
+[?Y1, <http://www.w3.org/2002/07/owl#sameAs>, ?Y2] :- 
+    [?X, <http://ns.imfid.org/imf#classifier>, ?Y1],
+    [?X, <http://ns.imfid.org/imf#classifier>, ?Y2],
+    [?Y1, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1543446460>],
+    [?Y2, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1543446460>],
+    not [?Y1, <http://www.w3.org/2002/07/owl#sameAs>, ?Y2],
+    [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−534985120>] .
+
+
