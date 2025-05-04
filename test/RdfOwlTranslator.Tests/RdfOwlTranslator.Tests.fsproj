@@ -9,6 +9,7 @@
 
     <ItemGroup>
         <Compile Include="Tests.fs"/>
+        <Compile Include="TestTurtle.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
@@ -35,6 +36,7 @@
         <ProjectReference Include="..\..\src\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
         <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
         <ProjectReference Include="..\..\src\OwlOntology\OwlOntology.fsproj" />
+        <ProjectReference Include="..\..\src\Turtle.Parser\Turtle.Parser.csproj" />
     </ItemGroup>
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
@@ -42,10 +44,17 @@
         <PackageReference Include="DagSemTools.RdfOwlTranslator" Version="$(Version)" />
         <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
         <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Turtle.Parser" Version="$(Version)" />
     </ItemGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\..\src\TestUtils\TestUtils.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <None Include="TestData\triple-subset-qualified-restriction.ttl">
+        <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
 
 </Project>
