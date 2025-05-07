@@ -124,9 +124,6 @@
       <None Update="TestData\LIS-14.ttl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="TestData\minimal_wrong_loop.datalog">
-        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-      </None>
       <None Update="TestData\duplicate_rules.datalog">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>

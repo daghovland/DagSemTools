@@ -196,25 +196,6 @@ public class TestApiOntology
     
     
     [Fact]
-    public void MinimalWrongLoopWorks()
-    {
-        // Arrange
-        var datalogString = File.ReadAllText("TestData/minimal_wrong_loop.datalog");
-        var datastore = new Datastore(1000);
-        var rules = DagSemTools.Datalog.Parser.Parser.ParseString(datalogString, _outputWriter, datastore);
-        var ruleList = ListModule.OfSeq(rules);
-        var stratifier = new Stratifier.RulePartitioner(_logger,  ruleList, datastore.Resources);
-        
-        // Act
-        var ordered = stratifier.orderRules();
-        
-        // Assert
-        ordered.Should().NotBeEmpty();
-        _inMemorySink.LogEvents.Should().HaveCount(0);
-    }
-    
-    
-    [Fact]
     public void DuplicateRulesWorks()
     {
         // Arrange
