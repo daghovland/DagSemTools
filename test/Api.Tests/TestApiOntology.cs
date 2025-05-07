@@ -143,7 +143,7 @@ public class TestApiOntology
 
 
     [Fact]
-    public void MinimalImfSubsetCyclic()
+    public void MaxQualifiedCardinalityIsIgnored()
     {
         // Arrange
         var ontologyFileInfo = new FileInfo("TestData/minimal-loop-test.ttl");

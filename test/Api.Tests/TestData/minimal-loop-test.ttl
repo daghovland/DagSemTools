@@ -1,24 +1,14 @@
 @prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
-@prefix imf: <http://ns.imfid.org/imf#> .
+@prefix ex: <http://example.com/> .
 @prefix owl: <http://www.w3.org/2002/07/owl#> .
 @prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
 @prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
 
-imf:Aspect
+ex:Subclass
     a owl:Class ;
-    rdfs:subClassOf  [
-        a owl:Restriction ;
-        owl:onClass imf:InformationDomain ;
-        owl:onProperty imf:hasCharacteristic ;
-        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
-    ], [
-        a owl:Restriction ;
-        owl:onClass imf:Modality ;
-        owl:onProperty imf:hasCharacteristic ;
-        owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger
-    ], [
+    rdfs:subClassOf   [
         a owl:Restriction ;
         owl:maxQualifiedCardinality "1"^^xsd:nonNegativeInteger ;
-        owl:onClass imf:Interest ;
-        owl:onProperty imf:hasCharacteristic
+        owl:onClass ex:Superclass ;
+        owl:onProperty ex:property
     ]  .

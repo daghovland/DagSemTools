@@ -162,7 +162,10 @@ module ELI2RL =
                                           PositiveTriple (GetObjPropTriplePattern resources objectProperty "X" "Y2")
                                           PositiveTriple (GetTypeTriplePattern resources "Y1" conceptName)
                                           PositiveTriple (GetTypeTriplePattern resources "Y2" conceptName)
-                                          NotTriple (GetObjPropTriplePattern resources sameAs "Y1" "Y2")]
+                                          // TODO: This should be a rule that the datalog engine just uses to see if the resources are the same (perhaps just "sameResource"?)
+                                          // The downside of not having it, is that reflexivity is added which is bad for performance
+                                          // NotTriple (GetObjPropTriplePattern resources sameAs "Y1" "Y2")
+                                          ]
                            |> Seq.toList
                            }]
     (* The fourth case of Table 2 in https://arxiv.org/pdf/2008.02232:

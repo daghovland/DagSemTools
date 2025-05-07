@@ -188,59 +188,38 @@ module TestClassAxioms =
         Arules.Should().Contain(expectedAxiom)
         
     [<Fact>]
-    let ``Subclass of three restrictions is translated correctly``() =
+    let ``MaxQualifiedCardinality is ignored correctly``() =
         // Arrange
         let tripleTable = new Datastore(100u)
         let errorOutput = new System.IO.StringWriter()
         let aspectClassIri = new IriReference $"http://ns.imfid.org/imf#Aspect"
+        let hasCharacteristic = IriReference "http://ns.imfid.org/imf#hasCharacteristic"
+        let imfInterestIri = IriReference "http://ns.imfid.org/imf#Interest"
+        let imfInformationDomainIri = new IriReference "http://ns.imfid.org/imf#InformationDomain"
+        let imfModalityIri = new IriReference "http://ns.imfid.org/imf#Modality"
         let axioms = [
             AxiomClassAxiom(
                 SubClassOf(
                     [],
                     ClassName(Iri.FullIri(aspectClassIri)),
-                    ObjectExactQualifiedCardinality (1,
-                                                   (NamedObjectProperty (Iri.FullIri "http://ns.imfid.org/imf#hasCharacteristic")),
-                                                   ClassName(Iri.FullIri(new IriReference "http://ns.imfid.org/imf#InformationDomain")))
-                )
-            )
-            AxiomClassAxiom(
-                SubClassOf(
-                    [],
-                    ClassName(Iri.FullIri(aspectClassIri)),
-                    ObjectExactQualifiedCardinality (1,
-                                                   (NamedObjectProperty (Iri.FullIri "http://ns.imfid.org/imf#hasCharacteristic")),
-                                                   ClassName(Iri.FullIri(new IriReference "http://ns.imfid.org/imf#Modality")))
-                )
-            )
-            AxiomClassAxiom(
-                SubClassOf(
-                    [],
-                    ClassName(Iri.FullIri(aspectClassIri)),
                     ObjectMaxQualifiedCardinality (1,
-                                                   (NamedObjectProperty (Iri.FullIri "http://ns.imfid.org/imf#hasCharacteristic")),
-                                                   ClassName(Iri.FullIri(new IriReference "http://ns.imfid.org/imf#Interest")))
+                                                   (NamedObjectProperty (Iri.FullIri hasCharacteristic)),
+                                                   ClassName(Iri.FullIri imfInterestIri))
                 )
-        )]
-        
+            )
+            
+         ]
         let ontology = Ontology([], ontologyVersion.UnNamedOntology,[], axioms)
-        let rdfTypeResource = tripleTable.Resources.AddNodeResource (Iri (IriReference Namespaces.RdfType))
-        let aspectClassResource = tripleTable.Resources.AddNodeResource (Iri aspectClassIri)
-        let expectedRules = [
-            {
-                Head = NormalHead {
-                            Subject = Term.Variable "X"
-                            Predicate = Term.Resource rdfTypeResource
-                            Object = Term.Resource aspectClassResource}
-                Body = []
-         }]
+        
         // Act
-        
-        
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
-        rlProgram.Should().BeSupersetOf expectedRules
         
+        //Assert
+        let allRulesHaveSingleAtom = 
+            rlProgram 
+            |> Seq.forall (fun rule -> rule.Body.Length = 1)
+        allRulesHaveSingleAtom.Should().BeTrue("There should only be the default rules with one body element, nothing with actual logic") |> ignore
         
-
     [<Fact>]
     let ``Equivalentclass RL reasoning from rdf works the other way`` () =
         let tripleTable = new Datastore(100u)

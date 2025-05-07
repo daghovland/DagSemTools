@@ -189,3 +189,28 @@ module TestClassAxioms =
             match restrictionFormaula with
             | AllValuesFrom (role, concept) -> concept 
         inMemorySink.LogEvents.Should().BeEmpty
+
+
+
+    [<Fact>]
+    let ``Subclass axiom normalization handles qualified union`` () =
+
+                //Arrange
+        // Arrange
+        let tripleTable = new Datastore(100u)
+        let errorOutput = new System.IO.StringWriter()
+        
+        let Airi = IriReference "https://example.com/class/A"
+        let A = FullIri Airi
+        let Eiri = IriReference "https://example.com/class/E"
+        let E = FullIri Eiri
+        
+        let roleIri = IriReference "https://example.com/property/t"
+        let role = NamedObjectProperty (FullIri roleIri)
+        
+        //Act
+        let translatedRules = ELI.ELI2RL.getQualifiedAtMostOneNormalizedRule tripleTable.Resources [A] role E 
+        
+        //Assert
+         
+        inMemorySink.LogEvents.Should().BeEmpty

@@ -136,7 +136,7 @@ type Rule =
         let bodyString = this.Body
                             |> List.map (fun el -> el.ToString())
                             |> String.concat ","
-        $"{this.Head.ToString()} :- {bodyString}"
+        $"{this.Head.ToString()} :- {bodyString} .\n"
     member this.ToString (manager) =
         let bodyString = this.Body
                             |> List.map (fun el -> el.ToString(manager))
