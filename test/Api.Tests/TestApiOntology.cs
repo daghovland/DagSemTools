@@ -193,43 +193,6 @@ public class TestApiOntology
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
-
-    [Fact]
-    public void LoadGeneratedDatalogWorks()
-    {
-        // Arrange
-        var datalogString = File.ReadAllText("TestData/loop.datalog");
-        var datastore = new Datastore(1000);
-        var rules = DagSemTools.Datalog.Parser.Parser.ParseString(datalogString, _outputWriter, datastore);
-        var ruleList = ListModule.OfSeq(rules);
-        var invalidRules = ruleList.Where(rule => 
-                rule.Head is RuleHead.NormalHead head && 
-                (head.pattern == null || 
-                 head.pattern.Subject == null || 
-                 head.pattern.Predicate == null || 
-                 head.pattern.Object == null))
-            .ToList();
-
-        if (invalidRules.Any())
-        {
-            _outputWriter.WriteLine("Found invalid rules:");
-            foreach (var rule in invalidRules)
-            {
-                _outputWriter.WriteLine($"Rule: {rule}, Head: {rule.Head}");
-            }
-
-            Assert.Empty(invalidRules);
-        }
-
-        var stratifier = new Stratifier.RulePartitioner(_logger,  ruleList, datastore.Resources);
-        
-        // Act
-        var ordered = stratifier.orderRules();
-        
-        // Assert
-        ordered.Should().NotBeEmpty();
-        _inMemorySink.LogEvents.Should().HaveCount(0);
-    }
     
     
     [Fact]

@@ -193,9 +193,8 @@ module TestClassAxioms =
 
 
     [<Fact>]
-    let ``Subclass axiom normalization handles qualified union`` () =
+    let ``Max qualified cardinality 1 is translated correctly`` () =
 
-                //Arrange
         // Arrange
         let tripleTable = new Datastore(100u)
         let errorOutput = new System.IO.StringWriter()
@@ -204,13 +203,22 @@ module TestClassAxioms =
         let A = FullIri Airi
         let Eiri = IriReference "https://example.com/class/E"
         let E = FullIri Eiri
+        let owlSameAsResource = tripleTable.Resources.AddNodeResource (RdfResource.Iri (IriReference Namespaces.OwlSameAs))
         
         let roleIri = IriReference "https://example.com/property/t"
         let role = NamedObjectProperty (FullIri roleIri)
+        let negative_equality = NotTriple {
+            Subject = Term.Variable "Y1"
+            Predicate = Term.Resource owlSameAsResource
+            Object = Term.Variable "Y2"
+        }
         
         //Act
         let translatedRules = ELI.ELI2RL.getQualifiedAtMostOneNormalizedRule tripleTable.Resources [A] role E 
         
         //Assert
-         
+        translatedRules.Should().ContainExactlyOneItem() |> ignore
+        let rule = translatedRules |> Seq.head
+        rule.Body.Should().NotContain(negative_equality) |> ignore
+        
         inMemorySink.LogEvents.Should().BeEmpty

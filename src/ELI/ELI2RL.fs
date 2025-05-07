@@ -151,7 +151,7 @@ module ELI2RL =
                            }]
     (* The fourth case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <=  <=1 R. A *) 
-    let internal getQualifiedAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) (FullIri conceptName) =
+    let public getQualifiedAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) (FullIri conceptName) =
         let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
         [{Head = NormalHead ( GetObjPropTriplePattern resources sameAs "Y1" "Y2" )
           Body = subConceptIntersection
@@ -164,6 +164,7 @@ module ELI2RL =
                                           PositiveTriple (GetTypeTriplePattern resources "Y2" conceptName)
                                           // TODO: This should be a rule that the datalog engine just uses to see if the resources are the same (perhaps just "sameResource"?)
                                           // The downside of not having it, is that reflexivity is added which is bad for performance
+                                          // https://github.com/daghovland/DagSemTools/issues/76
                                           // NotTriple (GetObjPropTriplePattern resources sameAs "Y1" "Y2")
                                           ]
                            |> Seq.toList
