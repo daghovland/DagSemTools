@@ -34,8 +34,8 @@ jobs:
 
       - name: Install Apache Jena
         run: |
-          wget https://dlcdn.apache.org/jena/binaries/apache-jena-5.3.0.tar.gz
-          tar -xzf apache-jena-5.3.0.tar.gz
+          wget https://dlcdn.apache.org/jena/binaries/apache-jena-5.4.0.tar.gz
+          tar -xzf apache-jena-5.4.0.tar.gz
 
       - name: Download external test files
         run: |
@@ -43,7 +43,7 @@ jobs:
           curl -o test/Api.Tests/TestData/go.owl.xml http://current.geneontology.org/ontology/go.owl &
           curl -o "test/Api.Tests/TestData/LIS-14.ttl" https://rds.posccaesar.org/ontology/lis14/ont/core/4.0/LIS-14.ttl &
           wait
-          ./apache-jena-5.3.0/bin/riot --output=TURTLE test/Api.Tests/TestData/go.owl.xml > test/Api.Tests/TestData/go.ttl
+          ./apache-jena-5.4.0/bin/riot --output=TURTLE test/Api.Tests/TestData/go.owl.xml > test/Api.Tests/TestData/go.ttl
 
       - name: Format code
         run: dotnet format ./DagSemTools.sln --verbosity diagnostic --verify-no-changes --no-restore
