@@ -174,21 +174,10 @@ public class TestApiOntology
 
         // Assert
         axiomRules.Should().NotBeEmpty();
-        var descriptorIri = RdfResource.NewIri(new IriReference("http://ns.imfid.org/imf#Descriptor"));
-        var descriptorNode =
-            rdfImf.Datastore.Resources.GraphElementMap[DagSemTools.Ingress.GraphElement.NewNodeOrEdge(descriptorIri)];
-        var descriptorTerm = Term.NewResource(descriptorNode);
-        var DescriptorRules = axiomRules.Where((rule, i) =>
-                rule.Head is RuleHead.NormalHead tp
-                && tp.pattern.Object.Equals(descriptorTerm)
-        ).ToList();
-        DescriptorRules.Should().NotBeEmpty();
-        var descriptorRuleString = String.Join("\n", DescriptorRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources)).ToList());
-        rdfImf.LoadDatalog(DescriptorRules);
-        axiomRules.Should().NotBeEmpty();
         var ruleStringList = axiomRules.Select(rule => rule.ToString(rdfImf.Datastore.Resources));
         var ruleString = String.Join("\n", ruleStringList.Concat());
         _outputWriter.WriteLine(ruleString);
+        
         rdfImf.LoadDatalog(axiomRules);
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
