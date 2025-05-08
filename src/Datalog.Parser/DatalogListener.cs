@@ -96,7 +96,7 @@ internal class DatalogListener : DatalogBaseListener
 
     public override void ExitProperRule(DatalogParser.ProperRuleContext context)
     {
-        var headCtxt = context.head() ?? 
+        var headCtxt = context.head() ??
                        throw new Exception($"Head is missing in rule at line {context.Start.Line}, position {context.Start.Column}");
         RuleHead ruleHead = _ruleHeadVisitor.Visit(headCtxt);
 

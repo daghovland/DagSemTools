@@ -31,12 +31,12 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<TriplePattern>
         var predicate = context.relation();
         var @object = context.term(1);
 
-        Term predicateResource = _predicateVisitor.Visit(predicate) ?? 
+        Term predicateResource = _predicateVisitor.Visit(predicate) ??
                                  throw new Exception($"Predicate is null  at line {context.Start.Line}, position {context.Start.Column}");
-        Term subjectResource = _predicateVisitor.Visit(subject) ?? 
+        Term subjectResource = _predicateVisitor.Visit(subject) ??
                                throw new Exception($"Subject is null  at line {context.Start.Line}, position {context.Start.Column}");
-        Term objectResource = _predicateVisitor.Visit(@object) ?? 
-                              throw new Exception($"Object is null at line {context.Start.Line}, position {context.Start.Column}");;
+        Term objectResource = _predicateVisitor.Visit(@object) ??
+                              throw new Exception($"Object is null at line {context.Start.Line}, position {context.Start.Column}"); ;
         return new TriplePattern(
             subjectResource,
             predicateResource,

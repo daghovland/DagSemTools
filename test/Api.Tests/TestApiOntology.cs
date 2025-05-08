@@ -31,7 +31,7 @@ public class TestApiOntology
             .CreateLogger();
     }
 
-[Fact]
+    [Fact]
     public void LoadEmptyOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/empty.owl");
@@ -158,7 +158,7 @@ public class TestApiOntology
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    
+
     [Fact]
     public void LoadImfOntologyWorks()
     {
@@ -193,8 +193,8 @@ public class TestApiOntology
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
-    
-    
+
+
     [Fact]
     public void DuplicateRulesWorks()
     {
@@ -203,18 +203,18 @@ public class TestApiOntology
         var datastore = new Datastore(1000);
         var rules = DagSemTools.Datalog.Parser.Parser.ParseString(datalogString, _outputWriter, datastore);
         var ruleList = ListModule.OfSeq(rules);
-        var stratifier = new Stratifier.RulePartitioner(_logger,  ruleList, datastore.Resources);
-        
+        var stratifier = new Stratifier.RulePartitioner(_logger, ruleList, datastore.Resources);
+
         // Act
-        var ordered = stratifier.orderRules().ToList();;
-        
+        var ordered = stratifier.orderRules().ToList(); ;
+
         // Assert
         ordered.Should().HaveCount(1);
         ordered.First().Should().HaveCount(1);
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    
+
     [Fact]
     public void ParseImfOntologyWorks()
     {

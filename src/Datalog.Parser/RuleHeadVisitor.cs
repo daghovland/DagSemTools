@@ -18,7 +18,7 @@ internal class RuleHeadVisitor : DatalogBaseVisitor<RuleHead>
     }
     public override RuleHead VisitNormalRuleHead(DatalogParser.NormalRuleHeadContext context)
     {
-        var triplePattern = TriplePatternVisitor.Visit(context) ?? 
+        var triplePattern = TriplePatternVisitor.Visit(context) ??
                             throw new Exception($"Head is missing in proper rule  at line {context.Start.Line}, position {context.Start.Column}");
         return RuleHead.NewNormalHead(triplePattern);
     }

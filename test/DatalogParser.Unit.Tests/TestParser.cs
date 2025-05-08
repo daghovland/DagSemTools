@@ -203,7 +203,7 @@ public class TestParser
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }
 
-    
+
     [Fact]
     public void TestContradictionRule()
     {
@@ -221,7 +221,7 @@ public class TestParser
         var fInfo = File.ReadAllText("TestData/loop.datalog");
         var ont = TestProgram(fInfo).ToList();
         ont.Should().NotBeNull();
-        ont.Should().HaveCountGreaterThan(100);    
+        ont.Should().HaveCountGreaterThan(100);
     }
 
 }

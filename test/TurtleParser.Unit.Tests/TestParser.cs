@@ -322,7 +322,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
 
-    
+
     [Fact]
     public void TestTripleSubSetRestriction()
     {
@@ -332,7 +332,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.ReifiedTriples.QuadCount.Should().Be(0);
     }
 
-    
+
     [Fact]
     public void TestCollection()
     {
