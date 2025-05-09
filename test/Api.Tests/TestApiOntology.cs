@@ -252,16 +252,16 @@ public class TestApiOntology
     }
 
 
-    [Fact(Skip = "Takes too long for normal testing. https://github.com/daghovland/DagSemTools/issues/58"), Category("LongRunning")]
+    [Fact]
     public void ParseGeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         rdf.IsEmpty().Should().BeFalse();
-        // var ont = OwlOntology.Create(rdf);
-        // ont.GetAxioms().Should().NotBeEmpty();
-        // var datalogProgram = ont.GetAxiomRules().ToList();
-        // datalogProgram.Should().NotBeEmpty();
-        // rdf.LoadDatalog(datalogProgram);
+        var ont = OwlOntology.Create(rdf);
+        ont.GetAxioms().Should().NotBeEmpty();
+        var datalogProgram = ont.GetAxiomRules().ToList();
+        datalogProgram.Should().NotBeEmpty();
+        rdf.LoadDatalog(datalogProgram);
     }
 }
