@@ -290,6 +290,16 @@ module internal Stratifier =
                     IntentionalRules remainingRules atomRelation
                     |> Seq.isEmpty
                 )
+                
+        member internal this.outputCycleElement rel =
+          if not orderedRules.[int rel].output then 
+            orderedRules.[int rel].output <- true
+            ready_elements_queue <- ready_elements_queue.Enqueue orderedRules.[int rel]
+            
+        member internal this.handleSingleCycle cycle =
+          cycle
+          //|> Seq.distinct
+          |> (Seq.iter this.outputCycleElement)
         (* 
             Only called when topological sorting stops, so there is a cycle
             Finds one cycle, if that contains a negative edge, reports error, otherwise,
@@ -315,12 +325,7 @@ module internal Stratifier =
                         |> Seq.forall (this.RuleIsCoveredByCycle cycle)
                 )         
               let cycles = coveredCycles
-              cycles |> Seq.iter (fun cycle ->
-                  cycle |> Seq.distinct |>(Seq.iter (fun rel ->
-                      if not orderedRules.[int rel].output then 
-                        orderedRules.[int rel].output <- true
-                        ready_elements_queue <- ready_elements_queue.Enqueue orderedRules.[int rel])
-                  ))
+              cycles |> Seq.iter this.handleSingleCycle
                 
             
         (*  Catches some errors in stratification, to avoid a wrong stratification being returned
