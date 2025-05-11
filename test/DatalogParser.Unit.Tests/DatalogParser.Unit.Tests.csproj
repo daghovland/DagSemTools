@@ -67,12 +67,12 @@
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
 
-        <None Update="TestData\loop.datalog">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </None>
-
         <None Update="TestData\contradiction.datalog">
           <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+
+        <None Update="TestData\large.datalog">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
     </ItemGroup>
 

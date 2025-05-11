@@ -218,7 +218,7 @@ public class TestParser
     [Fact]
     public void TestLargeFile()
     {
-        var fInfo = File.ReadAllText("TestData/loop.datalog");
+        var fInfo = File.ReadAllText("TestData/large.datalog");
         var ont = TestProgram(fInfo).ToList();
         ont.Should().NotBeNull();
         ont.Should().HaveCountGreaterThan(100);
