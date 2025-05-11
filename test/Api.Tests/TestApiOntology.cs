@@ -217,7 +217,7 @@ public class TestApiOntology
         var axiomRules = ont.GetAxiomRules().ToList();
 
         axiomRules.Should().NotBeEmpty();
-        
+
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
