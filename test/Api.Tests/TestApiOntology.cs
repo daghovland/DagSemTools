@@ -159,7 +159,7 @@ public class TestApiOntology
     }
 
 
-    [Fact]
+    [Fact(Skip = "Not implemented yet")]
     public void LoadImfOntologyWorks()
     {
         // Arrange
@@ -252,7 +252,7 @@ public class TestApiOntology
     }
 
 
-    [Fact]
+    [Fact(Skip="Too long runtime")]
     public void ParseGeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");

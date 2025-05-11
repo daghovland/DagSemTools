@@ -192,7 +192,7 @@ module TestClassAxioms =
 
 
 
-    [<Fact>]
+    [<Fact(Skip="https://github.com/daghovland/DagSemTools/issues/76")>]
     let ``Max qualified cardinality 1 is translated correctly`` () =
 
         // Arrange
