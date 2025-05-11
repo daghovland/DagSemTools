@@ -178,7 +178,7 @@ public class TestApiOntology
         var ruleString = String.Join("\n", ruleStringList.Concat());
         _outputWriter.WriteLine(ruleString);
 
-        rdfImf.LoadDatalog(axiomRules);
+        imfData.LoadDatalog(axiomRules);
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }

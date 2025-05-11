@@ -115,7 +115,9 @@ module ELIExtractor =
                         | ObjectMaxQualifiedCardinality(cardinality, _objectPropertyExpression, classExpression) when cardinality = 0I ->
                             ([], [classExpression], [NormalizedConcept.Bottom])
                         | ObjectMaxQualifiedCardinality(cardinality, objectPropertyExpression, classExpression) when cardinality = 1I ->
-                            ([], [classExpression], [NormalizedConcept.AtMostOneValueFromQualified(objectPropertyExpression, classExpression |> conceptRepresentative)])
+                            logger.Warning("ObjectMaxQualifiedCardinality on superConcept  with cardinality 1 is not implemented. Sorry. See https://github.com/daghovland/DagSemTools/issues/76")
+                            ([], [], [])
+                            //([], [classExpression], [NormalizedConcept.AtMostOneValueFromQualified(objectPropertyExpression, classExpression |> conceptRepresentative)])
                         | ObjectMaxQualifiedCardinality(i, _objectPropertyExpression, _classExpression) ->
                             logger.Warning("Invalid OWL 2 RL: ObjectMaxQualifiedCardinality on superConcept only allowed with cardinality 0 or 1")
                             ([], [], [])

@@ -113,6 +113,7 @@ type RuleHead =
 type RuleAtom = 
     | PositiveTriple of TriplePattern
     | NotTriple of TriplePattern
+    | NotEqualsAtom of Term * Term
     override this.ToString () =
         match this with
         | PositiveTriple tp -> tp.ToString()
