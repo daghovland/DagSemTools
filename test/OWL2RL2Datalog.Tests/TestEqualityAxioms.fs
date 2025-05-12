@@ -73,7 +73,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
                            Body = [PositiveTriple (triplePattern "s2")]}
         let partitioner = DagSemTools.Datalog.Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
-        let stratification = partitioner.orderRules
+        let stratification = partitioner.orderRules()
         stratification.Should().HaveLength(1) |> ignore
 
     [<Fact>]
@@ -223,12 +223,12 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         // Act
         let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates([sameAsRule2], tripleTable) |> Seq.toList
         let stratifier = Stratifier.RulePartitioner (logger, rules_with_iri_predicates, tripleTable.Resources)
-        let relationInfos = stratifier.GetOrderedRelations()
+        let relationInfos = stratifier.GetOrderedRules()
         
         //Assert
         let predRelsInfo = relationInfos.[(int) predIndex]
-        predRelsInfo.num_predecessors.Should().Be((uint) 2) |> ignore
-        predRelsInfo.Successors.Should().HaveLength(1) |> ignore
+        predRelsInfo.num_predecessors.Should().Be((uint) 5) |> ignore
+        predRelsInfo.Successors.Should().HaveLength(5) |> ignore
         
     [<Fact>]
     let ``Equality axioms can be grounded`` () =

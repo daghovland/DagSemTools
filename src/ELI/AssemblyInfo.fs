@@ -1,6 +1,8 @@
-namespace System.Runtime.CompilerServices
+module AssemblyInfo
+
 open System.Runtime.CompilerServices
 
+[<assembly: InternalsVisibleTo("DagSemTools.ELI.Test")>]
 [<assembly: InternalsVisibleTo("DagSemTools.OWL2RL2Datalog.Tests")>]
-[<assembly: InternalsVisibleTo("DagSemTools.ELI.Tests")>]
+[<assembly: InternalsVisibleTo("Api.Tests")>]
 do ()

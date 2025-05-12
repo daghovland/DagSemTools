@@ -21,6 +21,12 @@ type Datastore(triples: TripleTable,
                   new QuadTable(init_triples),
                   new GraphElementManager(init_resources))
         
+    
+    new(elementManager : GraphElementManager, init_triples : uint) =
+        Datastore(new TripleTable(init_triples),
+                  new QuadTable(init_triples),
+                  new QuadTable(init_triples),
+                  elementManager)
     member this.AddTriple (triple: Triple) =
         this.Triples.AddTriple triple
     

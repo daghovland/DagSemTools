@@ -22,7 +22,7 @@
         <PackageReference Include="FluentAssertions" Version="7.0.0" />
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-        <PackageReference Include="Antlr4BuildTasks" Version="12.8.0" />
+        <PackageReference Include="Antlr4BuildTasks" Version="12.10.0" />
         <PackageReference Include="FSharp.Core" Version="8.0.403" />
     </ItemGroup>
 
@@ -100,6 +100,9 @@
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
       <None Update="TestData\onlyPrefixIri.ttl">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Update="TestData\triple-subset-qualified-restriction.ttl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>

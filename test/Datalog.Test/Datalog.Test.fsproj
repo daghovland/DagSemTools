@@ -13,11 +13,13 @@
     <ItemGroup>
         <Compile Include="Tests.fs"/>
         <Compile Include="PredicateGrounderTests.fs" />
+        <Compile Include="StratifierTests.fs" />
         <Compile Include="Program.fs"/>
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Faqt" Version="4.4.0" />
+        <PackageReference Include="Antlr4BuildTasks" Version="12.10.0" />
+        <PackageReference Include="Faqt" Version="4.5.0" />
         <PackageReference Include="IriTools" Version="2.2.0" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
         <PackageReference Include="Serilog" Version="4.2.0" />
@@ -27,7 +29,7 @@
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
-        <PackageReference Include="coverlet.collector" Version="6.0.3">
+        <PackageReference Include="coverlet.collector" Version="6.0.4">
             <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
             <PrivateAssets>all</PrivateAssets>
         </PackageReference>
@@ -36,18 +38,29 @@
 
     <!-- Use project references for local development -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
-    <ProjectReference Include="..\..\src\Datalog\Datalog.fsproj" />
-      <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
+        <ProjectReference Include="..\..\src\Datalog\Datalog.fsproj" />
+        <ProjectReference Include="..\..\src\Datalog.Parser\Datalog.Parser.csproj" />
+        <ProjectReference Include="..\..\src\Rdf\Rdf.fsproj" />
     </ItemGroup>
 
     <!-- Use NuGet package references otherwise, f.ex. when included as nuget package -->
     <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
         <PackageReference Include="DagSemTools.Datalog" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Datalog.Parser" Version="$(Version)" />
         <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
     </ItemGroup>
     
     <ItemGroup>
       <ProjectReference Include="..\..\src\TestUtils\TestUtils.csproj" />
+    </ItemGroup>
+    
+    <ItemGroup>
+      <None Include="TestData\large.datalog">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
+      <None Include="TestData\imf.datalog">
+        <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      </None>
     </ItemGroup>
     
 </Project>

@@ -20,7 +20,7 @@ open IriTools
         | AnonymousBlankNode of anon_blankNode: uint32
         override this.ToString() =
                 match this with
-                | Iri iri -> $"<%A{iri}>"
+                | Iri iri -> if iri = (IriReference Namespaces.RdfType) then "a" else $"<%A{iri}>"
                 | AnonymousBlankNode anon_blankNode -> $"_:(%u{anon_blankNode})"
             
     [<StructuralComparison>]

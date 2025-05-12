@@ -151,20 +151,25 @@ module ELI2RL =
                            }]
     (* The fourth case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <=  <=1 R. A *) 
-    let internal getQualifiedAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) (FullIri conceptName) =
-        let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
-        [{Head = NormalHead ( GetObjPropTriplePattern resources sameAs "Y1" "Y2" )
-          Body = subConceptIntersection
-                           |> Seq.map (fun (FullIri name) -> name)
-                           |> Seq.map (GetTypeTriplePattern resources "X")
-                           |> Seq.map PositiveTriple
-                           |> Seq.append [PositiveTriple (GetObjPropTriplePattern resources objectProperty "X" "Y1")
-                                          PositiveTriple (GetObjPropTriplePattern resources objectProperty "X" "Y2")
-                                          PositiveTriple (GetTypeTriplePattern resources "Y1" conceptName)
-                                          PositiveTriple (GetTypeTriplePattern resources "Y2" conceptName)
-                                          NotTriple (GetObjPropTriplePattern resources sameAs "Y1" "Y2")]
-                           |> Seq.toList
-                           }]
+    let public getQualifiedAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) (FullIri conceptName) =
+        failwith "owl Qualified At Most One is not handled, lacking proper equality treatment. See https://github.com/daghovland/DagSemTools/issues/76"
+        // let sameAs = NamedObjectProperty (FullIri (IriReference Namespaces.OwlSameAs))
+        // [{Head = NormalHead ( GetObjPropTriplePattern resources sameAs "Y1" "Y2" )
+        //   Body = subConceptIntersection
+        //                    |> Seq.map (fun (FullIri name) -> name)
+        //                    |> Seq.map (GetTypeTriplePattern resources "X")
+        //                    |> Seq.map PositiveTriple
+        //                    |> Seq.append [PositiveTriple (GetObjPropTriplePattern resources objectProperty "X" "Y1")
+        //                                   PositiveTriple (GetObjPropTriplePattern resources objectProperty "X" "Y2")
+        //                                   PositiveTriple (GetTypeTriplePattern resources "Y1" conceptName)
+        //                                   PositiveTriple (GetTypeTriplePattern resources "Y2" conceptName)
+        //                                   // TODO: This should be a rule that the datalog engine just uses to see if the resources are the same (perhaps just "sameResource"?)
+        //                                   // The downside of not having it, is that reflexivity is added which is bad for performance
+        //                                   // https://github.com/daghovland/DagSemTools/issues/76
+        //                                   NotEqualsAtom ("Y1", "Y2")
+        //                                   ]
+        //                    |> Seq.toList
+        //                    }]
     (* The fourth case of Table 2 in https://arxiv.org/pdf/2008.02232:
        A_1 and ... and A_n <=  <=1 R *) 
     let internal getAtMostOneNormalizedRule (resources : GraphElementManager) (subConceptIntersection) (objectProperty) =
@@ -208,8 +213,9 @@ module ELI2RL =
                 getUniversalNormalizedRule resources subConceptIntersection objectPropertyExpression qualifyingConcept
             | AtomicAnonymousConcept ->
                 getAtomicAnonymousNormalizedRule resources subConceptIntersection
-            | AtMostOneValueFromQualified(objectPropertyExpression, qualifyingConcept) ->
-                getQualifiedAtMostOneNormalizedRule resources subConceptIntersection objectPropertyExpression qualifyingConcept
+            // TODO: See https://github.com/daghovland/DagSemTools/issues/76
+            //| AtMostOneValueFromQualified(objectPropertyExpression, qualifyingConcept) ->
+            //    getQualifiedAtMostOneNormalizedRule resources subConceptIntersection objectPropertyExpression qualifyingConcept
             | NormalizedConcept.ObjectHasValue(objectPropertyExpression, individual) ->
                 getObjectHasValueNormalizedRule resources subConceptIntersection objectPropertyExpression individual
             | AtMostOneValueFrom objectPropertyExpression -> failwith "todo"

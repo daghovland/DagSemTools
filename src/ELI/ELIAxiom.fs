@@ -27,7 +27,8 @@ module Axioms =
         | AtomicAnonymousConcept
         | ObjectHasValue of ObjectPropertyExpression * Individual
         | AllValuesFrom of ObjectPropertyExpression * Class
-        | AtMostOneValueFromQualified of ObjectPropertyExpression * Class
+        // TODO: See https://github.com/daghovland/DagSemTools/issues/76
+        //| AtMostOneValueFromQualified of ObjectPropertyExpression * Class
         | AtMostOneValueFrom of ObjectPropertyExpression
 
 

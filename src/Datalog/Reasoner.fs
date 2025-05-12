@@ -33,14 +33,14 @@ module Reasoner =
                                 |> List.map GetPartialMatches
                                 |> mergeMaps
                                    
-        member this.AddRule(rule: Rule)  =
+        member internal this.AddRule(rule: Rule)  =
             if not (isSafeRule rule) then
                 raise (new System.ArgumentException("Rule is not safe"))
             Rules <- rule :: Rules
             RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
                 
             
-        member this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq = 
+        member internal this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq = 
             ConstantTriplePattern fact
                 |> WildcardTriplePattern
                 |> Seq.map (fun wildcardFact ->
@@ -51,7 +51,7 @@ module Reasoner =
                 |> Seq.collect (Seq.collect (GetMatchesForRule fact))
         
         
-        member this.GetFacts() =
+        member internal this.GetFacts() =
             Rules
                 |> Seq.filter isFact
                 |> Seq.map (fun rule -> rule.Head)
@@ -71,7 +71,7 @@ module Reasoner =
                 for triple in tripleStore.Triples.GetTriples() do
                     for rules in this.GetRulesForFact triple do
                         let ruleMatchHead = match rules.Match.Rule.Head with
-                                            | Contradiction -> failwith $"Contradiction occurred during reasoning: {RuleToString tripleStore rules.Match.Rule}"
+                                            | Contradiction -> failwith $"Contradiction occurred during reasoning: {rules.Match.Rule.ToString(tripleStore.Resources)}"
                                             | NormalHead head -> head
                         for subs in evaluate tripleStore.Triples rules  do
                             let newTriple = ApplySubstitutionTriple subs ruleMatchHead
@@ -80,7 +80,7 @@ module Reasoner =
     let evaluate (logger: ILogger, rules: Rule list, triplestore: Datastore) =
             // let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates(rules, triplestore) |> Seq.toList
             let stratifier = RulePartitioner (logger, rules, triplestore.Resources)
-            let stratification = stratifier.orderRules
+            let stratification = stratifier.orderRules()
             for partition in stratification do
                 let program = DatalogProgram(Rules = Seq.toList partition, tripleStore = triplestore)
                 program.materialiseNaive()

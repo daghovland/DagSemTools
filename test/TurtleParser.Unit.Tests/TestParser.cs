@@ -322,6 +322,17 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
 
+
+    [Fact]
+    public void TestTripleSubSetRestriction()
+    {
+        var ontology = File.ReadAllText("TestData/triple-subset-qualified-restriction.ttl");
+        var ont = TestOntology(ontology);
+        ont.Triples.TripleCount.Should().Be(16);
+        ont.ReifiedTriples.QuadCount.Should().Be(0);
+    }
+
+
     [Fact]
     public void TestCollection()
     {

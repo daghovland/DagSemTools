@@ -10,44 +10,118 @@ namespace DagSemTools.Datalog
 open System
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
+open DagSemTools.Rdf
 
 
-[<StructuralComparison>]
-[<StructuralEquality>]
+[<CustomComparison>]
+[<CustomEquality>]
 type Term = 
     | Resource of GraphElementId
     | Variable of string
+    member this.ToString (manager : GraphElementManager) : string =
+        match this with
+        | Resource res -> (manager.GetGraphElement res).ToString()
+        | Variable vName -> $"?{vName}"
+    member internal this.GetHashCodeForUnification : int =
+        match this with
+        | Resource res -> res.GetHashCode()
+        | Variable vName -> 100
+        
+    interface System.IComparable with
+        member this.CompareTo(obj) =
+            match obj with
+            | null -> 1  // null is less than any value
+            | :? Term as other -> 
+                match this, other with
+                | Resource r1, Resource r2 -> compare r1 r2
+                | Variable v1, Variable v2 -> compare v1 v2
+                | Resource _, Variable _ -> -1  // Resources come before variables
+                | Variable _, Resource _ -> 1
+            | _ -> 1
 
+    override this.Equals(obj) =
+        match obj with
+        | null -> false
+        | :? Term as other -> (this :> System.IComparable).CompareTo(other) = 0
+        | _ -> false
+        
+    override this.GetHashCode() =
+        match this with
+        | Resource res -> hash res
+        | Variable v -> hash v
+        
 [<StructuralComparison>]
 [<StructuralEquality>]
 type ResourceOrWildcard = 
     | Resource of GraphElementId
     | Wildcard
 
-
 [<StructuralComparison>]
 [<StructuralEquality>]
 type TriplePattern =
     {Subject: Term; Predicate: Term; Object: Term}
+    member private this.GeneralToString(termToStringFunction : Term -> string ) : string  =
+        $"[{termToStringFunction this.Subject}, {termToStringFunction this.Predicate}, {termToStringFunction this.Object}]"
+    override this.ToString() =
+        this.GeneralToString(fun t -> t.ToString())
+    member this.ToString(manager : GraphElementManager) =
+        this.GeneralToString(fun (t : Term) ->t.ToString(manager))
+    
 
-
-[<StructuralComparison>]
-[<StructuralEquality>]
+[<CustomComparison>]
+[<CustomEquality>]
 type RuleHead =
-    NormalHead of pattern: TriplePattern
+    | NormalHead of pattern: TriplePattern
     | Contradiction
     member this.GetVariables() =
         match this with
         | NormalHead triplePattern -> [triplePattern.Subject; triplePattern.Predicate; triplePattern.Object]
         | Contradiction -> []
-        
+    override this.ToString() =
+        match this with
+        | NormalHead tp -> tp.ToString()
+        | Contradiction -> "false"
+    member this.ToString(manager) =
+        match this with
+        | NormalHead tp -> tp.ToString(manager)
+        | Contradiction -> "false"
+    interface System.IComparable with
+        member this.CompareTo(obj) =
+            match obj with
+            | :? RuleHead as other ->
+                match this, other with
+                | Contradiction, Contradiction -> 0
+                | Contradiction, _ -> -1
+                | _, Contradiction -> 1
+                | NormalHead p1, NormalHead p2 -> 
+                    compare (p1.Subject, p1.Predicate, p1.Object)
+                           (p2.Subject, p2.Predicate, p2.Object)
+            | _ -> 1  
             
+    override this.Equals(obj) =
+        match obj with
+        | :? RuleHead as other -> (this :> System.IComparable).CompareTo(other) = 0
+        | _ -> false
         
+    override this.GetHashCode() =
+        match this with
+        | Contradiction -> -1
+        | NormalHead p -> hash (p.Subject, p.Predicate, p.Object)
+
 [<StructuralComparison>]
 [<StructuralEquality>]
 type RuleAtom = 
     | PositiveTriple of TriplePattern
     | NotTriple of TriplePattern
+    | NotEqualsAtom of Term * Term
+    override this.ToString () =
+        match this with
+        | PositiveTriple tp -> tp.ToString()
+        | NotTriple tp -> $"not {tp.ToString()}"
+    member this.ToString (manager) =
+        match this with
+        | PositiveTriple tp -> tp.ToString(manager)
+        | NotTriple tp -> $"not {tp.ToString(manager)}"
 
 
 [<StructuralComparison>]
@@ -59,7 +133,16 @@ type TripleWildcard =
 [<StructuralEquality>]
 type Rule = 
     {Head: RuleHead; Body: RuleAtom list}
-
+    override this.ToString () =
+        let bodyString = this.Body
+                            |> List.map (fun el -> el.ToString())
+                            |> String.concat ","
+        $"{this.Head.ToString()} :- {bodyString} .\n"
+    member this.ToString (manager) =
+        let bodyString = this.Body
+                            |> List.map (fun el -> el.ToString(manager))
+                            |> String.concat ","
+        $"{this.Head.ToString(manager)} :- {bodyString} .\n"
 type Substitution = 
     Map<string, Ingress.GraphElementId>
 type PartialRule = 
@@ -71,28 +154,7 @@ type PartialRuleMatch =
 module Datalog =
     let emptySubstitution : Substitution = Map.empty
     let isFact (rule) = rule.Body |> List.isEmpty
-    let VariableToString (v : string) : string = $"?{v}"
     
-    let ResourceToString (tripleTable: Datastore) r : string =
-        (tripleTable.GetGraphElement r).ToString()
-    
-    let ResourceOrVariableToString (tripleTable : Datastore) res : string =
-        match res with
-        | Term.Resource r -> (tripleTable.GetGraphElement r).ToString()
-        | Variable v -> VariableToString v
-    
-
-    let TriplePatternToString (tripleTable : Datastore) (triplePattern : TriplePattern) : string =
-        $"[{ResourceOrVariableToString tripleTable triplePattern.Subject},
-        {ResourceOrVariableToString tripleTable triplePattern.Predicate},
-        {ResourceOrVariableToString tripleTable triplePattern.Object} ]"
-    
-    
-    let ResourceAtom (tripleTable : Datastore) (ruleAtom : RuleAtom) : string =
-        match ruleAtom with
-        | PositiveTriple t -> TriplePatternToString tripleTable t
-        | NotTriple t -> $"not {TriplePatternToString tripleTable t}"
-        
     let ConstantTriplePattern (triple : Ingress.Triple) : TriplePattern = 
         {Subject = Term.Resource triple.subject; Predicate = Term.Resource triple.predicate; Object = Term.Resource triple.obj}
     
@@ -112,16 +174,6 @@ module Datalog =
                     rest |> List.collect (fun triplePart -> [Resource r :: triplePart; Wildcard :: triplePart])
         generatePatterns resourceList |> List.map (fun triplePart ->
             {Subject = List.item 0 triplePart; Predicate = List.item 1 triplePart; Object = List.item 2 triplePart})
-        
-    let RuleHeadToString (tripleTable : Datastore) ruleHead : string =
-        match ruleHead with
-        | NormalHead triplePattern -> TriplePatternToString tripleTable triplePattern
-        | Contradiction -> "false"
-    let RuleToString (tripleTable : Datastore) (rule : Rule) : string =
-        let mutable headString = rule.Head |> RuleHeadToString tripleTable
-        headString <- headString + " :- "
-        rule.Body |> List.iter (fun atom -> headString <- headString + ResourceAtom tripleTable atom + ", ")
-        headString
         
     (* Safe rules are those where the head only has variable that are in the body *)
     let GetUnsafeHeadVariables (rule) =
@@ -284,4 +336,5 @@ module Datalog =
                                 )
             )
             (evaluatePositive rdf ruleMatch)
+    
     

@@ -1,0 +1,94 @@
+[?X, a, <http://ns.imfid.org/imf#Descriptor>] :- [?X, a, <http://ns.imfid.org/imf#Aspect>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1227077597>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/983673608>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/983673608>] :- [?X, a, <http://ns.imfid.org/imf#Aspect>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−774233005>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/983673608>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/983673608>] :- [?X, a, <http://ns.imfid.org/imf#Aspect>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/2078897051>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/983673608>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/983673608>] :- [?X, a, <http://ns.imfid.org/imf#Aspect>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−954198851>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1663195799>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1663195799>] :- [?X, a, <http://ns.imfid.org/imf#AspectElement>] .
+[?Y, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1663195799>] :- [?X, <http://ns.imfid.org/imf#intraAspectRelation>, ?Y],[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−954198851>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1663195799>] :- [?X, a, <http://ns.imfid.org/imf#AspectElement>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−840526033>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1663195799>] .
+[?X, a, <http://ns.imfid.org/imf#Element>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/975187715>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/975187715>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−840526033>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1150370759>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−840526033>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1663195799>] :- [?X, a, <http://ns.imfid.org/imf#AspectElement>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1663195799>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−840526033>] .
+[?X, a, <http://ns.imfid.org/imf#AspectElement>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1663195799>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/975187715>] :- [?X, a, <http://ns.imfid.org/imf#Element>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/983673608>] :- [?X, a, <http://ns.imfid.org/imf#Aspect>] .
+[?Y, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1150370759>] :- [?Y, <http://ns.imfid.org/imf#hasAspect>, ?X],[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/983673608>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−840526033>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/975187715>],[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1150370759>] .
+[?X, a, <http://ns.imfid.org/imf#Descriptor>] :- [?X, a, <http://ns.imfid.org/imf#Attribute>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1375836894>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] :- [?X, a, <http://ns.imfid.org/imf#Attribute>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−65689273>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] :- [?X, a, <http://ns.imfid.org/imf#Attribute>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1894040640>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] :- [?X, a, <http://ns.imfid.org/imf#Attribute>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1548035841>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] :- [?X, a, <http://ns.imfid.org/imf#Attribute>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/20160878>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] :- [?X, a, <http://ns.imfid.org/imf#Attribute>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1065435699>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] :- [?X, a, <http://ns.imfid.org/imf#Attribute>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1556850621>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1458247900>] :- [?X, a, <http://ns.imfid.org/imf#Attribute>] .
+[?X, a, <http://ns.imfid.org/imf#Descriptor>] :- [?X, a, <http://ns.imfid.org/imf#AttributeGroup>] .
+[?X, a, <http://ns.imfid.org/imf#Descriptor>] :- [?X, a, <http://ns.imfid.org/imf#AttributeQualifier>] .
+[?X, a, <http://ns.imfid.org/imf#Terminal>] :- [?X, a, <http://ns.imfid.org/imf#BiTerminal>] .
+[?X, a, <http://ns.imfid.org/imf#Element>] :- [?X, a, <http://ns.imfid.org/imf#Block>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/54094095>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1524787470>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1287753015>] :- [?X, a, <http://ns.imfid.org/imf#Terminal>] .
+[?Y, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1287753015>] :- [?X, <http://ns.imfid.org/imf#adjacentTo>, ?Y],[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/54094095>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1524787470>] :- [?X, a, <http://ns.imfid.org/imf#Block>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/920297230>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1524787470>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1524787470>] :- [?X, a, <http://ns.imfid.org/imf#Block>] .
+[?Y, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1524787470>] :- [?X, <http://ns.imfid.org/imf#transfersTo>, ?Y],[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/920297230>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1524787470>] :- [?X, a, <http://ns.imfid.org/imf#Block>] .
+[?X, a, <http://ns.imfid.org/imf#Element>] :- [?X, a, <http://ns.imfid.org/imf#Connector>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/54094095>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1079165324>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1287753015>] :- [?X, a, <http://ns.imfid.org/imf#Terminal>] .
+[?Y, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1287753015>] :- [?X, <http://ns.imfid.org/imf#adjacentTo>, ?Y],[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/54094095>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1079165324>] :- [?X, a, <http://ns.imfid.org/imf#Connector>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1836343282>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1079165324>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1079165324>] :- [?X, a, <http://ns.imfid.org/imf#Connector>] .
+[?X, a, <http://ns.imfid.org/imf#InformationArtefact>] :- [?X, a, <http://ns.imfid.org/imf#Descriptor>] .
+[?X, a, <http://ns.imfid.org/imf#InformationArtefact>] :- [?X, a, <http://ns.imfid.org/imf#Element>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/1372204>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/975187715>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/975187715>] :- [?X, a, <http://ns.imfid.org/imf#Element>] .
+[?X, a, <http://ns.imfid.org/imf#Element>] :- [?X, a, <http://ns.imfid.org/imf#Terminal>] .
+[?X, a, <http://ns.imfid.org/imf#Element>] :- [?X, a, <http://ns.imfid.org/imf#Connector>] .
+[?X, a, <http://ns.imfid.org/imf#Element>] :- [?X, a, <http://ns.imfid.org/imf#Block>] .
+[?X, a, <http://ns.imfid.org/imf#Block>] :- [?X, a, <http://ns.imfid.org/imf#FunctionBlock>] .
+[?X, a, <http://ns.imfid.org/imf#FunctionElement>] :- [?X, a, <http://ns.imfid.org/imf#FunctionBlock>] .
+[?X, a, <http://ns.imfid.org/imf#Block>] :- [?X, a, <http://ns.imfid.org/imf#FunctionBlock>] .
+[?X, a, <http://ns.imfid.org/imf#FunctionElement>] :- [?X, a, <http://ns.imfid.org/imf#FunctionBlock>] .
+[?X, a, <http://ns.imfid.org/imf#FunctionBlock>] :- [?X, a, <http://ns.imfid.org/imf#Block>],[?X, a, <http://ns.imfid.org/imf#FunctionElement>] .
+[?X, a, <http://ns.imfid.org/imf#AspectElement>] :- [?X, a, <http://ns.imfid.org/imf#FunctionElement>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/653588269>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1838715095>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1838715095>] :- [?X, a, <http://ns.imfid.org/imf#FunctionElement>] .
+[?Y, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1838715095>] :- [?X, <http://ns.imfid.org/imf#intraAspectRelation>, ?Y],[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/653588269>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1838715095>] :- [?X, a, <http://ns.imfid.org/imf#FunctionElement>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/510435678>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1838715095>] .
+[?X, <http://ns.imfid.org/imf#hasAspect>, <http://ns.imfid.org/imf#functionAspect>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/510435678>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1838715095>] :- [?X, a, <http://ns.imfid.org/imf#FunctionElement>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1838715095>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/510435678>] .
+[?X, a, <http://ns.imfid.org/imf#FunctionElement>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−1838715095>] .
+[?X, a, <http://ns.imfid.org/imf#FunctionElement>] :- [?X, a, <http://ns.imfid.org/imf#FunctionTerminal>] .
+[?X, a, <http://ns.imfid.org/imf#Terminal>] :- [?X, a, <http://ns.imfid.org/imf#FunctionTerminal>] .
+[?X, a, <http://ns.imfid.org/imf#Terminal>] :- [?X, a, <http://ns.imfid.org/imf#FunctionTerminal>] .
+[?X, a, <http://ns.imfid.org/imf#FunctionElement>] :- [?X, a, <http://ns.imfid.org/imf#FunctionTerminal>] .
+[?X, a, <http://ns.imfid.org/imf#FunctionTerminal>] :- [?X, a, <http://ns.imfid.org/imf#Terminal>],[?X, a, <http://ns.imfid.org/imf#FunctionElement>] .
+[?X, a, <http://ns.imfid.org/imf#Descriptor>] :- [?X, a, <http://ns.imfid.org/imf#InformationDomain>] .
+[?X, a, <http://ns.imfid.org/imf#InformationArtefact>] :- [?X, a, <http://ns.imfid.org/imf#InformationModel>] .
+[?X, a, <http://ns.imfid.org/imf#Terminal>] :- [?X, a, <http://ns.imfid.org/imf#InputTerminal>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−493324282>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−106360328>] .
+false :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−493324282>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−106360328>] :- [?X, a, <http://ns.imfid.org/imf#InputTerminal>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/689900469>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−106360328>] .
+[?X, <http://ns.imfid.org/imf#direction>, <http://ns.imfid.org/imf#inputDirection>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/689900469>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−106360328>] :- [?X, a, <http://ns.imfid.org/imf#InputTerminal>] .
+[?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−106360328>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/689900469>] .
+[?X, a, <http://ns.imfid.org/imf#InputTerminal>] :- [?X, a, <https://github.org/daghovland/DagSemTools/ConceptRepresentative/−106360328>] .

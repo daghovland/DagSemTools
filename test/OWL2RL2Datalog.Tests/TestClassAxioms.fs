@@ -187,7 +187,39 @@ module TestClassAxioms =
         Arules.Should().NotBeEmpty() |> ignore
         Arules.Should().Contain(expectedAxiom)
         
-
+    [<Fact>]
+    let ``MaxQualifiedCardinality is ignored correctly``() =
+        // Arrange
+        let tripleTable = new Datastore(100u)
+        let errorOutput = new System.IO.StringWriter()
+        let aspectClassIri = new IriReference $"http://ns.imfid.org/imf#Aspect"
+        let hasCharacteristic = IriReference "http://ns.imfid.org/imf#hasCharacteristic"
+        let imfInterestIri = IriReference "http://ns.imfid.org/imf#Interest"
+        let imfInformationDomainIri = new IriReference "http://ns.imfid.org/imf#InformationDomain"
+        let imfModalityIri = new IriReference "http://ns.imfid.org/imf#Modality"
+        let axioms = [
+            AxiomClassAxiom(
+                SubClassOf(
+                    [],
+                    ClassName(Iri.FullIri(aspectClassIri)),
+                    ObjectMaxQualifiedCardinality (1,
+                                                   (NamedObjectProperty (Iri.FullIri hasCharacteristic)),
+                                                   ClassName(Iri.FullIri imfInterestIri))
+                )
+            )
+            
+         ]
+        let ontology = Ontology([], ontologyVersion.UnNamedOntology,[], axioms)
+        
+        // Act
+        let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology
+        
+        //Assert
+        let allRulesHaveSingleAtom = 
+            rlProgram 
+            |> Seq.forall (fun rule -> rule.Body.Length = 1)
+        allRulesHaveSingleAtom.Should().BeTrue("There should only be the default rules with one body element, nothing with actual logic") |> ignore
+        
     [<Fact>]
     let ``Equivalentclass RL reasoning from rdf works the other way`` () =
         let tripleTable = new Datastore(100u)
