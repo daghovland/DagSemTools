@@ -9,4 +9,4 @@ triplesOrGraph 	: 	(labelOrSubject (wrappedGraph | (predicateObjectList '.'))) |
 triples2 	: 	(blankNodePropertyList predicateObjectList? '.') | (collection predicateObjectList '.');
 wrappedGraph 	: 	'{' triplesBlock? '}';
 triplesBlock 	: 	triples ('.' triplesBlock?)?;
-labelOrSubject 	: 	iri | BlankNode;
+labelOrSubject 	: 	iri | blankNode;
