@@ -40,6 +40,9 @@
         <None Update="grammars\TurtleTokens.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <Antlr4 Include="grammars\TriGDoc.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
         
     </ItemGroup>
 
