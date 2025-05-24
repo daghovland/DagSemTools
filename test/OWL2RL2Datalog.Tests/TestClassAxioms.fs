@@ -6,6 +6,9 @@
     Contact: hovlanddag@gmail.com
 *)
 namespace DagSemTools.OWL2RL2Datalog.Tests
+
+open System.Numerics
+
 module TestClassAxioms =
 
     open DagSemTools
@@ -108,7 +111,7 @@ module TestClassAxioms =
         let union = ObjectUnionOf [E; F]
         let roleIri = IriReference "https://example.com/property/t"
         let role = NamedObjectProperty (FullIri roleIri)
-        let restriction = ObjectMinQualifiedCardinality(1, role, union)
+        let restriction = ObjectMinQualifiedCardinality(BigInteger(1), role, union)
         let classAxiom = (SubClassOf ([], restriction, A))
         // Act
         let eliAxioms = SubClassAxiomNormalization logger classAxiom
@@ -147,7 +150,7 @@ module TestClassAxioms =
         let intersection = ObjectIntersectionOf [E; F]
         let roleIri = IriReference "https://example.com/property/t"
         let role = NamedObjectProperty (FullIri roleIri)
-        let restriction = ObjectMinQualifiedCardinality(1, role, intersection)
+        let restriction = ObjectMinQualifiedCardinality(BigInteger(1), role, intersection)
         let subClassAxiom = AxiomClassAxiom (SubClassOf ([], restriction, A))
         let ontology = OwlOntology.Ontology([], ontologyVersion.UnNamedOntology,[], [subClassAxiom])
         // Act
@@ -202,7 +205,7 @@ module TestClassAxioms =
                 SubClassOf(
                     [],
                     ClassName(Iri.FullIri(aspectClassIri)),
-                    ObjectMaxQualifiedCardinality (1,
+                    ObjectMaxQualifiedCardinality (BigInteger(1),
                                                    (NamedObjectProperty (Iri.FullIri hasCharacteristic)),
                                                    ClassName(Iri.FullIri imfInterestIri))
                 )

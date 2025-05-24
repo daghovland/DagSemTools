@@ -31,15 +31,15 @@
         <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
     <ItemGroup>
-        <Antlr4 Include="grammars\TurtleDoc.g4">
-          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-        </Antlr4>
         <None Update="grammars\TurtleResource.g4">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
         <None Update="grammars\TurtleTokens.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </None>
+        <Antlr4 Include="grammars\TriGDoc.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
         
     </ItemGroup>
 

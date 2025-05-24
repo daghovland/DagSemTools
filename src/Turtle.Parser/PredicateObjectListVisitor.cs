@@ -10,7 +10,7 @@ using static DagSemTools.Rdf.Ingress;
 
 namespace DagSemTools.Turtle.Parser;
 
-internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List<Triple>>>
+internal class PredicateObjectListVisitor : TriGDocBaseVisitor<Func<uint, List<Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
 
@@ -25,7 +25,7 @@ internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List
     /// <param name="context"></param>
     /// <returns></returns>
     public override Func<uint, List<Triple>> VisitPredicateObjectList(
-        TurtleDocParser.PredicateObjectListContext context) =>
+        TriGDocParser.PredicateObjectListContext context) =>
         (node) =>
             context.verbObjectList()
                 .SelectMany(vo => VisitVerbObjectList(vo)(node))
@@ -44,7 +44,7 @@ internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List
         internal IEnumerable<uint> tripleIds = _tripleIds;
     }
 
-    private void HandleAnnotation((TurtleDocParser.AnnotationContext? annot, Triple triple) rdfobj)
+    private void HandleAnnotation((TriGDocParser.AnnotationContext? annot, Triple triple) rdfobj)
     {
         if (rdfobj.annot != null && rdfobj.annot.children != null)
         {
@@ -52,20 +52,20 @@ internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List
                 .Aggregate(seed: new AnnotationStatus(_resourceVisitor.Datastore.NewAnonymousBlankNode(), new List<Triple>(), new List<uint>()),
                     func: (aggr, child) => child switch
                     {
-                        TurtleDocParser.PredicateObjectListContext predobj => HandlePredicateObjectReification(predobj, aggr),
-                        TurtleDocParser.ReifierContext reif => HandleReification(reif, rdfobj.triple, aggr),
+                        TriGDocParser.PredicateObjectListContext predobj => HandlePredicateObjectReification(predobj, aggr),
+                        TriGDocParser.ReifierContext reif => HandleReification(reif, rdfobj.triple, aggr),
                         _ => aggr
                     });
             reifications.triples.ToList().ForEach(_resourceVisitor.Datastore.AddTriple);
             reifications.tripleIds.ToList().ForEach(tripleId => _resourceVisitor.Datastore.AddReifiedTriple(rdfobj.triple, tripleId));
         }
     }
-    private AnnotationStatus HandlePredicateObjectReification(TurtleDocParser.PredicateObjectListContext predobj, AnnotationStatus aggr)
+    private AnnotationStatus HandlePredicateObjectReification(TriGDocParser.PredicateObjectListContext predobj, AnnotationStatus aggr)
     {
         var newTriples = VisitPredicateObjectList(predobj)(aggr.reifierNodeId);
         return new AnnotationStatus(aggr.reifierNodeId, aggr.triples.Concat(newTriples), aggr.tripleIds);
     }
-    private AnnotationStatus HandleReification(TurtleDocParser.ReifierContext reif, Triple triple, AnnotationStatus aggr)
+    private AnnotationStatus HandleReification(TriGDocParser.ReifierContext reif, Triple triple, AnnotationStatus aggr)
     {
         var reifier = _resourceVisitor.Visit(reif);
         return new AnnotationStatus(reifier, aggr.triples, aggr.tripleIds.Append(reifier));
@@ -78,7 +78,7 @@ internal class PredicateObjectListVisitor : TurtleDocBaseVisitor<Func<uint, List
     /// <param name="context"></param>
     /// <returns></returns>
     public override Func<uint, List<Triple>> VisitVerbObjectList(
-        TurtleDocParser.VerbObjectListContext context) =>
+        TriGDocParser.VerbObjectListContext context) =>
         (node) =>
         {
             var predicate = _resourceVisitor.Visit(context.verb());

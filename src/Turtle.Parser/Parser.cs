@@ -55,13 +55,13 @@ public static class Parser
     public static Datastore ParseReader(TextReader textReader, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
         var input = new AntlrInputStream(textReader);
-        var lexer = new TurtleDocLexer(input);
+        var lexer = new TriGDocLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        var parser = new TurtleDocParser(tokens);
+        var parser = new TriGDocParser(tokens);
         var customErrorListener = new ParserErrorListener(errorOutput);
         parser.RemoveErrorListeners();
         parser.AddErrorListener(customErrorListener);
-        IParseTree tree = parser.turtleDoc();
+        IParseTree tree = parser.trigDoc();
         ParseTreeWalker walker = new ParseTreeWalker();
         var listener = new TurtleListener(initSize, customErrorListener);
         walker.Walk(listener, tree);

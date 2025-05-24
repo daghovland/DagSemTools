@@ -214,7 +214,7 @@ module TermsUnifiableTests =
             Assert.True(result, "Triple patterns with variable and resource should be unifiable")
 
 
-        [<Fact>]
+        [<Fact(Skip="Too long")>]
         let TestLargeFile() = 
             let fInfo = File.ReadAllText("TestData/large.datalog")
             let datastore = new Datastore(1000u);

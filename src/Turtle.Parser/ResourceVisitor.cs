@@ -16,9 +16,9 @@ namespace DagSemTools.Turtle.Parser;
 
 using System.Collections.Generic;
 using IriTools;
-using static TurtleDocParser;
+using static TriGDocParser;
 
-internal class ResourceVisitor : TurtleDocBaseVisitor<uint>
+internal class ResourceVisitor : TriGDocBaseVisitor<uint>
 {
     private StringVisitor _stringVisitor = new();
     private IriGrammarVisitor _iriGrammarVisitor;
