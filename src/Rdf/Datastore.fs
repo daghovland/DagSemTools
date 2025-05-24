@@ -1,8 +1,10 @@
 namespace DagSemTools.Rdf
 
+open DagSemTools.Rdf.Ingress
 open Ingress
 open System
 open DagSemTools.Ingress
+open IriTools
 
 type Datastore(triples: TripleTable,
                reifiedTriples: QuadTable,
@@ -30,6 +32,8 @@ type Datastore(triples: TripleTable,
     member this.AddTriple (triple: Triple) =
         this.Triples.AddTriple triple
     
+    member this.AddNamedGraphTriple(graph: GraphElementId, triple: Triple) =
+        this.NamedGraphs.AddQuad{ tripleId = graph; subject = triple.subject; predicate = triple.predicate; obj = triple.obj}
     member this.AddReifiedTriple (triple: Triple, id: GraphElementId) =
         this.ReifiedTriples.AddQuad { tripleId = id; subject = triple.subject; predicate = triple.predicate; obj = triple.obj }
     
@@ -63,22 +67,34 @@ type Datastore(triples: TripleTable,
         
     member this.GetTriplesWithSubject (subject: GraphElementId) : Triple seq =
         this.Triples.GetTriplesWithSubject subject
+    member this.GetTriplesWithSubject (graphid: GraphElementId, subject: GraphElementId)  =
+        this.NamedGraphs.GetQuadsWithIdSubject (graphid, subject)
     
     member this.GetTriplesWithObject (object: GraphElementId) : Triple seq =
         this.Triples.GetTriplesWithObject object
-    
+    member this.GetTriplesWithObject (graphid: GraphElementId, object: GraphElementId)  =
+        this.NamedGraphs.GetQuadsWithIdObject (graphid, object)
     member this.GetTriplesWithPredicate (predicate: GraphElementId) : Triple seq =
         this.Triples.GetTriplesWithPredicate predicate
     
+    member this.GetTriplesWithPredicate (graphid: GraphElementId, predicate: GraphElementId)  =
+        this.NamedGraphs.GetQuadsWithIdPredicate (graphid, predicate)
     
     member this.GetTriplesWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
         this.Triples.GetTriplesWithSubjectPredicate (subject, predicate)
     
+    member this.GetTriplesWithSubjectPredicate (graphId : GraphElementId, subject: GraphElementId, predicate: GraphElementId) =
+        this.NamedGraphs.GetQuadsWithIdSubjectPredicate(graphId, subject, predicate)
     member this.GetTriplesWithObjectPredicate (object: GraphElementId, predicate: GraphElementId) =
         this.Triples.GetTriplesWithObjectPredicate (object, predicate)
+    member this.GetTriplesWithObjectPredicate (graphId : GraphElementId, object: GraphElementId, predicate: GraphElementId) =
+        this.NamedGraphs.GetQuadsWithIdObjectPredicate(graphId, object, predicate)
+    
         
-    member this.GetTriplesWithSubjectObject (subject: GraphElementId, object: GraphElementId) : Triple seq =
+    member this.GetTriplesWithSubjectObject (subject: GraphElementId, object: GraphElementId)  =
         this.Triples.GetTriplesWithSubjectObject (subject, object)
+    member this.GetTriplesWithSubjectObject (graphId: GraphElementId, subject: GraphElementId, object: GraphElementId)  =
+        this.NamedGraphs.GetQuadsWithIdSubjectPredicate (graphId, subject, object)
         
     member this.ContainsTriple (triple : Triple) : bool =
             this.Triples.Contains triple

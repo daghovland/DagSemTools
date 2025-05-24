@@ -118,4 +118,25 @@ type QuadTable(quadList: Quad array,
             this.GetQuadsWithSubject subject
                 |> Seq.where (fun triple ->  triple.obj = object)
         
+       member this.GetQuadsWithIdSubject (id: GraphElementId, subject: GraphElementId) : Quad seq =
+            this.GetQuadsWithSubject subject
+                |> Seq.where (fun quad -> quad.tripleId = id) 
+        
+       member this.GetQuadsWithIdPredicate (id: GraphElementId, predicate: GraphElementId) : Quad seq =
+            this.GetQuadsWithPredicate predicate
+                |> Seq.where (fun quad -> quad.tripleId = id) 
        
+       member this.GetQuadsWithIdObject (id: GraphElementId, obj: GraphElementId) : Quad seq =
+            this.GetQuadsWithObject obj
+                |> Seq.where (fun quad -> quad.tripleId = id) 
+       member this.GetQuadsWithIdSubjectPredicate (id: GraphElementId, subject: GraphElementId, predicate: GraphElementId) : Quad seq =
+            this.GetQuadsWithSubjectPredicate (subject, predicate)
+                |> Seq.where (fun quad -> quad.tripleId = id) 
+       
+       member this.GetQuadsWithIdSubjectObject (id: GraphElementId, subject: GraphElementId, object: GraphElementId) : Quad seq =
+            this.GetQuadsWithSubjectObject (subject, object)
+                |> Seq.where (fun quad -> quad.tripleId = id)
+                
+        member this.GetQuadsWithIdObjectPredicate (id: GraphElementId, object: GraphElementId, predicate: GraphElementId) : Quad seq =
+            this.GetQuadsWithObjectPredicate (object, predicate)
+                |> Seq.where (fun quad -> quad.tripleId = id)

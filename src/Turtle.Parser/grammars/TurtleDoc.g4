@@ -1,1 +1,0 @@
-../../../grammars/turtle/TurtleDoc.g4

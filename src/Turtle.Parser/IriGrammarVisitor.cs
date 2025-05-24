@@ -11,12 +11,12 @@ using Microsoft.FSharp.Collections;
 using DagSemTools.Ingress;
 using System.Collections.Generic;
 using IriTools;
-using static TurtleDocParser;
+using static TriGDocParser;
 
 /// <summary>
 /// Visitor for the IRI grammar in the Turtle language.
 /// </summary>
-public class IriGrammarVisitor : TurtleDocBaseVisitor<IriReference>
+public class IriGrammarVisitor : TriGDocBaseVisitor<IriReference>
 {
     private Dictionary<string, IriReference> _prefixes;
     private IriReference? _baseIriReference;
