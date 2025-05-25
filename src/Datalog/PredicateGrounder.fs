@@ -28,19 +28,22 @@ module PredicateGrounder =
     let getAtomPredicate (atom: RuleAtom)  =
         match atom with
         | PositiveTriple triple -> getTriplePredicate triple
-        | NotTriple triple -> getTriplePredicate triple    
+        | NotTriple triple -> getTriplePredicate triple
+        | NotEqualsAtom (t1, t2) -> None
     let getPredicatesInUse (rules: Rule seq, triplestore: Datastore) =
         let headPredicates = rules |> Seq.choose (fun rule -> getRuleHeadPredicate rule.Head)
         let dataPredicates = triplestore.Resources.GetIriResourceIds()
         Seq. concat [headPredicates; dataPredicates] |> Seq.distinct
 
+    let instantiateResourceWithVariableMapping variableName predicate res =
+            match res with
+                    | _variableName when _variableName = variableName -> Term.Resource predicate
+                    | _ -> res
+    
     let instantiateTripleWithVariableMapping (triple : TriplePattern) (variableName : Term) predicate : TriplePattern =
         let tripleList =
             [triple.Subject; triple.Predicate; triple.Object]
-            |> List.map (fun res -> 
-            match res with
-                    | _variableName when _variableName = variableName -> Term.Resource predicate
-                    | _ -> res)
+            |> List.map (instantiateResourceWithVariableMapping variableName predicate)
         {Subject = tripleList.[0]; Predicate = tripleList.[1]; Object = tripleList.[2]}
         
     let instantiateRuleWithVariableMapping (predicate, rule: Rule, variableName) =
@@ -52,6 +55,8 @@ module PredicateGrounder =
                 match atom with
                 | PositiveTriple triple -> PositiveTriple (instantiateTripleWithVariableMapping triple variableName predicate)
                 | RuleAtom.NotTriple triple -> NotTriple (instantiateTripleWithVariableMapping triple variableName predicate)
+                | NotEqualsAtom (t1, t2) -> NotEqualsAtom (instantiateResourceWithVariableMapping variableName predicate t1,
+                                                           instantiateResourceWithVariableMapping variableName predicate t2)
                 )
         {rule with Head = newHead; Body = newBody}
     
@@ -74,6 +79,7 @@ module PredicateGrounder =
             match atom with
             | PositiveTriple triple -> getTripleRelationVariable triple
             | NotTriple triple -> getTripleRelationVariable triple
+            | NotEqualsAtom (t1, t2) -> None
             )
     
     let getGroundPredicateRules (rule: Rule) predicates (relationVariableName: string) : Rule seq =
