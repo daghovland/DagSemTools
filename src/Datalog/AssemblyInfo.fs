@@ -3,8 +3,6 @@ module DagSemTools.Datalog.AssemblyInfo
 
 open System.Runtime.CompilerServices
 
-[<assembly: InternalsVisibleTo("TurtleParser.Unit.Tests")>]
-[<assembly: InternalsVisibleTo("Rdf.Unit.Tests")>]
 [<assembly: InternalsVisibleTo("OWL2RL2Datalog.Tests")>]
 [<assembly: InternalsVisibleTo("Datalog.Test")>]
 [<assembly: InternalsVisibleTo("Api.Tests")>]
