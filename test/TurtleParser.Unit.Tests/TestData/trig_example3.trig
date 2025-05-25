@@ -1,4 +1,6 @@
 # This document contains a same data as the previous example.
+# From https://www.w3.org/TR/rdf12-trig/
+# Copyright © 2010-2024 World Wide Web Consortium.
 
 PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
 PREFIX dc: <http://purl.org/dc/terms/>

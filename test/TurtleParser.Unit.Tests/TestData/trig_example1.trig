@@ -1,4 +1,5 @@
 # From https://www.w3.org/TR/rdf12-trig/
+# Copyright © 2010-2024 World Wide Web Consortium.
 # This document encodes one graph.
 PREFIX ex: <http://www.example.org/vocabulary#>
 PREFIX : <http://www.example.org/exampleDocument#>
