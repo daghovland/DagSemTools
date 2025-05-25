@@ -78,6 +78,15 @@ public class TestTriGParser : IDisposable, IAsyncDisposable
         var bobGraphBobTriples = ont.GetTriplesWithObject(bob, bobString);
         bobGraphBobTriples.Should().HaveCount(1);
     }
+
+    [Fact]
+    public void TestTrigExample4()
+    {
+        var ontology = File.ReadAllText("TestData/trig_example4.trig");
+        var ont = TestOntology(ontology);
+        Assert.NotNull(ont);
+    }
+
     public void Dispose()
     {
         _outputWriter.Dispose();
