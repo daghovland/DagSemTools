@@ -127,7 +127,6 @@ internal class TurtleListener : TriGDocBaseListener
         var internalTriples =
             _resourceVisitor._predicateObjectListVisitor.Visit(
                 blankNodePropertyList.predicateObjectList())(blankNode);
-        TriGDocParser.BlankNodeTriplesContext context;
         var postTriples = predicateObjectList switch
         {
             null => new List<Rdf.Ingress.Triple>(),

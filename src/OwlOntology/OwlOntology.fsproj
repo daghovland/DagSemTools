@@ -22,6 +22,7 @@
         <Platforms>AnyCPU</Platforms>
         <PackageTags>Owl</PackageTags>
         <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

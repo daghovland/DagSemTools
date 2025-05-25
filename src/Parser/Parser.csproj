@@ -20,7 +20,8 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
 

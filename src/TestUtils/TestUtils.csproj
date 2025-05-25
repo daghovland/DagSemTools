@@ -10,6 +10,7 @@
         <IsTestProject>false</IsTestProject>
         <IsPackable>false</IsPackable>
         <Copyright>Copyright Dag Hovland 2024</Copyright>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     </PropertyGroup>
 
     <ItemGroup>

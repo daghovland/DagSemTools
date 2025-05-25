@@ -118,10 +118,12 @@ type RuleAtom =
         match this with
         | PositiveTriple tp -> tp.ToString()
         | NotTriple tp -> $"not {tp.ToString()}"
+        | NotEqualsAtom (t1, t2) -> $"{t1.ToString()} != {t2.ToString()}"
     member this.ToString (manager) =
         match this with
         | PositiveTriple tp -> tp.ToString(manager)
         | NotTriple tp -> $"not {tp.ToString(manager)}"
+        | NotEqualsAtom (t1, t2) -> $"{t1.ToString(manager)} != {t2.ToString(manager)}"
 
 
 [<StructuralComparison>]
@@ -181,6 +183,7 @@ module Datalog =
                                 |> Seq.collect (fun atom -> match atom with
                                                             | PositiveTriple t -> [t.Subject; t.Predicate; t.Object]
                                                             | NotTriple t -> [t.Subject; t.Predicate; t.Object]
+                                                            | NotEqualsAtom (t1, t2) -> [t1; t2]
                                 )
                                 |> Seq.choose (fun r -> match r with
                                                         | Variable v -> Some (v)
@@ -246,6 +249,7 @@ module Datalog =
         |> Seq.choose (fun r -> match r with
                                 | PositiveTriple t -> Some t
                                 | NotTriple t -> None
+                                | NotEqualsAtom (t1, t2) -> None
                     )
         |> Seq.map (fun r -> r, GetSubstitutions (Map.empty) fact r) 
         |> Seq.choose (fun (r, s) -> Option.map (fun s -> {Match = rule; Substitution = s}) s)
@@ -258,6 +262,8 @@ module Datalog =
        |> Seq.choose (fun atom -> match atom with
                                     | PositiveTriple t -> Some t
                                     | NotTriple t -> None
+                                    // TODO: This migth need a match
+                                    | NotEqualsAtom (t1, t2) -> None
                     )
        |> Seq.collect (fun pat ->
            WildcardTriplePattern pat
@@ -306,14 +312,13 @@ module Datalog =
             | Variable s, Variable p, Variable o -> rdf.GetTriples()
             ) 
         matchedTriples |> Seq.choose (fun t -> GetSubstitutions sub t mappedTriple)
-    
-    
                             
     let evaluatePositive (rdf : TripleTable) (ruleMatch : PartialRuleMatch) : Substitution seq =
          ruleMatch.Match.Rule.Body
         |> Seq.choose (fun atom -> match atom with
                                     | PositiveTriple t -> Some t
                                     | NotTriple t -> None
+                                    | NotEqualsAtom (t1, t2) -> None
                     )
         |> Seq.fold
             ( fun subs tr ->
@@ -325,6 +330,7 @@ module Datalog =
         |> Seq.choose (fun atom -> match atom with
                                     | PositiveTriple _ -> None
                                     | NotTriple t -> Some t
+                                    | NotEqualsAtom (t1, t2) -> None
                     )
         |> Seq.fold
             ( fun subs tr ->

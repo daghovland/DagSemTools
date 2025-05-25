@@ -95,8 +95,7 @@ let internal init_tbox_expander (tbox : TBoxAxiom list) init_state  =
     tbox |> List.fold (fun state assertion ->
         match assertion with
         | Inclusion (c1, c2) -> 
-            add_subclass_assertion state c1 c2
-        | _ -> state )
+            add_subclass_assertion state c1 c2 )
         init_state
 
 let internal create_negative_role_assertion_map (abox : ABoxAssertion list) =

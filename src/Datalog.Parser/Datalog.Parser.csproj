@@ -20,8 +20,6 @@
         <IncludeSource>true</IncludeSource>
         <IncludeSymbols>true</IncludeSymbols>
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
-        
-        
         <Platforms>AnyCPU</Platforms>
     </PropertyGroup>
     

@@ -8,6 +8,7 @@
 
 namespace DagSemTools.ELI.Tests
 
+open System.Numerics
 open DagSemTools
 open DagSemTools.Datalog
 open DagSemTools.ELI.Axioms
@@ -140,7 +141,7 @@ module TestClassAxioms =
         let union = ObjectUnionOf [E; F]
         let roleIri = IriReference "https://example.com/property/t"
         let role = NamedObjectProperty (FullIri roleIri)
-        let restriction = ObjectMinQualifiedCardinality(1, role, union)
+        let restriction = ObjectMinQualifiedCardinality(BigInteger(1), role, union)
         let classAxiom = (SubClassOf ([], restriction, A))
         //Act
         let normalizedAxioms = ELI.ELIExtractor.SubClassAxiomNormalization logger classAxiom
@@ -187,7 +188,8 @@ module TestClassAxioms =
                                 | _ -> failwith "test failure"
         let restrictionConceptIri =
             match restrictionFormaula with
-            | AllValuesFrom (role, concept) -> concept 
+            | AllValuesFrom (role, concept) -> concept
+            | _ -> failwith $"Test failure {restrictionFormaula} must be AllValuesFrom"
         inMemorySink.LogEvents.Should().BeEmpty
 
 

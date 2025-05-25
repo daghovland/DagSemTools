@@ -62,7 +62,6 @@ ManchesterAntlr/gen/
 /.vscode/
 src/Api/bin
 src/Api/obj
-
 src/Manchester/bin
 src/Manchester/obj
 src/ManchesterAntlr/bin
@@ -70,13 +69,11 @@ src/ManchesterAntlr/obj
 src/TurtleAntlr/bin
 src/TurtleAntlr/obj
 src/Rdf/bin
-src/Api/bin
 src/Rdf/obj
 src/OwlApp/bin
 src/OwlApp/obj
 test/NugetTest/bin
 test/NugetTest/obj
-
 localNugetPackages/*
 src/Datalog/bin/
 src/Datalog.Parser/bin/
@@ -88,3 +85,5 @@ test/Api.Tests/TestData/imf.ttl
 test/Api.Tests/TestData/go.ttl
 test/Api.Tests/TestData/go.owl.xml
 DagSemTools.sln.DotSettings.user
+src/Turtle.Parser/grammars/gen/*
+src/Datalog.Parser/grammars/gen/*

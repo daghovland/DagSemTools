@@ -66,7 +66,8 @@ public class OwlOntology
             Tableau.ReasoningResult.Consistent consistentState =>
                 Either<TableauReasoner, string>.Left(TableauReasoner.Create(consistentState.Item, _logger)),
             Tableau.ReasoningResult.InConsistent inConsistent =>
-                Either<TableauReasoner, string>.Right(inConsistent.Item.ToString())
+                Either<TableauReasoner, string>.Right(inConsistent.Item.ToString()),
+            _ => throw new NotImplementedException("Unknown reasoner state: " + reasonerstate.GetType().Name + "")
         };
 
     }

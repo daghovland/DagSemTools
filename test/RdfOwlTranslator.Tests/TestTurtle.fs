@@ -8,6 +8,7 @@
 namespace DagSemTools.RdfOwlTranslator.Tests
 
 open System.IO
+open System.Numerics
 open DagSemTools.OwlOntology
 open Xunit.Abstractions
 open Xunit
@@ -43,7 +44,7 @@ type TestTurtle(output : ITestOutputHelper) =
                 SubClassOf(
                     [],
                     ClassName(Iri.FullIri(new IriReference $"http://ns.imfid.org/imf#Aspect")),
-                    ObjectExactQualifiedCardinality (1,
+                    ObjectExactQualifiedCardinality (BigInteger(1),
                                                    (NamedObjectProperty (Iri.FullIri "http://ns.imfid.org/imf#hasCharacteristic")),
                                                    ClassName(Iri.FullIri(new IriReference "http://ns.imfid.org/imf#InformationDomain")))
                 )
@@ -52,7 +53,7 @@ type TestTurtle(output : ITestOutputHelper) =
                 SubClassOf(
                     [],
                     ClassName(Iri.FullIri(new IriReference $"http://ns.imfid.org/imf#Aspect")),
-                    ObjectExactQualifiedCardinality (1,
+                    ObjectExactQualifiedCardinality (BigInteger(1),
                                                    (NamedObjectProperty (Iri.FullIri "http://ns.imfid.org/imf#hasCharacteristic")),
                                                    ClassName(Iri.FullIri(new IriReference "http://ns.imfid.org/imf#Modality")))
                 )
@@ -61,7 +62,7 @@ type TestTurtle(output : ITestOutputHelper) =
                 SubClassOf(
                     [],
                     ClassName(Iri.FullIri(new IriReference $"http://ns.imfid.org/imf#Aspect")),
-                    ObjectMaxQualifiedCardinality (1,
+                    ObjectMaxQualifiedCardinality (BigInteger(1),
                                                    (NamedObjectProperty (Iri.FullIri "http://ns.imfid.org/imf#hasCharacteristic")),
                                                    ClassName(Iri.FullIri(new IriReference "http://ns.imfid.org/imf#Interest")))
                 )

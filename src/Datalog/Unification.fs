@@ -67,6 +67,7 @@ module internal Unification =
         match atom with
         | NotTriple pattern -> if triplePatternsUnifiable triple1 pattern then Some NegativeRelation else None
         | PositiveTriple pattern -> if triplePatternsUnifiable triple1 pattern then Some PositiveRelation else None
+        | NotEqualsAtom (t1, t2) -> None
     
     (* Returns all rules where there is a body atom that is unifiable with the triple pattern
       TODO: This should probably be cached or indexed in a better way

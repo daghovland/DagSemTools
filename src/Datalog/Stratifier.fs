@@ -90,15 +90,17 @@ module internal Stratifier =
             | NormalHead pattern -> Some pattern
     let GetRuleAtomPattern (atom : RuleAtom)  =
         match atom with
-                        | PositiveTriple t -> t
-                        | NotTriple t -> t
+                        | PositiveTriple t -> Some t
+                        | NotTriple t -> Some t
+                        | NotEqualsAtom (t1, t2) -> None 
                  
     let GetBodyTriplePatterns rules = rules
                                     |> Seq.collect (fun rule ->
-                                    rule.Body |> Seq.map GetRuleAtomPattern
+                                    rule.Body |> Seq.choose GetRuleAtomPattern
                                     )
-    let GetHeadPattern rules = rules
-                                |> Seq.choose (fun rule -> rule.Head |> GetRuleHeadPattern)
+    let GetHeadPattern rules =
+        rules
+        |> Seq.choose (fun rule -> rule.Head |> GetRuleHeadPattern)
                             
                 
     (* The intensional triple patterns are those that occur in the head of at least one rule *)       
@@ -286,9 +288,9 @@ module internal Stratifier =
                     |> Array.map (fun rule -> rule.Relation)
                 rule.Body
                 |> Seq.forall (fun atom ->
-                    let atomRelation = atom|> GetRuleAtomPattern 
-                    IntentionalRules remainingRules atomRelation
-                    |> Seq.isEmpty
+                    match atom |> GetRuleAtomPattern with
+                    | Some atomRelation -> IntentionalRules remainingRules atomRelation |> Seq.isEmpty
+                    | None -> true
                 )
                 
         member internal this.outputCycleElement rel =

@@ -41,7 +41,8 @@ public class TableauReasoner
             ALC.Concept.Disjunction disjunction => throw new NotImplementedException(),
             ALC.Concept.Existential existential => throw new NotImplementedException(),
             ALC.Concept.Negation negation => throw new NotImplementedException(),
-            ALC.Concept.Universal universal => throw new NotImplementedException()
+            ALC.Concept.Universal universal => throw new NotImplementedException(),
+            _ => throw new NotImplementedException("Unknown concept type: " + concept.GetType().Name + "")
         };
     /// <summary>
     /// Get iris of all types of the individual

@@ -816,10 +816,10 @@ module Tests =
             }
             let partitioner  = Stratifier.RulePartitioner (logger, [ruleA; ruleB], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRules()
-            ordered_relations.Should().HaveLength(2) 
+            ordered_relations.Should().HaveLength(2) |> ignore 
             
             let init_queue = partitioner.GetReadyElementsQueue()
-            init_queue.Should().HaveLength(1)
+            init_queue.Should().HaveLength(1) |> ignore
             let first_partition = partitioner.get_rule_partition()
             first_partition.Should().Contain(ruleB).And.HaveLength(1)
     

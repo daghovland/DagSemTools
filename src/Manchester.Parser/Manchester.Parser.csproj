@@ -21,6 +21,7 @@
     <EmbedUntrackedSources>true</EmbedUntrackedSources>
     <IncludeSource>true</IncludeSource>
     <IncludeSymbols>true</IncludeSymbols>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <SymbolPackageFormat>snupkg</SymbolPackageFormat>
     <Platforms>AnyCPU</Platforms>
   </PropertyGroup>
