@@ -7,6 +7,7 @@
 *)
 namespace DagSemTools.Rdf
 
+open System
 open System.Numerics
 open DagSemTools.Ingress
 
@@ -39,7 +40,12 @@ module Ingress =
                 this.subject 
                 this.predicate 
                 this.obj
-    
+        member this.GetTriple =
+            {
+                Triple.subject = this.subject
+                predicate = this.predicate
+                obj = this.obj
+            }
     
     [<Struct>]
     [<StructuralEquality>]
@@ -55,6 +61,29 @@ module Ingress =
                 this.predicate 
                 this.obj
     
+    
+    
+    [<Struct>]
+    [<StructuralEquality>]
+    [<NoComparison>]
+    type QuadResource = {
+            tripleId: GraphElement
+            subject: GraphElement
+            predicate: GraphElement
+            obj: GraphElement
+    } with
+        override this.ToString() =
+            sprintf "%A: (%A, %A, %A)"
+                this.tripleId
+                this.subject 
+                this.predicate 
+                this.obj
+            member this.GetTripleResource =
+                {
+                    TripleResource.subject = this.subject
+                    predicate = this.predicate
+                    obj = this.obj
+                }
     
       
     let doubleArraySize (originalArray: 'T array) : 'T array =

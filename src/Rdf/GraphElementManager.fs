@@ -91,5 +91,12 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
           TripleResource.predicate = ResourceList.[int triple.predicate]
           TripleResource.obj = ResourceList.[int triple.obj]
         }
-     
     
+    member this.GetResourceQuad(quad: Quad) =
+        {
+          QuadResource.tripleId = ResourceList.[int quad.tripleId]
+          subject = ResourceList.[int quad.subject]
+          predicate = ResourceList.[int quad.predicate]
+          obj = ResourceList.[int quad.obj]
+        }
+     
