@@ -84,43 +84,43 @@ internal class TurtleListener : TriGDocBaseListener
         var curSubject = _resourceVisitor.Visit(context.subject());
         ExitNamedTripleList(curSubject, context.predicateObjectList());
     }
-    
+
     public override void ExitCollectionTriples2(TriGDocParser.CollectionTriples2Context context)
     {
         var curSubject = _resourceVisitor.Visit(context.collection());
         ExitNamedTripleList(curSubject, context.predicateObjectList());
     }
-    
+
     public override void ExitLabelOrSubjectTriples(TriGDocParser.LabelOrSubjectTriplesContext context)
     {
         var curSubject = _resourceVisitor.Visit(context.labelOrSubject());
         ExitNamedTripleList(curSubject, context.predicateObjectList());
     }
-    
-    
-    
+
+
+
     public override void ExitReifiedTripleObjectList(TriGDocParser.ReifiedTripleObjectListContext context)
     {
         var curSubject = _resourceVisitor.Visit(context.reifiedTriple());
         ExitNamedTripleList(curSubject, context.predicateObjectList());
     }
 
-    
+
     private void ExitNamedTripleList(uint curSubject, TriGDocParser.PredicateObjectListContext predicateObjectListContext)
     {
         var triples = _resourceVisitor._predicateObjectListVisitor.Visit(predicateObjectListContext)(curSubject);
-        if(GraphName == null )
+        if (GraphName == null)
             triples.ToList().ForEach(triple => datastore.AddTriple(triple));
-        else 
+        else
             triples.ToList().ForEach(triple => datastore.AddNamedGraphTriple(GraphName.Value, triple));
     }
-    
+
     public override void ExitBlankNodeTriples2(TriGDocParser.BlankNodeTriples2Context context) =>
         ExitAnyBlankNodeTriples(context.blankNodePropertyList(), context.predicateObjectList());
-    
+
     public override void ExitBlankNodeTriples(TriGDocParser.BlankNodeTriplesContext context) =>
         ExitAnyBlankNodeTriples(context.blankNodePropertyList(), context.predicateObjectList());
-    
+
     private void ExitAnyBlankNodeTriples(TriGDocParser.BlankNodePropertyListContext blankNodePropertyList, TriGDocParser.PredicateObjectListContext predicateObjectList)
     {
         var blankNode = datastore.NewAnonymousBlankNode();
@@ -134,9 +134,9 @@ internal class TurtleListener : TriGDocBaseListener
             var c => _resourceVisitor._predicateObjectListVisitor.Visit(c)(blankNode)
         };
         var triples = internalTriples.Concat(postTriples);
-        if(GraphName == null) 
+        if (GraphName == null)
             triples.ToList().ForEach(triple => datastore.AddTriple(triple));
-        else 
+        else
             triples.ToList().ForEach(triple => datastore.AddNamedGraphTriple(GraphName.Value, triple));
     }
 

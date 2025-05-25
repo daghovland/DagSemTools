@@ -252,7 +252,7 @@ public class TestApiOntology
     }
 
 
-    [Fact(Skip="Too long")]
+    [Fact(Skip = "Too long")]
     public void ParseGeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");

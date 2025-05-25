@@ -41,10 +41,10 @@ public class TestTriGParser : IDisposable, IAsyncDisposable
         ont.GetTriplesWithPredicate(knows).Should().HaveCount(0);
         var graphIri = ont.GetGraphElementId(GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://www.example.org/exampleDocument#G1"))));
         ont.NamedGraphs.GetGraph(graphIri).Should().HaveCount(6);
-        
+
     }
-    
-    
+
+
     [Fact]
     public void TestTrigExample2()
     {
@@ -61,7 +61,7 @@ public class TestTriGParser : IDisposable, IAsyncDisposable
         var bobGraphBobTriples = ont.GetTriplesWithObject(bob, bobString);
         bobGraphBobTriples.Should().HaveCount(1);
     }
-    
+
     [Fact]
     public void TestTrigExample3()
     {
