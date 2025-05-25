@@ -13,14 +13,14 @@ type QuadTable(quadList: Quad array,
                  subjectPredicateIndex: Dictionary<GraphElementId, Dictionary<GraphElementId, QuadListIndex list>>,
                  objectPredicateIndex: Dictionary<GraphElementId, Dictionary<GraphElementId, QuadListIndex list>>) =
         
-    member val QuadList = quadList with get, set
-    member val QuadCount = quadCount with get, set
-    member val FourKeysIndex = fourKeysIndex with get, set
-    member val TripleIndex = tripleIndex with get, set
-    member val TripleIdIndex = tripleIdIndex with get, set
-    member val PredicateIndex = predicateIndex with get, set
-    member val SubjectPredicateIndex = subjectPredicateIndex with get, set
-    member val ObjectPredicateIndex = objectPredicateIndex with get, set
+    member val internal QuadList = quadList with get, set
+    member val internal QuadCount = quadCount with get, set
+    member val internal FourKeysIndex = fourKeysIndex with get, set
+    member val internal TripleIndex = tripleIndex with get, set
+    member val internal TripleIdIndex = tripleIdIndex with get, set
+    member val internal PredicateIndex = predicateIndex with get, set
+    member val internal SubjectPredicateIndex = subjectPredicateIndex with get, set
+    member val internal ObjectPredicateIndex = objectPredicateIndex with get, set
 
     new(init_rdf_size : uint) =
         let init_resources = max 10 (int init_rdf_size / 10)
@@ -36,27 +36,27 @@ type QuadTable(quadList: Quad array,
                     )
         
         
-    member this.doubleQuadListSize () =
+    member internal this.doubleQuadListSize () =
         this.QuadList <- doubleArraySize this.QuadList
-    member this.GetQuadListEntry (index: QuadListIndex) : Quad =
+    member internal this.GetQuadListEntry (index: QuadListIndex) : Quad =
         this.QuadList.[int index]
     
     
-    member this.AddTripleIdIndex (id: GraphElementId, tripleIndex: QuadListIndex) =
+    member internal this.AddTripleIdIndex (id: GraphElementId, tripleIndex: QuadListIndex) =
         if this.TripleIdIndex.ContainsKey id then
             let existList = this.TripleIdIndex.[id]
             this.TripleIdIndex.[id] <- tripleIndex :: existList
         else
             this.TripleIdIndex.Add(id, [tripleIndex]) |> ignore
             
-    member this.AddPredicateIndex (predicate: GraphElementId, tripleIndex: QuadListIndex) =
+    member internal this.AddPredicateIndex (predicate: GraphElementId, tripleIndex: QuadListIndex) =
         if this.PredicateIndex.ContainsKey predicate then
             let existList = this.PredicateIndex.[predicate]
             this.PredicateIndex.[predicate] <- tripleIndex :: existList
         else
             this.PredicateIndex.Add(predicate, [tripleIndex]) |> ignore
             
-    member this.AddSubjectPredicateIndex (subject: GraphElementId, predicate: GraphElementId, tripleIndex: QuadListIndex) =
+    member internal this.AddSubjectPredicateIndex (subject: GraphElementId, predicate: GraphElementId, tripleIndex: QuadListIndex) =
         let existSubjectMap = match  (this.SubjectPredicateIndex.TryGetValue subject) with 
                                 |    true, subjMap -> subjMap
                                 |    false, _ -> new Dictionary<GraphElementId, QuadListIndex list>()
@@ -66,7 +66,7 @@ type QuadTable(quadList: Quad array,
         existSubjectMap.[predicate] <- tripleIndex :: existSubjectPredicateList
         this.SubjectPredicateIndex.[subject] <- existSubjectMap
         
-    member this.AddObjectPredicateIndex (object: GraphElementId, predicate: GraphElementId, tripleIndex: QuadListIndex) =
+    member internal this.AddObjectPredicateIndex (object: GraphElementId, predicate: GraphElementId, tripleIndex: QuadListIndex) =
         let existObjectMap = match  (this.ObjectPredicateIndex.TryGetValue object) with 
                                 |    true, objMap -> objMap
                                 |    false, _ -> new Dictionary<GraphElementId, QuadListIndex list>()
@@ -76,7 +76,7 @@ type QuadTable(quadList: Quad array,
         existObjectMap.[predicate] <- tripleIndex :: existSubjectPredicateList
         this.ObjectPredicateIndex.[object] <- existObjectMap
             
-    member this.AddQuad (quad : Ingress.Quad) =
+    member internal this.AddQuad (quad : Ingress.Quad) =
             if this.FourKeysIndex.ContainsKey quad then
                 ()
             else
@@ -92,30 +92,55 @@ type QuadTable(quadList: Quad array,
                 this.QuadCount <- nextQuadCount
                 ()
             
-        member this.GetQuadsWithSubject (subject: GraphElementId) : Quad seq =
-            let subjectIndex = this.SubjectPredicateIndex.[subject]
-            subjectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetQuadListEntry e) 
+        member internal this.GetQuadsWithSubject (subject: GraphElementId) : Quad seq =
+            match this.SubjectPredicateIndex.TryGetValue subject with  
+            | true, subjectIndex -> subjectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetQuadListEntry e)
+            | false, _ -> []
             
             
-        member this.GetQuadsWithObject (object: GraphElementId) : Quad seq =
-            let objectIndex = this.ObjectPredicateIndex.[object]
-            objectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetQuadListEntry e) 
+        member internal this.GetQuadsWithObject (object: GraphElementId) : Quad seq =
+            match this.ObjectPredicateIndex.TryGetValue object with 
+            | true, objectIndex -> objectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetQuadListEntry e)
+            | false, _ -> []
             
-        member this.GetQuadsWithPredicate (predicate: GraphElementId) : Quad seq =
-            this.PredicateIndex.[predicate] |> Seq.map (fun e -> this.GetQuadListEntry e) 
+        member internal this.GetQuadsWithPredicate (predicate: GraphElementId) : Quad seq =
+            match this.PredicateIndex.TryGetValue predicate with
+            | true, predicates -> predicates |> Seq.map (fun e -> this.GetQuadListEntry e)
+            | false, _ -> []
         
-        member this.GetQuadsWithId (id: GraphElementId) : Quad seq =
+        member internal this.GetGraph (id: GraphElementId) : Quad seq =
             this.TripleIdIndex.[id] |> Seq.map (fun e -> this.GetQuadListEntry e) 
             
-        member this.GetQuadsWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
+        member internal this.GetQuadsWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
             this.SubjectPredicateIndex.[subject].[predicate] |> Seq.map (fun e -> this.GetQuadListEntry e)
             
             
-        member this.GetQuadsWithObjectPredicate (object: GraphElementId, predicate: GraphElementId) =
+        member internal this.GetQuadsWithObjectPredicate (object: GraphElementId, predicate: GraphElementId) =
             this.ObjectPredicateIndex.[object].[predicate] |> Seq.map (fun e -> this.GetQuadListEntry e)
             
-        member this.GetQuadsWithSubjectObject (subject: GraphElementId, object: GraphElementId) : Quad seq =
+        member internal this.GetQuadsWithSubjectObject (subject: GraphElementId, object: GraphElementId) : Quad seq =
             this.GetQuadsWithSubject subject
                 |> Seq.where (fun triple ->  triple.obj = object)
         
+       member internal this.GetQuadsWithIdSubject (id: GraphElementId, subject: GraphElementId) : Quad seq =
+            this.GetQuadsWithSubject subject
+                |> Seq.where (fun quad -> quad.tripleId = id) 
+        
+       member internal this.GetQuadsWithIdPredicate (id: GraphElementId, predicate: GraphElementId) : Quad seq =
+            this.GetQuadsWithPredicate predicate
+                |> Seq.where (fun quad -> quad.tripleId = id) 
        
+       member internal this.GetQuadsWithIdObject (id: GraphElementId, obj: GraphElementId) : Quad seq =
+            this.GetQuadsWithObject obj
+                |> Seq.where (fun quad -> quad.tripleId = id) 
+       member internal this.GetQuadsWithIdSubjectPredicate (id: GraphElementId, subject: GraphElementId, predicate: GraphElementId) : Quad seq =
+            this.GetQuadsWithSubjectPredicate (subject, predicate)
+                |> Seq.where (fun quad -> quad.tripleId = id) 
+       
+       member internal this.GetQuadsWithIdSubjectObject (id: GraphElementId, subject: GraphElementId, object: GraphElementId) : Quad seq =
+            this.GetQuadsWithSubjectObject (subject, object)
+                |> Seq.where (fun quad -> quad.tripleId = id)
+                
+        member internal this.GetQuadsWithIdObjectPredicate (id: GraphElementId, object: GraphElementId, predicate: GraphElementId) : Quad seq =
+            this.GetQuadsWithObjectPredicate (object, predicate)
+                |> Seq.where (fun quad -> quad.tripleId = id)

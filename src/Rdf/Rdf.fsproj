@@ -33,6 +33,7 @@
         <Compile Include="TripleTable.fs" />
         <Compile Include="QuadTable.fs" />
         <Compile Include="Datastore.fs" />
+        <Compile Include="AssemblyInfo.fs" />
     </ItemGroup>
 
     <ItemGroup>

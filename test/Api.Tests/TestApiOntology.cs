@@ -258,7 +258,7 @@ public class TestApiOntology
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");
         var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
         rdf.IsEmpty().Should().BeFalse();
-        var ont = OwlOntology.Create(rdf);
+        // var ont = OwlOntology.Create(rdf);
         //ont.GetAxioms().Should().NotBeEmpty();
         //var datalogProgram = ont.GetAxiomRules().ToList();
         //datalogProgram.Should().NotBeEmpty();

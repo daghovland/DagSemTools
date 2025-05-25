@@ -6,6 +6,8 @@
     Contact: hovlanddag@gmail.com
 */
 
+using System.Net.Mime;
+using DagSemTools.Ingress;
 using IriTools;
 using Microsoft.FSharp.Core;
 using DagSemTools.Rdf;
@@ -13,19 +15,18 @@ using DagSemTools.Parser;
 
 namespace DagSemTools.Turtle.Parser;
 
-internal class TurtleListener : TurtleDocBaseListener
+internal class TurtleListener : TriGDocBaseListener
 {
 
     private IriGrammarVisitor _iriGrammarVisitor;
     private ResourceVisitor _resourceVisitor;
-    private FSharpOption<IriReference> _graphName;
+    internal uint? GraphName;
     private readonly IVisitorErrorListener _errorListener;
     public Datastore datastore { get; init; }
 
     public TurtleListener(uint initSize, IVisitorErrorListener errorListener)
     {
         datastore = new Datastore(initSize);
-        _graphName = FSharpOption<IriReference>.None;
         _iriGrammarVisitor = new IriGrammarVisitor(DefaultPrefixes());
         _resourceVisitor = new ResourceVisitor(datastore, _iriGrammarVisitor);
         _errorListener = errorListener;
@@ -41,12 +42,7 @@ internal class TurtleListener : TurtleDocBaseListener
         return prefixes;
     }
 
-    /// <summary>
-    /// Used to transform input into iri in the handlers below
-    /// </summary>
-    /// <param name="input"></param>
-    /// <returns></returns>
-    public static string GetStringExcludingFirstAndLast(string input)
+    internal static string GetStringExcludingFirstAndLast(string input)
     {
         if (input.Length > 2)
         {
@@ -55,11 +51,7 @@ internal class TurtleListener : TurtleDocBaseListener
         return string.Empty;
     }
 
-    /// <summary>
-    /// Used to transform prefix: into prefix in the methods below
-    /// </summary>
-    /// <param name="prefixNs"></param>
-    public static string GetStringExcludingLastColon(string prefixNs)
+    internal static string GetStringExcludingLastColon(string prefixNs)
     {
         if (prefixNs.Length >= 1 && prefixNs[^1] == ':')
         {
@@ -67,47 +59,95 @@ internal class TurtleListener : TurtleDocBaseListener
         }
         throw new Exception($"Invalid prefix {prefixNs}. Prefix should end with ':'");
     }
-    public override void ExitBaseDeclaration(TurtleDocParser.BaseDeclarationContext context)
+    public override void ExitBaseDeclaration(TriGDocParser.BaseDeclarationContext context)
     {
         var iriString = GetStringExcludingFirstAndLast(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.SetBase(iri);
     }
 
-    public override void ExitPrefixId(TurtleDocParser.PrefixIdContext context)
+    public override void ExitPrefixId(TriGDocParser.PrefixIdContext context)
     {
         var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
         var iri = _iriGrammarVisitor.Visit(context.iri());
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
-    public override void ExitSparqlPrefix(TurtleDocParser.SparqlPrefixContext context)
+    public override void ExitSparqlPrefix(TriGDocParser.SparqlPrefixContext context)
     {
         var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
         var iri = _iriGrammarVisitor.Visit(context.iri());
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
 
-    public override void ExitNamedSubjectTriples(TurtleDocParser.NamedSubjectTriplesContext context)
+    public override void ExitNamedSubjectTriples(TriGDocParser.NamedSubjectTriplesContext context)
     {
         var curSubject = _resourceVisitor.Visit(context.subject());
-        var triples = _resourceVisitor._predicateObjectListVisitor.Visit(context.predicateObjectList())(curSubject);
-        triples.ToList().ForEach(triple => datastore.AddTriple(triple));
+        ExitNamedTripleList(curSubject, context.predicateObjectList());
+    }
+
+    public override void ExitCollectionTriples2(TriGDocParser.CollectionTriples2Context context)
+    {
+        var curSubject = _resourceVisitor.Visit(context.collection());
+        ExitNamedTripleList(curSubject, context.predicateObjectList());
+    }
+
+    public override void ExitLabelOrSubjectTriples(TriGDocParser.LabelOrSubjectTriplesContext context)
+    {
+        var curSubject = _resourceVisitor.Visit(context.labelOrSubject());
+        ExitNamedTripleList(curSubject, context.predicateObjectList());
     }
 
 
-    public override void ExitBlankNodeTriples(TurtleDocParser.BlankNodeTriplesContext context)
+
+    public override void ExitReifiedTripleObjectList(TriGDocParser.ReifiedTripleObjectListContext context)
+    {
+        var curSubject = _resourceVisitor.Visit(context.reifiedTriple());
+        ExitNamedTripleList(curSubject, context.predicateObjectList());
+    }
+
+
+    private void ExitNamedTripleList(uint curSubject, TriGDocParser.PredicateObjectListContext predicateObjectListContext)
+    {
+        var triples = _resourceVisitor._predicateObjectListVisitor.Visit(predicateObjectListContext)(curSubject);
+        if (GraphName == null)
+            triples.ToList().ForEach(triple => datastore.AddTriple(triple));
+        else
+            triples.ToList().ForEach(triple => datastore.AddNamedGraphTriple(GraphName.Value, triple));
+    }
+
+    public override void ExitBlankNodeTriples2(TriGDocParser.BlankNodeTriples2Context context) =>
+        ExitAnyBlankNodeTriples(context.blankNodePropertyList(), context.predicateObjectList());
+
+    public override void ExitBlankNodeTriples(TriGDocParser.BlankNodeTriplesContext context) =>
+        ExitAnyBlankNodeTriples(context.blankNodePropertyList(), context.predicateObjectList());
+
+    private void ExitAnyBlankNodeTriples(TriGDocParser.BlankNodePropertyListContext blankNodePropertyList, TriGDocParser.PredicateObjectListContext predicateObjectList)
     {
         var blankNode = datastore.NewAnonymousBlankNode();
         var internalTriples =
             _resourceVisitor._predicateObjectListVisitor.Visit(
-                context.blankNodePropertyList().predicateObjectList())(blankNode);
-        var postTriples = context.predicateObjectList() switch
+                blankNodePropertyList.predicateObjectList())(blankNode);
+        TriGDocParser.BlankNodeTriplesContext context;
+        var postTriples = predicateObjectList switch
         {
             null => new List<Rdf.Ingress.Triple>(),
             var c => _resourceVisitor._predicateObjectListVisitor.Visit(c)(blankNode)
         };
         var triples = internalTriples.Concat(postTriples);
-        triples.ToList().ForEach(triple => datastore.AddTriple(triple));
+        if (GraphName == null)
+            triples.ToList().ForEach(triple => datastore.AddTriple(triple));
+        else
+            triples.ToList().ForEach(triple => datastore.AddNamedGraphTriple(GraphName.Value, triple));
     }
+
+    public override void EnterBlockNamedWrappedGraph(TriGDocParser.BlockNamedWrappedGraphContext context) =>
+        GraphName = _resourceVisitor.Visit(context.labelOrSubject());
+    public override void ExitBlockNamedWrappedGraph(TriGDocParser.BlockNamedWrappedGraphContext context) =>
+        GraphName = null;
+    public override void EnterNamedWrappedGraph(TriGDocParser.NamedWrappedGraphContext context) =>
+        GraphName = _resourceVisitor.Visit(context.labelOrSubject());
+
+    public override void ExitNamedWrappedGraph(TriGDocParser.NamedWrappedGraphContext context) =>
+        GraphName = null;
 }
 
