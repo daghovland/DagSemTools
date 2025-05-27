@@ -16,6 +16,9 @@ Manchester/Lexer.fs
 TurtleParser/.antlr
 TurtleParser/bin/
 TurtleParser/obj/
+src/Sparql.Parser/bin/
+src/Sparql.Parser/obj
+src/Sparql.Parser/grammars/gen
 ManchesterAntlr/.antlr/
 ManchesterAntlr/bin/
 ManchesterAntlr/obj/
