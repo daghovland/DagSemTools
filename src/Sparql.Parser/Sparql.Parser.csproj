@@ -36,6 +36,8 @@
         <Antlr4 Update="grammars\Sparql.g4">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
+        <None Remove="grammars\Sparql.g4" />
+        <Antlr4 Include="grammars\Sparql.g4" />
         
     </ItemGroup>
 

@@ -57,7 +57,6 @@
     </ItemGroup>
     
     <ItemGroup>
-      <Folder Include="grammars\" />
       <Folder Include="grammars\gen\" />
     </ItemGroup>
 
