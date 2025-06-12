@@ -41,7 +41,6 @@
         <Antlr4 Include="grammars\TriGDoc.g4">
           <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
-        
     </ItemGroup>
 
     <!-- Use project references if BuildingProject is true -->
