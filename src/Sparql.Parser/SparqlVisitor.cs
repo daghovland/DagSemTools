@@ -1,6 +1,11 @@
+using DagSemTools.Rdf;
+
 namespace DagSemTools.Sparql.Parser;
 
-public class SparqlVisitor
+/// <summary>
+/// 
+/// </summary>
+public class SparqlVisitor : SparqlBaseVisitor<Query.SelectQuery>
 {
     
 }
