@@ -10,63 +10,14 @@ namespace DagSemTools.Datalog
 open System
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
-open DagSemTools.Rdf
+open DagSemTools.Rdf.Query
 
-
-[<CustomComparison>]
-[<CustomEquality>]
-type Term = 
-    | Resource of GraphElementId
-    | Variable of string
-    member this.ToString (manager : GraphElementManager) : string =
-        match this with
-        | Resource res -> (manager.GetGraphElement res).ToString()
-        | Variable vName -> $"?{vName}"
-    member internal this.GetHashCodeForUnification : int =
-        match this with
-        | Resource res -> res.GetHashCode()
-        | Variable vName -> 100
-        
-    interface System.IComparable with
-        member this.CompareTo(obj) =
-            match obj with
-            | null -> 1  // null is less than any value
-            | :? Term as other -> 
-                match this, other with
-                | Resource r1, Resource r2 -> compare r1 r2
-                | Variable v1, Variable v2 -> compare v1 v2
-                | Resource _, Variable _ -> -1  // Resources come before variables
-                | Variable _, Resource _ -> 1
-            | _ -> 1
-
-    override this.Equals(obj) =
-        match obj with
-        | null -> false
-        | :? Term as other -> (this :> System.IComparable).CompareTo(other) = 0
-        | _ -> false
-        
-    override this.GetHashCode() =
-        match this with
-        | Resource res -> hash res
-        | Variable v -> hash v
-        
+   
 [<StructuralComparison>]
 [<StructuralEquality>]
 type ResourceOrWildcard = 
     | Resource of GraphElementId
     | Wildcard
-
-[<StructuralComparison>]
-[<StructuralEquality>]
-type TriplePattern =
-    {Subject: Term; Predicate: Term; Object: Term}
-    member private this.GeneralToString(termToStringFunction : Term -> string ) : string  =
-        $"[{termToStringFunction this.Subject}, {termToStringFunction this.Predicate}, {termToStringFunction this.Object}]"
-    override this.ToString() =
-        this.GeneralToString(fun t -> t.ToString())
-    member this.ToString(manager : GraphElementManager) =
-        this.GeneralToString(fun (t : Term) ->t.ToString(manager))
-    
 
 [<CustomComparison>]
 [<CustomEquality>]
