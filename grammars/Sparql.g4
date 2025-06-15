@@ -144,6 +144,7 @@ numericLiteralPositive: INTEGER_POSITIVE | DECIMAL_POSITIVE | DOUBLE_POSITIVE;
 numericLiteralNegative: INTEGER_NEGATIVE | DECIMAL_NEGATIVE | DOUBLE_NEGATIVE;
 booleanLiteral    :    'true' | 'false';
 rdfStringLiteral            :    STRING_LITERAL1 | STRING_LITERAL2 | STRING_LITERAL_LONG1 | STRING_LITERAL_LONG2;
-iri               :    IRIREF | prefixedName;
+iri               :    fullIri | prefixedName;
+fullIri               :    IRIREF;
 prefixedName      :    PNAME_LN | PNAME_NS;
 blankNode         :    BLANK_NODE_LABEL | ANON;
