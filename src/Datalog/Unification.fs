@@ -10,6 +10,7 @@
 namespace DagSemTools.Datalog
 
 open DagSemTools.Rdf.Ingress
+open DagSemTools.Rdf.Query
 
 (* 
     The RuleCollection maintains a collection of rules and implements methods for 

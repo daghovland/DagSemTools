@@ -34,6 +34,7 @@
         <Compile Include="QuadTable.fs" />
         <Compile Include="Datastore.fs" />
         <Compile Include="AssemblyInfo.fs" />
+        <Compile Include="Query.fs" />
     </ItemGroup>
 
     <ItemGroup>
