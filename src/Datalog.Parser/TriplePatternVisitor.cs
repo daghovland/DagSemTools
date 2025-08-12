@@ -7,11 +7,12 @@
 */
 
 using DagSemTools.Ingress;
+using DagSemTools.Rdf;
 using IriTools;
 
 namespace DagSemTools.Datalog.Parser;
 
-internal class TriplePatternVisitor : DatalogBaseVisitor<TriplePattern>
+internal class TriplePatternVisitor : DatalogBaseVisitor<Query.TriplePattern>
 {
     private readonly PredicateVisitor _predicateVisitor;
 
@@ -25,19 +26,19 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<TriplePattern>
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override TriplePattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
+    public override Query.TriplePattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
     {
         var subject = context.term(0);
         var predicate = context.relation();
         var @object = context.term(1);
 
-        Term predicateResource = _predicateVisitor.Visit(predicate) ??
-                                 throw new Exception($"Predicate is null  at line {context.Start.Line}, position {context.Start.Column}");
-        Term subjectResource = _predicateVisitor.Visit(subject) ??
-                               throw new Exception($"Subject is null  at line {context.Start.Line}, position {context.Start.Column}");
-        Term objectResource = _predicateVisitor.Visit(@object) ??
-                              throw new Exception($"Object is null at line {context.Start.Line}, position {context.Start.Column}"); ;
-        return new TriplePattern(
+        Query.Term predicateResource = _predicateVisitor.Visit(predicate) ??
+                                       throw new Exception($"Predicate is null  at line {context.Start.Line}, position {context.Start.Column}");
+        Query.Term subjectResource = _predicateVisitor.Visit(subject) ??
+                                     throw new Exception($"Subject is null  at line {context.Start.Line}, position {context.Start.Column}");
+        Query.Term objectResource = _predicateVisitor.Visit(@object) ??
+                                    throw new Exception($"Object is null at line {context.Start.Line}, position {context.Start.Column}"); ;
+        return new Query.TriplePattern(
             subjectResource,
             predicateResource,
             objectResource
@@ -45,16 +46,16 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<TriplePattern>
     }
 
     /// <inheritdoc />
-    public override TriplePattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
+    public override Query.TriplePattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
     {
         var subject = context.term();
-        var predicate = Term
+        var predicate = Query.Term
             .NewResource(_predicateVisitor.ResourceVisitor.Datastore
                 .AddNodeResource(RdfResource
                     .NewIri(new IriReference(Namespaces.RdfType))));
         var @class = context.relation();
 
-        return new TriplePattern(
+        return new Query.TriplePattern(
                 _predicateVisitor.Visit(subject),
                 predicate,
                 _predicateVisitor.Visit(@class)

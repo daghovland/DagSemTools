@@ -15,6 +15,7 @@ open DagSemTools.ELI.Axioms
 open DagSemTools.Rdf
 open DagSemTools.Ingress
 open DagSemTools.OwlOntology
+open DagSemTools.Rdf.Query
 open IriTools
 open Xunit
 open Serilog

@@ -8,6 +8,7 @@
 namespace DagSemTools.OWL2RL2Datalog.Tests
 
 open System.Numerics
+open DagSemTools.Rdf.Query
 
 module TestClassAxioms =
 

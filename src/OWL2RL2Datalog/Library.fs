@@ -15,6 +15,7 @@ open DagSemTools.Rdf
 open DagSemTools.Datalog
 open DagSemTools.Ingress
 open DagSemTools.OwlOntology
+open DagSemTools.Rdf.Query
 open IriTools
 
 module Library =

@@ -42,14 +42,7 @@ internal class TurtleListener : TriGDocBaseListener
         return prefixes;
     }
 
-    internal static string GetStringExcludingFirstAndLast(string input)
-    {
-        if (input.Length > 2)
-        {
-            return input.Substring(1, input.Length - 2);
-        }
-        return string.Empty;
-    }
+    
 
     internal static string GetStringExcludingLastColon(string prefixNs)
     {
@@ -61,7 +54,7 @@ internal class TurtleListener : TriGDocBaseListener
     }
     public override void ExitBaseDeclaration(TriGDocParser.BaseDeclarationContext context)
     {
-        var iriString = GetStringExcludingFirstAndLast(context.ABSOLUTEIRIREF().GetText());
+        var iriString = DagSemTools.Parser.ParserUtils.TrimIri(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.SetBase(iri);
     }

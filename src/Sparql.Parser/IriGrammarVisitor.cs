@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Dag Hovland
+    Copyright (C) 2024-2025 Dag Hovland
     This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
@@ -16,7 +16,7 @@ using static SparqlParser;
 /// <summary>
 /// Visitor for the IRI grammar in the Turtle language.
 /// </summary>
-public class IriGrammarVisitor : SparqlBaseVisitor<IriReference>
+internal class IriGrammarVisitor : SparqlBaseVisitor<IriReference>
 {
     private Dictionary<string, IriReference> _prefixes;
     private IriReference? _baseIriReference;
@@ -92,31 +92,7 @@ public class IriGrammarVisitor : SparqlBaseVisitor<IriReference>
 
         return input.TrimEnd(':');
     }
-
-    /// <summary>
-    /// Visits an IRI which is just the prefix, f.ex. ex: or rdfs:
-    /// </summary>
-    /// <param name="ctxt"></param>
-    /// <returns></returns>
-    public override IriReference VisitIriPrefix(IriPrefixContext ctxt)
-    {
-        var iriString = ctxt.PNAME_NS().GetText();
-        var prefix = RemoveTrailingColon(iriString);
-        if (!_prefixes.TryGetValue(prefix, out var namespaceName))
-            throw new Exception($"Prefix {prefix} is not defined.");
-        return namespaceName;
-    }
-    /// <summary>
-    /// Visits a relative IRI in angled brackets, f.ex. &lt;../relative&gt;
-    /// </summary>
-    /// <param name="ctxt"></param>
-    /// <returns></returns>
-    public override IriReference VisitRelativeIri(RelativeIriContext ctxt)
-    {
-        string rdfiristring = ctxt.RELATIVEIRIREF().GetText();
-        return ResolveRelativeIri(rdfiristring);
-    }
-
+    
     /// <summary>
     /// Resolves a relative IRI to a full IRI using the defined base IRI (Or throws an exception if the base IRI is not set)
     /// </summary>

@@ -51,7 +51,7 @@ public static class Parser
         parser.AddErrorListener(customErrorListener);
         IParseTree tree = parser.selectQuery();
         ParseTreeWalker walker = new ParseTreeWalker();
-        var listener = new SparqlVisitor(customErrorListener);
+        var listener = new SparqlListener(customErrorListener);
         walker.Walk(listener, tree);
         if (customErrorListener.HasError)
         {
