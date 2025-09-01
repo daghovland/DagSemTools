@@ -2,6 +2,7 @@ using Antlr4.Runtime;
 using DagSemTools.Parser;
 using DagSemTools.Rdf;
 using IriTools;
+using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Sparql.Parser;
 
@@ -84,7 +85,7 @@ internal class SparqlListener : SparqlBaseListener
     {
         // Initialize a new query object at the start of a select query.
         // TODO: If your model requires constructor args, adjust accordingly.
-        Result = new Query.SelectQuery();
+        Result = new Query.SelectQuery(FSharpList<string>.Empty, FSharpList<Query.TriplePattern>.Empty);
     }
 
     public override void ExitSelectQuery(SparqlParser.SelectQueryContext context)
