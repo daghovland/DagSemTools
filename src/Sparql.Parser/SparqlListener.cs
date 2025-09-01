@@ -83,8 +83,6 @@ internal class SparqlListener : SparqlBaseListener
 
     public override void EnterSelectQuery(SparqlParser.SelectQueryContext context)
     {
-        // Initialize a new query object at the start of a select query.
-        // TODO: If your model requires constructor args, adjust accordingly.
         Result = new Query.SelectQuery(FSharpList<string>.Empty, FSharpList<Query.TriplePattern>.Empty);
     }
 
@@ -101,10 +99,9 @@ internal class SparqlListener : SparqlBaseListener
 
     private void Report(ParserRuleContext ctx, string message)
     {
-        // Assuming your IVisitorErrorListener has a method like this; adjust as needed.
-        // Provide line/column if available.
-        var line = ctx.Start?.Line ?? 0;
-        var col = ctx.Start?.Column ?? 0;
-        _errorListener.VisitError(message, (uint)line, (uint)col);
+        var token = ctx.Start ?? throw new Exception($"Lacking token for parsing error {message}");
+        var line = token.Line;
+        var col = token.Column;
+         _errorListener.VisitorError(token , line, col, message);
     }
 }

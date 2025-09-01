@@ -20,13 +20,13 @@ namespace DagSemTools.Sparql.Parser;
 /// </summary>
 public static class Parser
 {
-    internal static Query.SelectQuery ParseFile(string filename, TextWriter errorOutput)
+    internal static Query.SelectQuery? ParseFile(string filename, TextWriter errorOutput)
     {
         using TextReader textReader = File.OpenText(filename);
         return ParseReader(textReader, (uint)(new FileInfo(filename).Length), errorOutput);
     }
 
-    internal static Query.SelectQuery ParseFile(FileInfo fInfo, TextWriter errorOutput)
+    internal static Query.SelectQuery? ParseFile(FileInfo fInfo, TextWriter errorOutput)
     {
         using TextReader textReader = File.OpenText(fInfo.FullName);
         return ParseReader(textReader, (uint)(fInfo.Length), errorOutput);
@@ -40,7 +40,7 @@ public static class Parser
     /// <param name="prefixes"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static Query.SelectQuery ParseReader(TextReader textReader, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    public static Query.SelectQuery? ParseReader(TextReader textReader, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
         var input = new AntlrInputStream(textReader);
         var lexer = new SparqlLexer(input);
@@ -57,7 +57,7 @@ public static class Parser
         {
             throw new Exception("Syntax errors in Turtle file");
         }
-        return listener.datastore;
+        return listener.Result;
     }
 
     /// <summary>
@@ -67,7 +67,7 @@ public static class Parser
     /// <param name="initSize"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static Query.SelectQuery ParseReader(TextReader textReader, UInt32 initSize, TextWriter errorOutput) =>
+    public static Query.SelectQuery? ParseReader(TextReader textReader, UInt32 initSize, TextWriter errorOutput) =>
         ParseReader(textReader, initSize, new Dictionary<string, IriReference>(), errorOutput);
 
     /// <summary>
@@ -76,7 +76,7 @@ public static class Parser
     /// <param name="owl"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static Query.SelectQuery ParseString(string owl, TextWriter errorOutput)
+    public static Query.SelectQuery? ParseString(string owl, TextWriter errorOutput)
     {
         using TextReader textReader = new StringReader(owl);
         return ParseReader(textReader, (uint)owl.Length, errorOutput);
