@@ -1,6 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# 
+#
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Rdf", "src\Rdf\Rdf.fsproj", "{833D8620-E7DE-45B9-AB30-9B943A4F3997}"
 EndProject
 Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "Datalog", "src\Datalog\Datalog.fsproj", "{F27E2851-BDBE-4EB4-8798-754EC665B4AE}"
@@ -75,6 +75,8 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Manchester2Alc.Tests", "test\Manchester2Alc.Tests\Manchester2Alc.Tests.csproj", "{93FB8371-4F7B-4A79-A8CA-B50C62A789FE}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sparql.Parser", "src\Sparql.Parser\Sparql.Parser.csproj", "{F4927792-D542-4A05-9519-F32FFA2F7D32}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Sparql.Parser.Tests", "test\Sparql.Parser.Tests\Sparql.Parser.Tests.csproj", "{7FEB67F4-6F98-4A2E-9813-3C19F9245DC5}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -206,6 +208,10 @@ Global
 		{F4927792-D542-4A05-9519-F32FFA2F7D32}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{F4927792-D542-4A05-9519-F32FFA2F7D32}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{F4927792-D542-4A05-9519-F32FFA2F7D32}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7FEB67F4-6F98-4A2E-9813-3C19F9245DC5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7FEB67F4-6F98-4A2E-9813-3C19F9245DC5}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7FEB67F4-6F98-4A2E-9813-3C19F9245DC5}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7FEB67F4-6F98-4A2E-9813-3C19F9245DC5}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{7C1CB214-5330-4DFA-9657-120DE7D9D255} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
@@ -239,5 +245,6 @@ Global
 		{44A840E1-C72C-4A59-9C87-06DED0950F96} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
 		{93FB8371-4F7B-4A79-A8CA-B50C62A789FE} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
 		{F4927792-D542-4A05-9519-F32FFA2F7D32} = {150881EB-B2AE-4E27-80B8-68FC9688D9BE}
+		{7FEB67F4-6F98-4A2E-9813-3C19F9245DC5} = {BF9EFAC5-4B46-4499-B2D1-A9276991495C}
 	EndGlobalSection
 EndGlobal

@@ -105,7 +105,7 @@ public class Graph : IGraph
                 return new IriResource(new IriReference(r.iri));
             case { IsAnonymousBlankNode: true } r:
                 return new BlankNodeResource($"{r.anon_blankNode}");
-            default: throw new Exception($"BUG: Resource {resource.ToString()} is a resource but not an Iri or a blank node"); ;
+            default: throw new Exception($"BUG: Resource {resource.ToString()} is a resource but not an Iri or a blank node"); 
         }
     }
 
