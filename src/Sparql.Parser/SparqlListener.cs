@@ -16,14 +16,25 @@ internal class SparqlListener : SparqlBaseListener
 
     private IriReference? _baseIriReference;
     private readonly Dictionary<string, IriReference> _prefixes;
+    private Query.SelectQuery? _result = null;
 
-    public SparqlListener(IVisitorErrorListener errorListener, Dictionary<string, IriReference>? prefixes = null)
-    {
-        _errorListener = errorListener;
-        _iriGrammarVisitor = new IriGrammarVisitor(DefaultPrefixes());
-        _prefixes = prefixes ?? new Dictionary<string, IriReference>();
+    public SparqlListener(IVisitorErrorListener errorListener) :
+        this(errorListener, new GraphElementManager(100)){
     }
 
+    public SparqlListener(IVisitorErrorListener errorListener, Dictionary<string, IriReference> prefixes)
+        : this(errorListener, prefixes, new GraphElementManager(100)){
+    }
+    public SparqlListener(IVisitorErrorListener errorListener, GraphElementManager elementManager)
+    : this(errorListener, new Dictionary<string, IriReference>(), elementManager){
+    }
+    public SparqlListener(IVisitorErrorListener errorListener, Dictionary<string, IriReference> prefixes, GraphElementManager elementManager)
+    {
+        ElementManager = elementManager;
+        _errorListener = errorListener;
+        _iriGrammarVisitor = new IriGrammarVisitor(DefaultPrefixes());
+        _prefixes = prefixes;
+    }
     
     private static Dictionary<string, IriReference> DefaultPrefixes()
     {
@@ -39,8 +50,9 @@ internal class SparqlListener : SparqlBaseListener
     /// The result of walking the parse tree.
     /// Populate this in the appropriate exit/enter methods.
     /// </summary>
-    public Query.SelectQuery? Result { get; private set; }
+    public Query.SelectQuery Result =>  this._result ?? throw new InvalidOperationException("Parser result does not exist before parsing has been done");
 
+    public GraphElementManager ElementManager { get; }
     // ===== Prologue handling =====
 
     public override void EnterBaseDecl(SparqlParser.BaseDeclContext context)
@@ -83,7 +95,7 @@ internal class SparqlListener : SparqlBaseListener
 
     public override void EnterSelectQuery(SparqlParser.SelectQueryContext context)
     {
-        Result = new Query.SelectQuery(FSharpList<string>.Empty, FSharpList<Query.TriplePattern>.Empty);
+        _result = new Query.SelectQuery(FSharpList<string>.Empty, FSharpList<Query.TriplePattern>.Empty);
     }
 
     public override void ExitSelectQuery(SparqlParser.SelectQueryContext context)

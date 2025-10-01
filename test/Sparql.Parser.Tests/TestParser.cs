@@ -38,14 +38,16 @@ public class TestParser : IDisposable, IAsyncDisposable
             }
             """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
-        result.Should().NotBeNull();
-        result!.Projection.Length.Should().Be(1, "There is one projected variable");
-        result.Projection[0].Should().Be("?name", "The projected variable is ?name");
-        result.BGPs.Length.Should().Be(1, "There is one BGP");
-        var bgp = result.BGPs[0];
+        var q = result.Item1;
+        var e =  result.Item2;
+        q.Should().NotBeNull();
+        q.Projection.Length.Should().Be(1, "There is one projected variable");
+        q.Projection[0].Should().Be("?name", "The projected variable is ?name");
+        q.BGPs.Length.Should().Be(1, "There is one BGP");
+        var bgp = q.BGPs[0];
         bgp.Should().Be(new Query.TriplePattern(
                 Query.Term.NewVariable("person"),
-                Query.Term.NewResource(new IriReference("http://xmlns.com/foaf/0.1/name")), 
+                Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")))]), 
                 Query.Term.NewVariable("name")),
             "?person foaf:name ?name ");
     }
