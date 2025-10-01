@@ -39,6 +39,9 @@ var tripleAnswersWithReasoning = graph.GetTriplesWithPredicate(new IriReference(
 ```
 See examples in [test/NugetTest](test/NugetTest)
 
+## Contributing and/or Building from source
+See [CONTRIBUTING.md](CONTRIBUTING.md) and [BUILDING.md](BUILDING.md)
+
 ## Copyright
 Dag Hovland 2024,2025. 
 
