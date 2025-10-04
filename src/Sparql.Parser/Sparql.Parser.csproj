@@ -1,0 +1,75 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <OutputType>Library</OutputType>
+        <PackageReadMeFile>README.md</PackageReadMeFile>
+        <PackageLicenseExpression>GPL-3.0-or-later</PackageLicenseExpression>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+        <PackageId>DagSemTools.Sparql.Parser</PackageId>
+        <Authors>Dag Hovland</Authors>
+        <Description>For parsing Sparql-1.2</Description>
+        <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
+        <PublishRepositoryUrl>true</PublishRepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+        <Copyright>Copyright Dag Hovland 2025</Copyright>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <EmbedUntrackedSources>true</EmbedUntrackedSources>
+        <IncludeSource>true</IncludeSource>
+        <IncludeSymbols>true</IncludeSymbols>
+        <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+        <PackageTags>Sparql Parser</PackageTags>
+        <Platforms>AnyCPU</Platforms>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
+        <PackageReference Include="Antlr4BuildTasks" Version="12.10.0" />
+        <PackageReference Include="FSharp.Core" Version="8.0.403" />
+        <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
+        <PackageReference Include="Serilog" Version="4.2.0" />
+    </ItemGroup>
+    <ItemGroup>
+        <None Update="grammars\SparqlTokens.g4" >
+                <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <Antlr4 Include="grammars\Sparql.g4">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </Antlr4>
+        <None Update="grammars\TurtleTokens.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="grammars\TurtleResource.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
+
+    <!-- Use project references if BuildingProject is true -->
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|AnyCPU'">
+        <ProjectReference Include="..\Parser\Parser.csproj" />
+        <ProjectReference Include="..\Rdf\Rdf.fsproj" />
+    </ItemGroup>
+
+    <!-- Use NuGet package references if BuildingProject is not true -->
+    <ItemGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
+        <PackageReference Include="DagSemTools.Rdf" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Parser" Version="$(Version)" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Folder Include="grammars\" />
+        <Folder Include="grammars\gen\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Content Include="README.md">
+            <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+            <Pack>true</Pack>
+            <PackagePath>README.md</PackagePath>
+        </Content>
+    </ItemGroup>
+
+</Project>

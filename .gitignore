@@ -16,6 +16,9 @@ Manchester/Lexer.fs
 TurtleParser/.antlr
 TurtleParser/bin/
 TurtleParser/obj/
+src/Sparql.Parser/bin/
+src/Sparql.Parser/obj
+src/Sparql.Parser/grammars/gen
 ManchesterAntlr/.antlr/
 ManchesterAntlr/bin/
 ManchesterAntlr/obj/
@@ -87,3 +90,4 @@ test/Api.Tests/TestData/go.owl.xml
 DagSemTools.sln.DotSettings.user
 src/Turtle.Parser/grammars/gen/*
 src/Datalog.Parser/grammars/gen/*
+src/Sparql.Parser/grammars/gen/*

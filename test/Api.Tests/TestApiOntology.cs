@@ -237,8 +237,6 @@ public class TestApiOntology
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-
-
     [Fact]
     public void LoadIDOOntologyWorks()
     {

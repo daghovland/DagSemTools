@@ -7,6 +7,8 @@
 *)
 namespace DagSemTools.Datalog
 
+open DagSemTools.Rdf.Query
+
 
 (* 
     This module makes it possible with variables in the predicate position in datalog rules

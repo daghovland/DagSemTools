@@ -10,11 +10,10 @@
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
         <PackageId>DagSemTools.Parser</PackageId>
         <Authors>Dag Hovland</Authors>
-        <Description>Common parser library for AlcTableau</Description>
+        <Description>Common parser library for Dag's SemTech Tools</Description>
         <RepositoryUrl>https://github.com/daghovland/DagSemTools</RepositoryUrl>
         <PublishRepositoryUrl>true</PublishRepositoryUrl>
         <RepositoryType>git</RepositoryType>
-        <Copyright>Copyright Dag Hovland 2024-2025</Copyright>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
         <EmbedUntrackedSources>true</EmbedUntrackedSources>
         <IncludeSource>true</IncludeSource>
@@ -29,7 +28,10 @@
       <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
       <PackageReference Include="Serilog" Version="4.2.0" />
     </ItemGroup>
-
+    <ItemGroup>
+        <InternalsVisibleTo Include="DagSemTools.Sparql.Parser" />
+        <InternalsVisibleTo Include="DagSemTools.Turtle.Parser" />
+    </ItemGroup>
     <ItemGroup>
         <Content Include="README.md">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

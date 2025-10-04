@@ -11,6 +11,7 @@ open System
 open DagSemTools.Datalog.Datalog
 open DagSemTools.Rdf
 open DagSemTools.Ingress
+open DagSemTools.Rdf.Query
 open IriTools
 open Serilog
 open Serilog.Sinks.InMemory

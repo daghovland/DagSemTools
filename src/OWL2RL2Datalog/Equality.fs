@@ -11,6 +11,7 @@ namespace DagSemTools.OWL2RL2Datalog
 open DagSemTools.Datalog
 open DagSemTools.Ingress
 open DagSemTools.Rdf
+open DagSemTools.Rdf.Query
 open IriTools
 
 

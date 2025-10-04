@@ -129,20 +129,20 @@ public class TestParser
         ruleAtom.Should().NotBeNull();
         ruleAtom.IsPositiveTriple.Should().BeTrue();
         var ruleTriplePattern = ((RuleAtom.PositiveTriple)ruleAtom).Item;
-        ruleTriplePattern.Subject.Should().Be(Term.NewVariable("?s"));
+        ruleTriplePattern.Subject.Should().Be(Query.Term.NewVariable("?s"));
 
-        var predicateResource = Term
+        var predicateResource = Query.Term
             .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference("https://example.com/data#predicate2"))));
         ruleTriplePattern.Predicate.Should().Be(predicateResource);
 
-        var objectResource = Term
+        var objectResource = Query.Term
             .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference("https://example.com/data3#obj"))));
         ruleTriplePattern.Object.Should().Be(objectResource);
 
-        ruleAtom.Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
-            Term.NewVariable("?s"),
+        ruleAtom.Should().Be(RuleAtom.NewPositiveTriple(new Query.TriplePattern(
+            Query.Term.NewVariable("?s"),
             predicateResource,
             objectResource)));
     }
@@ -158,17 +158,17 @@ public class TestParser
         ont.Should().HaveCount(1);
         var parsedDatalogRule = ont.First();
         parsedDatalogRule.Body.Count().Should().Be(2);
-        parsedDatalogRule.Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
-            Term.NewVariable("?x"),
-            Term.NewVariable("?p"),
-            Term.NewVariable("?y"))));
-        var rdfTypeResource = Term
+        parsedDatalogRule.Body.First().Should().Be(RuleAtom.NewPositiveTriple(new Query.TriplePattern(
+            Query.Term.NewVariable("?x"),
+            Query.Term.NewVariable("?p"),
+            Query.Term.NewVariable("?y"))));
+        var rdfTypeResource = Query.Term
             .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference(Namespaces.RdfType))));
-        var expectedHead = RuleHead.NewNormalHead(new TriplePattern(
-            Term.NewVariable("?x"),
+        var expectedHead = RuleHead.NewNormalHead(new Query.TriplePattern(
+            Query.Term.NewVariable("?x"),
             rdfTypeResource,
-            Term.NewVariable("?c")));
+            Query.Term.NewVariable("?c")));
         expectedHead.Should().NotBeNull();
         parsedDatalogRule.Head.Should().NotBeNull();
         parsedDatalogRule.Head.Should().Be(expectedHead);
@@ -185,20 +185,20 @@ public class TestParser
         ont.Should().NotBeNull();
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(1);
-        ont.First().Head.Should().Be(RuleHead.NewNormalHead(new TriplePattern(
-            Term.NewVariable("?new_node"),
-            Term
+        ont.First().Head.Should().Be(RuleHead.NewNormalHead(new Query.TriplePattern(
+            Query.Term.NewVariable("?new_node"),
+            Query.Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
-            Term
+            Query.Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
 
-        ont.First().Body.First().Should().Be(RuleAtom.NewPositiveTriple(new TriplePattern(
-            Term.NewVariable("?node"),
-            Term
+        ont.First().Body.First().Should().Be(RuleAtom.NewPositiveTriple(new Query.TriplePattern(
+            Query.Term.NewVariable("?node"),
+            Query.Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
-            Term
+            Query.Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
     }

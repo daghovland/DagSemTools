@@ -10,6 +10,7 @@ namespace DagSemTools.Datalog.Tests
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools
+open DagSemTools.Rdf.Query
 open IriTools
 open Xunit 
 open DagSemTools.Datalog

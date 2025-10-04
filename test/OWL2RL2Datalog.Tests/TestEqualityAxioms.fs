@@ -15,6 +15,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
     open DagSemTools.OWL2RL2Datalog
     open DagSemTools
     open DagSemTools.Ingress
+    open DagSemTools.Rdf.Query
     open IriTools
     open Xunit
     open Faqt

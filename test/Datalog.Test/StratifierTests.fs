@@ -12,6 +12,7 @@ open DagSemTools.Datalog.Stratifier
 open DagSemTools.Rdf
 open DagSemTools.Rdf.Ingress
 open DagSemTools
+open DagSemTools.Rdf.Query
 open IriTools
 open Serilog
 open Serilog.Sinks.InMemory
