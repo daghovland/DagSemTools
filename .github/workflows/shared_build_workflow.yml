@@ -60,6 +60,7 @@ jobs:
             "OWL2ALC"
             "Parser"
             "Turtle.Parser"
+            "Sparql.Parser"
             "Datalog"
             "ELI"
             "Datalog.Parser"
