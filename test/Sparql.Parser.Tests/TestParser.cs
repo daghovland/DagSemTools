@@ -68,7 +68,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("?title", "The projected variable is ?name");
+        q.Projection[0].Should().Be("?title", "The projected variable is ?title");
         q.BGPs.Length.Should().Be(1, "There is one BGP");
         var bgp = q.BGPs[0];
         bgp.Should().Be(new Query.TriplePattern(
