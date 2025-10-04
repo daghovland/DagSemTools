@@ -39,6 +39,12 @@
         <Antlr4 Include="grammars\Sparql.g4">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Antlr4>
+        <None Update="grammars\TurtleTokens.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
+        <None Update="grammars\TurtleResource.g4">
+          <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+        </None>
     </ItemGroup>
 
     <!-- Use project references if BuildingProject is true -->

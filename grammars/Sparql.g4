@@ -4,18 +4,22 @@
 */
 
 grammar Sparql;
-import SparqlTokens;
+import TurtleResource;
 
 queryUnit          :    query ;
 query             :    prologue ( selectQuery | constructQuery | describeQuery | askQuery ) valuesClause;
-prologue          :    ( baseDecl | prefixDecl | versionDecl )* ;
+prologue          :    ( directive | versionDecl )* ;
 baseDecl          :    'BASE' IRIREF;
 prefixDecl        :    'PREFIX' PNAME_NS IRIREF;
 versionDecl       :    'VERSION' versionSpecifier;
 versionSpecifier  :    STRING_LITERAL1 | STRING_LITERAL2;
 selectQuery       :    selectClause datasetClause* whereClause solutionModifier;
 subSelect         :    selectClause whereClause solutionModifier valuesClause;
-selectClause      :    'SELECT' ( 'DISTINCT' | 'REDUCED' )? ( ( var | ( '(' expression 'AS' var ')' ) )+ | '*' );
+selectClause      :    'SELECT' ( 'DISTINCT' | 'REDUCED' )? ( projection + | '*' );
+projection        :    
+    var #variableName 
+    | ( '(' expression 'AS' var ')' ) #variableAlias
+    ;
 constructQuery    :    'CONSTRUCT' ( constructTemplate datasetClause* whereClause solutionModifier | datasetClause* 'WHERE' '{' triplesTemplate? '}' solutionModifier );
 describeQuery     :    'DESCRIBE' ( varOrIri+ | '*' ) datasetClause* whereClause? solutionModifier;
 askQuery          :    'ASK' datasetClause* whereClause solutionModifier;

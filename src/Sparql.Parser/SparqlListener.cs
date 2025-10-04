@@ -1,3 +1,11 @@
+/*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*/
+
 using Antlr4.Runtime;
 using DagSemTools.Parser;
 using DagSemTools.Rdf;
@@ -53,8 +61,7 @@ internal class SparqlListener : SparqlBaseListener
     public Query.SelectQuery Result =>  this._result ?? throw new InvalidOperationException("Parser result does not exist before parsing has been done");
 
     public GraphElementManager ElementManager { get; }
-    // ===== Prologue handling =====
-
+    
     public override void EnterBaseDecl(SparqlParser.BaseDeclContext context)
     {
         var iriToken = context.IRIREF()?.GetText();
@@ -91,21 +98,17 @@ internal class SparqlListener : SparqlBaseListener
         }
     }
 
-    // ===== SELECT query handling =====
-
-    public override void EnterSelectQuery(SparqlParser.SelectQueryContext context)
-    {
-        _result = new Query.SelectQuery(FSharpList<string>.Empty, FSharpList<Query.TriplePattern>.Empty);
-    }
+    // TODO Handle distinct, reduced, * etc.
 
     public override void ExitSelectQuery(SparqlParser.SelectQueryContext context)
     {
-        // TODO: Extract parts of the query from 'context' and populate 'Result'
-        // Examples (pseudocode; adapt to your grammar/model):
-        // - SELECT variables: context.var_()
-        // - WHERE clause: context.whereClause()
-        // - Solution modifiers: context.solutionModifier()
-        // - Use _prefixes and _baseIriReference for IRI resolution as needed
+        var projection = context.selectClause();
+        var parsedVars = projection.projection().
+            Select(v => new ProjectionVisitor().Visit(v))
+            .ToList();
+        var whereClause = context.whereClause();
+        var solutionModifier = context.solutionModifier();
+        _result = new Query.SelectQuery(ListModule.OfSeq(parsedVars), FSharpList<Query.TriplePattern>.Empty);
     }
 
 
