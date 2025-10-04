@@ -42,7 +42,7 @@ internal class TurtleListener : TriGDocBaseListener
         return prefixes;
     }
 
-    
+
 
     public override void ExitBaseDeclaration(TriGDocParser.BaseDeclarationContext context)
     {

@@ -92,7 +92,7 @@ internal class IriGrammarVisitor : SparqlBaseVisitor<IriReference>
 
         return input.TrimEnd(':');
     }
-    
+
     /// <summary>
     /// Resolves a relative IRI to a full IRI using the defined base IRI (Or throws an exception if the base IRI is not set)
     /// </summary>

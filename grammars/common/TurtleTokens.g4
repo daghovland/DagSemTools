@@ -37,7 +37,6 @@ UCHAR: '\\u' HEX HEX HEX HEX | '\\U' HEX HEX HEX HEX HEX HEX HEX HEX;
 ECHAR: '\\' [tbnrf\\"'];
 
 WS: [ \t\r\n]+ -> skip;
-NIL: '(' WS* ')';
 ANON: '[' WS* ']';
 
 PN_CHARS_BASE: [A-Z]

@@ -77,9 +77,16 @@ propertyListNotEmpty: verb objectList ( ';' ( verb objectList )? )*;
 verb              :    varOrIri | 'a';
 objectList        :    tripleObject ( ',' tripleObject )*;
 tripleObject            :    graphNode annotation;
-triplesSameSubjectPath: varOrTerm propertyListPathNotEmpty | triplesNodePath propertyListPath | reifiedTripleBlockPath;
+triplesSameSubjectPath: 
+      varOrTerm propertyListPathNotEmpty #namedSubjectTriplesPath 
+    | triplesNodePath propertyListPath #triplesPathProperty 
+    | reifiedTripleBlockPath #reifiedTripleBlockPathPattern;
+
 propertyListPath  :    propertyListPathNotEmpty?;
-propertyListPathNotEmpty: ( verbPath | verbSimple ) objectListPath ( ';' ( ( verbPath | verbSimple ) objectListPath )? )*;
+propertyListPathNotEmpty: propertyPath ( ';' ( propertyPath )? )*;
+propertyPath      :    
+    verbPath objectListPath #verbPathObjectList
+   | verbSimple objectListPath #verbSimpleObjectList ;
 verbPath          :    path;
 verbSimple        :    var;
 objectListPath    :    objectPath ( ',' objectPath )*;

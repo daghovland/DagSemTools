@@ -21,28 +21,34 @@ internal class SparqlListener : SparqlBaseListener
 {
     private readonly IVisitorErrorListener _errorListener;
     private IriGrammarVisitor _iriGrammarVisitor;
-
+    private readonly TermVisitor _termVisitor;
+    private readonly GroupPatternVisitor _groupPatternVisitor;
     private readonly Dictionary<string, IriReference> _prefixes;
     private Query.SelectQuery? _result = null;
 
     public SparqlListener(IVisitorErrorListener errorListener) :
-        this(errorListener, new GraphElementManager(100)){
+        this(errorListener, new GraphElementManager(100))
+    {
     }
 
     public SparqlListener(IVisitorErrorListener errorListener, Dictionary<string, IriReference> prefixes)
-        : this(errorListener, prefixes, new GraphElementManager(100)){
+        : this(errorListener, prefixes, new GraphElementManager(100))
+    {
     }
     public SparqlListener(IVisitorErrorListener errorListener, GraphElementManager elementManager)
-    : this(errorListener, new Dictionary<string, IriReference>(), elementManager){
+    : this(errorListener, new Dictionary<string, IriReference>(), elementManager)
+    {
     }
     public SparqlListener(IVisitorErrorListener errorListener, Dictionary<string, IriReference> prefixes, GraphElementManager elementManager)
     {
         ElementManager = elementManager;
         _errorListener = errorListener;
         _iriGrammarVisitor = new IriGrammarVisitor(DefaultPrefixes());
+        _termVisitor = new TermVisitor(_iriGrammarVisitor, ElementManager);
+        _groupPatternVisitor = new GroupPatternVisitor(_termVisitor);
         _prefixes = prefixes;
     }
-    
+
     private static Dictionary<string, IriReference> DefaultPrefixes()
     {
         var prefixes = new Dictionary<string, IriReference>();
@@ -52,15 +58,15 @@ internal class SparqlListener : SparqlBaseListener
         prefixes.TryAdd("owl", new IriReference("http://www.w3.org/2002/07/owl#"));
         return prefixes;
     }
-    
+
     /// <summary>
     /// The result of walking the parse tree.
     /// Populate this in the appropriate exit/enter methods.
     /// </summary>
-    public Query.SelectQuery Result =>  this._result ?? throw new InvalidOperationException("Parser result does not exist before parsing has been done");
+    public Query.SelectQuery Result => this._result ?? throw new InvalidOperationException("Parser result does not exist before parsing has been done");
 
     public GraphElementManager ElementManager { get; }
-    
+
     public override void EnterBaseDeclaration(SparqlParser.BaseDeclarationContext context)
     {
         var iriToken = context.ABSOLUTEIRIREF()?.GetText();
@@ -90,14 +96,15 @@ internal class SparqlListener : SparqlBaseListener
         var nsToken = context.PNAME_NS()?.GetText() ??
             throw new ArgumentException("Parser dysfunction. Null prefix found in SPARQL PREFIX declaration");
         var prefix = ParserUtils.GetStringExcludingLastColon(nsToken);
-        try {
+        try
+        {
             var iri = _iriGrammarVisitor.Visit(context.iri());
             _iriGrammarVisitor.AddPrefix(prefix, iri);
         }
         catch (Exception ex)
         {
             Report(context, $"Invalid PREFIX IRI for '{prefix}': {ex.Message}");
-        }    
+        }
     }
 
 
@@ -108,9 +115,10 @@ internal class SparqlListener : SparqlBaseListener
         var parsedVars = projection.projection().
             Select(v => new ProjectionVisitor().Visit(v))
             .ToList();
-        var whereClause = context.whereClause();
+        var whereClause = context.whereClause().groupGraphPattern();
+        var parsedWhereClause = _groupPatternVisitor.Visit(whereClause);
         var solutionModifier = context.solutionModifier();
-        _result = new Query.SelectQuery(ListModule.OfSeq(parsedVars), FSharpList<Query.TriplePattern>.Empty);
+        _result = new Query.SelectQuery(ListModule.OfSeq(parsedVars), ListModule.OfSeq(parsedWhereClause));
     }
 
 
@@ -119,6 +127,6 @@ internal class SparqlListener : SparqlBaseListener
         var token = ctx.Start ?? throw new Exception($"Lacking token for parsing error {message}");
         var line = token.Line;
         var col = token.Column;
-         _errorListener.VisitorError(token , line, col, message);
+        _errorListener.VisitorError(token, line, col, message);
     }
 }

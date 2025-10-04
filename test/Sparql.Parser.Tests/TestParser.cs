@@ -26,7 +26,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         _output = output;
         _outputWriter = new TestOutputTextWriter(_output);
     }
-    
+
     [Fact]
     public void TestParseSimpleSelect()
     {
@@ -39,7 +39,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        var e =  result.Item2;
+        var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
         q.Projection[0].Should().Be("?name", "The projected variable is ?name");
@@ -47,11 +47,35 @@ public class TestParser : IDisposable, IAsyncDisposable
         var bgp = q.BGPs[0];
         bgp.Should().Be(new Query.TriplePattern(
                 Query.Term.NewVariable("person"),
-                Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")))]), 
+                Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")))]),
                 Query.Term.NewVariable("name")),
             "?person foaf:name ?name ");
     }
-    
+
+    [Fact]
+    public void TestSparql12Example1()
+    {
+        string sparql = """
+                        SELECT ?title
+                        WHERE
+                        {
+                            <http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> ?title .
+                        }
+                        
+                        """;
+        var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
+        var q = result.Item1;
+        var e = result.Item2;
+        q.Should().NotBeNull();
+        q.Projection.Length.Should().Be(1, "There is one projected variable");
+        q.Projection[0].Should().Be("?title", "The projected variable is ?name");
+        q.BGPs.Length.Should().Be(1, "There is one BGP");
+        var bgp = q.BGPs[0];
+        bgp.Should().Be(new Query.TriplePattern(
+            Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://example.org/book/book1")))]),
+                Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://purl.org/dc/elements/1.1/title")))]),
+                Query.Term.NewVariable("title")));
+    }
     public void Dispose()
     {
         _outputWriter.Dispose();

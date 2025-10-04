@@ -6,13 +6,27 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
 using DagSemTools.Parser;
+using DagSemTools.Rdf;
 using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Sparql.Parser;
 
-internal class ProjectionVisitor() : SparqlBaseVisitor<string>
+internal class TermVisitor(
+    IriGrammarVisitor iriGrammarVisitor,
+    GraphElementManager elementManager)
+    : SparqlBaseVisitor<Query.Term>
 {
-    public override string VisitVar(SparqlParser.VarContext context)
-        => context.GetText();
+
+
+    public override Query.Term VisitVar(SparqlParser.VarContext context)
+        => Query.Term.NewVariable(ParserUtils.GetVariableName(context.GetText()));
+
+    public override Query.Term VisitIri(SparqlParser.IriContext context)
+    => Query.Term.NewResource(
+        elementManager.AddNodeResource(
+            RdfResource.NewIri(
+            iriGrammarVisitor.Visit(context))
+        ));
 }
