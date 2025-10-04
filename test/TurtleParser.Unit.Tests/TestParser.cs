@@ -139,8 +139,8 @@ public class TestParser : IDisposable, IAsyncDisposable
                                p:subject4 p:predicate4 p:object4 .     # prefixed name, e.g., http://one.example/path/subject4
                                """);
         ont.Triples.TripleCount.Should().Be(1);
-        ont.Triples.GetTriples().First().subject.Should().BeGreaterOrEqualTo(0);
-        ont.Triples.GetTriples().First().predicate.Should().BeGreaterOrEqualTo(0);
+        ont.Triples.GetTriples().First().subject.Should().BeGreaterThanOrEqualTo(0);
+        ont.Triples.GetTriples().First().predicate.Should().BeGreaterThanOrEqualTo(0);
     }
 
     [Fact]
@@ -179,9 +179,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         Assert.NotNull(ont);
         ont.Triples.TripleCount.Should().Be(1);
         var triple = ont.Triples.GetTriples().First();
-        triple.subject.Should().BeGreaterOrEqualTo(0);
-        triple.predicate.Should().BeGreaterOrEqualTo(0);
-        triple.obj.Should().BeGreaterOrEqualTo(0);
+        triple.subject.Should().BeGreaterThanOrEqualTo(0);
+        triple.predicate.Should().BeGreaterThanOrEqualTo(0);
+        triple.obj.Should().BeGreaterThanOrEqualTo(0);
     }
 
     [Fact]

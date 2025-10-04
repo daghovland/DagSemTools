@@ -34,9 +34,9 @@
   <ItemGroup>
 		<PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
 		<PackageReference Include="Antlr4BuildTasks" Version="12.10.0" />
-    <PackageReference Include="FSharp.Core" Version="8.0.403" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.12.6" />
-    <PackageReference Include="Serilog" Version="4.2.0" />
+    <PackageReference Include="FSharp.Core" Version="9.0.303" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.8" />
+    <PackageReference Include="Serilog" Version="4.3.0" />
 	</ItemGroup>
 	<ItemGroup>
         <Antlr4 Include="grammars/IriGrammar.g4">
