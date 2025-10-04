@@ -44,6 +44,6 @@ internal class GroupPatternVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
             .Select(_propertyPathVisitor.Visit)
             .SelectMany(f => f(subject))
             .ToList();
-        
+
     }
 }

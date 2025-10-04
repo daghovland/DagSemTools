@@ -29,8 +29,8 @@ public class ParserUtils
         }
         throw new Exception($"Invalid prefix {prefixNs}. Prefix should end with ':'");
     }
-    
-    
+
+
     /// <summary>
     /// Used in the sparql parser to get the variable name without leading question mark.
     /// </summary>
