@@ -22,7 +22,6 @@ internal class SparqlListener : SparqlBaseListener
     private readonly IVisitorErrorListener _errorListener;
     private IriGrammarVisitor _iriGrammarVisitor;
 
-    private IriReference? _baseIriReference;
     private readonly Dictionary<string, IriReference> _prefixes;
     private Query.SelectQuery? _result = null;
 
@@ -62,15 +61,15 @@ internal class SparqlListener : SparqlBaseListener
 
     public GraphElementManager ElementManager { get; }
     
-    public override void EnterBaseDecl(SparqlParser.BaseDeclContext context)
+    public override void EnterBaseDeclaration(SparqlParser.BaseDeclarationContext context)
     {
-        var iriToken = context.IRIREF()?.GetText();
+        var iriToken = context.ABSOLUTEIRIREF()?.GetText();
         if (string.IsNullOrWhiteSpace(iriToken))
             return;
 
         try
         {
-            _baseIriReference = new IriReference(DagSemTools.Parser.ParserUtils.TrimIri(iriToken));
+            _iriGrammarVisitor.SetBase(new IriReference(ParserUtils.TrimIri(iriToken)));
         }
         catch (Exception ex)
         {
@@ -78,28 +77,31 @@ internal class SparqlListener : SparqlBaseListener
         }
     }
 
-    public override void EnterPrefixDecl(SparqlParser.PrefixDeclContext context)
+    public override void ExitPrefixId(SparqlParser.PrefixIdContext context)
     {
-        var nsToken = context.PNAME_NS()?.GetText();
-        var iriToken = context.IRIREF()?.GetText();
-        if (string.IsNullOrWhiteSpace(nsToken) || string.IsNullOrWhiteSpace(iriToken))
-            return;
-
-        // PNAME_NS includes the trailing ':', strip it
-        var prefix = nsToken.EndsWith(":") ? nsToken[..^1] : nsToken;
-
-        try
-        {
-            _prefixes[prefix] = new IriReference(ParserUtils.TrimIri(iriToken));
+        var nsToken = context.PNAME_NS()?.GetText() ??
+                      throw new ArgumentException("Parser dysfunction. Null prefix found in SPARQL PREFIX declaration");
+        var prefix = ParserUtils.GetStringExcludingLastColon(nsToken);
+        var iri = _iriGrammarVisitor.Visit(context.iri());
+        _iriGrammarVisitor.AddPrefix(prefix, iri);
+    }
+    public override void ExitSparqlPrefix(SparqlParser.SparqlPrefixContext context)
+    {
+        var nsToken = context.PNAME_NS()?.GetText() ??
+            throw new ArgumentException("Parser dysfunction. Null prefix found in SPARQL PREFIX declaration");
+        var prefix = ParserUtils.GetStringExcludingLastColon(nsToken);
+        try {
+            var iri = _iriGrammarVisitor.Visit(context.iri());
+            _iriGrammarVisitor.AddPrefix(prefix, iri);
         }
         catch (Exception ex)
         {
             Report(context, $"Invalid PREFIX IRI for '{prefix}': {ex.Message}");
-        }
+        }    
     }
 
-    // TODO Handle distinct, reduced, * etc.
 
+    // TODO Handle distinct, reduced, * etc.
     public override void ExitSelectQuery(SparqlParser.SelectQueryContext context)
     {
         var projection = context.selectClause();

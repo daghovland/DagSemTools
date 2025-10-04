@@ -1,1 +1,1 @@
-../../../grammars/SparqlTokens.g4
+../../../grammars/sparql/SparqlTokens.g4

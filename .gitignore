@@ -90,3 +90,4 @@ test/Api.Tests/TestData/go.owl.xml
 DagSemTools.sln.DotSettings.user
 src/Turtle.Parser/grammars/gen/*
 src/Datalog.Parser/grammars/gen/*
+src/Sparql.Parser/grammars/gen/*

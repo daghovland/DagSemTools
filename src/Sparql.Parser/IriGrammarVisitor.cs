@@ -60,7 +60,7 @@ internal class IriGrammarVisitor : SparqlBaseVisitor<IriReference>
     /// <returns></returns>
     public override IriReference VisitFullIri(FullIriContext ctxt)
     {
-        var uriString = ctxt.IRIREF().GetText()[1..^1];
+        var uriString = ctxt.ABSOLUTEIRIREF().GetText()[1..^1];
         return new IriReference(uriString);
     }
 
@@ -70,7 +70,7 @@ internal class IriGrammarVisitor : SparqlBaseVisitor<IriReference>
     /// </summary>
     /// <param name="ctxt"></param>
     /// <returns></returns>
-    public override IriReference VisitPrefixedName(PrefixedNameContext ctxt)
+    public override IriReference VisitPrefixedIri(PrefixedIriContext ctxt)
     {
         var prefixedIriString = ctxt.PNAME_LN().GetText();
         var components = prefixedIriString.Split(':', 2);

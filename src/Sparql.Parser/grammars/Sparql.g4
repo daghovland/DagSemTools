@@ -1,1 +1,1 @@
-../../../grammars/Sparql.g4
+../../../grammars/sparql/Sparql.g4

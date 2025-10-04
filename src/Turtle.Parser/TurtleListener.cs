@@ -44,14 +44,6 @@ internal class TurtleListener : TriGDocBaseListener
 
     
 
-    internal static string GetStringExcludingLastColon(string prefixNs)
-    {
-        if (prefixNs.Length >= 1 && prefixNs[^1] == ':')
-        {
-            return prefixNs.Substring(0, prefixNs.Length - 1);
-        }
-        throw new Exception($"Invalid prefix {prefixNs}. Prefix should end with ':'");
-    }
     public override void ExitBaseDeclaration(TriGDocParser.BaseDeclarationContext context)
     {
         var iriString = DagSemTools.Parser.ParserUtils.TrimIri(context.ABSOLUTEIRIREF().GetText());
@@ -61,13 +53,13 @@ internal class TurtleListener : TriGDocBaseListener
 
     public override void ExitPrefixId(TriGDocParser.PrefixIdContext context)
     {
-        var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
+        var prefix = ParserUtils.GetStringExcludingLastColon(context.PNAME_NS().GetText());
         var iri = _iriGrammarVisitor.Visit(context.iri());
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
     public override void ExitSparqlPrefix(TriGDocParser.SparqlPrefixContext context)
     {
-        var prefix = GetStringExcludingLastColon(context.PNAME_NS().GetText());
+        var prefix = ParserUtils.GetStringExcludingLastColon(context.PNAME_NS().GetText());
         var iri = _iriGrammarVisitor.Visit(context.iri());
         _iriGrammarVisitor.AddPrefix(prefix, iri);
     }
