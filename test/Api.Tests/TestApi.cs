@@ -129,4 +129,28 @@ public class TestApi(ITestOutputHelper output)
         resultsData.Should().HaveCount(1);
 
     }
+    
+    /// <summary>
+    /// First simple example in sparql 1.2 docs
+    /// </summary>
+    [Fact]
+    public void TestSparql1()
+    {
+        var data = "<http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> \"SPARQL Tutorial\" .";
+        var graph = TurtleParser.Parse(data, outputWriter);
+        var queryString = """
+                          SELECT ?title
+                          WHERE
+                          {
+                              <http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> ?title .
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+        var answer = answers.First();
+        answer.Count.Should().Be(1);
+        answer["title"].Should().Be(RdfLiteral.StringRdfLiteral("SPARQL Tutorial"));
+    }
+
 }

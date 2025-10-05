@@ -33,6 +33,7 @@
         <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
         <ProjectReference Include="..\Rdf\Rdf.fsproj" />
         <ProjectReference Include="..\Turtle.Parser\Turtle.Parser.csproj" />
+        <ProjectReference Include="..\Sparql.Parser\Sparql.Parser.csproj" />
         <ProjectReference Include="..\OwlOntology\OwlOntology.fsproj" />
         <ProjectReference Include="..\RdfOwlTranslator\RdfOwlTranslator.fsproj" />
     </ItemGroup>
@@ -46,6 +47,7 @@
         <PackageReference Include="DagSemTools.OWL2ALC" Version="$(Version)" />
         <PackageReference Include="DagSemTools.Datalog.Parser" Version="$(Version)" />
         <PackageReference Include="DagSemTools.Turtle.Parser" Version="$(Version)" />
+        <PackageReference Include="DagSemTools.Sparql.Parser" Version="$(Version)" />
         <PackageReference Include="DagSemTools.OwlOntology" Version="$(Version)" />
     </ItemGroup>
     
