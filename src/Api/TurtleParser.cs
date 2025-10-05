@@ -21,4 +21,16 @@ public static class TurtleParser
         var tt = DagSemTools.Turtle.Parser.Parser.ParseFile(rdfFile, errorOutput);
         return new Graph(tt);
     }
+    
+    /// <summary>
+    /// Parses a Turtle string into an RDF graph.
+    /// </summary>
+    /// <param name="rdfString">A string with Turtle RDf content</param>
+    /// <param name="errorOutput">The stream where parser errors are output. Try Console.Error</param>
+    /// <returns></returns>
+    public static IGraph Parse(string rdfString, TextWriter errorOutput)
+    {
+        var tt = DagSemTools.Turtle.Parser.Parser.ParseString(rdfString, errorOutput);
+        return new Graph(tt);
+    }
 }

@@ -82,6 +82,13 @@ public class Graph : IGraph
         LoadDatalog(newRules);
     }
 
+    /// <inheritdoc />
+    public IEnumerable<Dictionary<string, Resource>> AnswerSelectQuery(string query)
+    {
+        var parsedQuery = Sparql.Parser.Parser.ParseString(query, Console.Error);
+        return new List<Dictionary<string, Resource>>() ;
+    }
+
     /// <inheritDoc />
     public void LoadDatalog(IEnumerable<Rule> newRules)
     {
