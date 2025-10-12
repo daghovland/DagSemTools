@@ -85,7 +85,8 @@ public class Graph : IGraph
     /// <inheritdoc />
     public IEnumerable<Dictionary<string, Resource>> AnswerSelectQuery(string query)
     {
-        var parsedQuery = Sparql.Parser.Parser.ParseString(query, Console.Error);
+        var parsedQuery = Sparql.Parser.Parser.ParseString(query, Console.Error, Triples.Resources);
+        var results = Triples.AnswerSelectQuery(_logger, parsedQuery);
         return new List<Dictionary<string, Resource>>() ;
     }
 

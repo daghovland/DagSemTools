@@ -35,6 +35,7 @@
         <Compile Include="Datastore.fs" />
         <Compile Include="AssemblyInfo.fs" />
         <Compile Include="Query.fs" />
+        <Compile Include="QueryProcessor.fs" />
     </ItemGroup>
 
     <ItemGroup>

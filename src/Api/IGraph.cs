@@ -65,7 +65,7 @@ public interface IGraph
     /// Answers a SPARQL SELECT query
     /// </summary>
     /// <param name="query"></param>
-    /// <returns></returns>
+    /// <returns>An enumerable of solutions. Each solution is a dictionary of the bindings</returns>
     public IEnumerable<Dictionary<string, Resource>> AnswerSelectQuery(string query);
 
     
