@@ -59,7 +59,7 @@ module QueryProcessor =
                 | Some value -> Map.add var value acc
                 | None -> acc) Map.empty
     let public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
-        GetBindingsForBGP datastore query.BGPs
+        GetBindingsForBGP datastore query.BasicGraphPattern
         |> List.map (RemoveNonProjectedBindings query.Projection)
         
 

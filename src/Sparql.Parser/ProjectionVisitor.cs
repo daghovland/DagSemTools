@@ -14,5 +14,5 @@ namespace DagSemTools.Sparql.Parser;
 internal class ProjectionVisitor() : SparqlBaseVisitor<string>
 {
     public override string VisitVar(SparqlParser.VarContext context)
-        => context.GetText();
+        => ParserUtils.GetVariableName(context.GetText());
 }

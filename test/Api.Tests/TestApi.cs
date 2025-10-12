@@ -150,7 +150,10 @@ public class TestApi(ITestOutputHelper output)
         answers.Count.Should().Be(1);
         var answer = answers.First();
         answer.Count.Should().Be(1);
-        answer["title"].Should().Be(RdfLiteral.StringRdfLiteral("SPARQL Tutorial"));
+        var actual = answer["title"];
+        var expected = RdfLiteral.StringRdfLiteral("SPARQL Tutorial");
+        Assert.Equal(actual, expected);
+        
     }
 
 }

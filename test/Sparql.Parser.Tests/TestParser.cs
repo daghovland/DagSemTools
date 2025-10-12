@@ -42,9 +42,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("?name", "The projected variable is ?name");
-        q.BGPs.Length.Should().Be(1, "There is one BGP");
-        var bgp = q.BGPs[0];
+        q.Projection[0].Should().Be("name", "The projected variable is 'name'");
+        q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
+        var bgp = q.BasicGraphPattern[0];
         bgp.Should().Be(new Query.TriplePattern(
                 Query.Term.NewVariable("person"),
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")))]),
@@ -68,9 +68,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("?title", "The projected variable is ?title");
-        q.BGPs.Length.Should().Be(1, "There is one BGP");
-        var bgp = q.BGPs[0];
+        q.Projection[0].Should().Be("title", "The projected variable is 'title'");
+        q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
+        var bgp = q.BasicGraphPattern[0];
         bgp.Should().Be(new Query.TriplePattern(
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://example.org/book/book1")))]),
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://purl.org/dc/elements/1.1/title")))]),
