@@ -9,6 +9,7 @@
 namespace DagSemTools.Rdf
 
 open DagSemTools.Rdf.Ingress
+open DagSemTools.Rdf.Query
 open Ingress
 open System
 open DagSemTools.Ingress
@@ -126,4 +127,30 @@ type Datastore(triples: TripleTable,
             |> Seq.map this.Resources.GetResourceTriple
             |> Seq.map _.ToString()
             |> String.concat ". "
+            
+    member this.GetTriples(pat: Query.TriplePattern) : Triple seq =
+        let s = pat.Subject
+        let p = pat.Predicate
+        let o = pat.Object
+        match s, p, o with
+        | Resource sRes, Resource pRes, Resource oRes ->
+            let t = { Triple.subject =  sRes; predicate = pRes; obj = oRes }
+            if this.ContainsTriple t then
+                seq { yield t }
+            else
+                Seq.empty
+        | Resource sRes, Resource pRes, Variable _ ->
+            this.GetTriplesWithSubjectPredicate (sRes, pRes)
+        | Resource sRes, Variable _, Resource oRes ->
+            this.GetTriplesWithSubjectObject (sRes, oRes)
+        | Variable _, Resource pRes, Resource oRes ->
+            this.GetTriplesWithObjectPredicate (oRes, pRes)
+        | Resource sRes, Variable _, Variable _ ->
+            this.GetTriplesWithSubject sRes
+        | Variable _, Resource pRes, Variable _ ->
+            this.GetTriplesWithPredicate pRes
+        | Variable _, Variable _, Resource oRes ->
+            this.GetTriplesWithObject oRes
+        | Variable _, Variable _, Variable _ ->
+            this.Triples.GetTriples()
             

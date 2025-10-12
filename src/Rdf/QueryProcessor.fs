@@ -8,14 +8,58 @@
 
 namespace DagSemTools.Rdf
 
+open DagSemTools.Rdf.Ingress
+open DagSemTools.Rdf.Query
+
 module QueryProcessor =
-    let Answer (datastore : Datastore) (query : Query.SelectQuery) : (string * string) list seq =
-        let variableNames = 
-            query.BGPs
-            |> List.collect (fun pattern -> 
-                [ pattern.Subject; pattern.Predicate; pattern.Object ])
-            |> List.choose (function | Variable vName -> Some vName | Resource _ -> None)
-            |> List.distinct
-        // For simplicity, we will return empty results for now
-        Seq.empty
+    
+    let GetBindingsForBGP(datastore: Datastore) (bgp: TriplePattern list) : Map<string, GraphElementId> list =
+        let rec aux (patterns: TriplePattern list) (currentBindings: Map<string, GraphElementId> list) : Map<string, GraphElementId> list =
+            match patterns with
+            | [] -> currentBindings
+            | pattern :: rest ->
+                let newBindings =
+                    currentBindings
+                    |> List.collect (fun binding ->
+                        let boundPattern =
+                            { Subject = 
+                                match pattern.Subject with
+                                | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
+                                | _ -> pattern.Subject
+                              Predicate = 
+                                match pattern.Predicate with
+                                | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
+                                | _ -> pattern.Predicate
+                              Object = 
+                                match pattern.Object with
+                                | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
+                                | _ -> pattern.Object }
+                        datastore.GetTriples(boundPattern)
+                        |> Seq.map (fun triple ->
+                            let newBinding =
+                                [ match pattern.Subject with
+                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.subject)
+                                  | _ -> ()
+                                  match pattern.Predicate with
+                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.predicate)
+                                  | _ -> ()
+                                  match pattern.Object with
+                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.obj)
+                                  | _ -> () ]
+                                |> Map.ofList
+                            Map.fold (fun acc k v -> Map.add k v acc) binding newBinding)
+                        |> Seq.toList)
+                aux rest newBindings
+        aux bgp [Map.empty]
+    
+    let RemoveNonProjectedBindings (projectedVars: string list) (binding: Map<string, GraphElementId>) : Map<string, GraphElementId> =
+            projectedVars
+            |> List.fold (fun acc var ->
+                match binding.TryFind var with
+                | Some value -> Map.add var value acc
+                | None -> acc) Map.empty
+    let public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
+        GetBindingsForBGP datastore query.BGPs
+        |> List.map (RemoveNonProjectedBindings query.Projection)
+        
 

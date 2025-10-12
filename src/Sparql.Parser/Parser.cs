@@ -33,11 +33,9 @@ public static class Parser
     }
 
     /// <summary>
-    /// Parses the content of the TextReader containing RDF-1.2 Turtle.
+    /// Parses the content of the TextReader containing SPARQL-1.2.
     /// </summary>
     /// <param name="textReader"></param>
-    /// <param name="initSize"></param>
-    /// <param name="prefixes"></param>
     /// <param name="errorOutput"></param>
     /// <param name="elementManager">The mapper between rdf resources and integer indices</param>
     /// <returns></returns>
@@ -64,14 +62,15 @@ public static class Parser
     }
 
     /// <summary>
-    /// Parses the content of the string containing RDF-1.2 Turtle.
+    /// Parses the content of the string containing SPARQL-1.2.
     /// </summary>
-    /// <param name="owl"></param>
-    /// <param name="errorOutput"></param>
+    /// <param name="queryString">SPARQL-1.2 query</param>
+    /// <param name="errorOutput">For writing error messages, f.ex. Console.Error</param>
+    /// <param name="elementManager">The mapper from resource to id, f.ex. Datastore.Triples</param>
     /// <returns></returns>
-    public static (Query.SelectQuery, GraphElementManager) ParseString(string owl, TextWriter errorOutput, GraphElementManager? elementManager = null)
+    public static (Query.SelectQuery, GraphElementManager) ParseString(string queryString, TextWriter errorOutput, GraphElementManager? elementManager = null)
     {
-        using TextReader textReader = new StringReader(owl);
+        using TextReader textReader = new StringReader(queryString);
         return ParseReader(textReader, errorOutput, elementManager);
     }
 

@@ -66,7 +66,7 @@ public interface IGraph
     /// </summary>
     /// <param name="query"></param>
     /// <returns>An enumerable of solutions. Each solution is a dictionary of the bindings</returns>
-    public IEnumerable<Dictionary<string, Resource>> AnswerSelectQuery(string query);
+    public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query);
 
     
     /// <summary>
