@@ -156,4 +156,44 @@ public class TestApi(ITestOutputHelper output)
         
     }
 
+    
+    
+    /// <summary>
+    /// Second example in sparql 1.2 docs
+    /// </summary>
+    [Fact]
+    public void TestSparql2()
+    {
+        var data = """
+                    PREFIX foaf:  <http://xmlns.com/foaf/0.1/> .
+
+                    _:a  foaf:name   \"Johnny Lee Outlaw\" .
+                    _:a  foaf:mbox   <mailto:jlow@example.com> .
+                    _:b  foaf:name   \"Peter Goodguy\" .
+                    _:b  foaf:mbox   <mailto:peter@example.org> .
+                    _:c  foaf:mbox   <mailto:carol@example.org> .
+                """;
+        var graph = TurtleParser.Parse(data, outputWriter);
+        var queryString = """
+                          PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+                          SELECT ?name ?mbox
+                          WHERE
+                          { ?x foaf:name ?name .
+                            ?x foaf:mbox ?mbox }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(2);
+        var answer = answers.First();
+        answer.Count.Should().Be(2);
+        var actual = answer["name"];
+        var expected1 = RdfLiteral.StringRdfLiteral("Johnny Lee Outlaw");
+        var expected2 = RdfLiteral.StringRdfLiteral("Peter Goodguy");
+        (actual.Equals(expected1) || actual.Equals(expected2)).Should().BeTrue();
+        var actualMbox = answer["mbox"];
+        var expectedMbox1 = RdfResource.NewIri(new IriReference("mailto:peter@example.org"));
+        var expectedMbox2 = RdfResource.NewIri( new IriReference("mailto:carol@example.org"));
+        (actualMbox.Equals(expectedMbox1) || actualMbox.Equals(expectedMbox2)).Should().BeTrue();
+        
+    }
 }
