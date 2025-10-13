@@ -10,6 +10,7 @@ using DagSemTools.Ingress;
 using DagSemTools.Turtle.Parser;
 using FluentAssertions;
 using IriTools;
+using Newtonsoft.Json;
 using TestUtils;
 using Xunit.Abstractions;
 
@@ -503,6 +504,18 @@ public class TestParser : IDisposable, IAsyncDisposable
         
     }
 
+    
+    [Fact]
+    public void TestWholeStringMustBeParsed()
+    {
+        var outputWriter = new StringWriter();
+        Parser.ParseString("""
+                               PREFIX ex:  <http://example.com#> . ,
+                               """, outputWriter);
+        var output = outputWriter.ToString();
+        output.Should().Contain("line 1:36 extraneous input ','");
+    }
+    
     
     public void Dispose()
     {
