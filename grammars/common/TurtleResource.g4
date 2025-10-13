@@ -4,7 +4,7 @@ import TurtleTokens;
 directive: prefix | baseDeclaration ;
 
 
-prefix: PREFIX_STRING PNAME_NS iri  #sparqlPrefix
+prefix: PREFIX_STRING PNAME_NS iri PERIOD? #sparqlPrefix
     | ATPREFIX PNAME_NS iri PERIOD #prefixId
     ;
 
