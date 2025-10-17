@@ -137,7 +137,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestSparql1()
     {
         var data = "<http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> \"SPARQL Tutorial\" .";
-        var graph = TurtleParser.Parse(data, outputWriter);
+        var graph = ParseTurtleData(data);
         var queryString = """
                           SELECT ?title
                           WHERE
@@ -167,13 +167,13 @@ public class TestApi(ITestOutputHelper output)
         var data = """
                     PREFIX foaf:  <http://xmlns.com/foaf/0.1/> .
 
-                    _:a  foaf:name   \"Johnny Lee Outlaw\" .
+                    _:a  foaf:name   "Johnny Lee Outlaw" .
                     _:a  foaf:mbox   <mailto:jlow@example.com> .
-                    _:b  foaf:name   \"Peter Goodguy\" .
+                    _:b  foaf:name   "Peter Goodguy" .
                     _:b  foaf:mbox   <mailto:peter@example.org> .
                     _:c  foaf:mbox   <mailto:carol@example.org> .
                 """;
-        var graph = TurtleParser.Parse(data, outputWriter);
+        var graph = ParseTurtleData(data);
         var queryString = """
                           PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
                           SELECT ?name ?mbox
@@ -191,9 +191,23 @@ public class TestApi(ITestOutputHelper output)
         var expected2 = RdfLiteral.StringRdfLiteral("Peter Goodguy");
         (actual.Equals(expected1) || actual.Equals(expected2)).Should().BeTrue();
         var actualMbox = answer["mbox"];
-        var expectedMbox1 = RdfResource.NewIri(new IriReference("mailto:peter@example.org"));
-        var expectedMbox2 = RdfResource.NewIri( new IriReference("mailto:carol@example.org"));
+        var expectedMbox1 = new IriResource(new IriReference("mailto:peter@example.org"));
+        var expectedMbox2 = new IriResource( new IriReference("mailto:carol@example.org"));
         (actualMbox.Equals(expectedMbox1) || actualMbox.Equals(expectedMbox2)).Should().BeTrue();
         
+    }
+
+    private IGraph ParseTurtleData(string data)
+    {
+        var writer = new StringWriter();
+        var graph = TurtleParser.Parse(data, writer);
+        if(!string.IsNullOrEmpty(writer.ToString()))
+        {
+            output.WriteLine("Parser warnings/errors:");
+            output.WriteLine(writer.ToString());
+            Assert.Fail("Parser warnings/errors:");
+        }
+
+        return graph;
     }
 }

@@ -28,7 +28,16 @@ public class TestParser : IDisposable, IAsyncDisposable
     }
     public Datastore TestOntology(string ontology)
     {
-        return Parser.ParseString(ontology, _outputWriter);
+        var tmpWriter = new StringWriter();
+        var dstore = Parser.ParseString(ontology, tmpWriter);
+        var output = tmpWriter.ToString();
+        if (!string.IsNullOrEmpty(output))
+        {
+            _output.WriteLine("Parser output:");
+            _output.WriteLine(output);
+            Assert.Fail($"Parsing failed {output}");
+        }
+        return dstore;
 
     }
 
@@ -511,9 +520,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ont = TestOntology("""
                                    PREFIX foaf:  <http://xmlns.com/foaf/0.1/> .
 
-                                   _:a  foaf:name   \"Johnny Lee Outlaw\" .
+                                   _:a  foaf:name   "Johnny Lee Outlaw" .
                                    _:a  foaf:mbox   <mailto:jlow@example.com> .
-                                   _:b  foaf:name   \"Peter Goodguy\" .
+                                   _:b  foaf:name   "Peter Goodguy" .
                                    _:b  foaf:mbox   <mailto:peter@example.org> .
                                    _:c  foaf:mbox   <mailto:carol@example.org> .
                                """);
@@ -525,6 +534,25 @@ public class TestParser : IDisposable, IAsyncDisposable
         var nameTripleResources = nameTriples.Select(ont.GetResourceTriple);
         nameTripleResources.First().obj.IsGraphLiteral.Should().BeTrue();
 
+    }
+    
+    
+    [Fact]
+    public void TestHandlingWrongQuote()
+    {
+        var outputWriter = new StringWriter();
+        Parser.ParseString("""
+                                   PREFIX foaf:  <http://xmlns.com/foaf/0.1/> .
+
+                                   _:a  foaf:name   \"Johnny Lee Outlaw" .
+                                   _:a  foaf:mbox   <mailto:jlow@example.com> .
+                                   _:b  foaf:name   \"Peter Goodguy" .
+                                   _:b  foaf:mbox   <mailto:peter@example.org> .
+                                   _:c  foaf:mbox   <mailto:carol@example.org> .
+                               """, outputWriter);
+        
+        var output = outputWriter.ToString();
+        output.Should().Contain("line 3:21 mismatched input '\\\"'");
     }
     
     [Fact]

@@ -5,7 +5,7 @@ directive: prefix | baseDeclaration ;
 
 
 prefix: PREFIX_STRING PNAME_NS iri PERIOD? #sparqlPrefix
-    | ATPREFIX PNAME_NS iri PERIOD #prefixId
+    | ATPREFIX PNAME_NS iri PERIOD? #prefixId
     ;
 
 
