@@ -506,6 +506,28 @@ public class TestParser : IDisposable, IAsyncDisposable
 
     
     [Fact]
+    public void TestLiteralObjects()
+    {
+        var ont = TestOntology("""
+                                   PREFIX foaf:  <http://xmlns.com/foaf/0.1/> .
+
+                                   _:a  foaf:name   \"Johnny Lee Outlaw\" .
+                                   _:a  foaf:mbox   <mailto:jlow@example.com> .
+                                   _:b  foaf:name   \"Peter Goodguy\" .
+                                   _:b  foaf:mbox   <mailto:peter@example.org> .
+                                   _:c  foaf:mbox   <mailto:carol@example.org> .
+                               """);
+        Assert.NotNull(ont);
+        ont.Triples.TripleCount.Should().Be(5);
+        var name = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
+        var nameTriples = ont.GetTriplesWithPredicate(name).ToList();
+        nameTriples.Should().HaveCount(2);
+        var nameTripleResources = nameTriples.Select(ont.GetResourceTriple);
+        nameTripleResources.First().obj.IsGraphLiteral.Should().BeTrue();
+
+    }
+    
+    [Fact]
     public void TestWholeStringMustBeParsed()
     {
         var outputWriter = new StringWriter();
