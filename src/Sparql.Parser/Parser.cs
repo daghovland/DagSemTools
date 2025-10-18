@@ -20,28 +20,26 @@ namespace DagSemTools.Sparql.Parser;
 /// </summary>
 public static class Parser
 {
-    internal static (Query.SelectQuery, GraphElementManager) ParseFile(string filename, TextWriter errorOutput)
+    internal static (Query.SelectQuery, GraphElementManager) ParseFile(string filename, TextWriter errorOutput, GraphElementManager? elementManager = null)
     {
         using TextReader textReader = File.OpenText(filename);
-        return ParseReader(textReader, (uint)(new FileInfo(filename).Length), errorOutput);
+        return ParseReader(textReader, errorOutput, elementManager);
     }
 
-    internal static (Query.SelectQuery, GraphElementManager) ParseFile(FileInfo fInfo, TextWriter errorOutput)
+    internal static (Query.SelectQuery, GraphElementManager) ParseFile(FileInfo fInfo, TextWriter errorOutput, GraphElementManager? elementManager = null)
     {
         using TextReader textReader = File.OpenText(fInfo.FullName);
-        return ParseReader(textReader, (uint)(fInfo.Length), errorOutput);
+        return ParseReader(textReader, errorOutput, elementManager);
     }
 
     /// <summary>
-    /// Parses the content of the TextReader containing RDF-1.2 Turtle.
+    /// Parses the content of the TextReader containing SPARQL-1.2.
     /// </summary>
     /// <param name="textReader"></param>
-    /// <param name="initSize"></param>
-    /// <param name="prefixes"></param>
     /// <param name="errorOutput"></param>
     /// <param name="elementManager">The mapper between rdf resources and integer indices</param>
     /// <returns></returns>
-    public static (Query.SelectQuery, GraphElementManager) ParseReader(TextReader textReader, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput, GraphElementManager? elementManager = null)
+    public static (Query.SelectQuery, GraphElementManager) ParseReader(TextReader textReader, TextWriter errorOutput, GraphElementManager? elementManager = null)
     {
         var input = new AntlrInputStream(textReader);
         var lexer = new SparqlLexer(input);
@@ -64,25 +62,16 @@ public static class Parser
     }
 
     /// <summary>
-    /// Parses the content of the TextReader containing RDF-1.2 Turtle.
+    /// Parses the content of the string containing SPARQL-1.2.
     /// </summary>
-    /// <param name="textReader"></param>
-    /// <param name="initSize"></param>
-    /// <param name="errorOutput"></param>
+    /// <param name="queryString">SPARQL-1.2 query</param>
+    /// <param name="errorOutput">For writing error messages, f.ex. Console.Error</param>
+    /// <param name="elementManager">The mapper from resource to id, f.ex. Datastore.Triples</param>
     /// <returns></returns>
-    public static (Query.SelectQuery, GraphElementManager) ParseReader(TextReader textReader, UInt32 initSize, TextWriter errorOutput) =>
-        ParseReader(textReader, initSize, new Dictionary<string, IriReference>(), errorOutput);
-
-    /// <summary>
-    /// Parses the content of the string containing RDF-1.2 Turtle.
-    /// </summary>
-    /// <param name="owl"></param>
-    /// <param name="errorOutput"></param>
-    /// <returns></returns>
-    public static (Query.SelectQuery, GraphElementManager) ParseString(string owl, TextWriter errorOutput)
+    public static (Query.SelectQuery, GraphElementManager) ParseString(string queryString, TextWriter errorOutput, GraphElementManager? elementManager = null)
     {
-        using TextReader textReader = new StringReader(owl);
-        return ParseReader(textReader, (uint)owl.Length, errorOutput);
+        using TextReader textReader = new StringReader(queryString);
+        return ParseReader(textReader, errorOutput, elementManager);
     }
 
 

@@ -1,6 +1,15 @@
+(*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*)
+
 namespace DagSemTools.Rdf
 
 open DagSemTools.Rdf.Ingress
+open DagSemTools.Rdf.Query
 open Ingress
 open System
 open DagSemTools.Ingress
@@ -119,4 +128,29 @@ type Datastore(triples: TripleTable,
             |> Seq.map _.ToString()
             |> String.concat ". "
             
-    
+    member this.GetTriples(pat: Query.TriplePattern) : Triple seq =
+        let s = pat.Subject
+        let p = pat.Predicate
+        let o = pat.Object
+        match s, p, o with
+        | Resource sRes, Resource pRes, Resource oRes ->
+            let t = { Triple.subject =  sRes; predicate = pRes; obj = oRes }
+            if this.ContainsTriple t then
+                seq { yield t }
+            else
+                Seq.empty
+        | Resource sRes, Resource pRes, Variable _ ->
+            this.GetTriplesWithSubjectPredicate (sRes, pRes)
+        | Resource sRes, Variable _, Resource oRes ->
+            this.GetTriplesWithSubjectObject (sRes, oRes)
+        | Variable _, Resource pRes, Resource oRes ->
+            this.GetTriplesWithObjectPredicate (oRes, pRes)
+        | Resource sRes, Variable _, Variable _ ->
+            this.GetTriplesWithSubject sRes
+        | Variable _, Resource pRes, Variable _ ->
+            this.GetTriplesWithPredicate pRes
+        | Variable _, Variable _, Resource oRes ->
+            this.GetTriplesWithObject oRes
+        | Variable _, Variable _, Variable _ ->
+            this.Triples.GetTriples()
+            

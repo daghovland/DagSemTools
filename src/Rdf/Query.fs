@@ -62,5 +62,7 @@ module Query =
     
     [<StructuralComparison>]
     [<StructuralEquality>]
+    (* The projection is the list of variable names used in the select clause, without the question mark.
+       The Basic Graph Pattern is a list of Triple Patterns *)
     type SelectQuery =
-        {Projection: string list; BGPs : TriplePattern list }
+        {Projection: string list; BasicGraphPattern: TriplePattern list }

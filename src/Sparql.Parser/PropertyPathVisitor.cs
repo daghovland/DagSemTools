@@ -39,5 +39,21 @@ internal class PropertyPathVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
 
     }
 
+    public override Func<Query.Term, List<Query.TriplePattern>> VisitVerbSimpleObjectList(SparqlParser.VerbSimpleObjectListContext context)
+    {
+        return (subject) =>
+        {
+            var predicate = termVisitor.Visit(context.verbSimple().var());
+            var objs = context
+                .objectListPath()
+                .objectPath()
+                .Select(obj => termVisitor.Visit(obj.graphNodePath().varOrTerm()));
+            return objs
+                .Select(obj => new Query.TriplePattern(subject, predicate, obj))
+                .ToList();
+        };
+
+    }
+
 
 }
