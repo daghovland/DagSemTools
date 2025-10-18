@@ -88,7 +88,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("title", "The projected variable is 'v'");
+        q.Projection[0].Should().Be("v", "The projected variable is 'v'");
         q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
         var bgp = q.BasicGraphPattern[0];
         bgp.Should().Be(new Query.TriplePattern(
@@ -109,7 +109,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("title", "The projected variable is 'v'");
+        q.Projection[0].Should().Be("v", "The projected variable is 'v'");
         q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
         var bgp = q.BasicGraphPattern[0];
         bgp.Should().Be(new Query.TriplePattern(

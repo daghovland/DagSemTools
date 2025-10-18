@@ -97,9 +97,17 @@ pathSequence      :    pathEltOrInverse ( '/' pathEltOrInverse )*;
 pathElt           :    pathPrimary pathMod?;
 pathEltOrInverse  :    pathElt | '^' pathElt;
 pathMod           :    '?' | '*' | '+';
-pathPrimary       :    iri | 'a' | '!' pathNegatedPropertySet | '(' path ')';
+pathPrimary       :    
+    iri #PathIri 
+    | rdfTypeAbbrVerb #PathRdfType
+    | '!' pathNegatedPropertySet #PathNegation
+    | '(' path ')' #PathGroup;
+rdfTypeAbbrVerb  :    'a';
 pathNegatedPropertySet: pathOneInPropertySet | '(' ( pathOneInPropertySet ( '|' pathOneInPropertySet )* )? ')';
-pathOneInPropertySet: iri | 'a' | '^' ( iri | 'a' );
+pathOneInPropertySet: 
+        iri #PathPropertySetIri 
+        | rdfTypeAbbrVerb #PatPropertySetRdfTYpe
+        | '^' ( iri | rdfTypeAbbrVerb ) #PathPropertySetInverseIri ;
 triplesNode       :    collection | blankNodePropertyList;
 blankNodePropertyList: '[' propertyListNotEmpty ']';
 triplesNodePath   :    collectionPath | blankNodePropertyListPath;

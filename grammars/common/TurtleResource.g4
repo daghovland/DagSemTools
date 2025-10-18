@@ -75,8 +75,7 @@ booleanLiteral: 'true' #TrueBooleanLiteral
 rdfLiteral: stringLiteral #PlainStringLiteral
     | stringLiteral LANG_DIR #LangLiteral
     | stringLiteral '^^' iri? #TypedLiteral
-    ;
-    
+    ;    
 
 stringLiteral: string_single_quote | string_triple_quote;
  
