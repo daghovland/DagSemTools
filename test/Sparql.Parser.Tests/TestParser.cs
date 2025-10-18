@@ -115,7 +115,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         bgp.Should().Be(new Query.TriplePattern(
             Query.Term.NewVariable("v"),
             Query.Term.NewVariable("p"),
-            Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLangLiteral("en","cat"))])));
+            Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLangLiteral("cat","en"))])));
     }
     
     public void Dispose()
