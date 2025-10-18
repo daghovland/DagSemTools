@@ -197,6 +197,45 @@ public class TestApi(ITestOutputHelper output)
         
     }
 
+    
+    /// <summary>
+    /// Third example, literals, in sparql 1.2 docs section 2.3.1
+    /// </summary>
+    [Fact]
+    public void TestSparql3()
+    {
+        var data = """
+                   PREFIX dt:   <http://example.org/datatype#>
+                   PREFIX ns:   <http://example.org/ns#>
+                   PREFIX :     <http://example.org/ns#>
+                   PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+                   
+                   :x   ns:p     "cat"@en .
+                   :y   ns:p     "42"^^xsd:integer .
+                   :z   ns:p     "abc"^^dt:specialDatatype .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          SELECT ?v WHERE { ?v ?p "cat" }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(0);
+        
+        
+        queryString = """
+                          SELECT ?v WHERE { ?v ?p "cat"@en }
+                          """;
+        answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+        var answer = answers.First();
+        answer.Count.Should().Be(1);
+        var actual = answer["v"];
+        var expected = new IriResource(new IriReference("http://example.org/ns#x"));
+        actual.Should().Be(expected);
+    }
+    
     private IGraph ParseTurtleData(string data)
     {
         var writer = new StringWriter();

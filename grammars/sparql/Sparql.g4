@@ -78,15 +78,15 @@ verb              :    varOrIri | 'a';
 objectList        :    tripleObject ( ',' tripleObject )*;
 tripleObject            :    graphNode annotation;
 triplesSameSubjectPath: 
-      varOrTerm propertyListPathNotEmpty #namedSubjectTriplesPath 
-    | triplesNodePath propertyListPath #triplesPathProperty 
-    | reifiedTripleBlockPath #reifiedTripleBlockPathPattern;
+      varOrTerm propertyListPathNotEmpty #NamedSubjectTriplesPath 
+    | triplesNodePath propertyListPath #TriplesPathProperty 
+    | reifiedTripleBlockPath #ReifiedTripleBlockPathPattern;
 
 propertyListPath  :    propertyListPathNotEmpty?;
 propertyListPathNotEmpty: propertyPath ( ';' ( propertyPath )? )*;
 propertyPath      :    
-    verbPath objectListPath #verbPathObjectList
-   | verbSimple objectListPath #verbSimpleObjectList ;
+    verbPath objectListPath #VerbPathObjectList
+   | verbSimple objectListPath #VerbSimpleObjectList ;
 verbPath          :    path;
 verbSimple        :    var;
 objectListPath    :    objectPath ( ',' objectPath )*;
