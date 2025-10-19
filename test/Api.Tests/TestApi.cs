@@ -269,7 +269,7 @@ public class TestApi(ITestOutputHelper output)
 
     
     /// <summary>
-    /// Third example, int literals, in sparql 1.2 docs section 2.3.3
+    /// Fifth example, custom datatypes, in sparql 1.2 docs section 2.3.3
     /// </summary>
     [Fact]
     public void TestSparql5()
@@ -299,6 +299,101 @@ public class TestApi(ITestOutputHelper output)
         actual.Should().Be(expected);
     }
     
+    /// <summary>
+    /// Example, blank results nodes, in sparql 1.2 docs section 2.4
+    /// </summary>
+    [Fact]
+    public void TestSparql6()
+    {
+        var data = """
+                   PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+                   
+                   _:a  foaf:name   "Alice" .
+                   _:b  foaf:name   "Bob" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+                          SELECT ?x ?name
+                          WHERE  { ?x foaf:name ?name }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(2);
+        foreach (var answer in answers)
+        {
+            answer.Count.Should().Be(2);
+            var actual = answer["name"];
+            var alice = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("Alice"));
+            var bob = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("Bob"));
+            (actual.Equals(alice) || actual.Equals(bob)).Should().BeTrue();
+            var actualX = answer["x"];
+            actualX.Should().BeOfType<BlankNodeResource>();
+        }
+    }
+    
+    
+    /// <summary>
+    /// Example, creating values, in sparql 1.2 docs section 2.5
+    /// </summary>
+    [Fact]
+    public void TestSparqlCreatingValues()
+    {
+        var data = """
+                   PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+                               
+                   _:a  foaf:givenName   "John" .
+                   _:a  foaf:surname  "Doe" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+                          SELECT ( CONCAT(?G, " ", ?S) AS ?name )
+                          WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+        var answer = answers.First();
+        answer.Count.Should().Be(1);
+        var actual = answer["name"];
+        var expected = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
+        actual.Should().Be(expected);
+    }
+    
+    
+    /// <summary>
+    /// Example, creating values with bind, in sparql 1.2 docs section 2.5
+    /// </summary>
+    [Fact]
+    public void TestSparqlCreatingValuesBind()
+    {
+        var data = """
+                   PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+                               
+                   _:a  foaf:givenName   "John" .
+                   _:a  foaf:surname  "Doe" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+                          SELECT ?name
+                          WHERE  { 
+                              ?P foaf:givenName ?G ; 
+                                 foaf:surname ?S 
+                              BIND(CONCAT(?G, " ", ?S) AS ?name)
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+        var answer = answers.First();
+        answer.Count.Should().Be(1);
+        var actual = answer["name"];
+        var expected = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
+        actual.Should().Be(expected);
+    }
     private IGraph ParseTurtleData(string data)
     {
         var writer = new StringWriter();
