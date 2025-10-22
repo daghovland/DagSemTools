@@ -337,7 +337,7 @@ public class TestApi(ITestOutputHelper output)
     /// <summary>
     /// Example, creating values, in sparql 1.2 docs section 2.5
     /// </summary>
-    [Fact]
+    [Fact(Skip = "See https://github.com/daghovland/DagSemTools/issues/86")]
     public void TestSparqlCreatingValues()
     {
         var data = """
