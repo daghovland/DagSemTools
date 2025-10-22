@@ -477,7 +477,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.GetTriplesWithObjectPredicate(person2, knows).Should().HaveCount(1);
     }
 
-    
+
     [Fact]
     public void TestSparqlExample2()
     {
@@ -493,12 +493,12 @@ public class TestParser : IDisposable, IAsyncDisposable
         Assert.NotNull(ont);
         var knows = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
         ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
-        
+
         var person2 = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox")));
-        ont.GetTriplesWithPredicate( knows).Should().HaveCount(2);
+        ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
     }
-    
-    
+
+
     [Fact]
     public void TestPrefixBlankNode()
     {
@@ -510,10 +510,10 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.Triples.TripleCount.Should().Be(1);
         var knows = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://example.com#name")));
         ont.GetTriplesWithPredicate(knows).Should().HaveCount(1);
-        
+
     }
 
-    
+
     [Fact]
     public void TestLiteralObjects()
     {
@@ -535,8 +535,8 @@ public class TestParser : IDisposable, IAsyncDisposable
         nameTripleResources.First().obj.IsGraphLiteral.Should().BeTrue();
 
     }
-    
-    
+
+
     [Fact]
     public void TestHandlingWrongQuote()
     {
@@ -550,11 +550,11 @@ public class TestParser : IDisposable, IAsyncDisposable
                                    _:b  foaf:mbox   <mailto:peter@example.org> .
                                    _:c  foaf:mbox   <mailto:carol@example.org> .
                                """, outputWriter);
-        
+
         var output = outputWriter.ToString();
         output.Should().Contain("line 3:21 mismatched input '\\\"'");
     }
-    
+
     [Fact]
     public void TestWholeStringMustBeParsed()
     {
@@ -565,8 +565,8 @@ public class TestParser : IDisposable, IAsyncDisposable
         var output = outputWriter.ToString();
         output.Should().Contain("line 1:36 extraneous input ','");
     }
-    
-    
+
+
     public void Dispose()
     {
         _outputWriter.Dispose();

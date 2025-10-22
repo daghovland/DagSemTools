@@ -76,7 +76,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://purl.org/dc/elements/1.1/title")))]),
                 Query.Term.NewVariable("title")));
     }
-    
+
     [Fact]
     public void TestSparql12Example3()
     {
@@ -97,7 +97,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString("cat"))])));
     }
 
-    
+
     [Fact]
     public void TestSparql12Example4()
     {
@@ -115,9 +115,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         bgp.Should().Be(new Query.TriplePattern(
             Query.Term.NewVariable("v"),
             Query.Term.NewVariable("p"),
-            Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLangLiteral("cat","en"))])));
+            Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLangLiteral("cat", "en"))])));
     }
-    
+
     public void Dispose()
     {
         _outputWriter.Dispose();

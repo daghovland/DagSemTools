@@ -32,7 +32,7 @@ internal class TermVisitor(
             RdfResource.NewIri(
             iriGrammarVisitor.Visit(context))
         ));
-    
+
     public override Query.Term VisitRdfTypeAbbrVerb(SparqlParser.RdfTypeAbbrVerbContext context)
     {
         var iri = new IriReference(Namespaces.RdfType);
@@ -101,7 +101,7 @@ internal class TermVisitor(
     private Query.Term GetTripleId(SparqlParser.ReifiedTripleContext context) =>
         context.reifier() switch
         {
-            null => Query.Term.NewResource( elementManager.CreateUnnamedAnonResource()),
+            null => Query.Term.NewResource(elementManager.CreateUnnamedAnonResource()),
             var reifier => Visit(reifier)
         };
 
@@ -140,10 +140,10 @@ internal class TermVisitor(
     }
 
     public override Query.Term VisitTrueBooleanLiteral(SparqlParser.TrueBooleanLiteralContext context)
-        => Query.Term.NewResource( elementManager.AddLiteralResource(RdfLiteral.NewBooleanLiteral(true)));
+        => Query.Term.NewResource(elementManager.AddLiteralResource(RdfLiteral.NewBooleanLiteral(true)));
 
     public override Query.Term VisitFalseBooleanLiteral(SparqlParser.FalseBooleanLiteralContext context)
-        => Query.Term.NewResource( elementManager.AddLiteralResource(RdfLiteral.NewBooleanLiteral(false)));
+        => Query.Term.NewResource(elementManager.AddLiteralResource(RdfLiteral.NewBooleanLiteral(false)));
 
     public override Query.Term VisitPlainStringLiteral(SparqlParser.PlainStringLiteralContext context)
     {
@@ -156,7 +156,7 @@ internal class TermVisitor(
     {
         var literalString = _stringVisitor.Visit(context.stringLiteral());
         var langDirString = context.LANG_DIR().GetText();
-        if(langDirString[0] != '@')
+        if (langDirString[0] != '@')
             throw new Exception($"Language tag {langDirString} does not start with @");
         var langDir = langDirString.Substring(1);
         var literal = RdfLiteral.NewLangLiteral(literalString, langDir);

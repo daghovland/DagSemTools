@@ -89,7 +89,7 @@ public class Graph : IGraph
         var parsedQuery = Sparql.Parser.Parser.ParseString(query, Console.Error, Triples.Resources);
         var results = QueryProcessor.Answer(Triples, parsedQuery.Item1);
         return results
-            .Map(r => 
+            .Map(r =>
                 r.ToDictionary(kv => kv.Key, kv => GetResource(kv.Value)))
             .ToList();
     }

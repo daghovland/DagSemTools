@@ -129,7 +129,7 @@ public class TestApi(ITestOutputHelper output)
         resultsData.Should().HaveCount(1);
 
     }
-    
+
     /// <summary>
     /// First simple example in sparql 1.2 docs
     /// </summary>
@@ -153,11 +153,11 @@ public class TestApi(ITestOutputHelper output)
         var actual = answer["title"];
         var expected = RdfLiteral.StringRdfLiteral("SPARQL Tutorial");
         Assert.Equal(actual, expected);
-        
+
     }
 
-    
-    
+
+
     /// <summary>
     /// Second example in sparql 1.2 docs
     /// </summary>
@@ -192,12 +192,12 @@ public class TestApi(ITestOutputHelper output)
         (actual.Equals(expected1) || actual.Equals(expected2)).Should().BeTrue();
         var actualMbox = answer["mbox"];
         var expectedMbox1 = new IriResource(new IriReference("mailto:peter@example.org"));
-        var expectedMbox2 = new IriResource( new IriReference("mailto:carol@example.org"));
+        var expectedMbox2 = new IriResource(new IriReference("mailto:carol@example.org"));
         (actualMbox.Equals(expectedMbox1) || actualMbox.Equals(expectedMbox2)).Should().BeTrue();
-        
+
     }
 
-    
+
     /// <summary>
     /// Third example, literals, in sparql 1.2 docs section 2.3.1
     /// </summary>
@@ -221,8 +221,8 @@ public class TestApi(ITestOutputHelper output)
         var answers = graph.AnswerSelectQuery(queryString).ToList();
         Assert.NotNull(answers);
         answers.Count.Should().Be(0);
-        
-        
+
+
         queryString = """
                           SELECT ?v WHERE { ?v ?p "cat"@en }
                           """;
@@ -235,7 +235,7 @@ public class TestApi(ITestOutputHelper output)
         var expected = new IriResource(new IriReference("http://example.org/ns#x"));
         actual.Should().Be(expected);
     }
-    
+
     /// <summary>
     /// Third example, int literals, in sparql 1.2 docs section 2.3.2
     /// </summary>
@@ -267,7 +267,7 @@ public class TestApi(ITestOutputHelper output)
         actual.Should().Be(expected);
     }
 
-    
+
     /// <summary>
     /// Fifth example, custom datatypes, in sparql 1.2 docs section 2.3.3
     /// </summary>
@@ -298,7 +298,7 @@ public class TestApi(ITestOutputHelper output)
         var expected = new IriResource(new IriReference("http://example.org/ns#z"));
         actual.Should().Be(expected);
     }
-    
+
     /// <summary>
     /// Example, blank results nodes, in sparql 1.2 docs section 2.4
     /// </summary>
@@ -332,8 +332,8 @@ public class TestApi(ITestOutputHelper output)
             actualX.Should().BeOfType<BlankNodeResource>();
         }
     }
-    
-    
+
+
     /// <summary>
     /// Example, creating values, in sparql 1.2 docs section 2.5
     /// </summary>
@@ -361,8 +361,8 @@ public class TestApi(ITestOutputHelper output)
         var expected = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
         actual.Should().Be(expected);
     }
-    
-    
+
+
     /// <summary>
     /// Example, creating values with bind, in sparql 1.2 docs section 2.5
     /// </summary>
@@ -398,7 +398,7 @@ public class TestApi(ITestOutputHelper output)
     {
         var writer = new StringWriter();
         var graph = TurtleParser.Parse(data, writer);
-        if(!string.IsNullOrEmpty(writer.ToString()))
+        if (!string.IsNullOrEmpty(writer.ToString()))
         {
             output.WriteLine("Parser warnings/errors:");
             output.WriteLine(writer.ToString());
