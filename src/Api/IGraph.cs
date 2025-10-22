@@ -62,6 +62,14 @@ public interface IGraph
 
 
     /// <summary>
+    /// Answers a SPARQL SELECT query
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns>An enumerable of solutions. Each solution is a dictionary of the bindings</returns>
+    public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query);
+
+
+    /// <summary>
     /// Loads and runs datalog rules from the file
     /// Note that this adds new triples to the datastore
     /// </summary>

@@ -4,8 +4,8 @@ import TurtleTokens;
 directive: prefix | baseDeclaration ;
 
 
-prefix: PREFIX_STRING PNAME_NS iri  #sparqlPrefix
-    | ATPREFIX PNAME_NS iri PERIOD #prefixId
+prefix: PREFIX_STRING PNAME_NS iri PERIOD? #sparqlPrefix
+    | ATPREFIX PNAME_NS iri PERIOD? #prefixId
     ;
 
 
@@ -75,8 +75,7 @@ booleanLiteral: 'true' #TrueBooleanLiteral
 rdfLiteral: stringLiteral #PlainStringLiteral
     | stringLiteral LANG_DIR #LangLiteral
     | stringLiteral '^^' iri? #TypedLiteral
-    ;
-    
+    ;    
 
 stringLiteral: string_single_quote | string_triple_quote;
  

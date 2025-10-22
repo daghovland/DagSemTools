@@ -3,6 +3,7 @@ using IriTools;
 using DagSemTools.Rdf;
 using Microsoft.FSharp.Collections;
 using DagSemTools.Ingress;
+using LanguageExt;
 using Microsoft.FSharp.Core;
 using Serilog;
 
@@ -80,6 +81,17 @@ public class Graph : IGraph
         var newRules = Datalog.Parser.Parser.ParseFile(datalog, System.Console.Error,
             Triples ?? throw new InvalidOperationException());
         LoadDatalog(newRules);
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query)
+    {
+        var parsedQuery = Sparql.Parser.Parser.ParseString(query, Console.Error, Triples.Resources);
+        var results = QueryProcessor.Answer(Triples, parsedQuery.Item1);
+        return results
+            .Map(r =>
+                r.ToDictionary(kv => kv.Key, kv => GetResource(kv.Value)))
+            .ToList();
     }
 
     /// <inheritDoc />

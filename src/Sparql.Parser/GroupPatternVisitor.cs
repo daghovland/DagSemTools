@@ -30,6 +30,8 @@ internal class GroupPatternVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
     public override IEnumerable<Query.TriplePattern> VisitTriplesBlock(SparqlParser.TriplesBlockContext context)
     {
         var triplePatterns = Visit(context.triplesSameSubjectPath());
+        if (triplePatterns == null)
+            throw new NotImplementedException("TriplesSameSubjectPath is not yet parsed. Sorry");
         if (context.triplesBlock() is not null)
             return triplePatterns.Concat(Visit(context.triplesBlock()));
         return triplePatterns.ToList();
@@ -38,12 +40,9 @@ internal class GroupPatternVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
     public override IEnumerable<Query.TriplePattern> VisitNamedSubjectTriplesPath(SparqlParser.NamedSubjectTriplesPathContext context)
     {
         var subject = termVisitor.Visit(context.varOrTerm());
-        return context
-            .propertyListPathNotEmpty()
-            .propertyPath()
-            .Select(_propertyPathVisitor.Visit)
-            .SelectMany(f => f(subject))
-            .ToList();
-
+        var propPath = _propertyPathVisitor.Visit(context.propertyListPathNotEmpty());
+        if (subject == null || propPath == null)
+            throw new NotImplementedException("VarOrTerm or propertyPath is not properly parsed. This is a bug in the parser. Sorry");
+        return propPath(subject);
     }
 }

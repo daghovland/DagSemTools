@@ -42,9 +42,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("?name", "The projected variable is ?name");
-        q.BGPs.Length.Should().Be(1, "There is one BGP");
-        var bgp = q.BGPs[0];
+        q.Projection[0].Should().Be("name", "The projected variable is 'name'");
+        q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
+        var bgp = q.BasicGraphPattern[0];
         bgp.Should().Be(new Query.TriplePattern(
                 Query.Term.NewVariable("person"),
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")))]),
@@ -68,14 +68,56 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("?title", "The projected variable is ?title");
-        q.BGPs.Length.Should().Be(1, "There is one BGP");
-        var bgp = q.BGPs[0];
+        q.Projection[0].Should().Be("title", "The projected variable is 'title'");
+        q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
+        var bgp = q.BasicGraphPattern[0];
         bgp.Should().Be(new Query.TriplePattern(
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://example.org/book/book1")))]),
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://purl.org/dc/elements/1.1/title")))]),
                 Query.Term.NewVariable("title")));
     }
+
+    [Fact]
+    public void TestSparql12Example3()
+    {
+        string sparql = """
+                        SELECT ?v WHERE { ?v ?p "cat" }
+                        """;
+        var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
+        var q = result.Item1;
+        var e = result.Item2;
+        q.Should().NotBeNull();
+        q.Projection.Length.Should().Be(1, "There is one projected variable");
+        q.Projection[0].Should().Be("v", "The projected variable is 'v'");
+        q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
+        var bgp = q.BasicGraphPattern[0];
+        bgp.Should().Be(new Query.TriplePattern(
+            Query.Term.NewVariable("v"),
+            Query.Term.NewVariable("p"),
+            Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString("cat"))])));
+    }
+
+
+    [Fact]
+    public void TestSparql12Example4()
+    {
+        string sparql = """
+                        SELECT ?v WHERE { ?v ?p "cat"@en }
+                        """;
+        var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
+        var q = result.Item1;
+        var e = result.Item2;
+        q.Should().NotBeNull();
+        q.Projection.Length.Should().Be(1, "There is one projected variable");
+        q.Projection[0].Should().Be("v", "The projected variable is 'v'");
+        q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
+        var bgp = q.BasicGraphPattern[0];
+        bgp.Should().Be(new Query.TriplePattern(
+            Query.Term.NewVariable("v"),
+            Query.Term.NewVariable("p"),
+            Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLangLiteral("cat", "en"))])));
+    }
+
     public void Dispose()
     {
         _outputWriter.Dispose();

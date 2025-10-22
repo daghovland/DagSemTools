@@ -25,6 +25,26 @@ public class TestApi(ITestOutputHelper output)
 
     }
 
+    [Fact]
+    public void TestSparql()
+    {
+        var ontology = new FileInfo("TestData/example1.ttl");
+        var ont = TurtleParser.Parse(ontology, outputWriter);
+
+        Assert.NotNull(ont);
+        var enemies = ont.AnswerSelectQuery("SELECT * WHERE where{?hero <http://www.perceive.net/schemas/relationship/enemyOf> ?enemy.}").ToList();
+        Assert.NotNull(enemies);
+        foreach (var answerMap in enemies)
+        {
+            outputWriter.WriteLine();
+            foreach (var answer in answerMap.Values)
+                outputWriter.Write(answer);
+        }
+        enemies.Count().Should().Be(2, "There are two triples with enemies");
+        
+    }
+
+    
 
     [Fact]
     public void TestDbPedia()

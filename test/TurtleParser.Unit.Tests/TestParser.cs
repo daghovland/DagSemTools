@@ -10,6 +10,7 @@ using DagSemTools.Ingress;
 using DagSemTools.Turtle.Parser;
 using FluentAssertions;
 using IriTools;
+using Newtonsoft.Json;
 using TestUtils;
 using Xunit.Abstractions;
 
@@ -27,7 +28,16 @@ public class TestParser : IDisposable, IAsyncDisposable
     }
     public Datastore TestOntology(string ontology)
     {
-        return Parser.ParseString(ontology, _outputWriter);
+        var tmpWriter = new StringWriter();
+        var dstore = Parser.ParseString(ontology, tmpWriter);
+        var output = tmpWriter.ToString();
+        if (!string.IsNullOrEmpty(output))
+        {
+            _output.WriteLine("Parser output:");
+            _output.WriteLine(output);
+            Assert.Fail($"Parsing failed {output}");
+        }
+        return dstore;
 
     }
 
@@ -466,6 +476,96 @@ public class TestParser : IDisposable, IAsyncDisposable
         var person2 = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://example.org/person2")));
         ont.GetTriplesWithObjectPredicate(person2, knows).Should().HaveCount(1);
     }
+
+
+    [Fact]
+    public void TestSparqlExample2()
+    {
+        var ont = TestOntology("""
+                               PREFIX foaf:  <http://xmlns.com/foaf/0.1/> .
+                               
+                               _:a  foaf:name   "Johnny Lee Outlaw" .
+                               _:a  foaf:mbox   <mailto:jlow@example.com> .
+                               _:b  foaf:name   "Peter Goodguy" .
+                               _:b  foaf:mbox   <mailto:peter@example.org> .
+                               _:c  foaf:mbox   <mailto:carol@example.org> .
+                               """);
+        Assert.NotNull(ont);
+        var knows = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
+        ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
+
+        var person2 = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox")));
+        ont.GetTriplesWithPredicate(knows).Should().HaveCount(2);
+    }
+
+
+    [Fact]
+    public void TestPrefixBlankNode()
+    {
+        var ont = TestOntology("""
+                               PREFIX ex:  <http://example.com#> .
+                               _:a  ex:name   "Firstname" .
+                               """);
+        Assert.NotNull(ont);
+        ont.Triples.TripleCount.Should().Be(1);
+        var knows = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://example.com#name")));
+        ont.GetTriplesWithPredicate(knows).Should().HaveCount(1);
+
+    }
+
+
+    [Fact]
+    public void TestLiteralObjects()
+    {
+        var ont = TestOntology("""
+                                   PREFIX foaf:  <http://xmlns.com/foaf/0.1/> .
+
+                                   _:a  foaf:name   "Johnny Lee Outlaw" .
+                                   _:a  foaf:mbox   <mailto:jlow@example.com> .
+                                   _:b  foaf:name   "Peter Goodguy" .
+                                   _:b  foaf:mbox   <mailto:peter@example.org> .
+                                   _:c  foaf:mbox   <mailto:carol@example.org> .
+                               """);
+        Assert.NotNull(ont);
+        ont.Triples.TripleCount.Should().Be(5);
+        var name = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
+        var nameTriples = ont.GetTriplesWithPredicate(name).ToList();
+        nameTriples.Should().HaveCount(2);
+        var nameTripleResources = nameTriples.Select(ont.GetResourceTriple);
+        nameTripleResources.First().obj.IsGraphLiteral.Should().BeTrue();
+
+    }
+
+
+    [Fact]
+    public void TestHandlingWrongQuote()
+    {
+        var outputWriter = new StringWriter();
+        Parser.ParseString("""
+                                   PREFIX foaf:  <http://xmlns.com/foaf/0.1/> .
+
+                                   _:a  foaf:name   \"Johnny Lee Outlaw" .
+                                   _:a  foaf:mbox   <mailto:jlow@example.com> .
+                                   _:b  foaf:name   \"Peter Goodguy" .
+                                   _:b  foaf:mbox   <mailto:peter@example.org> .
+                                   _:c  foaf:mbox   <mailto:carol@example.org> .
+                               """, outputWriter);
+
+        var output = outputWriter.ToString();
+        output.Should().Contain("line 3:21 mismatched input '\\\"'");
+    }
+
+    [Fact]
+    public void TestWholeStringMustBeParsed()
+    {
+        var outputWriter = new StringWriter();
+        Parser.ParseString("""
+                               PREFIX ex:  <http://example.com#> . ,
+                               """, outputWriter);
+        var output = outputWriter.ToString();
+        output.Should().Contain("line 1:36 extraneous input ','");
+    }
+
 
     public void Dispose()
     {

@@ -2,7 +2,7 @@
 A very incomplete collection of tools for using Rdf, Owl and semantic technology in dotnet. 
 
 Currently it includes a Turtle parser, OWL Manchester syntax parser, a datalog engine over Rdf, a reasoner for acyclic ALC ontologies (imported from Manchester), stratifiable datalog programs (over the imported Turtle), and OWL 2 RL reasoning over the imported Rdf.
-Sparql is not supported, but single triple-pattern queries over the data are possible.
+Sparql with simple selects over basic graph patterns is supported.
 
 ## Supported language
 * OWL 2 Manchester Syntax. Only the OWL 2 DL subset is supported. Especially, axioms on annotations are not allowed (even though the manchester syntax allows them).
@@ -10,6 +10,8 @@ Sparql is not supported, but single triple-pattern queries over the data are pos
 * Rdf-1.2 Turtle
 
 * Stratifiable datalog over Rdf. Only triples (and restricted negation) is allowed, no other functions.
+
+* Sparql 1.2. Only simple selects over basic graph patterns are supported.
 
 ## Usage
 Install the nuget package [DagSemTools.Api](https://www.nuget.org/packages/DagSemTools.Api/), f.ex. by `dotnet add package DagSemTools.Api`
@@ -24,6 +26,13 @@ To get answers to single basic graph patterns, use functions on the graph, like 
 ```csharp
 var tripleAnswers = graph.GetTriplesWithPredicate(new IriReference("https://exampe.com/some/predicate"));
 ```
+or if you prefer SPARQL, 
+```csharp
+var sparqlAnswerMap = graph.AnswerSelectQuery("SELECT * WHERE where{?s <https://example.com/some/predicate> ?o.}");
+```
+The output (called `sparqlAnswerMap` above) is an `IEnumerable<Dictionary<string, GraphElement>>`. Each dictonary maps variable names to values.
+Only the basic syntax as shown in this example is supported.
+There is no built-in protection against SPARQL injection.
 
 To load an ontology and use that to reason over the data, first load it as rdf (as above) 
 and then parse the rdf into an ontology with `Ontology.create`, extract it as datalog rules with `GetAxiomRules`, 

@@ -78,15 +78,15 @@ verb              :    varOrIri | 'a';
 objectList        :    tripleObject ( ',' tripleObject )*;
 tripleObject            :    graphNode annotation;
 triplesSameSubjectPath: 
-      varOrTerm propertyListPathNotEmpty #namedSubjectTriplesPath 
-    | triplesNodePath propertyListPath #triplesPathProperty 
-    | reifiedTripleBlockPath #reifiedTripleBlockPathPattern;
+      varOrTerm propertyListPathNotEmpty #NamedSubjectTriplesPath 
+    | triplesNodePath propertyListPath #TriplesPathProperty 
+    | reifiedTripleBlockPath #ReifiedTripleBlockPathPattern;
 
 propertyListPath  :    propertyListPathNotEmpty?;
 propertyListPathNotEmpty: propertyPath ( ';' ( propertyPath )? )*;
 propertyPath      :    
-    verbPath objectListPath #verbPathObjectList
-   | verbSimple objectListPath #verbSimpleObjectList ;
+    verbPath objectListPath #VerbPathObjectList
+   | verbSimple objectListPath #VerbSimpleObjectList ;
 verbPath          :    path;
 verbSimple        :    var;
 objectListPath    :    objectPath ( ',' objectPath )*;
@@ -97,9 +97,17 @@ pathSequence      :    pathEltOrInverse ( '/' pathEltOrInverse )*;
 pathElt           :    pathPrimary pathMod?;
 pathEltOrInverse  :    pathElt | '^' pathElt;
 pathMod           :    '?' | '*' | '+';
-pathPrimary       :    iri | 'a' | '!' pathNegatedPropertySet | '(' path ')';
+pathPrimary       :    
+    iri #PathIri 
+    | rdfTypeAbbrVerb #PathRdfType
+    | '!' pathNegatedPropertySet #PathNegation
+    | '(' path ')' #PathGroup;
+rdfTypeAbbrVerb  :    'a';
 pathNegatedPropertySet: pathOneInPropertySet | '(' ( pathOneInPropertySet ( '|' pathOneInPropertySet )* )? ')';
-pathOneInPropertySet: iri | 'a' | '^' ( iri | 'a' );
+pathOneInPropertySet: 
+        iri #PathPropertySetIri 
+        | rdfTypeAbbrVerb #PatPropertySetRdfTYpe
+        | '^' ( iri | rdfTypeAbbrVerb ) #PathPropertySetInverseIri ;
 triplesNode       :    collection | blankNodePropertyList;
 blankNodePropertyList: '[' propertyListNotEmpty ']';
 triplesNodePath   :    collectionPath | blankNodePropertyListPath;

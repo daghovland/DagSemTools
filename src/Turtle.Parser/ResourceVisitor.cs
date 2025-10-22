@@ -171,7 +171,10 @@ internal class ResourceVisitor : TriGDocBaseVisitor<uint>
     public override uint VisitLangLiteral(LangLiteralContext context)
     {
         var literalString = _stringVisitor.Visit(context.stringLiteral());
-        var langDir = context.LANG_DIR().GetText();
+        var langDirString = context.LANG_DIR().GetText();
+        if (langDirString[0] != '@')
+            throw new Exception($"Language tag {langDirString} does not start with @");
+        var langDir = langDirString.Substring(1);
         var literal = RdfLiteral.NewLangLiteral(literalString, langDir);
         return Datastore.AddLiteralResource(literal);
     }

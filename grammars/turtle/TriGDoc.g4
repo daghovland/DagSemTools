@@ -1,7 +1,7 @@
 grammar TriGDoc;
 import TurtleResource;
 
-trigDoc: (directive | block)*;
+trigDoc: (directive | block)* EOF;
 
 block 	: 	
     triplesOrGraph #BlockTriplesOrGraph 
