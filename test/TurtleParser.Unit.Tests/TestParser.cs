@@ -301,6 +301,21 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.GetTriplesWithSubject(employee38).Should().HaveCount(1);
     }
 
+    
+    [Fact]
+    public void TestReifiedTripleExample23()
+    {
+        var ontology = File.ReadAllText("TestData/reified_triple_example23.ttl");
+        var ont = TestOntology(ontology);
+        ont.Triples.TripleCount.Should().Be(2);
+        var reifiedTriples = ont.GetReifiedTriplesWithPredicate(
+                ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://www.example.org/jobTitle"))))
+            .ToList();
+        reifiedTriples.Should().HaveCount(1);
+        var employee38 = reifiedTriples.First().subject;
+        ont.GetTriplesWithSubject(employee38).Should().HaveCount(1);
+    }
+    
     [Fact]
     public void TestAnnotatedTriple()
     {

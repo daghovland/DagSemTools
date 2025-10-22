@@ -15,9 +15,15 @@ using DagSemTools.Parser;
 
 namespace DagSemTools.Turtle.Parser;
 
+internal enum RdfVersion
+{
+    Unspecified,
+    Rdf11,
+    Rdf12
+}
 internal class TurtleListener : TriGDocBaseListener
 {
-
+    private RdfVersion version = RdfVersion.Unspecified;
     private IriGrammarVisitor _iriGrammarVisitor;
     private ResourceVisitor _resourceVisitor;
     internal uint? GraphName;
@@ -49,6 +55,19 @@ internal class TurtleListener : TriGDocBaseListener
         var iriString = DagSemTools.Parser.ParserUtils.TrimIri(context.ABSOLUTEIRIREF().GetText());
         var iri = new IriReference(iriString);
         _iriGrammarVisitor.SetBase(iri);
+    }
+
+    public override void ExitVersion(TriGDocParser.VersionContext context)
+    {
+        if(version != RdfVersion.Unspecified)
+            throw new Exception("Only one version declaration is allowed");
+        var newVersion = new StringVisitor().Visit(context.versionSpecifier());
+        if(newVersion.Equals("1.1"))
+            version = RdfVersion.Rdf11;
+        else if(newVersion.Equals("1.2"))
+            version = RdfVersion.Rdf12;
+        else
+            throw new Exception($"Unknown version specifier {newVersion}");
     }
 
     public override void ExitPrefixId(TriGDocParser.PrefixIdContext context)
