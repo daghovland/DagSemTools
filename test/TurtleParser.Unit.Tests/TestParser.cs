@@ -272,9 +272,15 @@ public class TestParser : IDisposable, IAsyncDisposable
     [Fact]
     public void TestExample27()
     {
-        var ontology = File.ReadAllText("TestData/example27.ttl");
-        var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(5);
+        var example27 = File.ReadAllText("TestData/example27.ttl");
+        var abreviatedList = TestOntology(example27);
+        var example31 = File.ReadAllText("TestData/example31.ttl");
+        var expandedList = TestOntology(example31);
+
+        abreviatedList.Triples.TripleCount.Should().Be(5);
+        expandedList.Triples.TripleCount.Should().Be(5);
+        // TODO Why are these not equal?
+        //abreviatedList.Resources.ResourceCount.Should().Be(expandedList.Resources.ResourceCount);
     }
 
 

@@ -127,7 +127,7 @@
       <None Update="TestData\annotated_triple_expanded_triple_terms_example28.ttl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
-      <None Update="TestData\example29.ttl">
+      <None Update="TestData\example31.ttl">
         <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       </None>
     </ItemGroup>
