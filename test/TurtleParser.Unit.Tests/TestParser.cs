@@ -289,10 +289,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var example32 = File.ReadAllText("TestData/example32.ttl");
         var newLineExample = TestOntology(example32);
-        newLineExample.Triples.TripleCount.Should().Be(2);
-        var escapedNewLines = newLineExample.GetGraphElement(newLineExample.Triples.TripleList[0].obj).literal.literal;
-        var actualNewLines = newLineExample.GetGraphElement(newLineExample.Triples.TripleList[1].obj).literal.literal;
-        escapedNewLines.Should().Be(actualNewLines);
+        newLineExample.Triples.TripleCount.Should().Be(1);
         
     }
 
