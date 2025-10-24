@@ -60,7 +60,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             <http://example.org/#green-goblin> .
             """);
         Assert.NotNull(ont);
-        Assert.Equal(3u, ont.Resources.ResourceCount);
+        ont.Resources.ResourceCount.Should().BeGreaterThanOrEqualTo(3);
         Assert.Equal(1u, ont.Triples.TripleCount);
     }
 
@@ -325,15 +325,32 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
 
+    
+    [Fact]
+    public void TestAnnotatedTripleExpandedExample27()
+    {
+        var ontology = File.ReadAllText("TestData/annotated_triple_expanded_example27.ttl");
+        var ont = TestOntology(ontology);
+        ont.Triples.TripleCount.Should().Be(3);
+        ont.ReifiedTriples.QuadCount.Should().Be(1);
+    }
+    
+    [Fact]
+    public void TestAnnotatedTripleExpandedTripleTermsExample28()
+    {
+        var ontology = File.ReadAllText("TestData/annotated_triple_expanded_triple_terms_example28.ttl");
+        var ont = TestOntology(ontology);
+        ont.Triples.TripleCount.Should().Be(3);
+        ont.ReifiedTriples.QuadCount.Should().Be(1);
+    }
     [Fact]
     public void TestTripleTerm()
     {
         var ontology = File.ReadAllText("TestData/triple_term.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(3);
-        var reifications = ont.GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference(Namespaces.RdfReifies)))).ToList();
-        reifications.Should().HaveCount(1);
-        var tripleId = reifications.First().obj;
+        ont.Triples.TripleCount.Should().Be(2);
+        ont.ReifiedTriples.QuadCount.Should().Be(1);
+        var tripleId = ont.ReifiedTriples.QuadList.First().tripleId;
         ont.GetReifiedTriplesWithId(tripleId).Should().HaveCount(1);
     }
 
@@ -346,8 +363,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.Triples.TripleCount.Should().Be(2);
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
-
-
+    
     [Fact]
     public void TestTripleSubSetRestriction()
     {

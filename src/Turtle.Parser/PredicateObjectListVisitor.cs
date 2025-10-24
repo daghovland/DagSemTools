@@ -6,6 +6,7 @@
  Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
 using static DagSemTools.Rdf.Ingress;
 
 namespace DagSemTools.Turtle.Parser;
@@ -13,10 +14,12 @@ namespace DagSemTools.Turtle.Parser;
 internal class PredicateObjectListVisitor : TriGDocBaseVisitor<Func<uint, List<Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
+    private uint _rdfReifiesNodeId; 
 
     internal PredicateObjectListVisitor(ResourceVisitor resourceVisitor)
     {
         _resourceVisitor = resourceVisitor;
+        _rdfReifiesNodeId = _resourceVisitor.Datastore.AddNodeResource(RdfResource.NewIri("http://www.w3.org/1999/02/22-rdf-syntax-ns#reifies"));
     }
 
     /// <summary>
@@ -44,22 +47,31 @@ internal class PredicateObjectListVisitor : TriGDocBaseVisitor<Func<uint, List<T
         internal IEnumerable<uint> tripleIds = _tripleIds;
     }
 
-    private void HandleAnnotation((TriGDocParser.AnnotationContext? annot, Triple triple) rdfobj)
-    {
-        if (rdfobj.annot != null && rdfobj.annot.children != null)
+    private Action<(TriGDocParser.AnnotationContext, Triple)> HandleAnnotation(uint reifierId) =>
+        ((TriGDocParser.AnnotationContext annot, Triple triple) rdfobj) =>
         {
-            var reifications = rdfobj.annot.children
-                .Aggregate(seed: new AnnotationStatus(_resourceVisitor.Datastore.NewAnonymousBlankNode(), new List<Triple>(), new List<uint>()),
-                    func: (aggr, child) => child switch
-                    {
-                        TriGDocParser.PredicateObjectListContext predobj => HandlePredicateObjectReification(predobj, aggr),
-                        TriGDocParser.ReifierContext reif => HandleReification(reif, rdfobj.triple, aggr),
-                        _ => aggr
-                    });
-            reifications.triples.ToList().ForEach(_resourceVisitor.Datastore.AddTriple);
-            reifications.tripleIds.ToList().ForEach(tripleId => _resourceVisitor.Datastore.AddReifiedTriple(rdfobj.triple, tripleId));
-        }
-    }
+            if (rdfobj.annot != null && rdfobj.annot.children != null)
+            {
+                var reifications = rdfobj.annot.children
+                    .Aggregate(
+                        seed: new AnnotationStatus(
+                            reifierId,
+                            new List<Triple>(),
+                            new List<uint>()),
+                        func: (aggr, child) => child switch
+                        {
+                            TriGDocParser.PredicateObjectListContext predobj => HandlePredicateObjectReification(
+                                predobj, aggr),
+                            TriGDocParser.ReifierContext reif => HandleReification(reif, rdfobj.triple, aggr),
+                            _ => aggr
+                        });
+                reifications.triples.ToList().ForEach(_resourceVisitor.Datastore.AddTriple);
+                reifications.tripleIds.ToList().ForEach(tripleId =>
+                    _resourceVisitor.Datastore.AddReifiedTriple(rdfobj.triple, tripleId));
+            }
+        };
+    
+
     private AnnotationStatus HandlePredicateObjectReification(TriGDocParser.PredicateObjectListContext predobj, AnnotationStatus aggr)
     {
         var newTriples = VisitPredicateObjectList(predobj)(aggr.reifierNodeId);
@@ -82,13 +94,15 @@ internal class PredicateObjectListVisitor : TriGDocBaseVisitor<Func<uint, List<T
         (node) =>
         {
             var predicate = _resourceVisitor.Visit(context.verb());
-            var tripes = context.annotatedObject()
+            var isReifyingTriple = predicate.Equals(_rdfReifiesNodeId);
+            var reifierNodeId = isReifyingTriple ? node : _resourceVisitor.Datastore.NewAnonymousBlankNode();
+            var triples = context.annotatedObject()
                 .Select(rdfObj => (annot: rdfObj.annotation(), obj: _resourceVisitor.Visit(rdfObj.rdfobject())))
                 .Select(obj => (annot: obj.annot, triple: new Triple(node, predicate, obj.obj)))
                 .ToList();
-            tripes
-                .ForEach(HandleAnnotation);
-            return tripes.Select(triple => triple.triple).ToList();
+            triples
+                .ForEach(HandleAnnotation(reifierNodeId));
+            return isReifyingTriple ? [] : triples.Select(triple => triple.triple).ToList();
         };
 
 }

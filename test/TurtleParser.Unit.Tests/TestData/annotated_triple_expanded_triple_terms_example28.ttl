@@ -1,0 +1,8 @@
+VERSION     "1.2"
+PREFIX : <http://example.com/>
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+:a :name "Alice" .
+:t rdf:reifies <<( :a :name "Alice" )>> .
+:t :statedBy :bob .
+:t :recorded "2021-07-07"^^xsd:date .
