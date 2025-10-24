@@ -10,13 +10,20 @@ namespace DagSemTools.Turtle.Parser;
 
 internal class StringVisitor : TriGDocBaseVisitor<string>
 {
+    static string UnescapeTurtle(string s)
+    {
+        s = s.Replace(@"\n", "\n").Replace(@"\r", "\r")
+            .Replace(@"\t", "\t").Replace(@"\\", "\\").Replace(@"\""", "\"");
+        return s;
+    }
+
     public override string VisitString_single_quote(TriGDocParser.String_single_quoteContext context)
     {
-        return context.GetText()[1..^1];
+        return UnescapeTurtle(context.GetText()[1..^1]);
     }
 
     public override string VisitString_triple_quote(TriGDocParser.String_triple_quoteContext context)
     {
-        return context.GetText()[3..^3];
+        return context.GetText()[3..^3].ReplaceLineEndings();
     }
 }

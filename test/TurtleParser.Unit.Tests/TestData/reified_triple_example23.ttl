@@ -1,0 +1,5 @@
+VERSION     "1.2"
+PREFIX :    <http://www.example.org/>
+
+:employee38 :familyName "Smith" .
+<< :employee38 :jobTitle "Assistant Designer" >> :accordingTo :employee22 .

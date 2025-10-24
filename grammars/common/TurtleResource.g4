@@ -1,7 +1,7 @@
 grammar TurtleResource;
 import TurtleTokens;
 
-directive: prefix | baseDeclaration ;
+directive: prefix | baseDeclaration | version;
 
 
 prefix: PREFIX_STRING PNAME_NS iri PERIOD? #sparqlPrefix
@@ -18,6 +18,9 @@ baseDeclaration: ATBASE ABSOLUTEIRIREF PERIOD
 BASE_STRING : 'BASE' ;
     
 ATBASE : '@base' ;
+
+version: ('@version' | 'VERSION') versionSpecifier '.'? ;
+versionSpecifier: string_single_quote; 
 
 PREFIX_STRING: [Pp] [Rr] [Ee] [Ff] [Ii] [Xx];
 
