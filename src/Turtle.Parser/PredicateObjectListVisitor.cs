@@ -14,7 +14,7 @@ namespace DagSemTools.Turtle.Parser;
 internal class PredicateObjectListVisitor : TriGDocBaseVisitor<Func<uint, List<Triple>>>
 {
     private ResourceVisitor _resourceVisitor;
-    private uint _rdfReifiesNodeId; 
+    private uint _rdfReifiesNodeId;
 
     internal PredicateObjectListVisitor(ResourceVisitor resourceVisitor)
     {
@@ -70,7 +70,7 @@ internal class PredicateObjectListVisitor : TriGDocBaseVisitor<Func<uint, List<T
                     _resourceVisitor.Datastore.AddReifiedTriple(rdfobj.triple, tripleId));
             }
         };
-    
+
 
     private AnnotationStatus HandlePredicateObjectReification(TriGDocParser.PredicateObjectListContext predobj, AnnotationStatus aggr)
     {

@@ -59,12 +59,12 @@ internal class TurtleListener : TriGDocBaseListener
 
     public override void ExitVersion(TriGDocParser.VersionContext context)
     {
-        if(version != RdfVersion.Unspecified)
+        if (version != RdfVersion.Unspecified)
             throw new Exception("Only one version declaration is allowed");
         var newVersion = new StringVisitor().Visit(context.versionSpecifier());
-        if(newVersion.Equals("1.1"))
+        if (newVersion.Equals("1.1"))
             version = RdfVersion.Rdf11;
-        else if(newVersion.Equals("1.2"))
+        else if (newVersion.Equals("1.2"))
             version = RdfVersion.Rdf12;
         else
             throw new Exception($"Unknown version specifier {newVersion}");

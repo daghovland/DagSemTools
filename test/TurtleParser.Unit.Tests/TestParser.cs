@@ -283,14 +283,14 @@ public class TestParser : IDisposable, IAsyncDisposable
         //abreviatedList.Resources.ResourceCount.Should().Be(expandedList.Resources.ResourceCount);
     }
 
-    
+
     [Fact]
     public void TestNewLines()
     {
         var example32 = File.ReadAllText("TestData/example32.ttl");
         var newLineExample = TestOntology(example32);
         newLineExample.Triples.TripleCount.Should().Be(1);
-        
+
     }
 
 
@@ -316,7 +316,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.GetTriplesWithSubject(employee38).Should().HaveCount(1);
     }
 
-    
+
     [Fact]
     public void TestReifiedTripleExample23()
     {
@@ -330,7 +330,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var employee38 = reifiedTriples.First().subject;
         ont.GetTriplesWithSubject(employee38).Should().HaveCount(1);
     }
-    
+
     [Fact]
     public void TestAnnotatedTriple()
     {
@@ -340,7 +340,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
 
-    
+
     [Fact]
     public void TestAnnotatedTripleExpandedExample27()
     {
@@ -349,7 +349,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.Triples.TripleCount.Should().Be(3);
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
-    
+
     [Fact]
     public void TestAnnotatedTripleExpandedTripleTermsExample28()
     {
@@ -378,7 +378,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         ont.Triples.TripleCount.Should().Be(2);
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
-    
+
     [Fact]
     public void TestTripleSubSetRestriction()
     {
