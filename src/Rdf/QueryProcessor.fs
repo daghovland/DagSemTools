@@ -62,4 +62,3 @@ module QueryProcessor =
         GetBindingsForBGP datastore query.BasicGraphPattern
         |> List.map (RemoveNonProjectedBindings query.Projection)
         
-
