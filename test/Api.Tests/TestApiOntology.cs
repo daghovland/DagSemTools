@@ -249,6 +249,26 @@ public class TestApiOntology
         rdf.LoadDatalog(datalogProgram);
     }
 
+    [Fact]
+    public void LoadIDOOntologyTableau()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        var alc = ont.GetTableauReasoner();
+        alc.Should().NotBeNull();
+        alc.IsLeft.Should().BeTrue();
+
+        var reasoner = alc.Match(
+            Right: r => [],
+            Left: t => t
+                .GetTypes(" http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
+                .ToList()
+        );
+        reasoner.Should().NotBeEmpty();
+        reasoner.Should().HaveCount(1);
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
 
     [Fact(Skip = "Too long runtime")]
     public void ParseGeneOntologyWorks()

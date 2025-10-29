@@ -131,13 +131,15 @@ module ALC =
     let GetAxiomConcepts (axiom: TBoxAxiom) : Concept list =
         match axiom with
         | Inclusion (sub, sup) -> GetConcepts sub @ GetConcepts sup
+
     let GetAxiomExistentials (axiom: TBoxAxiom)  =
         match axiom with
         | Inclusion (sub, sup) -> GetExistentials sub @ GetExistentials sup
-        
+
     let GetAxiomConceptNames (axiom: TBoxAxiom) : IriReference list =
         match axiom with
         | Inclusion (sub, sup) -> GetConceptNames sub @ GetConceptNames sup
+
     type TBox = TBoxAxiom list
     
     type ABoxAssertion =

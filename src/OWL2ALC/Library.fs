@@ -187,7 +187,7 @@ module Translator =
             failwith "todo"
         | AxiomHasKey(tuples, classExpression, objectPropertyExpressions, iris) -> failwith "todo"
         | AxiomAssertion assertion -> translateAssertion logger assertion |> ABOX |> Seq.singleton
-        | AxiomAnnotationAxiom annotationAxiom -> failwith "todo"
+        | AxiomAnnotationAxiom annotationAxiom -> [ ] 
         
     let translateOntology (logger : ILogger) (ontology: DagSemTools.OwlOntology.Ontology)  =
      ontology.Axioms
