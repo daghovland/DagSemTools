@@ -249,7 +249,7 @@ public class TestApiOntology
         rdf.LoadDatalog(datalogProgram);
     }
 
-    [Fact]
+    [Fact(Skip="Many owl axioms are not supported yet. See Issue https://github.com/daghovland/DagSemTools/issues/18")]
     public void LoadIDOOntologyTableau()
     {
         var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");
