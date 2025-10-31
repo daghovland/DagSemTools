@@ -220,7 +220,7 @@ public class TestApiOntology
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
-    [Fact(Skip="Not implemented yet. See Issue https://github.com/daghovland/DagSemTools/issues/93")]
+    [Fact(Skip = "Not implemented yet. See Issue https://github.com/daghovland/DagSemTools/issues/93")]
     public void TableauWorks()
     {
         // Arrange
@@ -240,12 +240,12 @@ public class TestApiOntology
         xTypes.Should().NotBeEmpty();
         xTypes.Should().HaveCount(1);
 
-        
+
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    
-    
+
+
     [Fact(Skip = "Must wait until number constraints are implemented in tableau. See Issue https://github.com/daghovland/DagSemTools/issues/2")]
     public void Imf2AlcWorks()
     {
@@ -266,7 +266,7 @@ public class TestApiOntology
         reasoner.Should().NotBeEmpty();
         reasoner.Should().HaveCount(1);
 
-        
+
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
@@ -282,7 +282,7 @@ public class TestApiOntology
         rdf.LoadDatalog(datalogProgram);
     }
 
-    [Fact(Skip="Many owl axioms are not supported yet. See Issue https://github.com/daghovland/DagSemTools/issues/18")]
+    [Fact(Skip = "Many owl axioms are not supported yet. See Issue https://github.com/daghovland/DagSemTools/issues/18")]
     public void LoadIDOOntologyTableau()
     {
         var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");
@@ -303,7 +303,7 @@ public class TestApiOntology
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    [Fact(Skip="Takes ca. 30 secs, too long for unit testing")]
+    [Fact(Skip = "Takes ca. 30 secs, too long for unit testing")]
     public void ParseGeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");
