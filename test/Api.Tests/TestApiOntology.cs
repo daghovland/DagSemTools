@@ -233,7 +233,16 @@ public class TestApiOntology
         // Act 
         var alc = ont.GetTableauReasoner();
         alc.Should().NotBeNull();
+        var reasoner = alc.Match(
+            Right: r => [],
+            Left: t => t
+                .GetTypes(" http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
+                .ToList()
+        );
+        reasoner.Should().NotBeEmpty();
+        reasoner.Should().HaveCount(1);
 
+        
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
