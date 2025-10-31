@@ -394,6 +394,47 @@ public class TestApi(ITestOutputHelper output)
         var expected = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
         actual.Should().Be(expected);
     }
+    
+    
+    PREFIX foaf:       <http://xmlns.com/foaf/0.1/>
+    PREFIX rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+
+        
+        
+    /// <summary>
+    /// Example, creating values with bind, in sparql 1.2 docs section 2.5
+    /// </summary>
+    [Fact]
+    public void TestSparqlOptionalPatterns()
+    {
+        var data = """
+                   _:a  rdf:type        foaf:Person .
+                       _:a  foaf:name       "Alice" .
+                   _:a  foaf:mbox       <mailto:alice@example.com> .
+                   _:a  foaf:mbox       <mailto:alice@work.example> .
+                   
+                   _:b  rdf:type        foaf:Person .
+                       _:b  foaf:name       "Bob" .
+                   
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                          SELECT ?name ?mbox
+                          WHERE  {
+                              ?x foaf:name  ?name .
+                              OPTIONAL { ?x  foaf:mbox  ?mbox }
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+        var answer = answers.First();
+        answer.Count.Should().Be(1);
+        var actual = answer["name"];
+        var expected = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
+        actual.Should().Be(expected);
+    }
     private IGraph ParseTurtleData(string data)
     {
         var writer = new StringWriter();
