@@ -220,6 +220,30 @@ public class TestApiOntology
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
+    [Fact(Skip = "Not implemented yet. See Issue https://github.com/daghovland/DagSemTools/issues/93")]
+    public void TableauWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/someValuesExample.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
+        var ont = OwlOntology.Create(rdf);
+
+        // Act 
+        var alc = ont.GetTableauReasoner();
+        alc.Should().NotBeNull();
+        var xTypes = alc.Match(
+            Right: r => [],
+            Left: t => t
+                .GetTypes(new("http://example.org/x"))
+                .ToList()
+        );
+        xTypes.Should().NotBeEmpty();
+        xTypes.Should().HaveCount(1);
+
+
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
 
 
     [Fact(Skip = "Must wait until number constraints are implemented in tableau. See Issue https://github.com/daghovland/DagSemTools/issues/2")]
@@ -233,6 +257,15 @@ public class TestApiOntology
         // Act 
         var alc = ont.GetTableauReasoner();
         alc.Should().NotBeNull();
+        var reasoner = alc.Match(
+            Right: r => [],
+            Left: t => t
+                .GetTypes(" http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
+                .ToList()
+        );
+        reasoner.Should().NotBeEmpty();
+        reasoner.Should().HaveCount(1);
+
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
@@ -249,8 +282,28 @@ public class TestApiOntology
         rdf.LoadDatalog(datalogProgram);
     }
 
+    [Fact(Skip = "Many owl axioms are not supported yet. See Issue https://github.com/daghovland/DagSemTools/issues/18")]
+    public void LoadIDOOntologyTableau()
+    {
+        var ontologyFileInfo = new FileInfo("TestData/LIS-14.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
+        var ont = OwlOntology.Create(rdf);
+        var alc = ont.GetTableauReasoner();
+        alc.Should().NotBeNull();
+        alc.IsLeft.Should().BeTrue();
 
-    [Fact(Skip = "Too long runtime")]
+        var reasoner = alc.Match(
+            Right: r => [],
+            Left: t => t
+                .GetTypes(" http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
+                .ToList()
+        );
+        reasoner.Should().NotBeEmpty();
+        reasoner.Should().HaveCount(1);
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
+    [Fact(Skip = "Takes ca. 30 secs, too long for unit testing")]
     public void ParseGeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");

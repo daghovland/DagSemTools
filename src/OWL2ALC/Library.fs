@@ -184,10 +184,10 @@ module Translator =
             translateDataPropertyAxiom logger dataPropertyAxiom |> TBOX |> Seq.singleton
         | AxiomDatatypeDefinition(_annots, (FullIri iri), dataRange) ->
             // translateDataRange logger dataRange
-            failwith "todo"
-        | AxiomHasKey(tuples, classExpression, objectPropertyExpressions, iris) -> failwith "todo"
+            failwith "Datatype definitions are not yet translated"
+        | AxiomHasKey(tuples, classExpression, objectPropertyExpressions, iris) -> failwith "Owl Key Axioms are not yet translated into owl"
         | AxiomAssertion assertion -> translateAssertion logger assertion |> ABOX |> Seq.singleton
-        | AxiomAnnotationAxiom annotationAxiom -> failwith "todo"
+        | AxiomAnnotationAxiom annotationAxiom -> [ ] 
         
     let translateOntology (logger : ILogger) (ontology: DagSemTools.OwlOntology.Ontology)  =
      ontology.Axioms
