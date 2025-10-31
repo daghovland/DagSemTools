@@ -220,8 +220,32 @@ public class TestApiOntology
 
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
+    [Fact(Skip="Not implemented yet. See Issue https://github.com/daghovland/DagSemTools/issues/93")]
+    public void TableauWorks()
+    {
+        // Arrange
+        var ontologyFileInfo = new FileInfo("TestData/someValuesExample.ttl");
+        var rdf = DagSemTools.Api.TurtleParser.Parse(ontologyFileInfo, _outputWriter);
+        var ont = OwlOntology.Create(rdf);
 
+        // Act 
+        var alc = ont.GetTableauReasoner();
+        alc.Should().NotBeNull();
+        var xTypes = alc.Match(
+            Right: r => [],
+            Left: t => t
+                .GetTypes(new("http://example.org/x"))
+                .ToList()
+        );
+        xTypes.Should().NotBeEmpty();
+        xTypes.Should().HaveCount(1);
 
+        
+        _inMemorySink.LogEvents.Should().HaveCount(0);
+    }
+
+    
+    
     [Fact(Skip = "Must wait until number constraints are implemented in tableau. See Issue https://github.com/daghovland/DagSemTools/issues/2")]
     public void Imf2AlcWorks()
     {
@@ -279,7 +303,7 @@ public class TestApiOntology
         _inMemorySink.LogEvents.Should().HaveCount(0);
     }
 
-    [Fact(Skip = "Too long runtime")]
+    [Fact(Skip="Takes ca. 30 secs, too long for unit testing")]
     public void ParseGeneOntologyWorks()
     {
         var ontologyFileInfo = new FileInfo("TestData/go.ttl");
