@@ -52,10 +52,12 @@ This materializes the new answers which can be fetched as before:
 var tripleAnswersWithReasoning = graph.GetTriplesWithPredicate(new IriReference("https://exampe.com/some/predicate"));
 ```
 ### Datalog
+Datalog rules can be loaded directly from a file like this:
 ```csharp
 var datalog_file = new FileInfo("rules.datalog");
 graph.LoadDatalog(datalogfile);
 ```
+After loading, the new inferred answers can be fetched as above.
 
 See examples in [test/NugetTest](test/NugetTest)
 
