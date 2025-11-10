@@ -20,9 +20,6 @@ public class TestApi(ITestOutputHelper output)
         Assert.NotNull(ont);
         var enemies = ont.GetTriplesWithPredicate(new IriReference("http://www.perceive.net/schemas/relationship/enemyOf"));
         enemies.Count().Should().Be(2, "There are two trples with enemies");
-
-
-
     }
 
     [Fact]
@@ -70,5 +67,28 @@ public class TestApi(ITestOutputHelper output)
             new IriReference("http://dbpedia.org/ontology/NaturalEvent"),
             new IriReference("http://www.w3.org/2000/01/rdf-schema#label"));
         labels.Count().Should().Be(7, "There are two labels on natural event");
+    }
+    
+    
+    [Fact]
+    public void TestDatalog()
+    {
+        var ontology = new FileInfo("TestData/data.ttl");
+        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetTriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object"));
+        resultsData.Should().HaveCount(1);
+        var resultsBefore = ont.GetTriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object2"));
+        resultsBefore.Should().BeEmpty();
+        Assert.NotNull(ont);
+        var datalogFile = new FileInfo("TestData/rules.datalog");
+        ont.LoadDatalog(datalogFile);
+        var resultsAfter = ont.GetTriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object2"));
+        resultsAfter.Should().HaveCount(1);
     }
 }

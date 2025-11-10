@@ -14,6 +14,8 @@ Sparql with simple selects over basic graph patterns is supported.
 * Sparql 1.2. Only simple selects over basic graph patterns are supported.
 
 ## Usage
+
+### Rdf
 Install the nuget package [DagSemTools.Api](https://www.nuget.org/packages/DagSemTools.Api/), f.ex. by `dotnet add package DagSemTools.Api`
 
 To load an rdf graph in turtle format, try f.ex.
@@ -26,7 +28,9 @@ To get answers to single basic graph patterns, use functions on the graph, like 
 ```csharp
 var tripleAnswers = graph.GetTriplesWithPredicate(new IriReference("https://exampe.com/some/predicate"));
 ```
-or if you prefer SPARQL, 
+
+### SPARQL
+Continuing the example above, you can also run simple SPARQL select queries like this:
 ```csharp
 var sparqlAnswerMap = graph.AnswerSelectQuery("SELECT * WHERE where{?s <https://example.com/some/predicate> ?o.}");
 ```
@@ -34,6 +38,7 @@ The output (called `sparqlAnswerMap` above) is an `IEnumerable<Dictionary<string
 Only the basic syntax as shown in this example is supported.
 There is no built-in protection against SPARQL injection.
 
+### OWL RL Reasoning
 To load an ontology and use that to reason over the data, first load it as rdf (as above) 
 and then parse the rdf into an ontology with `Ontology.create`, extract it as datalog rules with `GetAxiomRules`, 
 like this:
@@ -46,6 +51,12 @@ This materializes the new answers which can be fetched as before:
 ```csharp
 var tripleAnswersWithReasoning = graph.GetTriplesWithPredicate(new IriReference("https://exampe.com/some/predicate"));
 ```
+### Datalog
+```csharp
+var datalog_file = new FileInfo("rules.datalog");
+graph.LoadDatalog(datalogfile);
+```
+
 See examples in [test/NugetTest](test/NugetTest)
 
 ## Contributing and/or Building from source
