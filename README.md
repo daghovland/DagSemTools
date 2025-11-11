@@ -52,7 +52,16 @@ This materializes the new answers which can be fetched as before:
 var tripleAnswersWithReasoning = graph.GetTriplesWithPredicate(new IriReference("https://exampe.com/some/predicate"));
 ```
 ### Datalog
-Datalog rules can be loaded directly from a file like this:
+Datalog with negation (and recursion) is supported, with the normal restriction on stratification when negation and recursion are combined. No extensions are implemented.
+Triples are written `ex:predicate[?s, ex:object]` or `[?s, ex:predicate, ex:object]` in the datalog rules. Negation is written with `not`, like `not ex:predicate[?s, ex:object]`.
+Example rules:
+```prolog
+prefix ex: <https://example.com/data#>
+
+[?s, ex:predicate, ex:object2] :- ex:predicate[?s, ex:object].
+```
+
+Rules can be loaded directly from a file like this:
 ```csharp
 var datalog_file = new FileInfo("rules.datalog");
 graph.LoadDatalog(datalogfile);
