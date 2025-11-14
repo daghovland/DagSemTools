@@ -1,5 +1,5 @@
-﻿/*
-    Copyright (C) 2024 Dag Hovland
+/*
+    Copyright (C) 2025 Dag Hovland
     This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
@@ -20,33 +20,47 @@ namespace DagSemTools.Api;
 /// <summary>
 /// Implementation of a rdf graph. 
 /// </summary>
-public class Graph : IGraph
+public class Dataset : IGraph
 {
     private ILogger _logger;
-    internal Graph(Datastore triples, ILogger? logger = null)
+    internal Dataset(Datastore quads, ILogger? logger = null)
     {
-        Triples = triples;
+        Quads = quads;
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
+        DefaultGraph = new Graph(quads, logger);
     }
 
-    private Datastore Triples { get; init; }
+    private Datastore Quads { get; init; }
+    private IGraph DefaultGraph { get; init; }
 
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
 
-    /// <inheritdoc />
-    public bool ContainsTriple(Triple apiTriple) =>
-        TryGetRdfTriple(apiTriple, out var rdfTriple)
-         && Triples
-             .ContainsTriple(rdfTriple);
+    /// Checks whether the default graph contains the given triple.
+    public bool ContainsTriple(Triple apiTriple) => DefaultGraph.ContainsTriple(apiTriple);
+    
+    /// <summary>
+    /// Checks whether the quad exists in the dataset.
+    /// </summary>
+    /// <param name="subject"></param>
+    /// <param name="subjIdx"></param>
+    /// <returns></returns>
+    public bool ContainsQuad(Quad quad) => Quads.NamedGraphs.ContainsKey(quad.GraphName) &&
+    {
+        return (GetRdfIriGraphElementId(quad.GraphName, out var graphIdx)
+                && GetRdfIriGraphElementId(quad.Predicate, out var predIdx)
+                && GetRdfResourceGraphElementId(quad.Subject, out var subjIdx)
+                && GetRdfGraphElementId(quad.Object, out var objIdx))
+            && Quads.ContainsQuad(graphIdx, new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx));
+    }
 
     private bool GetRdfIriGraphElementId(IriReference subject, out uint subjIdx) =>
-        Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)),
+        Quads.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)),
             out subjIdx);
 
     private bool GetRdfLiteralGraphElementId(RdfLiteral literal, out uint subjIdx) =>
-        Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewGraphLiteral(literal.InternalRdfLiteral), out subjIdx);
+        Quads.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewGraphLiteral(literal.InternalRdfLiteral), out subjIdx);
 
     private bool GetRdfResourceGraphElementId(Resource resource, out uint idx) =>
         resource switch
@@ -87,15 +101,15 @@ public class Graph : IGraph
     public void LoadDatalog(FileInfo datalog)
     {
         var newRules = Datalog.Parser.Parser.ParseFile(datalog, System.Console.Error,
-            Triples ?? throw new InvalidOperationException());
+            Quads ?? throw new InvalidOperationException());
         LoadDatalog(newRules);
     }
 
     /// <inheritdoc />
     public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query)
     {
-        var parsedQuery = Sparql.Parser.Parser.ParseString(query, Console.Error, Triples.Resources);
-        var results = QueryProcessor.Answer(Triples, parsedQuery.Item1);
+        var parsedQuery = Sparql.Parser.Parser.ParseString(query, Console.Error, Quads.Resources);
+        var results = QueryProcessor.Answer(Quads, parsedQuery.Item1);
         return results
             .Map(r =>
                 r.ToDictionary(kv => kv.Key, kv => GetResource(kv.Value)))
@@ -106,16 +120,16 @@ public class Graph : IGraph
     public void LoadDatalog(IEnumerable<Rule> newRules)
     {
         _rules = _rules.Concat(newRules);
-        Reasoner.evaluate(_logger, ListModule.OfSeq(_rules), Triples);
+        Reasoner.evaluate(_logger, ListModule.OfSeq(_rules), Quads);
     }
 
     /// <inheritdoc />
-    public bool IsEmpty() => Triples.Triples.TripleCount == 0;
+    public bool IsEmpty() => Quads.Triples.TripleCount == 0;
 
 
     private Resource GetBlankNodeOrIriResource(uint resourceId)
     {
-        var resource = Triples.GetGraphNode(resourceId);
+        var resource = Quads.GetGraphNode(resourceId);
         if (!FSharpOption<RdfResource>.get_IsSome(resource))
             throw new ArgumentException($"Resource {resource} is not an Iri or a blank node"); ;
 
@@ -140,7 +154,7 @@ public class Graph : IGraph
 
     private GraphElement GetResource(uint resourceId)
     {
-        var resource = Triples.GetGraphElement(resourceId);
+        var resource = Quads.GetGraphElement(resourceId);
         if (resource.IsNodeOrEdge)
         {
             var r = resource.resource;
@@ -166,7 +180,7 @@ public class Graph : IGraph
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
         (GetRdfIriGraphElementId(obj, out var objIdx)
          && GetRdfIriGraphElementId(predicate, out var predIdx))
-            ? Triples
+            ? Quads
                 .GetTriplesWithObjectPredicate(objIdx, predIdx)
                 .Select(EnsureApiTriple)
             : [];
@@ -176,7 +190,7 @@ public class Graph : IGraph
     public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference subject, IriReference predicate) =>
         (GetRdfIriGraphElementId(subject, out var subjIdx)
          && GetRdfIriGraphElementId(predicate, out var predIdx))
-            ? Triples
+            ? Quads
                 .GetTriplesWithSubjectPredicate(subjIdx, predIdx)
                 .Select(EnsureApiTriple)
             : [];
@@ -184,7 +198,7 @@ public class Graph : IGraph
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubject(IriReference subject) =>
         (GetRdfIriGraphElementId(subject, out var subjIdx))
-            ? Triples
+            ? Quads
                 .GetTriplesWithSubject(subjIdx)
                 .Select(EnsureApiTriple)
             : [];
@@ -192,7 +206,7 @@ public class Graph : IGraph
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicate(IriReference predicate) =>
         (GetRdfIriGraphElementId(predicate, out var predIdx))
-            ? Triples
+            ? Quads
                 .GetTriplesWithPredicate(predIdx)
                 .Select(EnsureApiTriple)
             : [];
@@ -200,7 +214,7 @@ public class Graph : IGraph
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithObject(IriReference @object) =>
         (GetRdfIriGraphElementId(@object, out var objIdx))
-            ? Triples
+            ? Quads
                 .GetTriplesWithObject(objIdx)
                 .Select(EnsureApiTriple)
             : [];
@@ -208,16 +222,16 @@ public class Graph : IGraph
     /// <inheritdoc />
     public void EnableOwlReasoning()
     {
-        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Triples.Triples, Triples.Resources, _logger).extractOntology;
-        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Triples.Resources, ontology.Ontology);
+        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Quads.Triples, Quads.Resources, _logger).extractOntology;
+        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Quads.Resources, ontology.Ontology);
         LoadDatalog(ontologyRules);
     }
     /// <inheritdoc />
     public void EnableEqualityReasoning() =>
-        LoadDatalog(OWL2RL2Datalog.Equality.GetEqualityAxioms(Triples.Resources));
+        LoadDatalog(OWL2RL2Datalog.Equality.GetEqualityAxioms(Quads.Resources));
 
 
-    Datastore IGraph.Datastore => Triples;
+    Datastore IGraph.Datastore => Quads;
 
 
 }

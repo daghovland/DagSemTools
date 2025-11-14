@@ -1,0 +1,3 @@
+prefix ex: <https://example.com/data#>
+
+[?s, ex:predicate, ex:object2] ?graph :- ex:predicate[?s, ex:object] ?graph .

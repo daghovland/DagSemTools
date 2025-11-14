@@ -1,5 +1,5 @@
 /*
-    Copyright (C) 2024 Dag Hovland
+    Copyright (C) 2025 Dag Hovland
     This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
     This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
     You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
@@ -12,50 +12,52 @@ using DagSemTools.Rdf;
 namespace DagSemTools.Api;
 
 /// <summary>
-/// Represents a triple in RDF. https://www.w3.org/TR/rdf12-concepts/#dfn-rdf-triple
+/// Represents a quad (a triple with a graphname) in RDF. https://www.w3.org/TR/rdf12-concepts/#dfn-rdf-triple
 /// </summary>
-public class Triple
+public class Quad
 {
+    private Triple triple;
+
     /// <summary>
-    /// The most generic triple constructor. 
+    /// The most generic quad constructor. 
     /// </summary>
+    /// <param name="graphName"></param>
     /// <param name="subject"></param>
     /// <param name="predicate"></param>
     /// <param name="object"></param>
-    public Triple(Resource subject, IriReference predicate, GraphElement @object)
+    public Quad(IriReference graphName, Resource subject, IriReference predicate, GraphElement @object)
     {
-        Subject = subject;
-        Predicate = predicate;
-        Object = @object;
+        triple = new Triple(subject, predicate, @object);
+        GraphName = graphName;
     }
 
     /// <summary>
     /// Creates a triple with IRIs on all three places
     /// </summary>
-    /// <param name="subject"></param>
-    /// <param name="predicate"></param>
-    /// <param name="object"></param>
-    public Triple(IriReference subject, IriReference predicate, IriReference @object)
+    public Quad(IriReference graphName, Triple triple)
     {
-        Subject = new IriResource(subject);
-        Predicate = predicate;
-        Object = new IriResource(@object);
+        this.triple = triple;
+        GraphName = graphName;
     }
 
     /// <summary>
     /// The subject of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-subject
     /// </summary>
-    public Resource Subject { get; }
+    public Resource Subject  => triple.Subject; 
 
     /// <summary>
     /// The predicate of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-predicate
     /// </summary>
-    public IriReference Predicate { get; }
+    public IriReference Predicate => triple.Predicate;
 
     /// <summary>
     /// The object of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-object
     /// </summary>
-    public GraphElement Object { get; }
-
+    public GraphElement Object => triple.Object;
+    
+    /// <summary>
+    /// The graph name of the quad. https://www.w3.org/TR/rdf11-datasets/#dfn-rdf-quad
+    /// </summary>
+    public IriReference GraphName { get; }
 }
 

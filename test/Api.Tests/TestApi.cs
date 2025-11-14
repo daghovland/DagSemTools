@@ -74,6 +74,29 @@ public class TestApi(ITestOutputHelper output)
         resultsAfter.Should().HaveCount(1);
     }
 
+    
+    [Fact]
+    public void TestNamedGraphDatalogReasoning()
+    {
+        var ontology = new FileInfo("TestData/namedgraph.trig");
+        var ont = DagSemTools.Api. Tr TurtleParser.Parse(ontology, outputWriter);
+        var resultsData = ont.Get GetQ TriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object"));
+        resultsData.Should().HaveCount(1);
+        var resultsBefore = ont.GetTriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object2"));
+        resultsBefore.Should().BeEmpty();
+        Assert.NotNull(ont);
+        var datalogFile = new FileInfo("TestData/namedgraph.datalog");
+        ont.LoadDatalog(datalogFile);
+        var resultsAfter = ont.GetTriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object2"));
+        resultsAfter.Should().HaveCount(1);
+    }
+    
     [Fact]
     public void TestA()
     {
