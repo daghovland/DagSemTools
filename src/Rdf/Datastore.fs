@@ -110,7 +110,8 @@ type Datastore(triples: TripleTable,
         
     member this.ContainsTriple (triple : Triple) : bool =
             this.Triples.Contains triple
-        
+    member this.ContainsQuad(quad : Quad) : bool =
+        this.NamedGraphs.Contains quad
     member this.GetReifiedTriplesWithId(id: GraphElementId) : Quad seq =
         this.ReifiedTriples.GetGraph id
     member this.GetReifiedTriplesWithSubject(subject: GraphElementId) : Quad seq =

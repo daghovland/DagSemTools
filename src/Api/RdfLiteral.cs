@@ -22,7 +22,7 @@ public class RdfLiteral : GraphElement
         _elementManager = elementManager;
         InternalRdfLiteral = rdfLiteral;
     }
-        
+
 
     /// <summary>
     /// Creates an rdf literal of type xsd:string. This is the default type in rdf
@@ -49,6 +49,9 @@ public class RdfLiteral : GraphElement
     public override int GetHashCode() => InternalRdfLiteral.GetHashCode();
 
     internal override bool GetGraphElementId(out uint idx) =>
-        _elementManager.GraphElementMap.TryGetValue(DagSemTools.Ingress.GraphElement.NewGraphLiteral(InternalRdfLiteral), out idx);
-    }
+        _elementManager.GraphElementMap.TryGetValue(
+            DagSemTools.Ingress.GraphElement.NewGraphLiteral(InternalRdfLiteral), out idx);
+}
+    
+    
 

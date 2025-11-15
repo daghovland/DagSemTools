@@ -49,6 +49,8 @@ type QuadTable(quadList: Quad array,
     member internal this.GetQuadListEntry (index: QuadListIndex) : Quad =
         this.QuadList.[int index]
     
+        member this.Contains (quad : Quad) : bool =
+            this.FourKeysIndex.ContainsKey quad
     
     member internal this.AddTripleIdIndex (id: GraphElementId, tripleIndex: QuadListIndex) =
         if this.TripleIdIndex.ContainsKey id then
