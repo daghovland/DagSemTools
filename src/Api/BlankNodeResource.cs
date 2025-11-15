@@ -41,4 +41,8 @@ public class BlankNodeResource(string name) : Resource
     /// </summary>
     /// <returns></returns>
     public override int GetHashCode() => _name.GetHashCode();
+
+    internal override bool GetGraphElementId(out uint idx) =>
+        throw new NotImplementedException();
+
 }

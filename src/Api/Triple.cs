@@ -6,6 +6,7 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
 using IriTools;
 using DagSemTools.Rdf;
 
@@ -16,14 +17,18 @@ namespace DagSemTools.Api;
 /// </summary>
 public class Triple
 {
+    private GraphElementManager _elementManager;
+
     /// <summary>
     /// The most generic triple constructor. 
     /// </summary>
+    /// <param name="elementManager"></param>
     /// <param name="subject"></param>
     /// <param name="predicate"></param>
     /// <param name="object"></param>
-    public Triple(Resource subject, IriReference predicate, GraphElement @object)
+    internal Triple(GraphElementManager elementManager, Resource subject, IriReference predicate, GraphElement @object)
     {
+        _elementManager = elementManager;
         Subject = subject;
         Predicate = predicate;
         Object = @object;
@@ -32,14 +37,16 @@ public class Triple
     /// <summary>
     /// Creates a triple with IRIs on all three places
     /// </summary>
+    /// <param name="elementManager"></param>
     /// <param name="subject"></param>
     /// <param name="predicate"></param>
     /// <param name="object"></param>
-    public Triple(IriReference subject, IriReference predicate, IriReference @object)
+    internal Triple(GraphElementManager elementManager, IriReference subject, IriReference predicate, IriReference @object)
     {
-        Subject = new IriResource(subject);
+        _elementManager = elementManager;
+        Subject = new IriResource( elementManager, subject);
         Predicate = predicate;
-        Object = new IriResource(@object);
+        Object = new IriResource(elementManager, @object);
     }
 
     /// <summary>
@@ -56,6 +63,28 @@ public class Triple
     /// The object of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-object
     /// </summary>
     public GraphElement Object { get; }
+    
+    internal bool TryGetRdfTriple(Triple apiTriple, out Rdf.Ingress.Triple rdfTriple)
+    {
+        if (apiTriple.Subject.GetGraphElementId(out var subjIdx) &&
+            apiTriple.Object.GetGraphElementId( out var objIdx))
+        {
+            var predIdx = _elementManager.AddNodeResource(RdfResource.NewIri(apiTriple.Predicate));
+            rdfTriple = new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx);
+            return true;
+        }
+
+        rdfTriple = default;
+        return false;
+    }
+    internal Rdf.Ingress.Triple EnsureRdfTriple(Triple apiTriple) =>
+        (apiTriple.Subject.GetGraphElementId(out var subjIdx) &&
+         _elementManager.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(apiTriple.Predicate)), out var predIdx) &&
+         apiTriple.Object.GetGraphElementId(out var objIdx)) ?
+            new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx) :
+            throw new Exception($"BUG: Something went wrong when translating {apiTriple}");
+
+
 
 }
 

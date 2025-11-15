@@ -46,7 +46,7 @@ public class Dataset : IGraph
     /// <param name="subject"></param>
     /// <param name="subjIdx"></param>
     /// <returns></returns>
-    public bool ContainsQuad(Quad quad) => Quads.NamedGraphs.ContainsKey(quad.GraphName) &&
+    public bool ContainsQuad(Quad quad) => Quads.NamedGraphs. ContainsKey(quad.GraphName) &&
     {
         return (GetRdfIriGraphElementId(quad.GraphName, out var graphIdx)
                 && GetRdfIriGraphElementId(quad.Predicate, out var predIdx)

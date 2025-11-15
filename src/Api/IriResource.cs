@@ -6,6 +6,9 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
+using DagSemTools.Rdf;
+
 namespace DagSemTools.Api;
 using IriTools;
 
@@ -14,14 +17,16 @@ using IriTools;
 /// </summary>
 public class IriResource : Resource
 {
+    private GraphElementManager _elementManager;
     /// <summary>
     /// The IRI that identifies the resource.
     /// </summary>
     public IriReference Iri { get; }
 
     /// <inheritdoc />
-    public IriResource(IriReference iri)
+    internal IriResource(GraphElementManager elementManager, IriReference iri)
     {
+        _elementManager = elementManager;
         Iri = iri ?? throw new ArgumentNullException(nameof(iri));
     }
 
@@ -54,4 +59,8 @@ public class IriResource : Resource
     {
         return Iri.GetHashCode();
     }
+    internal override bool GetGraphElementId(out uint idx) =>
+        _elementManager.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(Iri)),
+            out idx);
+
 }
