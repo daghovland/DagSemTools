@@ -22,6 +22,7 @@ public class Quad
     /// <summary>
     /// The most generic quad constructor. 
     /// </summary>
+    /// <param name="elementManager"></param>
     /// <param name="graphName"></param>
     /// <param name="subject"></param>
     /// <param name="predicate"></param>

@@ -27,9 +27,10 @@ public class RdfLiteral : GraphElement
     /// <summary>
     /// Creates an rdf literal of type xsd:string. This is the default type in rdf
     /// </summary>
+    /// <param name="elementManager"></param>
     /// <param name="rdfLiteral"></param>
     /// <returns></returns>
-    internal static RdfLiteral StringRdfLiteral(GraphElementManager elementManager, string rdfLiteral) =>
+    public static RdfLiteral StringRdfLiteral(GraphElementManager elementManager, string rdfLiteral) =>
         new RdfLiteral(elementManager, DagSemTools.Ingress.RdfLiteral.NewLiteralString(rdfLiteral));
 
     /// <summary>

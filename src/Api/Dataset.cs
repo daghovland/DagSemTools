@@ -39,12 +39,11 @@ public class Dataset : IGraph
 
     /// Checks whether the default graph contains the given triple.
     public bool ContainsTriple(Triple apiTriple) => DefaultGraph.ContainsTriple(apiTriple);
-    
+
     /// <summary>
     /// Checks whether the quad exists in the dataset.
     /// </summary>
-    /// <param name="subject"></param>
-    /// <param name="subjIdx"></param>
+    /// <param name="quad"></param>
     /// <returns></returns>
     public bool ContainsQuad(Quad quad) 
     {
@@ -52,7 +51,7 @@ public class Dataset : IGraph
                 && GetRdfIriGraphElementId(quad.Predicate, out var predIdx)
                 && GetRdfResourceGraphElementId(quad.Subject, out var subjIdx)
                 && GetRdfGraphElementId(quad.Object, out var objIdx))
-            && Quads.ContainsQuad(graphIdx, new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx));
+            && Quads.ContainsQuad(new Rdf.Ingress.Quad (graphIdx, subjIdx, predIdx, objIdx));
     }
 
     private bool GetRdfIriGraphElementId(IriReference subject, out uint subjIdx) =>
@@ -136,7 +135,7 @@ public class Dataset : IGraph
         switch (resource.Value)
         {
             case { IsIri: true } r:
-                return new IriResource(new IriReference(r.iri));
+                return new IriResource(Quads.Resources, new IriReference(r.iri));
             case { IsAnonymousBlankNode: true } r:
                 return new BlankNodeResource($"{r.anon_blankNode}");
             default: throw new Exception($"BUG: Resource {resource.ToString()} is a resource but not an Iri or a blank node");
@@ -159,7 +158,7 @@ public class Dataset : IGraph
         {
             var r = resource.resource;
             if (r.IsIri)
-                return new IriResource(new IriReference(r.iri));
+                return new IriResource(Quads.Resources, new IriReference(r.iri));
             if (r.IsAnonymousBlankNode)
                 return new BlankNodeResource($"{r.anon_blankNode}");
             throw new Exception("BUG: Resource that is neither Iri nor Blank Node !!");
@@ -167,12 +166,13 @@ public class Dataset : IGraph
 
         if (!resource.IsGraphLiteral) throw new Exception("BUG: Resource that is neither resource or literal!!");
         var lit = resource.literal;
-        return new RdfLiteral(lit);
+        return new RdfLiteral(Quads.Resources, lit);
     }
 
 
     private Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
-        new(GetBlankNodeOrIriResource(triple.subject),
+        new(Quads.Resources, 
+            GetBlankNodeOrIriResource(triple.subject),
             GetApiIriResource(triple.predicate).Iri,
             GetResource(triple.obj));
 
