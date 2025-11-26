@@ -100,6 +100,9 @@ type QuadTable(quadList: Quad array,
                 this.QuadCount <- nextQuadCount
                 ()
             
+        member internal this.Contains(q : Quad) =
+            this.FourKeysIndex.ContainsKey q
+            
         member internal this.GetQuadsWithSubject (subject: GraphElementId) : Quad seq =
             match this.SubjectPredicateIndex.TryGetValue subject with  
             | true, subjectIndex -> subjectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetQuadListEntry e)
