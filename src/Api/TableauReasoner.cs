@@ -7,6 +7,7 @@
 */
 
 using DagSemTools.AlcTableau;
+using DagSemTools.Rdf;
 using IriTools;
 using LanguageExt;
 using Microsoft.FSharp.Collections;
@@ -33,24 +34,27 @@ public class TableauReasoner
     internal static TableauReasoner Create(Tableau.ReasonerState reasonerState, ILogger logger) =>
         new(reasonerState, logger);
 
-    internal static IriResource GetConceptResource(ALC.Concept concept) =>
-        concept switch
-        {
-            ALC.Concept.ConceptName cName => new IriResource(cName.Item),
-            ALC.Concept.Conjunction conjunction => throw new NotImplementedException(),
-            ALC.Concept.Disjunction disjunction => throw new NotImplementedException(),
-            ALC.Concept.Existential existential => throw new NotImplementedException(),
-            ALC.Concept.Negation negation => throw new NotImplementedException(),
-            ALC.Concept.Universal universal => throw new NotImplementedException(),
-            _ => throw new NotImplementedException("Unknown concept type: " + concept.GetType().Name + "")
-        };
+    internal static Func<ALC.Concept, IriResource> GetConceptResource(GraphElementManager elementManager) =>
+        (ALC.Concept concept) =>
+            concept switch
+            {
+                ALC.Concept.ConceptName cName => new IriResource(elementManager, cName.Item),
+                ALC.Concept.Conjunction conjunction => throw new NotImplementedException(),
+                ALC.Concept.Disjunction disjunction => throw new NotImplementedException(),
+                ALC.Concept.Existential existential => throw new NotImplementedException(),
+                ALC.Concept.Negation negation => throw new NotImplementedException(),
+                ALC.Concept.Universal universal => throw new NotImplementedException(),
+                _ => throw new NotImplementedException("Unknown concept type: " + concept.GetType().Name + "")
+            };
+
     /// <summary>
     /// Get iris of all types of the individual
     /// </summary>
+    /// <param name="elementManager"></param>
     /// <param name="individual"></param>
     /// <returns></returns>
-    public IEnumerable<IriResource> GetTypes(IriReference individual) =>
+    public IEnumerable<IriResource> GetTypes(GraphElementManager elementManager, IriReference individual) =>
         SeqModule.ToList(ReasonerService
             .get_individual_types(_reasoningState, individual)
-            .Select(GetConceptResource));
+            .Select(GetConceptResource(elementManager)));
 }
