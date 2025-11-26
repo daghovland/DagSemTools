@@ -79,8 +79,8 @@ public class TestApi(ITestOutputHelper output)
     public void TestNamedGraphDatalogReasoning()
     {
         var ontology = new FileInfo("TestData/namedgraph.trig");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetTriplesWithPredicateObject(
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
+        var resultsData = ont. GetQTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object"));
         resultsData.Should().HaveCount(1);

@@ -20,7 +20,7 @@ namespace DagSemTools.Api;
 /// <summary>
 /// Implementation of a rdf graph. 
 /// </summary>
-public class Dataset : IGraph
+public class Dataset : IDataset
 {
     private ILogger _logger;
     internal Dataset(Datastore quads, ILogger? logger = null)
@@ -234,4 +234,56 @@ public class Dataset : IGraph
     Datastore IGraph.Datastore => Quads;
 
 
+    /// <inheritdoc />
+    public IGraph GetDefaultGraph()
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public IGraph GetMergedTriples()
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public Dictionary<IriReference, IGraph> GetNamedGraphs()
+    {
+        throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
+    public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference graphName, IriReference predicate, IriReference obj)
+    {
+        throw new NotImplementedException();
+    }
+    /// <inheritdoc />
+    public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference graphName, IriReference subject, IriReference predicate) =>
+        (GetRdfIriGraphElementId(subject, out var subjIdx)
+         && GetRdfIriGraphElementId(predicate, out var predIdx)
+        && GetRdfIriGraphElementId(graphName, out var graphIdx))
+            ? Quads.NamedGraphs
+                . GetQuadsWithSubjectPredicate(subjIdx, predIdx)
+                .Select(EnsureApiTriple)
+            : [];
+    /// <inheritdoc />
+    public IEnumerable<Triple> GetTriplesWithSubject(IriReference graphName, IriReference subject)
+    {
+        throw new NotImplementedException();
+    }
+    /// <inheritdoc />
+    public IEnumerable<Triple> GetTriplesWithPredicate(IriReference graphName, IriReference predicate)
+    {
+        throw new NotImplementedException();
+    }
+    /// <inheritdoc />
+    public IEnumerable<Triple> GetTriplesWithObject(IriReference graphName, IriReference obj)
+    {
+        throw new NotImplementedException();
+    }
+    /// <inheritdoc />
+    public bool ContainsTriple(IriReference graphName, Triple triple)
+    {
+        throw new NotImplementedException();
+    }
 }
