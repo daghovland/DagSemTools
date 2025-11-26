@@ -6,20 +6,32 @@
     Contact: hovlanddag@gmail.com
 */
 
+using DagSemTools.Ingress;
+using DagSemTools.Rdf;
+
 namespace DagSemTools.Api;
 
 /// <inheritdoc />
-public class RdfLiteral(Ingress.RdfLiteral rdfLiteral) : GraphElement
+public class RdfLiteral : GraphElement
 {
-    internal readonly Ingress.RdfLiteral InternalRdfLiteral = rdfLiteral;
+    internal readonly Ingress.RdfLiteral InternalRdfLiteral;
+    private readonly GraphElementManager _elementManager;
+
+    internal RdfLiteral(GraphElementManager elementManager, Ingress.RdfLiteral rdfLiteral)
+    {
+        _elementManager = elementManager;
+        InternalRdfLiteral = rdfLiteral;
+    }
+
 
     /// <summary>
     /// Creates an rdf literal of type xsd:string. This is the default type in rdf
     /// </summary>
+    /// <param name="elementManager"></param>
     /// <param name="rdfLiteral"></param>
     /// <returns></returns>
-    public static RdfLiteral StringRdfLiteral(string rdfLiteral) =>
-        new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString(rdfLiteral));
+    public static RdfLiteral StringRdfLiteral(GraphElementManager elementManager, string rdfLiteral) =>
+        new RdfLiteral(elementManager, DagSemTools.Ingress.RdfLiteral.NewLiteralString(rdfLiteral));
 
     /// <summary>
     /// Two literals are equal if their string values are equal.
@@ -36,4 +48,11 @@ public class RdfLiteral(Ingress.RdfLiteral rdfLiteral) : GraphElement
 
     /// <inheritdoc />
     public override int GetHashCode() => InternalRdfLiteral.GetHashCode();
+
+    internal override bool GetGraphElementId(out uint idx) =>
+        _elementManager.GraphElementMap.TryGetValue(
+            DagSemTools.Ingress.GraphElement.NewGraphLiteral(InternalRdfLiteral), out idx);
 }
+    
+    
+

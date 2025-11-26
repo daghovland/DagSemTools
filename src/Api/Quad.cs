@@ -16,44 +16,48 @@ namespace DagSemTools.Api;
 /// </summary>
 public class Quad
 {
-    private Triple triple;
+    private readonly Triple _triple;
+    private readonly GraphElementManager _elementManager;
 
     /// <summary>
     /// The most generic quad constructor. 
     /// </summary>
+    /// <param name="elementManager"></param>
     /// <param name="graphName"></param>
     /// <param name="subject"></param>
     /// <param name="predicate"></param>
     /// <param name="object"></param>
-    public Quad(IriReference graphName, Resource subject, IriReference predicate, GraphElement @object)
+    internal Quad(GraphElementManager elementManager, IriReference graphName, Resource subject, IriReference predicate, GraphElement @object)
     {
-        triple = new Triple(subject, predicate, @object);
+        _elementManager = elementManager;
+        _triple = new Triple(elementManager, subject, predicate, @object);
         GraphName = graphName;
     }
 
     /// <summary>
     /// Creates a triple with IRIs on all three places
     /// </summary>
-    public Quad(IriReference graphName, Triple triple)
+    internal Quad(GraphElementManager elementManager, IriReference graphName, Triple triple)
     {
-        this.triple = triple;
+        _elementManager = elementManager;
+        this._triple = triple;
         GraphName = graphName;
     }
 
     /// <summary>
     /// The subject of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-subject
     /// </summary>
-    public Resource Subject  => triple.Subject; 
+    public Resource Subject  => _triple.Subject; 
 
     /// <summary>
     /// The predicate of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-predicate
     /// </summary>
-    public IriReference Predicate => triple.Predicate;
+    public IriReference Predicate => _triple.Predicate;
 
     /// <summary>
     /// The object of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-object
     /// </summary>
-    public GraphElement Object => triple.Object;
+    public GraphElement Object => _triple.Object;
     
     /// <summary>
     /// The graph name of the quad. https://www.w3.org/TR/rdf11-datasets/#dfn-rdf-quad
