@@ -33,8 +33,8 @@ public static class TurtleParser
         var tt = DagSemTools.Turtle.Parser.Parser.ParseString(rdfString, errorOutput);
         return new Graph(tt);
     }
-    
-    
+
+
     /// <summary>
     /// Parses a Turtle stream into an RDF graph.
     /// This method does not use buffering, so is suitable for large files or non-ending streams
