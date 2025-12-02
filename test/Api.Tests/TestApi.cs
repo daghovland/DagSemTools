@@ -87,6 +87,17 @@ public class TestApi(ITestOutputHelper output)
     }
 
     [Fact]
+    public void TestStreamParsing()
+    {
+        var ontology = new FileStream("TestData/test2.ttl", FileMode.Open, FileAccess.Read);
+        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetTriplesWithObject(
+            new IriReference("http://example.com/data#property")).ToList();
+        resultsData.Should().HaveCount(1);
+        resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
+
+    }
+    [Fact]
     public void TestDatalog2()
     {
         var ontology = new FileInfo("TestData/test2.ttl");
