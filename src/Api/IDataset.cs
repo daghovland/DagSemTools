@@ -13,7 +13,7 @@ namespace DagSemTools.Api;
 /// <summary>
 /// Represents an RDF dataset. https://www.w3.org/TR/rdf11-datasets/
 /// </summary>
-public interface IDataset : IGraph
+public interface IDataset 
 {
     /// <summary>
     /// Returns the default, unnamed graph of the dataset.

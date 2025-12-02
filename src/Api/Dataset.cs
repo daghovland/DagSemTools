@@ -47,7 +47,7 @@ public class Dataset : IDataset
     /// <returns></returns>
     public bool ContainsQuad(Quad quad) 
     {
-        return (GetRdfIriGraphElementId(quad.GraphName, out var graphIdx)
+        return (GetRdfResourceGraphElementId(quad.GraphName, out var graphIdx)
                 && GetRdfIriGraphElementId(quad.Predicate, out var predIdx)
                 && GetRdfResourceGraphElementId(quad.Subject, out var subjIdx)
                 && GetRdfGraphElementId(quad.Object, out var objIdx))
@@ -170,19 +170,24 @@ public class Dataset : IDataset
     }
 
 
-    private Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
-        new(Quads.Resources, 
-            GetBlankNodeOrIriResource(triple.subject),
-            GetApiIriResource(triple.predicate).Iri,
-            GetResource(triple.obj));
+    private Quad EnsureApiQuad(DagSemTools.Rdf.Ingress.Quad quad) =>
+        new(Quads.Resources,
+            GetApiIriResource(quad.tripleId),
+            GetBlankNodeOrIriResource(quad.subject),
+            GetApiIriResource(quad.predicate).Iri,
+            GetResource(quad.obj));
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
-        (GetRdfIriGraphElementId(obj, out var objIdx)
+        DefaultGraph.GetTriplesWithPredicateObject(predicate, obj);
+    
+    public IEnumerable<Quad> GetQuadsWithPredicateObject(IriReference predicate, IriReference obj) =>
+
+    (GetRdfIriGraphElementId(obj, out var objIdx)
          && GetRdfIriGraphElementId(predicate, out var predIdx))
-            ? Quads
-                .GetTriplesWithObjectPredicate(objIdx, predIdx)
-                .Select(EnsureApiTriple)
+            ? Quads.NamedGraphs
+                .GetQuadsWithObjectPredicate(objIdx, predIdx)
+                .Select(EnsureApiQuad)
             : [];
 
 
@@ -192,7 +197,7 @@ public class Dataset : IDataset
          && GetRdfIriGraphElementId(predicate, out var predIdx))
             ? Quads
                 .GetTriplesWithSubjectPredicate(subjIdx, predIdx)
-                .Select(EnsureApiTriple)
+                .Select(Graph.EnsureApiTriple)
             : [];
 
     /// <inheritdoc />

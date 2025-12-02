@@ -27,7 +27,7 @@ public class Quad
     /// <param name="subject"></param>
     /// <param name="predicate"></param>
     /// <param name="object"></param>
-    internal Quad(GraphElementManager elementManager, IriReference graphName, Resource subject, IriReference predicate, GraphElement @object)
+    internal Quad(GraphElementManager elementManager, IriResource graphName, Resource subject, IriReference predicate, GraphElement @object)
     {
         _elementManager = elementManager;
         _triple = new Triple(elementManager, subject, predicate, @object);
@@ -37,7 +37,7 @@ public class Quad
     /// <summary>
     /// Creates a triple with IRIs on all three places
     /// </summary>
-    internal Quad(GraphElementManager elementManager, IriReference graphName, Triple triple)
+    internal Quad(GraphElementManager elementManager, IriResource graphName, Triple triple)
     {
         _elementManager = elementManager;
         this._triple = triple;
@@ -62,6 +62,6 @@ public class Quad
     /// <summary>
     /// The graph name of the quad. https://www.w3.org/TR/rdf11-datasets/#dfn-rdf-quad
     /// </summary>
-    public IriReference GraphName { get; }
+    public IriResource GraphName { get; }
 }
 

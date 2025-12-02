@@ -77,7 +77,7 @@ public class Graph : IGraph
     public bool IsEmpty() => Triples.Triples.TripleCount == 0;
 
 
-    private Resource GetBlankNodeOrIriResource(uint resourceId)
+    private static Resource GetBlankNodeOrIriResource(uint resourceId)
     {
         var resource = Triples.GetGraphNode(resourceId);
         if (!FSharpOption<RdfResource>.get_IsSome(resource))
@@ -93,7 +93,7 @@ public class Graph : IGraph
         }
     }
     
-    private IriResource GetApiIriResource(uint resourceId)
+    internal static IriResource GetApiIriResource(uint resourceId)
     {
         var resource = GetBlankNodeOrIriResource(resourceId);
         if (resource is IriResource r)
@@ -120,7 +120,7 @@ public class Graph : IGraph
     }
 
 
-    private Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
+    internal Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
         new(Triples.Resources,
             GetBlankNodeOrIriResource(triple.subject),
             GetApiIriResource(triple.predicate).Iri,
