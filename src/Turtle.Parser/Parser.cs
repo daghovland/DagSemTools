@@ -29,7 +29,7 @@ public static class Parser
     public static Datastore ParseFile(string filename, TextWriter errorOutput)
     {
         var input = CharStreams.fromPath(filename);
-        return ParseAntlrStream(input, (uint)(new FileInfo(filename).Length), new Dictionary<string, IriReference>(), errorOutput);
+        return ParseAntlrBuffered(input, (uint)(new FileInfo(filename).Length), new Dictionary<string, IriReference>(), errorOutput);
     }
 
     /// <summary>
@@ -41,7 +41,7 @@ public static class Parser
     public static Datastore ParseFile(FileInfo fInfo, TextWriter errorOutput)
     {
         var input = CharStreams.fromPath(fInfo.FullName);
-        return ParseAntlrStream(input, (uint)(fInfo.Length), new Dictionary<string, IriReference>(), errorOutput);
+        return ParseAntlrBuffered(input, (uint)(fInfo.Length), new Dictionary<string, IriReference>(), errorOutput);
     }
 
     /// <summary>
@@ -52,18 +52,19 @@ public static class Parser
     /// <param name="prefixes"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static Datastore ParseReader(TextReader textReader, UInt32 initSize,
-        Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    public static Datastore ParseReader(TextReader textReader,
+        Dictionary<string, IriReference> prefixes, TextWriter errorOutput, UInt32 initSize = 1024)
     {
         var input = CharStreams.fromTextReader(textReader);
-        return ParseAntlrStream(input, initSize, prefixes, errorOutput);
+        return ParseAntlrBuffered(input, initSize, prefixes, errorOutput);
     }
 
-    private static Datastore ParseAntlrStream(ICharStream input, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    private static Datastore ParseAntlrBuffered(ICharStream input, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
 
         var lexer = new TriGDocLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
+        lexer.TokenFactory = new CommonTokenFactory(true);
         var parser = new TriGDocParser(tokens);
         var customErrorListener = new ParserErrorListener(errorOutput);
         parser.RemoveErrorListeners();
@@ -79,6 +80,30 @@ public static class Parser
         return listener.datastore;
     }
 
+    
+    
+    private static Datastore ParseAntlrUnbuffered(Stream inputStream, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
+    {
+        var input = new UnbufferedCharStream(inputStream);
+        var lexer = new TriGDocLexer(input)
+        {
+            TokenFactory = new CommonTokenFactory(true)
+        };
+        var tokens = new UnbufferedTokenStream(lexer);
+        var parser = new TriGDocParser(tokens);
+        var customErrorListener = new ParserErrorListener(errorOutput);
+        parser.RemoveErrorListeners();
+        parser.AddErrorListener(customErrorListener);
+        IParseTree tree = parser.trigDoc();
+        ParseTreeWalker walker = new ParseTreeWalker();
+        var listener = new TurtleListener(initSize, customErrorListener);
+        walker.Walk(listener, tree);
+        if (customErrorListener.HasError)
+        {
+            throw new Exception("Syntax errors in Turtle file");
+        }
+        return listener.datastore;
+    }
     /// <summary>
     /// Parses the content of the TextReader containing RDF-1.2 Turtle.
     /// </summary>
@@ -86,21 +111,20 @@ public static class Parser
     /// <param name="initSize"></param>
     /// <param name="errorOutput"></param>
     /// <returns></returns>
-    public static Datastore ParseReader(TextReader textReader, UInt32 initSize, TextWriter errorOutput) =>
-        ParseReader(textReader, initSize, new Dictionary<string, IriReference>(), errorOutput);
+    public static Datastore ParseReader(TextReader textReader, TextWriter errorOutput, UInt32 initSize = 1024) =>
+        ParseReader(textReader, new Dictionary<string, IriReference>(), errorOutput);
 
     /// <summary>
-    /// Parses the content of the Stream containing RDF-1.2 Turtle.
+    /// Parses the content of the Stream containing RDF-1.2 Turtle without full file buffering. 
     /// Use this for large files to avoid loading the entire file into memory.
     /// </summary>
-    /// <param name="textReader"></param>
-    /// <param name="initSize"></param>
-    /// <param name="errorOutput"></param>
+    /// <param name="inputStream">The large or infinite stream of rdf</param>
+    /// <param name="initSize">The assumed number of triples, just for a start</param>
+    /// <param name="errorOutput">Where errors should be written</param>
     /// <returns></returns>
-    public static Datastore ParseStream(Stream textReader, UInt32 initSize, TextWriter errorOutput)
+    public static Datastore ParseStream(Stream inputStream, TextWriter errorOutput, UInt32 initSize = 1024)
     {
-        var input = new UnbufferedCharStream(textReader);
-        return ParseAntlrStream(input, initSize, new Dictionary<string, IriReference>(), errorOutput);
+        return ParseAntlrUnbuffered(inputStream, initSize, new Dictionary<string, IriReference>(), errorOutput);
     }
 
 
@@ -113,7 +137,7 @@ public static class Parser
     public static Datastore ParseString(string owl, TextWriter errorOutput)
     {
         using TextReader textReader = new StringReader(owl);
-        return ParseReader(textReader, (uint)owl.Length, errorOutput);
+        return ParseReader(textReader, errorOutput, (uint)owl.Length);
     }
 
 
