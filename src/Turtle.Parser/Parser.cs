@@ -61,7 +61,7 @@ public static class Parser
 
     private static Datastore ParseAntlrStream(ICharStream input, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
-        
+
         var lexer = new TriGDocLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         var parser = new TriGDocParser(tokens);
@@ -99,7 +99,7 @@ public static class Parser
     /// <returns></returns>
     public static Datastore ParseStream(Stream textReader, UInt32 initSize, TextWriter errorOutput)
     {
-        var input =  new UnbufferedCharStream(textReader);
+        var input = new UnbufferedCharStream(textReader);
         return ParseAntlrStream(input, initSize, new Dictionary<string, IriReference>(), errorOutput);
     }
 

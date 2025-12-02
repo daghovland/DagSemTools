@@ -13,6 +13,7 @@ using Microsoft.FSharp.Collections;
 using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
+
 using DagSemTools;
 
 internal class FrameVisitor : ManchesterBaseVisitor<(List<ClassAxiom>, List<Assertion>)>

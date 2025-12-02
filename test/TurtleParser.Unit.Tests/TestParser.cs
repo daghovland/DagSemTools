@@ -439,6 +439,18 @@ public class TestParser : IDisposable, IAsyncDisposable
 
         triplesWithKnows.First().obj.Should().Be(triplesWithName.First().subject);
     }
+
+
+
+    [Fact]
+    public void TestLargeFile()
+    {
+        using var stream = new FileStream("TestData/largefile.ttl", FileMode.Open, FileAccess.Read);
+        var dstore = Parser.ParseStream(stream, 1000000, _outputWriter); // Replace ParseString with ParseStream if available
+        Assert.NotNull(dstore);
+    }
+
+
     [Fact]
     public void TestAbbreviatedBlankNode()
     {

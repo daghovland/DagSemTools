@@ -12,6 +12,7 @@ using DagSemTools.Ingress;
 using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
+
 using DagSemTools;
 using System;
 using System.Collections.Generic;
