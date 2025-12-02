@@ -16,13 +16,11 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Setup .NET
-        uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '9.x'
-
+        uses: actions/setup-dotnet@v5
+        
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
@@ -40,7 +38,7 @@ jobs:
       - name: Download external test files
         run: |
           curl -o test/Api.Tests/TestData/imf.ttl http://ns.imfid.org/20240531/imf-ontology.owl.ttl &
-          curl -o test/Api.Tests/TestData/go.owl.xml http://current.geneontology.org/ontology/go.owl &
+          curl -o test/Api.Tests/TestData/go.owl.xml https://current.geneontology.org/ontology/go.owl &
           curl -o "test/Api.Tests/TestData/LIS-14.ttl" https://rds.posccaesar.org/ontology/lis14/ont/core/4.0/LIS-14.ttl &
           wait
           ./apache-jena-5.6.0/bin/riot --output=TURTLE test/Api.Tests/TestData/go.owl.xml > test/Api.Tests/TestData/go.ttl

@@ -10,6 +10,7 @@ using Antlr4.Runtime;
 using DagSemTools.Parser;
 
 namespace DagSemTools.Manchester.Parser;
+
 using System.Collections.Generic;
 using IriTools;
 using static ManchesterParser;

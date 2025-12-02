@@ -12,6 +12,7 @@ using Microsoft.FSharp.Collections;
 using DagSemTools.OwlOntology;
 
 namespace DagSemTools.Manchester.Parser;
+
 using DagSemTools;
 
 internal class ObjectPropertyAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<IriReference, OwlOntology.Assertion>>>

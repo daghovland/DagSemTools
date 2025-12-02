@@ -23,17 +23,17 @@
     </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="FluentAssertions" Version="8.7.1" />
+    <PackageReference Include="FluentAssertions" Version="7.2.0" />
     <PackageReference Include="FSharp.Core" Version="9.0.303" />
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.28" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.12.0" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="18.0.2" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
     <PackageReference Include="Serilog" Version="4.3.0" />
-    <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
+    <PackageReference Include="Serilog.Sinks.Console" Version="6.1.1" />
     <PackageReference Include="Serilog.Sinks.InMemory" Version="2.0.0" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="Antlr4.Runtime.Standard" Version="4.13.1" />
-    <PackageReference Include="Antlr4BuildTasks" Version="12.10.0" />
-    <PackageReference Include="IriTools" Version="2.2.0" />
+    <PackageReference Include="Antlr4BuildTasks" Version="12.11.0" />
+    <PackageReference Include="IriTools" Version="2.3.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.5">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>

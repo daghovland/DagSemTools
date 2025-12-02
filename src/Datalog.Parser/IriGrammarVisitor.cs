@@ -10,6 +10,7 @@ using Microsoft.FSharp.Collections;
 using DagSemTools.Ingress;
 
 namespace DagSemTools.Datalog.Parser;
+
 using System.Collections.Generic;
 using IriTools;
 using static DatalogParser;
