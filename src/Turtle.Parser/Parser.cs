@@ -80,8 +80,8 @@ public static class Parser
         return listener.datastore;
     }
 
-    
-    
+
+
     private static Datastore ParseAntlrUnbuffered(Stream inputStream, UInt32 initSize, Dictionary<string, IriReference> prefixes, TextWriter errorOutput)
     {
         var input = new UnbufferedCharStream(inputStream);

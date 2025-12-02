@@ -446,7 +446,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     public void TestParseStream()
     {
         using var stream = new FileStream("TestData/example1.ttl", FileMode.Open, FileAccess.Read);
-        var dstore = Parser.ParseStream(stream, _outputWriter); 
+        var dstore = Parser.ParseStream(stream, _outputWriter);
         Assert.NotNull(dstore);
     }
 
