@@ -1,3 +1,14 @@
+/*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*/
+
+using DagSemTools.Ingress;
+using DagSemTools.Rdf;
+
 namespace DagSemTools.Api;
 
 using IriTools;
@@ -7,14 +18,16 @@ using IriTools;
 /// </summary>
 public class IriResource : Resource
 {
+    private GraphElementManager _elementManager;
     /// <summary>
     /// The IRI that identifies the resource.
     /// </summary>
     public IriReference Iri { get; }
 
     /// <inheritdoc />
-    public IriResource(IriReference iri)
+    internal IriResource(GraphElementManager elementManager, IriReference iri)
     {
+        _elementManager = elementManager;
         Iri = iri ?? throw new ArgumentNullException(nameof(iri));
     }
 
@@ -47,4 +60,8 @@ public class IriResource : Resource
     {
         return Iri.GetHashCode();
     }
+    internal override bool GetGraphElementId(out uint idx) =>
+        _elementManager.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(Iri)),
+            out idx);
+
 }

@@ -1,0 +1,4 @@
+prefix ex: <https://example.com/data#>
+
+
+ex:graph { ex:subject ex:predicate ex:object.}

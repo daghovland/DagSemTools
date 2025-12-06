@@ -49,6 +49,7 @@ type QuadTable(quadList: Quad array,
     member internal this.GetQuadListEntry (index: QuadListIndex) : Quad =
         this.QuadList.[int index]
     
+
     
     member internal this.AddTripleIdIndex (id: GraphElementId, tripleIndex: QuadListIndex) =
         if this.TripleIdIndex.ContainsKey id then
@@ -99,6 +100,9 @@ type QuadTable(quadList: Quad array,
                 this.FourKeysIndex.Add(quad, this.QuadCount) |> ignore
                 this.QuadCount <- nextQuadCount
                 ()
+            
+        member internal this.Contains(q : Quad) =
+            this.FourKeysIndex.ContainsKey q
             
         member internal this.GetQuadsWithSubject (subject: GraphElementId) : Quad seq =
             match this.SubjectPredicateIndex.TryGetValue subject with  

@@ -109,8 +109,8 @@ public class TestApiOntology
         var axioms = ont.GetAxioms().ToList();
         axioms.Should().NotBeEmpty();
         _inMemorySink.LogEvents.Should().HaveCount(0);
-        var calculatedTriple = new Triple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-        var notCalculatedTriple = new Triple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var calculatedTriple = new Triple(rdf.Datastore.Resources, new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(rdf.Datastore.Resources,new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
 
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
@@ -235,7 +235,7 @@ public class TestApiOntology
         var xTypes = alc.Match(
             Right: r => [],
             Left: t => t
-                .GetTypes(new("http://example.org/x"))
+                .GetTypes(rdf.Datastore.Resources, new("http://example.org/x"))
                 .ToList()
         );
         xTypes.Should().NotBeEmpty();
@@ -261,7 +261,7 @@ public class TestApiOntology
         var reasoner = alc.Match(
             Right: r => [],
             Left: t => t
-                .GetTypes(" http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
+                .GetTypes(rdfImf.Datastore.Resources," http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
                 .ToList()
         );
         reasoner.Should().NotBeEmpty();
@@ -296,7 +296,7 @@ public class TestApiOntology
         var reasoner = alc.Match(
             Right: r => [],
             Left: t => t
-                .GetTypes(" http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
+                .GetTypes(rdf.Datastore.Resources," http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
                 .ToList()
         );
         reasoner.Should().NotBeEmpty();

@@ -1,4 +1,12 @@
-﻿using DagSemTools.Datalog;
+﻿/*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*/
+
+using DagSemTools.Datalog;
 using IriTools;
 using DagSemTools.Rdf;
 using Microsoft.FSharp.Collections;
@@ -29,52 +37,16 @@ public class Graph : IGraph
 
     /// <inheritdoc />
     public bool ContainsTriple(Triple apiTriple) =>
-        TryGetRdfTriple(apiTriple, out var rdfTriple)
+        apiTriple.TryGetRdfTriple(apiTriple, out var rdfTriple)
          && Triples
              .ContainsTriple(rdfTriple);
 
-    private bool GetRdfIriGraphElementId(IriReference subject, out uint subjIdx) =>
+    internal bool GetRdfIriGraphElementId(IriReference subject, out uint subjIdx) =>
         Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)),
             out subjIdx);
 
-    private bool GetRdfLiteralGraphElementId(RdfLiteral literal, out uint subjIdx) =>
-        Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewGraphLiteral(literal.InternalRdfLiteral), out subjIdx);
-
-    private bool GetRdfResourceGraphElementId(Resource resource, out uint idx) =>
-        resource switch
-        {
-            BlankNodeResource blankNodeResource => throw new NotImplementedException(),
-            IriResource iriResource => GetRdfIriGraphElementId(iriResource.Iri, out idx),
-            _ => throw new Exception($"Unknown resource type: {resource.GetType().FullName}"),
-        };
-    private bool GetRdfGraphElementId(GraphElement gel, out uint idx) =>
-        gel switch
-        {
-            Resource resource => GetRdfResourceGraphElementId(resource, out idx),
-            RdfLiteral literal => GetRdfLiteralGraphElementId(literal, out idx),
-            _ => throw new Exception($"Unknown resource type: {gel.GetType().FullName}"),
-        };
-    internal bool TryGetRdfTriple(Triple apiTriple, out Rdf.Ingress.Triple rdfTriple)
-    {
-        if (GetRdfResourceGraphElementId(apiTriple.Subject, out var subjIdx) &&
-            GetRdfIriGraphElementId(apiTriple.Predicate, out var predIdx) &&
-            GetRdfGraphElementId(apiTriple.Object, out var objIdx))
-        {
-            rdfTriple = new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx);
-            return true;
-        }
-
-        rdfTriple = default;
-        return false;
-    }
-
-    internal Rdf.Ingress.Triple EnsureRdfTriple(Triple apiTriple) =>
-        (GetRdfResourceGraphElementId(apiTriple.Subject, out var subjIdx) &&
-            GetRdfIriGraphElementId(apiTriple.Predicate, out var predIdx) &&
-            GetRdfGraphElementId(apiTriple.Object, out var objIdx)) ?
-        new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx) :
-        throw new Exception($"BUG: Something went wrong when translating {apiTriple}");
-
+    
+    
     /// <inheritDoc />
     public void LoadDatalog(FileInfo datalog)
     {
@@ -105,7 +77,7 @@ public class Graph : IGraph
     public bool IsEmpty() => Triples.Triples.TripleCount == 0;
 
 
-    private Resource GetBlankNodeOrIriResource(uint resourceId)
+    private static Resource GetBlankNodeOrIriResource(uint resourceId)
     {
         var resource = Triples.GetGraphNode(resourceId);
         if (!FSharpOption<RdfResource>.get_IsSome(resource))
@@ -114,15 +86,14 @@ public class Graph : IGraph
         switch (resource.Value)
         {
             case { IsIri: true } r:
-                return new IriResource(new IriReference(r.iri));
+                return new IriResource(Triples.Resources, new IriReference(r.iri));
             case { IsAnonymousBlankNode: true } r:
                 return new BlankNodeResource($"{r.anon_blankNode}");
             default: throw new Exception($"BUG: Resource {resource.ToString()} is a resource but not an Iri or a blank node");
         }
     }
-
-
-    private IriResource GetApiIriResource(uint resourceId)
+    
+    internal static IriResource GetApiIriResource(uint resourceId)
     {
         var resource = GetBlankNodeOrIriResource(resourceId);
         if (resource is IriResource r)
@@ -137,7 +108,7 @@ public class Graph : IGraph
         {
             var r = resource.resource;
             if (r.IsIri)
-                return new IriResource(new IriReference(r.iri));
+                return new IriResource(Triples.Resources, new IriReference(r.iri));
             if (r.IsAnonymousBlankNode)
                 return new BlankNodeResource($"{r.anon_blankNode}");
             throw new Exception("BUG: Resource that is neither Iri nor Blank Node !!");
@@ -145,12 +116,13 @@ public class Graph : IGraph
 
         if (!resource.IsGraphLiteral) throw new Exception("BUG: Resource that is neither resource or literal!!");
         var lit = resource.literal;
-        return new RdfLiteral(lit);
+        return new RdfLiteral(Triples.Resources, lit);
     }
 
 
-    private Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
-        new(GetBlankNodeOrIriResource(triple.subject),
+    internal Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
+        new(Triples.Resources,
+            GetBlankNodeOrIriResource(triple.subject),
             GetApiIriResource(triple.predicate).Iri,
             GetResource(triple.obj));
 
