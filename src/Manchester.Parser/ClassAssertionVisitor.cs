@@ -10,6 +10,7 @@ using DagSemTools.OwlOntology;
 using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Manchester.Parser;
+
 using DagSemTools;
 
 internal class ClassAssertionVisitor : ManchesterBaseVisitor<IEnumerable<Func<OwlOntology.ClassExpression, ClassAxiom>>>

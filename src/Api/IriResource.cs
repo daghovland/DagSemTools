@@ -10,6 +10,7 @@ using DagSemTools.Ingress;
 using DagSemTools.Rdf;
 
 namespace DagSemTools.Api;
+
 using IriTools;
 
 /// <summary>

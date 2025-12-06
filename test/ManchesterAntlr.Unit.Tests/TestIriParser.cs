@@ -11,6 +11,7 @@ using TestUtils;
 using Xunit.Abstractions;
 
 namespace DagSemTools.Manchester.Parser.Unit.Tests;
+
 using Antlr4;
 using Antlr4.Runtime;
 using Antlr4.Runtime.Tree;

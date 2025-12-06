@@ -10,6 +10,7 @@ using Serilog.Sinks.InMemory;
 using Xunit.Abstractions;
 
 namespace Api.Tests;
+
 using DagSemTools.Api;
 
 public class TestApiOntology
