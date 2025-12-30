@@ -112,7 +112,7 @@ public class TestApi(ITestOutputHelper output)
     [Fact]
     public void TestStreamParsing()
     {
-        var ontology = new FileStream("TestData/test2.ttl", FileMode.Open, FileAccess.Read);
+        var ontology = new FileInfo("TestData/test2.ttl");
         var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
         var resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#property")).ToList();
@@ -145,7 +145,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestDatalogStratified()
     {
         var ontology = new FileInfo("TestData/test_stratified.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
         var resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#Type")).ToList();
         resultsData.Should().HaveCount(1);

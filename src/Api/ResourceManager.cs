@@ -17,7 +17,6 @@ internal class ResourceManager(GraphElementManager ElementManager)
     /// <summary>
     /// Creates a triple with IRIs on all three places
     /// </summary>
-    /// <param name="elementManager"></param>
     /// <param name="subject"></param>
     /// <param name="predicate"></param>
     /// <param name="object"></param>

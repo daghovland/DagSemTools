@@ -52,7 +52,6 @@ public class TableauReasoner
     /// <summary>
     /// Get iris of all types of the individual
     /// </summary>
-    /// <param name="elementManager"></param>
     /// <param name="individual"></param>
     /// <returns></returns>
     public IEnumerable<IriResource> GetTypes(IriReference individual) =>
