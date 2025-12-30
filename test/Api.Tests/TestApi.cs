@@ -80,18 +80,18 @@ public class TestApi(ITestOutputHelper output)
     {
         var ontology = new FileInfo("TestData/namedgraph.trig");
         var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
-        var resultsData = ont. GetQTriplesWithPredicateObject(
+        var resultsData = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object"));
         resultsData.Should().HaveCount(1);
-        var resultsBefore = ont.GetTriplesWithPredicateObject(
+        var resultsBefore = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsBefore.Should().BeEmpty();
         Assert.NotNull(ont);
         var datalogFile = new FileInfo("TestData/namedgraph.datalog");
         ont.LoadDatalog(datalogFile);
-        var resultsAfter = ont.GetTriplesWithPredicateObject(
+        var resultsAfter = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsAfter.Should().HaveCount(1);
@@ -101,8 +101,8 @@ public class TestApi(ITestOutputHelper output)
     public void TestA()
     {
         var ontology = new FileInfo("TestData/test2.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetTriplesWithObject(
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
@@ -425,13 +425,13 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["name"];
-        var expected = new RdfLiteral(graph.Datastore.Resources,DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
-        actual.Should().Be(expected);
+        actual.Should().BeOfType<RdfLiteral>();
+        actual.ToString().Should().Be("John Doe");
     }
-    private IGraph ParseTurtleData(string data)
+    private IDataset ParseTurtleData(string data)
     {
         var writer = new StringWriter();
-        var graph = TurtleParser.Parse(data, writer);
+        var graph = TriGParser.Parse(data, writer);
         if (!string.IsNullOrEmpty(writer.ToString()))
         {
             output.WriteLine("Parser warnings/errors:");
