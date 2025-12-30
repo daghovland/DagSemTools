@@ -23,15 +23,17 @@ namespace DagSemTools.Api;
 public class Graph : IGraph
 {
     private ILogger _logger;
-    internal Graph(Datastore triples, ILogger? logger = null)
+    internal Graph(TripleTable triples, GraphElementManager _elementManager, ILogger? logger = null)
     {
         Triples = triples;
+        ElementManager = _elementManager;
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
     }
 
-    private Datastore Triples { get; init; }
+    private GraphElementManager ElementManager { get; init; }
+    private TripleTable Triples { get; init; }
 
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
 
@@ -39,10 +41,10 @@ public class Graph : IGraph
     public bool ContainsTriple(Triple apiTriple) =>
         apiTriple.TryGetRdfTriple(apiTriple, out var rdfTriple)
          && Triples
-             .ContainsTriple(rdfTriple);
+             .Contains(rdfTriple);
 
     internal bool GetRdfIriGraphElementId(IriReference subject, out uint subjIdx) =>
-        Triples.Resources.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)),
+        ElementManager.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)),
             out subjIdx);
 
     

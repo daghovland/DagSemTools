@@ -20,10 +20,11 @@ public interface IDataset
     /// </summary>
     /// <returns></returns>
   public IGraph GetDefaultGraph();
-/// <summary>
-/// Returns the merged triples of all graphs in the dataset.
-/// </summary>
-/// <returns></returns>
+    /// <summary>
+    /// Returns the merged triples of all graphs in the dataset.
+    /// Since blank nodes are scoped by graph, this operation will change the blank node names
+    /// </summary>
+    /// <returns>The RDF graph consisting of all triples in all the graphs in the dataset</returns>
     public IGraph GetMergedTriples();
     /// <summary>
     /// Returns all named graphs in the dataset as a dictionary where the key is the IRI of the graph and the value is the graph itself.

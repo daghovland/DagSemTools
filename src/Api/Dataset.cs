@@ -18,7 +18,7 @@ using Serilog;
 namespace DagSemTools.Api;
 
 /// <summary>
-/// Implementation of a rdf graph. 
+/// Implementation of an rdf dataset. 
 /// </summary>
 public class Dataset : IDataset
 {
