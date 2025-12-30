@@ -54,14 +54,9 @@ type Datastore(triples: TripleTable,
     member this.AddNodeResource (resource: RdfResource) : GraphElementId =
         this.Resources.AddNodeResource resource
     
-    member this.GetGraphElement (resourceId: GraphElementId) : GraphElement =
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, this.Resources.ResourceCount);
-        this.Resources.GetGraphElement(resourceId)
+
         
-    member this.GetGraphNode (resourceId: GraphElementId) : RdfResource option =
-        match this.GetGraphElement(resourceId) with
-        | NodeOrEdge node -> Some node
-        | GraphLiteral _ -> None
+
         
     member this.GetGraphElementId (resource : GraphElement) =
         this.Resources.GraphElementMap.[resource]
@@ -80,33 +75,33 @@ type Datastore(triples: TripleTable,
     member this.GetTriplesWithSubject (subject: GraphElementId) : Triple seq =
         this.Triples.GetTriplesWithSubject subject
     member this.GetTriplesWithSubject (graphid: GraphElementId, subject: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdSubject (graphid, subject)
+        this.NamedGraphs.GetTriplesWithIdSubject (graphid, subject)
     
     member this.GetTriplesWithObject (object: GraphElementId) : Triple seq =
         this.Triples.GetTriplesWithObject object
     member this.GetTriplesWithObject (graphid: GraphElementId, object: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdObject (graphid, object)
+        this.NamedGraphs.GetTriplesWithIdObject (graphid, object)
     member this.GetTriplesWithPredicate (predicate: GraphElementId) : Triple seq =
         this.Triples.GetTriplesWithPredicate predicate
     
     member this.GetTriplesWithPredicate (graphid: GraphElementId, predicate: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdPredicate (graphid, predicate)
+        this.NamedGraphs.GetTriplesWithIdPredicate (graphid, predicate)
     
     member this.GetTriplesWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
         this.Triples.GetTriplesWithSubjectPredicate (subject, predicate)
     
     member this.GetTriplesWithSubjectPredicate (graphId : GraphElementId, subject: GraphElementId, predicate: GraphElementId) =
-        this.NamedGraphs.GetQuadsWithIdSubjectPredicate(graphId, subject, predicate)
+        this.NamedGraphs.GetTriplesWithIdSubjectPredicate(graphId, subject, predicate)
     member this.GetTriplesWithObjectPredicate (object: GraphElementId, predicate: GraphElementId) =
         this.Triples.GetTriplesWithObjectPredicate (object, predicate)
     member this.GetTriplesWithObjectPredicate (graphId : GraphElementId, object: GraphElementId, predicate: GraphElementId) =
-        this.NamedGraphs.GetQuadsWithIdObjectPredicate(graphId, object, predicate)
+        this.NamedGraphs.GetTriplesWithIdObjectPredicate(graphId, object, predicate)
     
         
     member this.GetTriplesWithSubjectObject (subject: GraphElementId, object: GraphElementId)  =
         this.Triples.GetTriplesWithSubjectObject (subject, object)
     member this.GetTriplesWithSubjectObject (graphId: GraphElementId, subject: GraphElementId, object: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdSubjectPredicate (graphId, subject, object)
+        this.NamedGraphs.GetTriplesWithIdSubjectPredicate (graphId, subject, object)
         
     member this.ContainsTriple triple  =
             this.Triples.Contains triple

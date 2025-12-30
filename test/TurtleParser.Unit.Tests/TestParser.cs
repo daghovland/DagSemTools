@@ -90,7 +90,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         Assert.NotNull(ont);
         ont.Triples.TripleCount.Should().Be(1);
         var subjectId = ont.Triples.GetTriples().First().subject;
-        var subject = ont.GetGraphElement(subjectId);
+        var subject = ont.Resources.GetGraphElement(subjectId);
         subject.Should().Be(GraphElement.NewNodeOrEdge(RdfResource.NewIri("http://one.example/subject2")));
     }
 
@@ -477,13 +477,13 @@ public class TestParser : IDisposable, IAsyncDisposable
 
         var eve = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Eve")));
+            .Where(tr => ont.Resources.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Eve")));
         eve.Should().HaveCount(1);
 
 
         var alice = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
+            .Where(tr => ont.Resources.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
         alice.Should().HaveCount(1);
 
 
@@ -515,7 +515,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """, _outputWriter);
         var alice = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
+            .Where(tr => ont.Resources.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
         alice.Should().HaveCount(1);
 
     }

@@ -5,7 +5,7 @@ namespace DagSemTools.Api;
 using DagSemTools.Turtle.Parser;
 
 /// <summary>
-/// Parses a Turtle file into an RDF Dataset. https://www.w3.org/TR/rdf12-turtle/
+/// Parses a Trig or Turtle file into an RDF Dataset. https://www.w3.org/TR/rdf12-turtle/
 /// </summary>
 public static class TriGParser
 {

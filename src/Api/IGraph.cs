@@ -29,6 +29,13 @@ public interface IGraph
     /// <param name="obj"></param>
     /// <returns></returns>
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj);
+    
+    /// <summary>
+    /// Factory method for creating an owl ontology.
+    /// </summary>
+    /// <returns></returns>
+    public OwlOntology ParseToOntology();
+
     /// <summary>
     /// Returns an enumerator over all triples in the graph that have the given subject and predicate.
     /// Similar to the sparql query "SELECT * WHERE { subject predicate ?o }".
@@ -68,50 +75,5 @@ public interface IGraph
     public bool ContainsTriple(Triple triple);
 
 
-    /// <summary>
-    /// Answers a SPARQL SELECT query
-    /// </summary>
-    /// <param name="query"></param>
-    /// <returns>An enumerable of solutions. Each solution is a dictionary of the bindings</returns>
-    public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query);
-
-
-    /// <summary>
-    /// Loads and runs datalog rules from the file
-    /// Note that this adds new triples to the datastore
-    /// </summary>
-    /// <param name="datalog">The file with the datalog program</param>
-    /// <exception cref="InvalidOperationException"></exception>
-    public void LoadDatalog(FileInfo datalog);
-
-    /// <summary>
-    /// Loads and runs datalog rules from the file
-    /// The rules are added to (not replacing) the existing rules
-    /// Note that this adds new triples to the datastore (materialises)
-    /// </summary>
-    /// <param name="newRules">The new rules to be added</param>
-    public void LoadDatalog(IEnumerable<Rule> newRules);
-
-    /// <summary>
-    /// Enables OWL 2 RL Reasoning
-    /// https://www.w3.org/TR/owl2-profiles/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules
-    /// Note that this adds new triples to the datastore
-    /// </summary>
-    public void EnableOwlReasoning();
-
-    /// <summary>
-    /// Experimental: Enables owl:sameAs reasoning 
-    /// https://www.w3.org/TR/owl2-profiles/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules
-    /// Note that this adds new triples to the datastore
-    /// Also it limits the reasoners functionality on negation, since very few programs are stratifiable after these axioms are added
-    /// </summary>
-    public void EnableEqualityReasoning();
-
-
-    /// <summary>
-    /// Gives access to the underlying F# Datastore structure
-    /// This is not stable, and only provided for exceptional cases
-    /// </summary>
-    public Datastore Datastore { get; }
 
 }

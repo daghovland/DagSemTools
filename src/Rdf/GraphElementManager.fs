@@ -30,7 +30,11 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
         | Some (Iri i) -> Some i
         | _ -> None
     
-    
+    member this.GetGraphNode (resourceId: GraphElementId) : RdfResource option =
+        match this.GetGraphElement(resourceId) with
+        | NodeOrEdge node -> Some node
+        | GraphLiteral _ -> None
+        
     (* This should be called wheneer the context or file or RDF dataset that is loaded changes. Then blank node names will not overlap *)
     member this.ResetBlankNodesMap() =
         anonResourceMap <- Map.empty

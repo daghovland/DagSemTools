@@ -84,7 +84,6 @@ public class Triple
             new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx) :
             throw new Exception($"BUG: Something went wrong when translating {apiTriple}");
 
-
-
+    
 }
 

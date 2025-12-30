@@ -23,27 +23,22 @@ namespace DagSemTools.Api;
 public class OwlOntology
 {
     private readonly OntologyDocument _owlOntology;
-    private readonly Datastore _datastore;
+    private readonly GraphElementManager _elementManager;
+    private readonly TripleTable _tripleTable;
     private readonly ILogger _logger;
 
-    private OwlOntology(IGraph graph, ILogger? logger = null)
+    internal OwlOntology(TripleTable tripleTable, GraphElementManager elementManager, ILogger? logger = null)
     {
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
-        _datastore = graph.Datastore;
-        var translator = new Rdf2Owl(_datastore.Triples, _datastore.Resources, _logger);
+        _elementManager = elementManager;
+        _tripleTable = tripleTable;
+        var translator = new Rdf2Owl(_tripleTable, _elementManager, _logger);
         _owlOntology = translator.extractOntology;
     }
 
-    /// <summary>
-    /// Factory method for creating an owl ontology.
-    /// </summary>
-    /// <param name="graph"></param>
-    /// <param name="logger"></param>
-    /// <returns></returns>
-    public static OwlOntology Create(IGraph graph, ILogger? logger = null) =>
-        new(graph, logger);
+
 
     /// <summary>
     /// Returns all the axioms of the ontology. 
@@ -76,5 +71,5 @@ public class OwlOntology
     /// </summary>
     /// <returns></returns>
     public IEnumerable<Rule> GetAxiomRules() =>
-        OWL2RL2Datalog.Library.owl2Datalog(_logger, _datastore.Resources, _owlOntology.Ontology);
+        OWL2RL2Datalog.Library.owl2Datalog(_logger, _elementManager, _owlOntology.Ontology);
 }

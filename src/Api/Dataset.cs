@@ -26,13 +26,15 @@ public class Dataset : IDataset
     internal Dataset(Datastore quads, ILogger? logger = null)
     {
         Quads = quads;
+        Resources = new(quads.Resources);
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
-        DefaultGraph = new Graph(quads, logger);
+        DefaultGraph = new Graph(quads.Triples, quads.Resources, logger);
     }
 
     private Datastore Quads { get; init; }
+    private ResourceManager Resources { get; init;}
     private IGraph DefaultGraph { get; init; }
 
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
@@ -111,7 +113,7 @@ public class Dataset : IDataset
         var results = QueryProcessor.Answer(Quads, parsedQuery.Item1);
         return results
             .Map(r =>
-                r.ToDictionary(kv => kv.Key, kv => GetResource(kv.Value)))
+                r.ToDictionary(kv => kv.Key, kv => Resources.GetResource(kv.Value)))
             .ToList();
     }
 
@@ -126,69 +128,25 @@ public class Dataset : IDataset
     public bool IsEmpty() => Quads.Triples.TripleCount == 0;
 
 
-    private Resource GetBlankNodeOrIriResource(uint resourceId)
-    {
-        var resource = Quads.GetGraphNode(resourceId);
-        if (!FSharpOption<RdfResource>.get_IsSome(resource))
-            throw new ArgumentException($"Resource {resource} is not an Iri or a blank node"); ;
-
-        switch (resource.Value)
-        {
-            case { IsIri: true } r:
-                return new IriResource(Quads.Resources, new IriReference(r.iri));
-            case { IsAnonymousBlankNode: true } r:
-                return new BlankNodeResource($"{r.anon_blankNode}");
-            default: throw new Exception($"BUG: Resource {resource.ToString()} is a resource but not an Iri or a blank node");
-        }
-    }
-
-
-    private IriResource GetApiIriResource(uint resourceId)
-    {
-        var resource = GetBlankNodeOrIriResource(resourceId);
-        if (resource is IriResource r)
-            return r;
-        throw new ArgumentException($"Resource {resource.ToString()} is not an Iri");
-    }
-
-    private GraphElement GetResource(uint resourceId)
-    {
-        var resource = Quads.GetGraphElement(resourceId);
-        if (resource.IsNodeOrEdge)
-        {
-            var r = resource.resource;
-            if (r.IsIri)
-                return new IriResource(Quads.Resources, new IriReference(r.iri));
-            if (r.IsAnonymousBlankNode)
-                return new BlankNodeResource($"{r.anon_blankNode}");
-            throw new Exception("BUG: Resource that is neither Iri nor Blank Node !!");
-        }
-
-        if (!resource.IsGraphLiteral) throw new Exception("BUG: Resource that is neither resource or literal!!");
-        var lit = resource.literal;
-        return new RdfLiteral(Quads.Resources, lit);
-    }
-
-
-    private Quad EnsureApiQuad(DagSemTools.Rdf.Ingress.Quad quad) =>
-        new(Quads.Resources,
-            GetApiIriResource(quad.tripleId),
-            GetBlankNodeOrIriResource(quad.subject),
-            GetApiIriResource(quad.predicate).Iri,
-            GetResource(quad.obj));
-
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
         DefaultGraph.GetTriplesWithPredicateObject(predicate, obj);
     
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="predicate"></param>
+    /// <param name="obj"></param>
+    /// <returns></returns>
     public IEnumerable<Quad> GetQuadsWithPredicateObject(IriReference predicate, IriReference obj) =>
 
     (GetRdfIriGraphElementId(obj, out var objIdx)
          && GetRdfIriGraphElementId(predicate, out var predIdx))
             ? Quads.NamedGraphs
                 .GetQuadsWithObjectPredicate(objIdx, predIdx)
-                .Select(EnsureApiQuad)
+                .Select(Resources.EnsureApiQuad)
             : [];
+
 
 
     /// <inheritdoc />
@@ -197,7 +155,7 @@ public class Dataset : IDataset
          && GetRdfIriGraphElementId(predicate, out var predIdx))
             ? Quads
                 .GetTriplesWithSubjectPredicate(subjIdx, predIdx)
-                .Select(Graph.EnsureApiTriple)
+                .Select(Resources.EnsureApiTriple)
             : [];
 
     /// <inheritdoc />
@@ -205,7 +163,7 @@ public class Dataset : IDataset
         (GetRdfIriGraphElementId(subject, out var subjIdx))
             ? Quads
                 .GetTriplesWithSubject(subjIdx)
-                .Select(EnsureApiTriple)
+                .Select(Resources.EnsureApiTriple)
             : [];
 
     /// <inheritdoc />
@@ -213,7 +171,7 @@ public class Dataset : IDataset
         (GetRdfIriGraphElementId(predicate, out var predIdx))
             ? Quads
                 .GetTriplesWithPredicate(predIdx)
-                .Select(EnsureApiTriple)
+                .Select(Resources.EnsureApiTriple)
             : [];
 
     /// <inheritdoc />
@@ -221,22 +179,8 @@ public class Dataset : IDataset
         (GetRdfIriGraphElementId(@object, out var objIdx))
             ? Quads
                 .GetTriplesWithObject(objIdx)
-                .Select(EnsureApiTriple)
+                .Select(Resources.EnsureApiTriple)
             : [];
-
-    /// <inheritdoc />
-    public void EnableOwlReasoning()
-    {
-        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Quads.Triples, Quads.Resources, _logger).extractOntology;
-        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Quads.Resources, ontology.Ontology);
-        LoadDatalog(ontologyRules);
-    }
-    /// <inheritdoc />
-    public void EnableEqualityReasoning() =>
-        LoadDatalog(OWL2RL2Datalog.Equality.GetEqualityAxioms(Quads.Resources));
-
-
-    Datastore IGraph.Datastore => Quads;
 
 
     /// <inheritdoc />
@@ -262,14 +206,16 @@ public class Dataset : IDataset
     {
         throw new NotImplementedException();
     }
+
+    
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference graphName, IriReference subject, IriReference predicate) =>
         (GetRdfIriGraphElementId(subject, out var subjIdx)
          && GetRdfIriGraphElementId(predicate, out var predIdx)
         && GetRdfIriGraphElementId(graphName, out var graphIdx))
             ? Quads.NamedGraphs
-                . GetQuadsWithSubjectPredicate(subjIdx, predIdx)
-                .Select(EnsureApiTriple)
+                . GetTriplesWithIdSubjectPredicate(graphIdx, subjIdx, predIdx)
+                .Select(Resources.EnsureApiTriple)
             : [];
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubject(IriReference graphName, IriReference subject)
@@ -291,4 +237,19 @@ public class Dataset : IDataset
     {
         throw new NotImplementedException();
     }
+    
+    // TODO FIND BETTER API DESIGN FOR THIS
+    /// <inheritdoc />
+    public void EnableOwlReasoning()
+    {
+        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Quads.Triples, Quads.Resources, _logger).extractOntology;
+        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger,Quads.Resources, ontology.Ontology);
+        LoadDatalog(ontologyRules);
+    }
+    /// <inheritdoc />
+    public void EnableEqualityReasoning() =>
+        LoadDatalog(OWL2RL2Datalog.Equality.GetEqualityAxioms(Quads.Resources));
+
+
+
 }

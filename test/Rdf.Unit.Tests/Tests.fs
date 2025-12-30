@@ -24,7 +24,7 @@ let ``Can add resource to tripletable`` () =
     Assert.Equal(1u, tripleTable.Resources.ResourceCount)
     let mappedResourceId = tripleTable.GetGraphNodeId(Ingress.RdfResource.Iri(new IriReference "http://example.com"))
     Assert.Equal(0u, mappedResourceId)
-    let mappedResource = tripleTable.GetGraphElement (mappedResourceId)
+    let mappedResource = tripleTable.Resources.GetGraphElement (mappedResourceId)
     Assert.Equal(GraphElement.NodeOrEdge (RdfResource.Iri(new IriReference "http://example.com")), mappedResource)
     
 [<Fact>]
@@ -163,7 +163,7 @@ let ``Can query with subject predicate when object is literal`` () =
     let squery = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
     Assert.Equal(1, Seq.length squery)
     Assert.Equal(Triple, Seq.head squery)
-    let literal = tripleTable.GetGraphElement(objdIndex)
+    let literal = tripleTable.Resources.GetGraphElement(objdIndex)
     Assert.Equal(GraphElement.GraphLiteral(RdfLiteral.LangLiteral("object", "en")), literal)
 
 
