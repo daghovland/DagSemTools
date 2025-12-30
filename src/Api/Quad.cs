@@ -47,7 +47,7 @@ public class Quad
     /// <summary>
     /// The subject of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-subject
     /// </summary>
-    public Resource Subject  => _triple.Subject; 
+    public Resource Subject => _triple.Subject;
 
     /// <summary>
     /// The predicate of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-predicate
@@ -58,7 +58,7 @@ public class Quad
     /// The object of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-object
     /// </summary>
     public GraphElement Object => _triple.Object;
-    
+
     /// <summary>
     /// The graph name of the quad. https://www.w3.org/TR/rdf11-datasets/#dfn-rdf-quad
     /// </summary>

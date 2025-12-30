@@ -29,7 +29,7 @@ public interface IGraph
     /// <param name="obj"></param>
     /// <returns></returns>
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj);
-    
+
     /// <summary>
     /// Factory method for creating an owl ontology.
     /// </summary>

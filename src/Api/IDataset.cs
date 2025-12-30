@@ -14,13 +14,13 @@ namespace DagSemTools.Api;
 /// <summary>
 /// Represents an RDF dataset. https://www.w3.org/TR/rdf11-datasets/
 /// </summary>
-public interface IDataset 
+public interface IDataset
 {
     /// <summary>
     /// Returns the default, unnamed graph of the dataset.
     /// </summary>
     /// <returns></returns>
-  public IGraph GetDefaultGraph();
+    public IGraph GetDefaultGraph();
     /// <summary>
     /// Returns the merged triples of all graphs in the dataset.
     /// Since blank nodes are scoped by graph, this operation will change the blank node names
@@ -31,7 +31,7 @@ public interface IDataset
     /// Returns all named graphs in the dataset as a dictionary where the key is the IRI of the graph and the value is the graph itself.
     /// </summary>
     /// <returns></returns>
-  public Dictionary<IriReference, IGraph> GetNamedGraphs();
+    public Dictionary<IriReference, IGraph> GetNamedGraphs();
 
     /// <summary>
     /// Returns an enumerator over all triples in graphName that have the given predicate and object.
@@ -84,7 +84,7 @@ public interface IDataset
     /// <param name="triple"></param>
     /// <returns></returns>
     public bool ContainsTriple(IriReference graphName, Triple triple);
-    
+
     /// <summary>
     /// Answers a SPARQL SELECT query over the whole dataset
     /// </summary>
@@ -115,7 +115,7 @@ public interface IDataset
     /// Note that this adds new triples to the datastore
     /// </summary>
     public void EnableOwlReasoning();
-    
+
 
     /// <summary>
     /// Experimental: Enables owl:sameAs reasoning 

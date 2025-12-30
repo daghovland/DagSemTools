@@ -44,7 +44,7 @@ public class Triple
     internal Triple(GraphElementManager elementManager, IriReference subject, IriReference predicate, IriReference @object)
     {
         _elementManager = elementManager;
-        Subject = new IriResource( elementManager, subject);
+        Subject = new IriResource(elementManager, subject);
         Predicate = predicate;
         Object = new IriResource(elementManager, @object);
     }
@@ -63,11 +63,11 @@ public class Triple
     /// The object of the triple. https://www.w3.org/TR/rdf12-concepts/#dfn-object
     /// </summary>
     public GraphElement Object { get; }
-    
+
     internal bool TryGetRdfTriple(Triple apiTriple, out Rdf.Ingress.Triple rdfTriple)
     {
         if (apiTriple.Subject.GetGraphElementId(out var subjIdx) &&
-            apiTriple.Object.GetGraphElementId( out var objIdx))
+            apiTriple.Object.GetGraphElementId(out var objIdx))
         {
             var predIdx = _elementManager.AddNodeResource(RdfResource.NewIri(apiTriple.Predicate));
             rdfTriple = new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx);
@@ -84,6 +84,6 @@ public class Triple
             new Rdf.Ingress.Triple(subjIdx, predIdx, objIdx) :
             throw new Exception($"BUG: Something went wrong when translating {apiTriple}");
 
-    
+
 }
 

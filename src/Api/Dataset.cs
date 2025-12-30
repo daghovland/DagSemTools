@@ -34,7 +34,7 @@ public class Dataset : IDataset
     }
 
     private Datastore Quads { get; init; }
-    private ResourceManager Resources { get; init;}
+    private ResourceManager Resources { get; init; }
     private IGraph DefaultGraph { get; init; }
 
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
@@ -47,13 +47,13 @@ public class Dataset : IDataset
     /// </summary>
     /// <param name="quad"></param>
     /// <returns></returns>
-    public bool ContainsQuad(Quad quad) 
+    public bool ContainsQuad(Quad quad)
     {
         return (GetRdfResourceGraphElementId(quad.GraphName, out var graphIdx)
                 && GetRdfIriGraphElementId(quad.Predicate, out var predIdx)
                 && GetRdfResourceGraphElementId(quad.Subject, out var subjIdx)
                 && GetRdfGraphElementId(quad.Object, out var objIdx))
-            && Quads.ContainsQuad(new Rdf.Ingress.Quad (graphIdx, subjIdx, predIdx, objIdx));
+            && Quads.ContainsQuad(new Rdf.Ingress.Quad(graphIdx, subjIdx, predIdx, objIdx));
     }
 
     private bool GetRdfIriGraphElementId(IriReference subject, out uint subjIdx) =>
@@ -131,7 +131,7 @@ public class Dataset : IDataset
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj) =>
         DefaultGraph.GetTriplesWithPredicateObject(predicate, obj);
-    
+
     /// <summary>
     /// 
     /// </summary>
@@ -207,14 +207,14 @@ public class Dataset : IDataset
         throw new NotImplementedException();
     }
 
-    
+
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithSubjectPredicate(IriReference graphName, IriReference subject, IriReference predicate) =>
         (GetRdfIriGraphElementId(subject, out var subjIdx)
          && GetRdfIriGraphElementId(predicate, out var predIdx)
         && GetRdfIriGraphElementId(graphName, out var graphIdx))
             ? Quads.NamedGraphs
-                . GetTriplesWithIdSubjectPredicate(graphIdx, subjIdx, predIdx)
+                .GetTriplesWithIdSubjectPredicate(graphIdx, subjIdx, predIdx)
                 .Select(Resources.EnsureApiTriple)
             : [];
     /// <inheritdoc />
@@ -237,13 +237,13 @@ public class Dataset : IDataset
     {
         throw new NotImplementedException();
     }
-    
+
     // TODO FIND BETTER API DESIGN FOR THIS
     /// <inheritdoc />
     public void EnableOwlReasoning()
     {
         var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Quads.Triples, Quads.Resources, _logger).extractOntology;
-        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger,Quads.Resources, ontology.Ontology);
+        var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Quads.Resources, ontology.Ontology);
         LoadDatalog(ontologyRules);
     }
     /// <inheritdoc />

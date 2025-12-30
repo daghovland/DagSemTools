@@ -53,6 +53,6 @@ public class RdfLiteral : GraphElement
         _elementManager.GraphElementMap.TryGetValue(
             DagSemTools.Ingress.GraphElement.NewGraphLiteral(InternalRdfLiteral), out idx);
 }
-    
-    
+
+
 

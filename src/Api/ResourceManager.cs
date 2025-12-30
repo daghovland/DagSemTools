@@ -7,7 +7,7 @@ namespace DagSemTools.Api;
 
 internal class ResourceManager(GraphElementManager ElementManager)
 {
-    
+
     internal Resource GetBlankNodeOrIriResource(uint resourceId)
     {
         var resource = ElementManager.GetGraphNode(resourceId);
@@ -34,7 +34,7 @@ internal class ResourceManager(GraphElementManager ElementManager)
     }
     internal GraphElement GetResource(uint resourceId)
     {
-        var resource =ElementManager.GetGraphElement(resourceId);
+        var resource = ElementManager.GetGraphElement(resourceId);
         if (resource.IsNodeOrEdge)
         {
             var r = resource.resource;
@@ -50,7 +50,7 @@ internal class ResourceManager(GraphElementManager ElementManager)
         return new RdfLiteral(ElementManager, lit);
     }
 
-       
+
     internal Triple EnsureApiTriple(DagSemTools.Rdf.Ingress.Triple triple) =>
         new(ElementManager,
             GetBlankNodeOrIriResource(triple.subject),

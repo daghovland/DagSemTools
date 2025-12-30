@@ -74,7 +74,7 @@ public class TestApi(ITestOutputHelper output)
         resultsAfter.Should().HaveCount(1);
     }
 
-    
+
     [Fact]
     public void TestNamedGraphDatalogReasoning()
     {
@@ -96,7 +96,7 @@ public class TestApi(ITestOutputHelper output)
             new IriReference("https://example.com/data#object2"));
         resultsAfter.Should().HaveCount(1);
     }
-    
+
     [Fact]
     public void TestA()
     {
@@ -221,12 +221,12 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(2);
         var actual = answer["name"];
-        var expected1 = RdfLiteral.StringRdfLiteral(graph.Datastore.Resources,"Johnny Lee Outlaw");
-        var expected2 = RdfLiteral.StringRdfLiteral(graph.Datastore.Resources,"Peter Goodguy");
+        var expected1 = RdfLiteral.StringRdfLiteral(graph.Datastore.Resources, "Johnny Lee Outlaw");
+        var expected2 = RdfLiteral.StringRdfLiteral(graph.Datastore.Resources, "Peter Goodguy");
         (actual.Equals(expected1) || actual.Equals(expected2)).Should().BeTrue();
         var actualMbox = answer["mbox"];
-        var expectedMbox1 = new IriResource( graph.Datastore.Resources, new IriReference("mailto:peter@example.org"));
-        var expectedMbox2 = new IriResource(graph.Datastore.Resources,new IriReference("mailto:carol@example.org"));
+        var expectedMbox1 = new IriResource(graph.Datastore.Resources, new IriReference("mailto:peter@example.org"));
+        var expectedMbox2 = new IriResource(graph.Datastore.Resources, new IriReference("mailto:carol@example.org"));
         (actualMbox.Equals(expectedMbox1) || actualMbox.Equals(expectedMbox2)).Should().BeTrue();
 
     }
@@ -329,7 +329,7 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["v"];
-        var expected = new IriResource(graph.Datastore.Resources,new IriReference("http://example.org/ns#z"));
+        var expected = new IriResource(graph.Datastore.Resources, new IriReference("http://example.org/ns#z"));
         actual.Should().Be(expected);
     }
 
@@ -359,8 +359,8 @@ public class TestApi(ITestOutputHelper output)
         {
             answer.Count.Should().Be(2);
             var actual = answer["name"];
-            var alice = new RdfLiteral(graph.Datastore.Resources,DagSemTools.Ingress.RdfLiteral.NewLiteralString("Alice"));
-            var bob = new RdfLiteral(graph.Datastore.Resources,DagSemTools.Ingress.RdfLiteral.NewLiteralString("Bob"));
+            var alice = new RdfLiteral(graph.Datastore.Resources, DagSemTools.Ingress.RdfLiteral.NewLiteralString("Alice"));
+            var bob = new RdfLiteral(graph.Datastore.Resources, DagSemTools.Ingress.RdfLiteral.NewLiteralString("Bob"));
             (actual.Equals(alice) || actual.Equals(bob)).Should().BeTrue();
             var actualX = answer["x"];
             actualX.Should().BeOfType<BlankNodeResource>();
@@ -392,7 +392,7 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["name"];
-        var expected = new RdfLiteral(graph.Datastore.Resources,DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
+        var expected = new RdfLiteral(graph.Datastore.Resources, DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
         actual.Should().Be(expected);
     }
 

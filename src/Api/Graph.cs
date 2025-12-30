@@ -48,9 +48,9 @@ public class Graph : IGraph
         ElementManager.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)),
             out subjIdx);
 
-    
-    
-    
+
+
+
     /// <inheritdoc />
     public bool IsEmpty() => Triples.TripleCount == 0;
 
@@ -70,7 +70,7 @@ public class Graph : IGraph
             default: throw new Exception($"BUG: Resource {resource.ToString()} is a resource but not an Iri or a blank node");
         }
     }
-    
+
     internal IriResource GetApiIriResource(uint resourceId)
     {
         var resource = GetBlankNodeOrIriResource(resourceId);

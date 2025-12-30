@@ -110,7 +110,7 @@ public class TestApiOntology
         axioms.Should().NotBeEmpty();
         _inMemorySink.LogEvents.Should().HaveCount(0);
         var calculatedTriple = new Triple(rdf.Datastore.Resources, new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
-        var notCalculatedTriple = new Triple(rdf.Datastore.Resources,new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var notCalculatedTriple = new Triple(rdf.Datastore.Resources, new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
 
         // Act
         var axiomRules = ont.GetAxiomRules().ToList();
@@ -261,7 +261,7 @@ public class TestApiOntology
         var reasoner = alc.Match(
             Right: r => [],
             Left: t => t
-                .GetTypes(rdfImf.Datastore.Resources," http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
+                .GetTypes(rdfImf.Datastore.Resources, " http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
                 .ToList()
         );
         reasoner.Should().NotBeEmpty();
@@ -296,7 +296,7 @@ public class TestApiOntology
         var reasoner = alc.Match(
             Right: r => [],
             Left: t => t
-                .GetTypes(rdf.Datastore.Resources," http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
+                .GetTypes(rdf.Datastore.Resources, " http://rds.posccaesar.org/ontology/lis14/rdl/hasActivityPart")
                 .ToList()
         );
         reasoner.Should().NotBeEmpty();
