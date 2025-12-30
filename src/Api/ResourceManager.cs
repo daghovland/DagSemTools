@@ -8,6 +8,23 @@ namespace DagSemTools.Api;
 internal class ResourceManager(GraphElementManager ElementManager)
 {
 
+    internal RdfLiteral CreateRdfStringLiteral(string value) => 
+        new RdfLiteral(ElementManager, DagSemTools.Ingress.RdfLiteral.NewLiteralString(value));
+    
+    internal IriResource CreateIriResource(string value) => 
+        new IriResource(ElementManager, new IriReference(value));
+    
+    /// <summary>
+    /// Creates a triple with IRIs on all three places
+    /// </summary>
+    /// <param name="elementManager"></param>
+    /// <param name="subject"></param>
+    /// <param name="predicate"></param>
+    /// <param name="object"></param>
+    internal Triple CreateTriple(IriReference subject, IriReference predicate, IriReference @object)
+    => new(ElementManager, subject, predicate, @object);
+
+    
     internal Resource GetBlankNodeOrIriResource(uint resourceId)
     {
         var resource = ElementManager.GetGraphNode(resourceId);

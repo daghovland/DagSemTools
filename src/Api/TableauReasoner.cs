@@ -23,16 +23,18 @@ public class TableauReasoner
 {
     private readonly ILogger _logger;
     private readonly Tableau.ReasonerState _reasoningState;
-    private TableauReasoner(Tableau.ReasonerState reasonerState, ILogger? logger = null)
+    private readonly GraphElementManager _elementManager;
+    private TableauReasoner(Tableau.ReasonerState reasonerState, GraphElementManager elementManager, ILogger? logger = null)
     {
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
         _reasoningState = reasonerState;
+        _elementManager = elementManager;
     }
 
-    internal static TableauReasoner Create(Tableau.ReasonerState reasonerState, ILogger logger) =>
-        new(reasonerState, logger);
+    internal static TableauReasoner Create(Tableau.ReasonerState reasonerState, GraphElementManager elementManager, ILogger logger) =>
+        new(reasonerState, elementManager, logger);
 
     internal static Func<ALC.Concept, IriResource> GetConceptResource(GraphElementManager elementManager) =>
         (ALC.Concept concept) =>
@@ -53,8 +55,8 @@ public class TableauReasoner
     /// <param name="elementManager"></param>
     /// <param name="individual"></param>
     /// <returns></returns>
-    public IEnumerable<IriResource> GetTypes(GraphElementManager elementManager, IriReference individual) =>
+    public IEnumerable<IriResource> GetTypes(IriReference individual) =>
         SeqModule.ToList(ReasonerService
             .get_individual_types(_reasoningState, individual)
-            .Select(GetConceptResource(elementManager)));
+            .Select(GetConceptResource(_elementManager)));
 }

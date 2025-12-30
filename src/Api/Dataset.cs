@@ -35,10 +35,11 @@ public class Dataset : IDataset
 
     private Datastore Quads { get; init; }
     private ResourceManager Resources { get; init; }
+    ResourceManager IDataset.GetResourceManager() => Resources;
     private IGraph DefaultGraph { get; init; }
 
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
-
+    
     /// Checks whether the default graph contains the given triple.
     public bool ContainsTriple(Triple apiTriple) => DefaultGraph.ContainsTriple(apiTriple);
 

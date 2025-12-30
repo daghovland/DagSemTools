@@ -32,7 +32,7 @@ public class Graph : IGraph
             .WriteTo.Console()
             .CreateLogger();
     }
-    private ResourceManager Resources { get; init; }
+    internal ResourceManager Resources { get; init; }
     private GraphElementManager ElementManager { get; init; }
     private TripleTable Triples { get; init; }
 
@@ -43,6 +43,8 @@ public class Graph : IGraph
         apiTriple.TryGetRdfTriple(apiTriple, out var rdfTriple)
          && Triples
              .Contains(rdfTriple);
+
+    ResourceManager IGraph.GetResourceManager() => Resources;
 
     internal bool GetRdfIriGraphElementId(IriReference subject, out uint subjIdx) =>
         ElementManager.GraphElementMap.TryGetValue(Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(subject)),

@@ -74,6 +74,6 @@ public interface IGraph
     /// <returns></returns>
     public bool ContainsTriple(Triple triple);
 
-
+    internal ResourceManager GetResourceManager();
 
 }

@@ -125,5 +125,5 @@ public interface IDataset
     /// </summary>
     public void EnableEqualityReasoning();
 
-
+    internal ResourceManager GetResourceManager();
 }
