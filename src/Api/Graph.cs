@@ -18,7 +18,7 @@ using Serilog;
 namespace DagSemTools.Api;
 
 /// <summary>
-/// Implementation of a rdf graph. 
+/// Implementation of a rdf graph based on a TripleTable.
 /// </summary>
 public class Graph : IGraph
 {

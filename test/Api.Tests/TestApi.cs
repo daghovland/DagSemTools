@@ -48,7 +48,7 @@ public class TestApi(ITestOutputHelper output)
         mbox.Should().HaveCount(1);
 
         var eve = ont.GetDefaultGraph().GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name"))
-            .Where(tr => tr.Object.Equals(ont.GetResourceManager().CreateRdfStringLiteral( "Eve")));
+            .Where(tr => tr.Object.Equals(ont.GetResourceManager().CreateRdfStringLiteral("Eve")));
         eve.Should().HaveCount(1);
     }
 
@@ -80,18 +80,18 @@ public class TestApi(ITestOutputHelper output)
     {
         var ontology = new FileInfo("TestData/namedgraph.trig");
         var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
+        var resultsData = ont.GetNamedGraphs()["https://example.com/data#graph"].GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object"));
         resultsData.Should().HaveCount(1);
-        var resultsBefore = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
+        var resultsBefore = ont.GetNamedGraphs()["https://example.com/data#graph"].GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsBefore.Should().BeEmpty();
         Assert.NotNull(ont);
         var datalogFile = new FileInfo("TestData/namedgraph.datalog");
         ont.LoadDatalog(datalogFile);
-        var resultsAfter = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
+        var resultsAfter = ont.GetNamedGraphs()["https://example.com/data#graph"].GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsAfter.Should().HaveCount(1);

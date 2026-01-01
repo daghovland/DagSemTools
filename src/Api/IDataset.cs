@@ -31,7 +31,7 @@ public interface IDataset
     /// Returns all named graphs in the dataset as a dictionary where the key is the IRI of the graph and the value is the graph itself.
     /// </summary>
     /// <returns></returns>
-    public Dictionary<IriReference, IGraph> GetNamedGraphs();
+    public IGraph GetNamedGraph(IriReference graphName);
 
     /// <summary>
     /// Returns an enumerator over all triples in graphName that have the given predicate and object.

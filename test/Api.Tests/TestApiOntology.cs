@@ -109,7 +109,7 @@ public class TestApiOntology
         var axioms = ont.GetAxioms().ToList();
         axioms.Should().NotBeEmpty();
         _inMemorySink.LogEvents.Should().HaveCount(0);
-        var calculatedTriple = rdf.GetResourceManager().CreateTriple( new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
+        var calculatedTriple = rdf.GetResourceManager().CreateTriple(new("http://example.org/x"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
         var notCalculatedTriple = rdf.GetResourceManager().CreateTriple(new("http://example.org/notx"), new IriReference(Namespaces.RdfType), new IriReference("http://example.org/A"));
 
         // Act

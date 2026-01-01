@@ -38,8 +38,20 @@ public class Dataset : IDataset
     ResourceManager IDataset.GetResourceManager() => Resources;
     private IGraph DefaultGraph { get; init; }
 
-    private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
     
+    /// <inheritdoc />
+    public IGraph GetNamedGraph(IriReference graphName)
+    {
+        var graphNameResource = Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(graphName));
+        var graphId = Quads.Resources.GraphElementMap[graphNameResource];
+        var namedGraph = Quads.NamedGraphs.GetGraph(graphId);
+        return new Graph(namedGraph, Quads.Resources, _logger);
+    }
+    /// <inheritdoc />
+    public IGraph GetDefaultGraph() => DefaultGraph;
+    
+    private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
+
     /// Checks whether the default graph contains the given triple.
     public bool ContainsTriple(Triple apiTriple) => DefaultGraph.ContainsTriple(apiTriple);
 
@@ -184,11 +196,7 @@ public class Dataset : IDataset
             : [];
 
 
-    /// <inheritdoc />
-    public IGraph GetDefaultGraph()
-    {
-        throw new NotImplementedException();
-    }
+
 
     /// <inheritdoc />
     public IGraph GetMergedTriples()
@@ -196,11 +204,6 @@ public class Dataset : IDataset
         throw new NotImplementedException();
     }
 
-    /// <inheritdoc />
-    public Dictionary<IriReference, IGraph> GetNamedGraphs()
-    {
-        throw new NotImplementedException();
-    }
 
     /// <inheritdoc />
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference graphName, IriReference predicate, IriReference obj)

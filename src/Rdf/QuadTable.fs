@@ -120,8 +120,10 @@ type QuadTable(quadList: Quad array,
             | true, predicates -> predicates |> Seq.map (fun e -> this.GetQuadListEntry e)
             | false, _ -> []
         
-        member internal this.GetGraph (id: GraphElementId) : Quad seq =
-            this.TripleIdIndex.[id] |> Seq.map (fun e -> this.GetQuadListEntry e) 
+        member internal this.GetGraph (id: GraphElementId) : TripleTable =
+            this.TripleIdIndex.[id]
+            |> Seq.map (fun e -> this.GetQuadListEntry e)
+            |> Seq.map (fun e -> e.GetTriple)
             
         member internal this.GetQuadsWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
             this.SubjectPredicateIndex.[subject].[predicate] |> Seq.map (fun e -> this.GetQuadListEntry e)

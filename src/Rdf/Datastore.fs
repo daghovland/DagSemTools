@@ -71,7 +71,6 @@ type Datastore(triples: TripleTable,
         
     member this.GetNamedGraph (graphId : GraphElementId) : Triple seq =
         this.NamedGraphs.GetGraph graphId
-        |> Seq.map (fun quad -> quad.GetTriple )
     member this.GetTriplesWithSubject (subject: GraphElementId) : Triple seq =
         this.Triples.GetTriplesWithSubject subject
     member this.GetTriplesWithSubject (graphid: GraphElementId, subject: GraphElementId)  =
@@ -107,7 +106,7 @@ type Datastore(triples: TripleTable,
             this.Triples.Contains triple
     member this.ContainsQuad quad =
         this.NamedGraphs.Contains quad
-    member this.GetReifiedTriplesWithId(id: GraphElementId) : Quad seq =
+    member this.GetReifiedTriplesWithId(id: GraphElementId) : Triple seq =
         this.ReifiedTriples.GetGraph id
     member this.GetReifiedTriplesWithSubject(subject: GraphElementId) : Quad seq =
         this.ReifiedTriples.GetQuadsWithSubject subject
