@@ -236,7 +236,7 @@ module Datalog =
                               | true, r -> Term.Resource r
                               | false, _ -> Variable v
 
-    let evaluatePattern (rdf : TripleTable) (triplePattern : TriplePattern) (sub : Substitution)  =
+    let evaluatePattern (rdf : ITripleTable) (triplePattern : TriplePattern) (sub : Substitution)  =
         let mappedTriple : TriplePattern = {
                             TriplePattern.Subject = GetMappedResource sub triplePattern.Subject
                             TriplePattern.Predicate = GetMappedResource sub triplePattern.Predicate
@@ -255,9 +255,10 @@ module Datalog =
             | Variable _s, Term.Resource p, Term.Resource o -> 
                     rdf.GetTriplesWithObjectPredicate(o, p)
             | Term.Resource s, Term.Resource p, Term.Resource o -> 
-                    match rdf.ThreeKeysIndex.TryGetValue {subject = s; predicate = p; obj = o} with
-                    | false,_ -> []
-                    | true, v -> [rdf.GetTripleListEntry v]                    
+                    let triple = {Triple.subject = s; predicate = p; obj = o}
+                    match rdf.Contains triple with
+                    | false -> []
+                    | true -> [ triple ]                    
             | Term.Resource s, Variable p, Term.Resource o ->
                 rdf.GetTriplesWithSubjectObject (s, o)
             | Variable s, Variable p, Variable o -> rdf.GetTriples()

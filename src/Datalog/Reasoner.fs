@@ -68,7 +68,7 @@ module Reasoner =
         *)
         member internal this.materialiseNaive() =
                 this.GetFacts() |> Seq.iter tripleStore.AddTriple
-                for triple in tripleStore.Triples.GetTriples() do
+                for triple in tripleStore.itriples.GetTriples() do
                     for rules in this.GetRulesForFact triple do
                         let ruleMatchHead = match rules.Match.Rule.Head with
                                             | Contradiction -> failwith $"Contradiction occurred during reasoning: {rules.Match.Rule.ToString(tripleStore.Resources)}"

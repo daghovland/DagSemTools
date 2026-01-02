@@ -39,7 +39,7 @@ let ``Can add triple to tripletable`` () =
     tripleTable.AddTriple(Triple)
     Assert.Equal(3u, tripleTable.Resources.ResourceCount)
     Assert.Equal(1u, tripleTable.Triples.TripleCount)
-    let mappedTriple = tripleTable.Triples.GetTriples() |> Seq.head
+    let mappedTriple = tripleTable.itriples.GetTriples() |> Seq.head
     Assert.Equal(Triple, mappedTriple)
     
     

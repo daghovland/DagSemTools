@@ -119,12 +119,8 @@ type QuadTable(quadList: Quad array,
             match this.PredicateIndex.TryGetValue predicate with
             | true, predicates -> predicates |> Seq.map (fun e -> this.GetQuadListEntry e)
             | false, _ -> []
-        
-        member internal this.GetGraph (id: GraphElementId) : TripleTable =
-            this.TripleIdIndex.[id]
-            |> Seq.map (fun e -> this.GetQuadListEntry e)
-            |> Seq.map (fun e -> e.GetTriple)
-            
+
+
         member internal this.GetQuadsWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
             this.SubjectPredicateIndex.[subject].[predicate] |> Seq.map (fun e -> this.GetQuadListEntry e)
             
@@ -136,20 +132,26 @@ type QuadTable(quadList: Quad array,
             this.GetQuadsWithSubject subject
                 |> Seq.where (fun triple ->  triple.obj = object)
         
+        member internal this.GetTriplesWithId (graphName: GraphElementId) : Triple seq =
+             this.TripleIdIndex.[graphName]
+                |> Seq.map (fun e -> this.GetQuadListEntry e)
+                |> Seq.map (fun e -> e.GetTriple)
+        
        member internal this.GetTriplesWithIdSubject (id: GraphElementId, subject: GraphElementId) : Triple seq =
             this.GetQuadsWithSubject subject
                 |> Seq.where (fun quad -> quad.tripleId = id)
-                |> Seq.map (fun quad -> quad.GetTriple)
-        
+                |> Seq.map _.GetTriple
+
        member internal this.GetTriplesWithIdPredicate (id: GraphElementId, predicate: GraphElementId) : Triple seq =
             this.GetQuadsWithPredicate predicate
                 |> Seq.where (fun quad -> quad.tripleId = id)
-                |> Seq.map (fun quad -> quad.GetTriple)
-       
+                |> Seq.map _.GetTriple
+
        member internal this.GetTriplesWithIdObject (id: GraphElementId, obj: GraphElementId) : Triple seq =
             this.GetQuadsWithObject obj
                 |> Seq.where (fun quad -> quad.tripleId = id)
-                |> Seq.map (fun quad -> quad.GetTriple)
+                |> Seq.map _.GetTriple
+
        member internal this.GetTriplesWithIdSubjectPredicate (id: GraphElementId, subject: GraphElementId, predicate: GraphElementId) : Triple seq =
             this.GetQuadsWithSubjectPredicate (subject, predicate)
                 |> Seq.where (fun quad -> quad.tripleId = id)

@@ -24,10 +24,10 @@ public class OwlOntology
 {
     private readonly OntologyDocument _owlOntology;
     private readonly GraphElementManager _elementManager;
-    private readonly TripleTable _tripleTable;
+    private readonly ITripleTable _tripleTable;
     private readonly ILogger _logger;
 
-    internal OwlOntology(TripleTable tripleTable, GraphElementManager elementManager, ILogger? logger = null)
+    internal OwlOntology(ITripleTable tripleTable, GraphElementManager elementManager, ILogger? logger = null)
     {
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()

@@ -8,5 +8,6 @@ open System.Runtime.CompilerServices
 [<assembly: InternalsVisibleTo("Api.Tests")>]
 [<assembly: InternalsVisibleTo("Api")>]
 [<assembly: InternalsVisibleTo("TurtleParser.Unit.Tests")>]
+[<assembly: InternalsVisibleTo("Rdf.Unit.Tests")>]
 
 do ()
