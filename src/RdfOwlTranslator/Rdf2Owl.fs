@@ -15,7 +15,7 @@ open DagSemTools.Ingress.Namespaces
 open IriTools
 open Serilog
 
-type Rdf2Owl (triples : TripleTable,
+type Rdf2Owl (triples : ITripleTable,
               resourceManager : GraphElementManager,
               logger : ILogger) =
     

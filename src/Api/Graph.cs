@@ -23,7 +23,7 @@ namespace DagSemTools.Api;
 public class Graph : IGraph
 {
     private ILogger _logger;
-    internal Graph(TripleTable triples, GraphElementManager _elementManager, ILogger? logger = null)
+    internal Graph(ITripleTable triples, GraphElementManager _elementManager, ILogger? logger = null)
     {
         Triples = triples;
         ElementManager = _elementManager;
@@ -34,7 +34,7 @@ public class Graph : IGraph
     }
     internal ResourceManager Resources { get; init; }
     private GraphElementManager ElementManager { get; init; }
-    private TripleTable Triples { get; init; }
+    private ITripleTable Triples { get; init; }
 
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
 
@@ -54,10 +54,10 @@ public class Graph : IGraph
 
 
     /// <inheritdoc />
-    public bool IsEmpty() => Triples.TripleCount == 0;
+    public bool IsEmpty() => !Triples.GetTriples().Any();
 
 
-    private Resource GetBlankNodeOrIriResource(uint resourceId)
+    internal Resource GetBlankNodeOrIriResource(uint resourceId)
     {
         var resource = ElementManager.GetGraphNode(resourceId);
         if (!FSharpOption<RdfResource>.get_IsSome(resource))

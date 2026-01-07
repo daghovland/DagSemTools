@@ -80,18 +80,18 @@ public class TestApi(ITestOutputHelper output)
     {
         var ontology = new FileInfo("TestData/namedgraph.trig");
         var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetNamedGraphs()["https://example.com/data#graph"].GetTriplesWithPredicateObject(
+        var resultsData = ont.GetNamedGraph("https://example.com/data#graph").GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object"));
         resultsData.Should().HaveCount(1);
-        var resultsBefore = ont.GetNamedGraphs()["https://example.com/data#graph"].GetTriplesWithPredicateObject(
+        var resultsBefore = ont.GetNamedGraph("https://example.com/data#graph").GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsBefore.Should().BeEmpty();
         Assert.NotNull(ont);
         var datalogFile = new FileInfo("TestData/namedgraph.datalog");
         ont.LoadDatalog(datalogFile);
-        var resultsAfter = ont.GetNamedGraphs()["https://example.com/data#graph"].GetTriplesWithPredicateObject(
+        var resultsAfter = ont.GetNamedGraph("https://example.com/data#graph").GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsAfter.Should().HaveCount(1);

@@ -38,18 +38,17 @@ public class Dataset : IDataset
     ResourceManager IDataset.GetResourceManager() => Resources;
     private IGraph DefaultGraph { get; init; }
 
-    
+
     /// <inheritdoc />
     public IGraph GetNamedGraph(IriReference graphName)
     {
         var graphNameResource = Ingress.GraphElement.NewNodeOrEdge(RdfResource.NewIri(graphName));
         var graphId = Quads.Resources.GraphElementMap[graphNameResource];
-        var namedGraph = Quads.NamedGraphs.GetGraph(graphId);
-        return new Graph(namedGraph, Quads.Resources, _logger);
+        return new Graph(Quads.GetNamedGraph(graphId), Quads.Resources, _logger);
     }
     /// <inheritdoc />
     public IGraph GetDefaultGraph() => DefaultGraph;
-    
+
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
 
     /// Checks whether the default graph contains the given triple.

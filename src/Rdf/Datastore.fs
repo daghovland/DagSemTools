@@ -19,6 +19,7 @@ type Datastore(triples: TripleTable,
                reifiedTriples: QuadTable,
                namedGraphs: QuadTable,
                resources: GraphElementManager) =
+    member val itriples = triples :> ITripleTable
     member val Triples = triples with get, set
     member val ReifiedTriples = reifiedTriples with get, set
     member val NamedGraphs = namedGraphs with get, set
@@ -69,45 +70,45 @@ type Datastore(triples: TripleTable,
     member this.GetResourceTriple (triple: Triple) =
         this.Resources.GetResourceTriple triple
         
-    member this.GetNamedGraph (graphId : GraphElementId) : Triple seq =
-        this.NamedGraphs.GetGraph graphId
+    member this.GetNamedGraph (graphId : GraphElementId) : ITripleTable
+        = NamedTripleTable(this.NamedGraphs, graphId)
     member this.GetTriplesWithSubject (subject: GraphElementId) : Triple seq =
-        this.Triples.GetTriplesWithSubject subject
+        this.itriples.GetTriplesWithSubject subject
     member this.GetTriplesWithSubject (graphid: GraphElementId, subject: GraphElementId)  =
         this.NamedGraphs.GetTriplesWithIdSubject (graphid, subject)
     
     member this.GetTriplesWithObject (object: GraphElementId) : Triple seq =
-        this.Triples.GetTriplesWithObject object
+        this.itriples.GetTriplesWithObject object
     member this.GetTriplesWithObject (graphid: GraphElementId, object: GraphElementId)  =
         this.NamedGraphs.GetTriplesWithIdObject (graphid, object)
     member this.GetTriplesWithPredicate (predicate: GraphElementId) : Triple seq =
-        this.Triples.GetTriplesWithPredicate predicate
+        this.itriples.GetTriplesWithPredicate predicate
     
     member this.GetTriplesWithPredicate (graphid: GraphElementId, predicate: GraphElementId)  =
         this.NamedGraphs.GetTriplesWithIdPredicate (graphid, predicate)
     
     member this.GetTriplesWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
-        this.Triples.GetTriplesWithSubjectPredicate (subject, predicate)
+        this.itriples.GetTriplesWithSubjectPredicate (subject, predicate)
     
     member this.GetTriplesWithSubjectPredicate (graphId : GraphElementId, subject: GraphElementId, predicate: GraphElementId) =
         this.NamedGraphs.GetTriplesWithIdSubjectPredicate(graphId, subject, predicate)
     member this.GetTriplesWithObjectPredicate (object: GraphElementId, predicate: GraphElementId) =
-        this.Triples.GetTriplesWithObjectPredicate (object, predicate)
+        this.itriples.GetTriplesWithObjectPredicate (object, predicate)
     member this.GetTriplesWithObjectPredicate (graphId : GraphElementId, object: GraphElementId, predicate: GraphElementId) =
         this.NamedGraphs.GetTriplesWithIdObjectPredicate(graphId, object, predicate)
     
         
     member this.GetTriplesWithSubjectObject (subject: GraphElementId, object: GraphElementId)  =
-        this.Triples.GetTriplesWithSubjectObject (subject, object)
+        this.itriples.GetTriplesWithSubjectObject (subject, object)
     member this.GetTriplesWithSubjectObject (graphId: GraphElementId, subject: GraphElementId, object: GraphElementId)  =
         this.NamedGraphs.GetTriplesWithIdSubjectPredicate (graphId, subject, object)
         
     member this.ContainsTriple triple  =
-            this.Triples.Contains triple
+            this.itriples.Contains triple
     member this.ContainsQuad quad =
         this.NamedGraphs.Contains quad
     member this.GetReifiedTriplesWithId(id: GraphElementId) : Triple seq =
-        this.ReifiedTriples.GetGraph id
+        this.ReifiedTriples.GetTriplesWithId (id)
     member this.GetReifiedTriplesWithSubject(subject: GraphElementId) : Quad seq =
         this.ReifiedTriples.GetQuadsWithSubject subject
     member this.GetReifiedTriplesWithPredicate(predicate: GraphElementId) : Quad seq =
@@ -118,7 +119,7 @@ type Datastore(triples: TripleTable,
         this.ReifiedTriples.GetQuadsWithSubjectPredicate (subject, predicate)
 
     member this.GetResourceInfoForErrorMessage(subject: GraphElementId) : string =
-           this.Triples.GetTriplesMentioning subject
+           this.itriples.GetTriplesMentioning subject
             |> Seq.map this.Resources.GetResourceTriple
             |> Seq.map _.ToString()
             |> String.concat ". "
@@ -147,5 +148,5 @@ type Datastore(triples: TripleTable,
         | Variable _, Variable _, Resource oRes ->
             this.GetTriplesWithObject oRes
         | Variable _, Variable _, Variable _ ->
-            this.Triples.GetTriples()
+            this.itriples.GetTriples()
             

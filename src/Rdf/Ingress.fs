@@ -23,7 +23,12 @@ module Ingress =
             subject: GraphElementId
             predicate: GraphElementId
             obj: GraphElementId
-        }
+        } with
+        override this.ToString() =
+            sprintf "(%A, %A, %A)" 
+                this.subject 
+                this.predicate 
+                this.obj
         
     [<Struct>]
     [<StructuralEquality>]
@@ -46,7 +51,7 @@ module Ingress =
                 predicate = this.predicate
                 obj = this.obj
             }
-    
+
     [<Struct>]
     [<StructuralEquality>]
     [<NoComparison>]
@@ -84,6 +89,13 @@ module Ingress =
                     predicate = this.predicate
                     obj = this.obj
                 }
+    let tripleToQuad (triple: Triple) (tripleId: GraphElementId) : Quad =
+        {
+            tripleId = tripleId
+            subject = triple.subject
+            predicate = triple.predicate
+            obj = triple.obj
+        }
     
       
     let doubleArraySize (originalArray: 'T array) : 'T array =

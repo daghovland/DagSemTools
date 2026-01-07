@@ -20,19 +20,11 @@ type TripleTable(tripleList: Triple array,
                  objectPredicateIndex: Dictionary<GraphElementId, Dictionary<GraphElementId, TripleListIndex list>>) =
         
     let mutable TripleList = tripleList
-    member val TripleCount = tripleCount with get, set
-    
-    member this.GetTriples() : Triple seq =
-        seq {
-            let mutable index = 0u
-            while index < this.TripleCount do
-                yield this.GetTripleListEntry index
-                index <- index + 1u
-        }
+    member val internal TripleCount = tripleCount with get, set
             
-    member val ThreeKeysIndex = threeKeysIndex with get, set
-    member val PredicateIndex = predicateIndex with get, set
-    member val SubjectPredicateIndex = subjectPredicateIndex with get, set
+    member val internal ThreeKeysIndex = threeKeysIndex with get, set
+    member val internal PredicateIndex = predicateIndex with get, set
+    member val internal SubjectPredicateIndex = subjectPredicateIndex with get, set
     member val ObjectPredicateIndex = objectPredicateIndex with get, set
 
     new(init_rdf_size : uint) =
@@ -93,24 +85,40 @@ type TripleTable(tripleList: Triple array,
                 this.ThreeKeysIndex.Add(triple, this.TripleCount) |> ignore
                 this.TripleCount <- nextTripleCount
                 ()
+                
+    member private this.GetTriplesWithSubjectImpl subject : Triple seq =
+        match  (this.SubjectPredicateIndex.TryGetValue subject) with 
+        |    true, subjMap -> subjMap |> Seq.collect (fun x -> x.Value) |> Seq.map this.GetTripleListEntry
+        |    false, _ -> []
+    member this.GetTriplesWithPredicateImpl (predicate: GraphElementId) : Triple seq =
+        match (this.PredicateIndex.TryGetValue predicate) with
+        | true, predMap -> predMap |> Seq.map (fun e -> this.GetTripleListEntry e)
+        | false, _ -> []
+    member this.GetTriplesWithObjectImpl (obj: GraphElementId) : Triple seq =
+        match (this.ObjectPredicateIndex.TryGetValue obj) with
+        |    true, objectIndex -> objectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetTripleListEntry e)
+        |    false, _ -> []
+
+    interface ITripleTable with
+        member this.TripleCount() : uint32 =
+            this.TripleCount
             
+        member this.GetTriples() : Triple seq =
+            seq {
+                let mutable index = 0u
+                while index < this.TripleCount do
+                    yield this.GetTripleListEntry index
+                    index <- index + 1u
+            }
+                
         member this.Contains (triple : Triple) : bool =
             this.ThreeKeysIndex.ContainsKey triple
-        member this.GetTriplesWithSubject (subject: GraphElementId) : Triple seq =
-            match  (this.SubjectPredicateIndex.TryGetValue subject) with 
-                                |    true, subjMap -> subjMap |> Seq.collect (fun x -> x.Value) |> Seq.map this.GetTripleListEntry
-                                |    false, _ -> []
-            
-        member this.GetTriplesWithObject (obj: GraphElementId) : Triple seq =
-            match (this.ObjectPredicateIndex.TryGetValue obj) with
-                                |    true, objectIndex -> objectIndex |> Seq.collect (fun x -> x.Value) |> Seq.map (fun e -> this.GetTripleListEntry e)
-                                |    false, _ -> []
-            
+        member this.GetTriplesWithSubject subject : Triple seq =
+            this.GetTriplesWithSubjectImpl subject
         member this.GetTriplesWithPredicate (predicate: GraphElementId) : Triple seq =
-            match (this.PredicateIndex.TryGetValue predicate) with
-                | true, predMap -> predMap |> Seq.map (fun e -> this.GetTripleListEntry e)
-                | false, _ -> []
-            
+            this.GetTriplesWithPredicateImpl predicate
+        member this.GetTriplesWithObject (obj: GraphElementId) : Triple seq =
+            this.GetTriplesWithObjectImpl obj
         member this.GetPredicates() : GraphElementId seq =
             this.PredicateIndex.Keys 
         member this.GetTriplesWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
@@ -119,8 +127,6 @@ type TripleTable(tripleList: Triple array,
                                                         |    true, subjPredList -> subjPredList |> Seq.map (fun e -> this.GetTripleListEntry e)
                                                         |    false, _ -> []
                                 |    false, _ -> []
-            
-            
         member this.GetTriplesWithObjectPredicate (obj: GraphElementId, predicate: GraphElementId) =
             match  (this.ObjectPredicateIndex.TryGetValue obj) with 
                                 |    true, objMap -> match objMap.TryGetValue predicate with
@@ -129,12 +135,12 @@ type TripleTable(tripleList: Triple array,
                                 |    false, _ -> []
             
         member this.GetTriplesWithSubjectObject (subject: GraphElementId, object: GraphElementId) : Triple seq =
-            this.GetTriplesWithSubject subject
+            this.GetTriplesWithSubjectImpl subject
                 |> Seq.where (fun triple ->  triple.obj = object)
         
        
-       member this.GetTriplesMentioning resource =
-           Seq.concat [this.GetTriplesWithSubject(resource)
-                       this.GetTriplesWithPredicate(resource)
-                       this.GetTriplesWithObject(resource)]
-           
+           member this.GetTriplesMentioning resource =
+               Seq.concat [this.GetTriplesWithSubjectImpl(resource)
+                           this.GetTriplesWithPredicateImpl(resource)
+                           this.GetTriplesWithObjectImpl(resource)]
+               
