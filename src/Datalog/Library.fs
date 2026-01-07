@@ -79,7 +79,11 @@ type RuleAtom =
          match this with
             | PositivePattern t -> t.GetVariables()
             | NotPattern t -> t.GetVariables()
-            | NotEqualsAtom (t1, t2) -> [t1.IsVariable; t2.IsVariable ? t1 : t2]
+            | NotEqualsAtom (t1, t2) -> 
+                    [
+                        match t1 with | Variable v1 -> yield v1 | _ -> ()
+                        match t2 with | Variable v2 -> yield v2 | _ -> ()
+                    ]
 
 [<StructuralComparison>]
 [<StructuralEquality>]
@@ -135,20 +139,9 @@ module Datalog =
     (* Safe rules are those where the head only has variable that are in the body *)
     let GetUnsafeHeadVariables (rule) =
         let variablesInBody = rule.Body
-                                |> Seq.collect (fun atom -> match atom with
-                                                            | PositivePattern t -> [t.Subject; t.Predicate; t.Object]
-                                                            | NotPattern t -> [t.Subject; t.Predicate; t.Object]
-                                                            | NotEqualsAtom (t1, t2) -> [t1; t2]
-                                )
-                                |> Seq.choose (fun r -> match r with
-                                                        | Variable v -> Some (v)
-                                                        | _ -> None
+                                |> Seq.collect (fun atom -> atom.GetVariables()
                                 )
         let variablesInHead = rule.Head.GetVariables()
-                                |> Seq.choose (fun r -> match r with
-                                                        | Variable v -> Some (v)
-                                                        | _ -> None
-                                )
         variablesInHead
                     |> Seq.filter (fun v -> variablesInBody
                                                 |> Seq.forall (fun b -> b <> v))
@@ -195,6 +188,16 @@ module Datalog =
                             ]
         resourceList |> Seq.fold GetSubstitutionOption (Some subs)
         
+    let GetSubstitutions (subs) (fact : Quad) (factPattern : QuadPattern)  : Substitution option =
+        let resourceList = [
+                            (fact.subject, factPattern.Triple.Subject)
+                            (fact.predicate, factPattern.Triple.Predicate)
+                            (fact.obj, factPattern.Triple.Object)
+                            (fact.tripleId, factPattern.Graph)
+                            ]
+        resourceList |> Seq.fold GetSubstitutionOption (Some subs)
+    
+    
     (*
         For a given triple/fact and a rule, return 
         all matches (PartialRuleMatch) such that the fact is an instance of the match in the rule.
@@ -202,8 +205,8 @@ module Datalog =
     let GetMatchesForRule fact rule =
         rule.Rule.Body
         |> Seq.choose (fun r -> match r with
-                                | PositiveTriple t -> Some t
-                                | NotTriple t -> None
+                                | PositivePattern t -> Some t
+                                | NotPattern t -> None
                                 | NotEqualsAtom (t1, t2) -> None
                     )
         |> Seq.map (fun r -> r, GetSubstitutions (Map.empty) fact r) 
