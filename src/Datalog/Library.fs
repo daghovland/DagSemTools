@@ -22,11 +22,11 @@ type ResourceOrWildcard =
 [<CustomComparison>]
 [<CustomEquality>]
 type RuleHead =
-    | NormalHead of pattern: TriplePattern
+    | NormalHead of pattern: GraphPattern
     | Contradiction
     member this.GetVariables() =
         match this with
-        | NormalHead triplePattern -> [triplePattern.Subject; triplePattern.Predicate; triplePattern.Object]
+        | NormalHead graphPattern -> graphPattern.GetVariables()
         | Contradiction -> []
     override this.ToString() =
         match this with
@@ -36,6 +36,7 @@ type RuleHead =
         match this with
         | NormalHead tp -> tp.ToString(manager)
         | Contradiction -> "false"
+
     interface System.IComparable with
         member this.CompareTo(obj) =
             match obj with
@@ -45,8 +46,7 @@ type RuleHead =
                 | Contradiction, _ -> -1
                 | _, Contradiction -> 1
                 | NormalHead p1, NormalHead p2 -> 
-                    compare (p1.Subject, p1.Predicate, p1.Object)
-                           (p2.Subject, p2.Predicate, p2.Object)
+                    compare p1 p2
             | _ -> 1  
             
     override this.Equals(obj) =
@@ -57,25 +57,29 @@ type RuleHead =
     override this.GetHashCode() =
         match this with
         | Contradiction -> -1
-        | NormalHead p -> hash (p.Subject, p.Predicate, p.Object)
+        | NormalHead p -> hash p
 
 [<StructuralComparison>]
 [<StructuralEquality>]
 type RuleAtom = 
-    | PositiveTriple of TriplePattern
-    | NotTriple of TriplePattern
+    | PositivePattern of GraphPattern
+    | NotPattern of GraphPattern
     | NotEqualsAtom of Term * Term
     override this.ToString () =
         match this with
-        | PositiveTriple tp -> tp.ToString()
-        | NotTriple tp -> $"not {tp.ToString()}"
+        | PositivePattern tp -> tp.ToString()
+        | NotPattern tp -> $"not {tp.ToString()}"
         | NotEqualsAtom (t1, t2) -> $"{t1.ToString()} != {t2.ToString()}"
     member this.ToString (manager) =
         match this with
-        | PositiveTriple tp -> tp.ToString(manager)
-        | NotTriple tp -> $"not {tp.ToString(manager)}"
+        | PositivePattern tp -> tp.ToString(manager)
+        | NotPattern tp -> $"not {tp.ToString(manager)}"
         | NotEqualsAtom (t1, t2) -> $"{t1.ToString(manager)} != {t2.ToString(manager)}"
-
+    member this.GetVariables() =
+         match this with
+            | PositivePattern t -> t.GetVariables()
+            | NotPattern t -> t.GetVariables()
+            | NotEqualsAtom (t1, t2) -> [t1.IsVariable; t2.IsVariable ? t1 : t2]
 
 [<StructuralComparison>]
 [<StructuralEquality>]
@@ -132,8 +136,8 @@ module Datalog =
     let GetUnsafeHeadVariables (rule) =
         let variablesInBody = rule.Body
                                 |> Seq.collect (fun atom -> match atom with
-                                                            | PositiveTriple t -> [t.Subject; t.Predicate; t.Object]
-                                                            | NotTriple t -> [t.Subject; t.Predicate; t.Object]
+                                                            | PositivePattern t -> [t.Subject; t.Predicate; t.Object]
+                                                            | NotPattern t -> [t.Subject; t.Predicate; t.Object]
                                                             | NotEqualsAtom (t1, t2) -> [t1; t2]
                                 )
                                 |> Seq.choose (fun r -> match r with
