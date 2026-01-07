@@ -70,6 +70,15 @@ public class TestParser
 
 
     [Fact]
+    public void TestNamedGraphRule()
+    {
+        var fInfo = File.ReadAllText("TestData/namedgraph.datalog");
+        var ont = TestProgram(fInfo).ToList();
+        ont.Should().NotBeNull();
+        ont.Should().HaveCount(1);
+    }
+
+    [Fact]
     public void TestRuleWithAnd()
     {
         var fInfo = File.ReadAllText("TestData/ruleand.datalog");

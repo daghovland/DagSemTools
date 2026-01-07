@@ -94,7 +94,7 @@ public class TestApi(ITestOutputHelper output)
         var resultsAfter = ont.GetNamedGraph("https://example.com/data#graph").GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
-        resultsAfter.Should().HaveCount(1);
+        resultsAfter.Should().HaveCount(1, "Datalog reasoning should have added this triple");
     }
 
     [Fact]
