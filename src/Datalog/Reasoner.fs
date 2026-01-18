@@ -40,8 +40,8 @@ module Reasoner =
             RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
                 
             
-        member internal this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq = 
-            ConstantTriplePattern fact
+        member internal this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq =
+            ConstantQuadPattern fact
                 |> WildcardTriplePattern
                 |> Seq.map (fun wildcardFact ->
                     match RuleMap.TryGetValue(wildcardFact) with
@@ -60,7 +60,7 @@ module Reasoner =
                                             | Contradiction -> failwith "Contradiction found during reasoning. Aborting. Should handle better. Sorry"
                                             | NormalHead pattern -> pattern
                                             )
-                |> Seq.map (ApplySubstitutionTriple emptySubstitution)
+                |> Seq.map (ApplySubstitutionQuad emptySubstitution)
         
         (* 
             The semi-naive materialisation algorithm. Assumes a non-cyclic ruleset
@@ -74,7 +74,7 @@ module Reasoner =
                                             | Contradiction -> failwith $"Contradiction occurred during reasoning: {rules.Match.Rule.ToString(tripleStore.Resources)}"
                                             | NormalHead head -> head
                         for subs in evaluate tripleStore.Triples rules  do
-                            let newTriple = ApplySubstitutionTriple subs ruleMatchHead
+                            let newTriple = ApplySubstitutionQuad subs ruleMatchHead
                             tripleStore.AddTriple newTriple
 
     let evaluate (logger: ILogger, rules: Rule list, triplestore: Datastore) =

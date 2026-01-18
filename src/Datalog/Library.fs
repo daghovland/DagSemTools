@@ -116,13 +116,15 @@ module Datalog =
     let emptySubstitution : Substitution = Map.empty
     let isFact (rule) = rule.Body |> List.isEmpty
     
-    let ConstantTriplePattern (triple : Ingress.Triple) : QuadPattern = 
-        {Subject = Term.Resource triple.subject; Predicate = Term.Resource triple.predicate; Object = Term.Resource triple.obj}
+    let ConstantQuadPattern (quad: Ingress.Quad) : QuadPattern = 
+        {QuadPattern.Graph = Term.Resource quad.tripleId
+         Subject = Term.Resource quad.subject
+         Predicate = Term.Resource quad.predicate; Object = Term.Resource quad.obj}
     
     /// Generate all 8 possible triple patterns with wildcards for a given triple pattern
     /// Duplicate patterns are ok since these are used as a key in a dictionary
-    let WildcardTriplePattern (triple : TriplePattern) : TripleWildcard list = 
-        let resourceList = [triple.Subject; triple.Predicate; triple.Object]
+    let WildcardQuadPattern (quad: QuadPattern) : TripleWildcard list = 
+        let resourceList = [ quad.Subject; quad.Predicate; quad.Object]
         let rec generatePatterns (triple: Term list) : ResourceOrWildcard list list = 
               match triple with
               | [] -> [[]]
@@ -160,11 +162,12 @@ module Datalog =
         | Variable v -> match sub.TryGetValue v with
                         | true, r -> r
                         | false, _ -> failwith "Head of rule not fully instantiated. Invalid datalog rule"
-    let ApplySubstitutionTriple sub (triple : TriplePattern) : Triple =
+    let ApplySubstitutionQuad sub (quad: QuadPattern) : Quad =
         {
-         Ingress.subject = ApplySubstitutionResource sub triple.Subject
-         Ingress.predicate = ApplySubstitutionResource sub triple.Predicate
-         Ingress.obj = ApplySubstitutionResource sub triple.Object 
+         Quad.tripleId = ApplySubstitutionResource sub quad.Graph
+         subject = ApplySubstitutionResource sub quad.Subject
+         predicate = ApplySubstitutionResource sub quad.Predicate
+         obj = ApplySubstitutionResource sub quad.Object 
         }
     
     
@@ -180,8 +183,9 @@ module Datalog =
     
     let GetSubstitutionOption (subs : Substitution option) (resource, variable) : Substitution option =
         Option.bind (GetSubstitution (resource, variable)) subs    
-    let GetSubstitutions (subs) (fact : Triple) (factPattern : TriplePattern)  : Substitution option =
+    let GetSubstitutions (subs) (fact : Quad) (factPattern : QuadPattern)  : Substitution option =
         let resourceList = [
+                            (fact.tripleId, factPattern.Graph)
                             (fact.subject, factPattern.Subject)
                             (fact.predicate, factPattern.Predicate)
                             (fact.obj, factPattern.Object)
@@ -190,9 +194,9 @@ module Datalog =
         
     let GetSubstitutions (subs) (fact : Quad) (factPattern : QuadPattern)  : Substitution option =
         let resourceList = [
-                            (fact.subject, factPattern.Triple.Subject)
-                            (fact.predicate, factPattern.Triple.Predicate)
-                            (fact.obj, factPattern.Triple.Object)
+                            (fact.subject, factPattern.Subject)
+                            (fact.predicate, factPattern.Predicate)
+                            (fact.obj, factPattern.Object)
                             (fact.tripleId, factPattern.Graph)
                             ]
         resourceList |> Seq.fold GetSubstitutionOption (Some subs)
@@ -212,8 +216,8 @@ module Datalog =
         |> Seq.map (fun r -> r, GetSubstitutions (Map.empty) fact r) 
         |> Seq.choose (fun (r, s) -> Option.map (fun s -> {Match = rule; Substitution = s}) s)
         
-    let GetPartialMatch (triple : TriplePattern)  =
-        WildcardTriplePattern triple
+    let GetPartialMatch (quad : QuadPattern)  =
+        WildcardQuadPattern quad
         
     let GetPartialMatches (rule : Rule) : Map<TripleWildcard, PartialRule list> =
        Map.ofSeq (rule.Body

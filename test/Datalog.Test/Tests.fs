@@ -155,7 +155,7 @@ module Tests =
         let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
         let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
-        let rule =  {Head =  NormalHead ( ConstantTriplePattern Triple2 )
+        let rule =  {Head =  NormalHead (ConstantQuadPattern Triple2 )
                      Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple)]}
         let TriplePatter = {
                             TriplePattern.Subject = Term.Resource subjectIndex
@@ -188,7 +188,7 @@ module Tests =
             let Triple3 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex3}
             
             
-            let rule =  {Head =  NormalHead( ConstantTriplePattern Triple2 )
+            let rule =  {Head =  NormalHead(ConstantQuadPattern Triple2 )
                          Body = [ RuleAtom.PositiveTriple (ConstantTriplePattern Triple) ; RuleAtom.NotTriple (ConstantTriplePattern Triple3)]}
             let TriplePatter = {
                                 TriplePattern.Subject = Term.Resource subjectIndex
@@ -946,7 +946,7 @@ module Tests =
         let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
         let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
-        let rule =  {Head =  ConstantTriplePattern Triple2 |> NormalHead
+        let rule =  {Head = ConstantQuadPattern Triple2 |> NormalHead
                      Body = [RuleAtom.PositiveTriple(ConstantTriplePattern Triple)]}
         let tripleAnswersBefore = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
         Assert.Equal(1, tripleAnswersBefore |> Seq.length)
