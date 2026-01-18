@@ -46,11 +46,11 @@ type QuadTable(quadList: Quad array,
                     new Dictionary<GraphSubjectKey, QuadListIndex list>()
                     )
         
-    member internal this.doubleQuadListSize () =
+    member private this.doubleQuadListSize () =
         this.QuadList <- doubleArraySize this.QuadList
     member internal this.GetQuadListEntry (index: QuadListIndex) : Quad =
         this.QuadList.[int index]
-    member val internal ResourceGraphMap = new Dictionary<GraphElementId, HashSet<GraphElementId>>()
+    member val private ResourceGraphMap = new Dictionary<GraphElementId, HashSet<GraphElementId>>()
 
     member internal this.RegisterResourceInGraph (resId: GraphElementId, graphId: GraphElementId) =
         match this.ResourceGraphMap.TryGetValue resId with
@@ -222,3 +222,10 @@ type QuadTable(quadList: Quad array,
         member internal this.GetTriplesWithIdObjectPredicate (id: GraphElementId, object: GraphElementId, predicate: GraphElementId) : Triple seq =
             this.GetQuadsWithIdObjectPredicate (id, object, predicate)
                 |> Seq.map (_.GetTriple)
+                
+        member internal this.GetQuads : Quad seq =
+            this.QuadList
+            
+        member internal this.GetQuadsWithTriple (subject, predicate, object) =
+            this.GetQuadsWithSubjectObject (subject, object)
+            |> Seq.where (fun q -> q.predicate = predicate)

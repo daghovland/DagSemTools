@@ -40,7 +40,7 @@ public class TestTriGParser : IDisposable, IAsyncDisposable
         var knows = ont.GetGraphElementId(GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://www.example.org/vocabulary#name"))));
         ont.GetTriplesWithPredicate(knows).Should().HaveCount(0);
         var graphIri = ont.GetGraphElementId(GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://www.example.org/exampleDocument#G1"))));
-        ont.NamedGraphs.GetTriplesWithId(graphIri).Should().HaveCount(6);
+        ont.NamedGraphs.GetQuadsWithId(graphIri).Should().HaveCount(6);
 
     }
 

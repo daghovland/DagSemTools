@@ -101,7 +101,6 @@ module Ingress =
         }
     
     let defaultGraphElementId = uint32 0
-    let defaultTripleId = uint32 0
     let getDefaultGraphTriple triple =
         tripleToQuad triple defaultGraphElementId
       

@@ -22,7 +22,7 @@ type ResourceOrWildcard =
 [<CustomComparison>]
 [<CustomEquality>]
 type RuleHead =
-    | NormalHead of pattern: GraphPattern
+    | NormalHead of pattern: QuadPattern
     | Contradiction
     member this.GetVariables() =
         match this with
@@ -62,8 +62,8 @@ type RuleHead =
 [<StructuralComparison>]
 [<StructuralEquality>]
 type RuleAtom = 
-    | PositivePattern of GraphPattern
-    | NotPattern of GraphPattern
+    | PositivePattern of QuadPattern
+    | NotPattern of QuadPattern
     | NotEqualsAtom of Term * Term
     override this.ToString () =
         match this with
@@ -107,7 +107,7 @@ type Rule =
 type Substitution = 
     Map<string, Ingress.GraphElementId>
 type PartialRule = 
-    {Rule: Rule; Match : TriplePattern}
+    {Rule: Rule; Match : QuadPattern}
 type PartialRuleMatch = 
     {Match: PartialRule; Substitution: Substitution}
 
@@ -116,7 +116,7 @@ module Datalog =
     let emptySubstitution : Substitution = Map.empty
     let isFact (rule) = rule.Body |> List.isEmpty
     
-    let ConstantTriplePattern (triple : Ingress.Triple) : TriplePattern = 
+    let ConstantTriplePattern (triple : Ingress.Triple) : QuadPattern = 
         {Subject = Term.Resource triple.subject; Predicate = Term.Resource triple.predicate; Object = Term.Resource triple.obj}
     
     /// Generate all 8 possible triple patterns with wildcards for a given triple pattern

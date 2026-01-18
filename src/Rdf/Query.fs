@@ -64,6 +64,11 @@ module Query =
             |> Seq.choose (fun r -> match r with
                                     | Variable v -> Some (v)
                                     | _ -> None)
+    let GetDefaultGraphPattern Subject Predicate Object =
+        {QuadPattern.Graph = Term.Resource Ingress.defaultGraphElementId
+         Subject = Subject
+         Predicate = Predicate
+         Object = Object}
         
 
     

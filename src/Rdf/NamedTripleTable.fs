@@ -20,7 +20,8 @@ type NamedTripleTable(quads: QuadTable, graphName: GraphElementId) =
             (uint32) quads.TripleIdIndex[graphName].Length 
             
         member this.GetTriples() : Triple seq =
-            quads.GetTriplesWithId graphName
+            quads.GetQuadsWithId graphName
+            |> Seq.map _.GetTriple
         member this.Contains (triple : Triple) : bool =
             quads.Contains (tripleToQuad triple graphName)
         member this.GetTriplesWithSubject subject : Triple seq =

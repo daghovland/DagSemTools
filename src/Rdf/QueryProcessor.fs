@@ -42,7 +42,7 @@ module QueryProcessor =
                         |> Seq.map (fun triple ->
                             let newBinding =
                                 [ match pattern.Graph with
-                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.graph)
+                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.tripleId)
                                   | _ -> ()
                                   match pattern.Subject with
                                   | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.subject)
