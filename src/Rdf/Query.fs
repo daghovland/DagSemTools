@@ -51,52 +51,25 @@ module Query =
     
     [<StructuralComparison>]
     [<StructuralEquality>]
-    type TriplePattern =
-        {Subject: Term; Predicate: Term; Object: Term}
+    type QuadPattern =
+        {Graph: Term; Subject: Term; Predicate: Term; Object: Term}
         member private this.GeneralToString(termToStringFunction : Term -> string ) : string  =
-            $"[{termToStringFunction this.Subject}, {termToStringFunction this.Predicate}, {termToStringFunction this.Object}]"
+            $"{termToStringFunction this.Graph} [{termToStringFunction this.Subject}, {termToStringFunction this.Predicate}, {termToStringFunction this.Object}]"
         override this.ToString() =
             this.GeneralToString(fun t -> t.ToString())
         member this.ToString(manager : GraphElementManager) =
             this.GeneralToString(fun (t : Term) ->t.ToString(manager))
         member this.GetVariables() =
-            [this.Subject; this.Predicate; this.Object]
+            [this.Graph; this.Subject; this.Predicate; this.Object]
             |> Seq.choose (fun r -> match r with
                                     | Variable v -> Some (v)
                                     | _ -> None)
         
-    [<StructuralComparison>]
-    [<StructuralEquality>]
-    type QuadPattern =
-        {Triple: TriplePattern; Graph: Term}
-        override this.ToString() =
-            $"{this.Triple.ToString()} {this.Graph.ToString()}"
-        member this.ToString(manager : GraphElementManager) =
-            $"{this.Triple.ToString(manager)} {this.Graph.ToString(manager)}"
-        member this.GetVariables() =
-            let variables = this.Triple.GetVariables() |> List.ofSeq
-            match this.Graph with
-            | Variable v -> v :: variables
-            | _ -> variables
 
-    [<StructuralComparison>]
-    [<StructuralEquality>]
-    type GraphPattern =
-        | TriplePattern of TriplePattern  
-        | QuadPattern  of QuadPattern
-        member this.ToString(manager : GraphElementManager) =
-            match this with
-            | TriplePattern tp -> tp.ToString(manager)
-            | QuadPattern qp -> qp.ToString(manager)
-        member this.GetVariables() =
-            match this with
-            | TriplePattern tp -> tp.GetVariables()
-            | QuadPattern qp -> qp.GetVariables()
-    
     
     [<StructuralComparison>]
     [<StructuralEquality>]
     (* The projection is the list of variable names used in the select clause, without the question mark.
        The Basic Graph Pattern is a list of Triple Patterns *)
     type SelectQuery =
-        {Projection: string list; BasicGraphPattern: TriplePattern list }
+        {Projection: string list; BasicGraphPattern: QuadPattern list }

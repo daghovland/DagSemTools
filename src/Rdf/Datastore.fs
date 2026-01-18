@@ -15,12 +15,9 @@ open System
 open DagSemTools.Ingress
 open IriTools
 
-type Datastore(triples: TripleTable,
-               reifiedTriples: QuadTable,
+type Datastore(reifiedTriples: QuadTable,
                namedGraphs: QuadTable,
                resources: GraphElementManager) =
-    member val itriples = triples :> ITripleTable
-    member val Triples = triples with get, set
     member val ReifiedTriples = reifiedTriples with get, set
     member val NamedGraphs = namedGraphs with get, set
     member val Resources = resources with get, set
@@ -28,19 +25,17 @@ type Datastore(triples: TripleTable,
     new(init_rdf_size : uint) =
         let init_resources : uint = uint ( max 10 (int init_rdf_size / 10) )
         let init_triples = uint ( max 10 (int init_rdf_size / 60) )
-        Datastore(new TripleTable(init_triples),
-                  new QuadTable(init_triples),
+        Datastore(new QuadTable(init_triples),
                   new QuadTable(init_triples),
                   new GraphElementManager(init_resources))
         
     
     new(elementManager : GraphElementManager, init_triples : uint) =
-        Datastore(new TripleTable(init_triples),
-                  new QuadTable(init_triples),
+        Datastore(new QuadTable(init_triples),
                   new QuadTable(init_triples),
                   elementManager)
     member this.AddTriple (triple: Triple) =
-        this.Triples.AddTriple triple
+        this.NamedGraphs.AddQuad (getDefaultGraphTriple triple)
     
     member this.AddNamedGraphTriple(graph: GraphElementId, triple: Triple) =
         this.NamedGraphs.AddQuad{ tripleId = graph; subject = triple.subject; predicate = triple.predicate; obj = triple.obj}
@@ -73,9 +68,9 @@ type Datastore(triples: TripleTable,
     member this.GetNamedGraph (graphId : GraphElementId) : ITripleTable
         = NamedTripleTable(this.NamedGraphs, graphId)
     member this.GetTriplesWithSubject (subject: GraphElementId) : Triple seq =
-        this.itriples.GetTriplesWithSubject subject
+        this.NamedGraphs.GetQuadsWithIdSubject itriples.GetTriplesWithSubject subject
     member this.GetTriplesWithSubject (graphid: GraphElementId, subject: GraphElementId)  =
-        this.NamedGraphs.GetTriplesWithIdSubject (graphid, subject)
+        this.NamedGraphs.GetQuadsWithIdSubject (graphid, subject)
     
     member this.GetTriplesWithObject (object: GraphElementId) : Triple seq =
         this.itriples.GetTriplesWithObject object
@@ -124,18 +119,19 @@ type Datastore(triples: TripleTable,
             |> Seq.map _.ToString()
             |> String.concat ". "
             
-    member this.GetTriples(pat: Query.TriplePattern) : Triple seq =
+    member this.GetQuads(pat: Query.QuadPattern) : Quad seq =
+        let g = pat.Graph       
         let s = pat.Subject
         let p = pat.Predicate
         let o = pat.Object
-        match s, p, o with
-        | Resource sRes, Resource pRes, Resource oRes ->
-            let t = { Triple.subject =  sRes; predicate = pRes; obj = oRes }
+        match g, s, p, o with
+        | Resource gRes, Resource sRes, Resource pRes, Resource oRes ->
+            let t = { Quad.tripleId = gRes; subject =  sRes; predicate = pRes; obj = oRes }
             if this.ContainsTriple t then
                 seq { yield t }
             else
                 Seq.empty
-        | Resource sRes, Resource pRes, Variable _ ->
+        | Resource gRes,  Resource sRes, Resource pRes, Variable _ ->
             this.GetTriplesWithSubjectPredicate (sRes, pRes)
         | Resource sRes, Variable _, Resource oRes ->
             this.GetTriplesWithSubjectObject (sRes, oRes)

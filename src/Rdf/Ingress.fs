@@ -89,6 +89,9 @@ module Ingress =
                     predicate = this.predicate
                     obj = this.obj
                 }
+    [<Struct>]
+    type GraphSubjectKey = { Graph: uint32; Subject: uint32 }
+
     let tripleToQuad (triple: Triple) (tripleId: GraphElementId) : Quad =
         {
             tripleId = tripleId
@@ -97,6 +100,10 @@ module Ingress =
             obj = triple.obj
         }
     
+    let defaultGraphElementId = uint32 0
+    let defaultTripleId = uint32 0
+    let getDefaultGraphTriple triple =
+        tripleToQuad triple defaultGraphElementId
       
     let doubleArraySize (originalArray: 'T array) : 'T array =
         let newSize = originalArray.Length * 2
