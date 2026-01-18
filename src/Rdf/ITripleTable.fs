@@ -17,7 +17,6 @@ type ITripleTable =
     abstract member GetTriplesWithSubject : GraphElementId -> Triple seq
     abstract member GetTriplesWithObject : GraphElementId -> Triple seq
     abstract member GetTriplesWithPredicate : GraphElementId -> Triple seq
-    abstract member GetPredicates : unit -> GraphElementId seq
     abstract member GetTriplesWithSubjectPredicate : GraphElementId * GraphElementId -> Triple seq
     abstract member GetTriplesWithObjectPredicate : GraphElementId * GraphElementId -> Triple seq
     abstract member GetTriplesWithSubjectObject : GraphElementId * GraphElementId -> Triple seq

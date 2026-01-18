@@ -144,6 +144,14 @@ type QuadTable(quadList: Quad array,
             this.TripleIdIndex.Keys
             |> Seq.collect (fun e -> this.GetQuadsWithIdPredicate (e, predicate))
 
+        member internal this.GetQuadsMentioningResource (resource : GraphElementId) : Quad seq =
+            let resourceQuads = this.ResourceGraphMap[resource]
+                                |> Seq.collect (fun g -> Seq.append
+                                                             (this.GetQuadsWithIdSubject (g, resource))
+                                                             (this.GetQuadsWithIdObject(g, resource) ))
+            let predicateQuads = this.GetQuadsWithIdPredicate (resource, resource)
+            Seq.append resourceQuads predicateQuads
+        
         member internal this.GetQuadsWithIdObjectPredicate (id: GraphElementId, object: GraphElementId, predicate: GraphElementId) =
             let predicateMatch = this.GetQuadsWithIdPredicate (id, predicate)
             let objectMatch = this.GetQuadsWithIdObject (id, object)
