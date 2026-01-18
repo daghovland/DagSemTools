@@ -121,7 +121,24 @@ type QuadTable(quadList: Quad array,
                                 |> Seq.collect (fun x -> this.GraphObjectIndex.[{Graph = x; Subject = object}])
                                 |> Seq.map (fun e -> this.GetQuadListEntry e)
             | false, _ -> []
+        member internal this.GetQuadsWithPredicate (predicate: GraphElementId) : Quad seq =
+            this.TripleIdIndex.Keys
+            |> Seq.collect (fun e -> this.GetQuadsWithIdPredicate (e, predicate))
        
+        member internal this.GetQuadsWithSubjectPredicate (subject, predicate) =
+            this.GetQuadsWithSubject subject
+            |> Seq.where (fun q -> q.predicate = predicate)
+        member internal this.GetQuadsWithObjectPredicate (object, predicate) =
+            this.GetQuadsWithObject object
+            |> Seq.where (fun q -> q.predicate = predicate)
+        member internal this.GetQuadsWithSubjectObject (subject, object) =
+            let subjectMatch = this.GetQuadsWithSubject subject
+            let objectMatch = this.GetQuadsWithObject object
+            if (Seq.length subjectMatch < (Seq.length objectMatch)) then
+                subjectMatch |> Seq.where (fun q -> q.predicate = object)
+            else
+                objectMatch |> Seq.where (fun q -> q.subject  = subject)
+        
         member internal this.GetQuadsWithIdSubject (id: GraphElementId, subject: GraphElementId) : Quad seq =
             match this.GraphSubjectIndex.TryGetValue {Graph = id; Subject = subject} with
             | true, quads -> quads
@@ -140,9 +157,6 @@ type QuadTable(quadList: Quad array,
                             |> Seq.map (fun e -> this.GetQuadListEntry e)
             | false, _ -> []
             
-        member internal this.GetQuadsWithPredicate (predicate: GraphElementId) : Quad seq =
-            this.TripleIdIndex.Keys
-            |> Seq.collect (fun e -> this.GetQuadsWithIdPredicate (e, predicate))
 
         member internal this.GetQuadsMentioningResource (resource : GraphElementId) : Quad seq =
             let resourceQuads = this.ResourceGraphMap[resource]
@@ -182,10 +196,9 @@ type QuadTable(quadList: Quad array,
                 objectMatch
                 |> Seq.where (fun q -> q.subject = subject)
         
-        member internal this.GetTriplesWithId (graphName: GraphElementId) : Triple seq =
+        member internal this.GetQuadsWithId (graphName: GraphElementId) : Quad seq =
              this.TripleIdIndex.[graphName]
                 |> Seq.map (fun e -> this.GetQuadListEntry e)
-                |> Seq.map (_.GetTriple)
         
        member internal this.GetTriplesWithIdSubject (id: GraphElementId, subject: GraphElementId) =
             this.GetQuadsWithIdSubject (id, subject) 

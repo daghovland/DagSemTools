@@ -115,8 +115,8 @@ type Datastore(reifiedTriples: QuadTable,
         this.ReifiedTriples.GetQuadsWithSubjectPredicate (subject, predicate)
 
     member this.GetResourceInfoForErrorMessage(subject: GraphElementId) : string =
-           this.itriples.GetTriplesMentioning subject
-            |> Seq.map this.Resources.GetResourceTriple
+           this.NamedGraphs.GetQuadsMentioningResource subject
+            |> Seq.map this.Resources.GetResourceQuad
             |> Seq.map _.ToString()
             |> String.concat ". "
             
@@ -127,23 +127,23 @@ type Datastore(reifiedTriples: QuadTable,
         let o = pat.Object
         match g, s, p, o with
         | Resource gRes, Resource sRes, Resource pRes, Resource oRes ->
-            let t = { Quad.tripleId = gRes; subject =  sRes; predicate = pRes; obj = oRes }
-            if this.ContainsTriple t then
-                seq { yield t }
+            let q = { Quad.tripleId = gRes; subject =  sRes; predicate = pRes; obj = oRes }
+            if this.NamedGraphs.Contains q then
+                seq { yield q }
             else
                 Seq.empty
         | Resource gRes,  Resource sRes, Resource pRes, Variable _ ->
-            this.GetTriplesWithSubjectPredicate (sRes, pRes)
-        | Resource sRes, Variable _, Resource oRes ->
-            this.GetTriplesWithSubjectObject (sRes, oRes)
-        | Variable _, Resource pRes, Resource oRes ->
-            this.GetTriplesWithObjectPredicate (oRes, pRes)
-        | Resource sRes, Variable _, Variable _ ->
-            this.GetTriplesWithSubject sRes
-        | Variable _, Resource pRes, Variable _ ->
-            this.GetTriplesWithPredicate pRes
-        | Variable _, Variable _, Resource oRes ->
-            this.GetTriplesWithObject oRes
-        | Variable _, Variable _, Variable _ ->
-            this.itriples.GetTriples()
+            this.NamedGraphs.GetQuadsWithIdSubjectPredicate (gRes, sRes, pRes)
+        | Resource gRes, Resource sRes, Variable _, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithIdSubjectObject (gRes, sRes, oRes)
+        | Resource gRes, Variable _, Resource pRes, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithIdObjectPredicate (gRes, oRes, pRes)
+        | Resource gRes,  Resource sRes, Variable _, Variable _ ->
+            this.NamedGraphs.GetQuadsWithIdSubject (gRes, sRes)
+        | Resource gRes, Variable _, Resource pRes, Variable _ ->
+            this.NamedGraphs.GetQuadsWithIdPredicate (gRes, pRes)
+        | Resource gRes, Variable _, Variable _, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithIdObject (gRes, oRes)
+        | Resource gRes, Variable _, Variable _, Variable _ ->
+            this.NamedGraphs.GetQuadsWithId (gRes)
             
