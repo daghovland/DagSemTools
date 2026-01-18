@@ -68,38 +68,39 @@ type Datastore(reifiedTriples: QuadTable,
     member this.GetNamedGraph (graphId : GraphElementId) : ITripleTable
         = NamedTripleTable(this.NamedGraphs, graphId)
     member this.GetTriplesWithSubject (subject: GraphElementId) : Triple seq =
-        this.NamedGraphs.GetQuadsWithIdSubject itriples.GetTriplesWithSubject subject
+        this.NamedGraphs.GetTriplesWithIdSubject (defaultGraphElementId, subject)
     member this.GetTriplesWithSubject (graphid: GraphElementId, subject: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdSubject (graphid, subject)
+        this.NamedGraphs.GetTriplesWithIdSubject (graphid, subject)
     
     member this.GetTriplesWithObject (object: GraphElementId) : Triple seq =
-        this.itriples.GetTriplesWithObject object
+        this.NamedGraphs.GetTriplesWithIdObject (defaultGraphElementId, object)
     member this.GetTriplesWithObject (graphid: GraphElementId, object: GraphElementId)  =
         this.NamedGraphs.GetTriplesWithIdObject (graphid, object)
     member this.GetTriplesWithPredicate (predicate: GraphElementId) : Triple seq =
-        this.itriples.GetTriplesWithPredicate predicate
-    
+        this.NamedGraphs.GetTriplesWithIdPredicate (defaultGraphElementId, predicate)
     member this.GetTriplesWithPredicate (graphid: GraphElementId, predicate: GraphElementId)  =
         this.NamedGraphs.GetTriplesWithIdPredicate (graphid, predicate)
     
     member this.GetTriplesWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
-        this.itriples.GetTriplesWithSubjectPredicate (subject, predicate)
-    
+        this.NamedGraphs.GetTriplesWithIdSubjectPredicate(defaultGraphElementId, subject, predicate)
+        
     member this.GetTriplesWithSubjectPredicate (graphId : GraphElementId, subject: GraphElementId, predicate: GraphElementId) =
         this.NamedGraphs.GetTriplesWithIdSubjectPredicate(graphId, subject, predicate)
     member this.GetTriplesWithObjectPredicate (object: GraphElementId, predicate: GraphElementId) =
-        this.itriples.GetTriplesWithObjectPredicate (object, predicate)
+        this.NamedGraphs.GetTriplesWithIdObjectPredicate (defaultGraphElementId, object, predicate)
     member this.GetTriplesWithObjectPredicate (graphId : GraphElementId, object: GraphElementId, predicate: GraphElementId) =
         this.NamedGraphs.GetTriplesWithIdObjectPredicate(graphId, object, predicate)
     
-        
     member this.GetTriplesWithSubjectObject (subject: GraphElementId, object: GraphElementId)  =
-        this.itriples.GetTriplesWithSubjectObject (subject, object)
+        this.NamedGraphs.GetTriplesWithIdSubjectObject (defaultGraphElementId, subject, object)
     member this.GetTriplesWithSubjectObject (graphId: GraphElementId, subject: GraphElementId, object: GraphElementId)  =
         this.NamedGraphs.GetTriplesWithIdSubjectPredicate (graphId, subject, object)
         
-    member this.ContainsTriple triple  =
-            this.itriples.Contains triple
+    member this.ContainsTriple (triple : Triple) : bool  =
+            this.NamedGraphs.Contains { Quad.tripleId = defaultGraphElementId
+                                        Quad.subject = triple.subject
+                                        predicate = triple.predicate
+                                        obj = triple.obj }
     member this.ContainsQuad quad =
         this.NamedGraphs.Contains quad
     member this.GetReifiedTriplesWithId(id: GraphElementId) : Triple seq =

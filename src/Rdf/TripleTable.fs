@@ -119,8 +119,6 @@ type TripleTable(tripleList: Triple array,
             this.GetTriplesWithPredicateImpl predicate
         member this.GetTriplesWithObject (obj: GraphElementId) : Triple seq =
             this.GetTriplesWithObjectImpl obj
-        member this.GetPredicates() : GraphElementId seq =
-            this.PredicateIndex.Keys 
         member this.GetTriplesWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
             match  (this.SubjectPredicateIndex.TryGetValue subject) with 
                                 |    true, subjMap -> match subjMap.TryGetValue predicate with
