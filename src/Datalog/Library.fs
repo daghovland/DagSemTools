@@ -191,15 +191,6 @@ module Datalog =
                             (fact.obj, factPattern.Object)
                             ]
         resourceList |> Seq.fold GetSubstitutionOption (Some subs)
-        
-    let GetSubstitutions (subs) (fact : Quad) (factPattern : QuadPattern)  : Substitution option =
-        let resourceList = [
-                            (fact.subject, factPattern.Subject)
-                            (fact.predicate, factPattern.Predicate)
-                            (fact.obj, factPattern.Object)
-                            (fact.tripleId, factPattern.Graph)
-                            ]
-        resourceList |> Seq.fold GetSubstitutionOption (Some subs)
     
     
     (*
@@ -222,13 +213,13 @@ module Datalog =
     let GetPartialMatches (rule : Rule) : Map<TripleWildcard, PartialRule list> =
        Map.ofSeq (rule.Body
        |> Seq.choose (fun atom -> match atom with
-                                    | PositiveTriple t -> Some t
-                                    | NotTriple t -> None
-                                    // TODO: This migth need a match
+                                    | RuleAtom.PositivePattern t -> Some t
+                                    | NotPattern t -> None
+                                    // TODO: This might need a match
                                     | NotEqualsAtom (t1, t2) -> None
                     )
        |> Seq.collect (fun pat ->
-           WildcardTriplePattern pat
+           WildcardQuadPattern pat
             |> Seq.map  (fun t -> (t, [{Rule = rule; Match = pat}]))
             )
        )
@@ -247,40 +238,55 @@ module Datalog =
                               | true, r -> Term.Resource r
                               | false, _ -> Variable v
 
-    let evaluatePattern (rdf : ITripleTable) (triplePattern : TriplePattern) (sub : Substitution)  =
-        let mappedTriple : TriplePattern = {
-                            TriplePattern.Subject = GetMappedResource sub triplePattern.Subject
-                            TriplePattern.Predicate = GetMappedResource sub triplePattern.Predicate
-                            TriplePattern.Object = GetMappedResource sub triplePattern.Object
+    let evaluatePattern (rdf : QuadTable) (triplePattern : QuadPattern) (sub : Substitution)  =
+        let mappedQuad : QuadPattern = {
+                            QuadPattern.Graph = GetMappedResource sub triplePattern.Graph
+                            QuadPattern.Subject = GetMappedResource sub triplePattern.Subject
+                            QuadPattern.Predicate = GetMappedResource sub triplePattern.Predicate
+                            QuadPattern.Object = GetMappedResource sub triplePattern.Object
                             }
-        let matchedTriples = (
-            match mappedTriple.Subject, mappedTriple.Predicate, mappedTriple.Object with
-            | Term.Resource s, Variable _p, Variable _o -> 
-                    rdf.GetTriplesWithSubject(s)
-            | Variable _s, Term.Resource p, Variable _o -> 
-                    rdf.GetTriplesWithPredicate(p)
-            | Variable _s, Variable _p, Term.Resource o -> 
-                    rdf.GetTriplesWithObject(o)
-            | Term.Resource s, Term.Resource p, Variable _o -> 
-                    rdf.GetTriplesWithSubjectPredicate(s, p)
-            | Variable _s, Term.Resource p, Term.Resource o -> 
-                    rdf.GetTriplesWithObjectPredicate(o, p)
-            | Term.Resource s, Term.Resource p, Term.Resource o -> 
-                    let triple = {Triple.subject = s; predicate = p; obj = o}
-                    match rdf.Contains triple with
+        let matchedQuads = (
+            match mappedQuad.Graph, mappedQuad.Subject, mappedQuad.Predicate, mappedQuad.Object with
+            | Term.Resource g, Term.Resource s, Variable _p, Variable _o -> 
+                    rdf.GetQuadsWithIdSubject(g, s)
+            | Term.Resource g, Variable _s, Term.Resource p, Variable _o -> 
+                    rdf.GetQuadsWithIdPredicate(g, p)
+            | Term.Resource g, Variable _s, Variable _p, Term.Resource o -> 
+                    rdf.GetQuadsWithIdObject(g, o)
+            | Term.Resource g, Term.Resource s, Term.Resource p, Variable _o -> 
+                    rdf.GetQuadsWithIdSubjectPredicate(g, s, p)
+            | Term.Resource g, Variable _s, Term.Resource p, Term.Resource o -> 
+                    rdf.GetQuadsWithIdObjectPredicate(g, o, p)
+            | Term.Resource g, Term.Resource s, Term.Resource p, Term.Resource o -> 
+                    let quad = {Quad.tripleId = g; Quad.subject = s; predicate = p; obj = o}
+                    match rdf.Contains quad with
                     | false -> []
-                    | true -> [ triple ]                    
-            | Term.Resource s, Variable p, Term.Resource o ->
-                rdf.GetTriplesWithSubjectObject (s, o)
-            | Variable s, Variable p, Variable o -> rdf.GetTriples()
-            ) 
-        matchedTriples |> Seq.choose (fun t -> GetSubstitutions sub t mappedTriple)
+                    | true -> [ quad ]                    
+            | Term.Resource g, Term.Resource s, Variable p, Term.Resource o ->
+                rdf.GetQuadsWithIdSubjectObject (g, s, o)
+            | Term.Resource g, Variable s, Variable p, Variable o -> rdf.GetQuadsWithId(g)
+            | Variable _g, Term.Resource s, Variable _p, Variable _o -> 
+                    rdf.GetQuadsWithSubject(s)
+            | Variable _g, Variable _s, Term.Resource p, Variable _o -> 
+                    rdf.GetQuadsWithPredicate(p)
+            | Variable _g, Variable _s, Variable _p, Term.Resource o -> 
+                    rdf.GetQuadsWithObject(o)
+            | Variable _g, Term.Resource s, Term.Resource p, Variable _o -> 
+                    rdf.GetQuadsWithSubjectPredicate(s, p)
+            | Variable _g, Variable _s, Term.Resource p, Term.Resource o -> 
+                    rdf.GetQuadsWithObjectPredicate(o, p)
+            | Variable _g, Term.Resource s, Term.Resource p, Term.Resource o -> 
+                    rdf.GetQuadsWithTriple(s, p, o)       
+            | Variable _g, Term.Resource s, Variable p, Term.Resource o ->
+                rdf.GetQuadsWithSubjectObject (s, o)
+            | Variable _g, Variable s, Variable p, Variable o -> rdf.GetQuads) 
+        matchedQuads |> Seq.choose (fun t -> GetSubstitutions sub t mappedQuad)
                             
-    let evaluatePositive (rdf : TripleTable) (ruleMatch : PartialRuleMatch) : Substitution seq =
+    let evaluatePositive (rdf : QuadTable) (ruleMatch : PartialRuleMatch) : Substitution seq =
          ruleMatch.Match.Rule.Body
         |> Seq.choose (fun atom -> match atom with
-                                    | PositiveTriple t -> Some t
-                                    | NotTriple t -> None
+                                    | PositivePattern t -> Some t
+                                    | NotPattern t -> None
                                     | NotEqualsAtom (t1, t2) -> None
                     )
         |> Seq.fold
@@ -288,11 +294,11 @@ module Datalog =
                     subs |> Seq.collect (evaluatePattern rdf tr) )
             [ruleMatch.Substitution]  
     
-    let evaluate (rdf : TripleTable) (ruleMatch : PartialRuleMatch)  : Substitution seq =
+    let evaluate (rdf : QuadTable) (ruleMatch : PartialRuleMatch)  : Substitution seq =
         ruleMatch.Match.Rule.Body
         |> Seq.choose (fun atom -> match atom with
-                                    | PositiveTriple _ -> None
-                                    | NotTriple t -> Some t
+                                    | PositivePattern _ -> None
+                                    | NotPattern t -> Some t
                                     | NotEqualsAtom (t1, t2) -> None
                     )
         |> Seq.fold

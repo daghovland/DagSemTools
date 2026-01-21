@@ -133,7 +133,7 @@ module TermsUnifiableTests =
             let triple2 = { TriplePattern.Subject = subject; Predicate = predicate; Object = obj }
 
             // Act
-            let result = Unification.triplePatternsUnifiable triple1 triple2
+            let result = Unification.quadPatternsUnifiable triple1 triple2
 
             // Assert
             Assert.True(result, "Triple patterns should be unifiable but are not")
@@ -152,7 +152,7 @@ module TermsUnifiableTests =
                 Object = Term.Resource((3u)) }
 
             // Act
-            let result = Unification.triplePatternsUnifiable triple1 triple2
+            let result = Unification.quadPatternsUnifiable triple1 triple2
 
             // Assert
             Assert.False(result, "Triple patterns should not be unifiable due to different subjects")
@@ -171,7 +171,7 @@ module TermsUnifiableTests =
                 Object = Term.Resource((3u)) }
 
             // Act
-            let result = Unification.triplePatternsUnifiable triple1 triple2
+            let result = Unification.quadPatternsUnifiable triple1 triple2
 
             // Assert
             Assert.False(result, "Triple patterns should not be unifiable due to different predicates")
@@ -190,7 +190,7 @@ module TermsUnifiableTests =
                 Object = Term.Resource((99u)) } // Different object
 
             // Act
-            let result = Unification.triplePatternsUnifiable triple1 triple2
+            let result = Unification.quadPatternsUnifiable triple1 triple2
 
             // Assert
             Assert.False(result, "Triple patterns should not be unifiable due to different objects")
@@ -209,7 +209,7 @@ module TermsUnifiableTests =
                 Object = Term.Resource((3u)) } // Matching resource for object variable
 
             // Act
-            let result = Unification.triplePatternsUnifiable triple1 triple2
+            let result = Unification.quadPatternsUnifiable triple1 triple2
 
             // Assert
             Assert.True(result, "Triple patterns with variable and resource should be unifiable")

@@ -40,9 +40,9 @@ module Reasoner =
             RuleMap <- mergeMaps [RuleMap; GetPartialMatches rule]
                 
             
-        member internal this.GetRulesForFact(fact: Ingress.Triple) : PartialRuleMatch seq =
+        member internal this.GetRulesForFact(fact) : PartialRuleMatch seq =
             ConstantQuadPattern fact
-                |> WildcardTriplePattern
+                |> WildcardQuadPattern
                 |> Seq.map (fun wildcardFact ->
                     match RuleMap.TryGetValue(wildcardFact) with
                     | true, rules -> rules
@@ -67,8 +67,8 @@ module Reasoner =
             Usually called from the evaluate function, which will stratify the ruleset
         *)
         member internal this.materialiseNaive() =
-                this.GetFacts() |> Seq.iter tripleStore.AddTriple
-                for triple in tripleStore.itriples.GetTriples() do
+                this.GetFacts() |> Seq.iter tripleStore.Add
+                for triple in tripleStore.NamedGraphs.GetQuads do
                     for rules in this.GetRulesForFact triple do
                         let ruleMatchHead = match rules.Match.Rule.Head with
                                             | Contradiction -> failwith $"Contradiction occurred during reasoning: {rules.Match.Rule.ToString(tripleStore.Resources)}"

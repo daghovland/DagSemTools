@@ -36,10 +36,11 @@ module internal Unification =
         | Term.Variable v1, Term.Variable v2 -> (Some (constantMap, (Map.add v1 (v2) variableMap)))
     
     (* Two triple patterns are unifiable if there exists a mapping of the variables such that they are equal *)
-    let internal triplePatternsUnifiable (triple1 : TriplePattern) (triple2 : TriplePattern)  =
-        TermsUnifiable triple1.Subject triple2.Subject (Map.empty, Map.empty)
-        |> Option.bind (TermsUnifiable triple1.Predicate triple2.Predicate)
-        |> Option.bind (TermsUnifiable triple1.Object triple2.Object)
+    let internal quadPatternsUnifiable (quad1: QuadPattern) (quad2: QuadPattern)  =
+        TermsUnifiable quad1.Subject quad2.Subject (Map.empty, Map.empty)
+        |> Option.bind (TermsUnifiable quad1.Predicate quad2.Predicate)
+        |> Option.bind (TermsUnifiable quad1.Object quad2.Object)
+        |> Option.bind (TermsUnifiable quad1.Graph quad2.Graph)
         |> Option.isSome
     
       (*
@@ -64,10 +65,10 @@ module internal Unification =
         | PositiveRelation
         | NegativeRelation
         
-    let internal triplePatternAtomUnifiable (triple1 : TriplePattern) (atom : RuleAtom) =
+    let internal triplePatternAtomUnifiable (quad1: QuadPattern) (atom : RuleAtom) =
         match atom with
-        | NotTriple pattern -> if triplePatternsUnifiable triple1 pattern then Some NegativeRelation else None
-        | PositiveTriple pattern -> if triplePatternsUnifiable triple1 pattern then Some PositiveRelation else None
+        | NotPattern pattern -> if quadPatternsUnifiable quad1 pattern then Some NegativeRelation else None
+        | PositivePattern pattern -> if quadPatternsUnifiable quad1 pattern then Some PositiveRelation else None
         | NotEqualsAtom (t1, t2) -> None
     
     (* Returns all rules where there is a body atom that is unifiable with the triple pattern
@@ -90,4 +91,4 @@ module internal Unification =
         rules |> Seq.where (fun rule ->
             match rule.Head with
             | Contradiction -> false
-            | NormalHead headPattern -> triplePatternsUnifiable triplePattern headPattern)
+            | NormalHead headPattern -> quadPatternsUnifiable triplePattern headPattern)
