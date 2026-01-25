@@ -194,7 +194,7 @@ public class TestParser
         ont.Should().NotBeNull();
         ont.Should().HaveCount(1);
         ont.First().Body.Count().Should().Be(1);
-        ont.First().Head.Should().Be(RuleHead.NewNormalHead(new Query.TriplePattern(
+        ont.First().Head.Should().Be(RuleHead.NewNormalHead(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("?new_node"),
             Query.Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://www.w3.org/1999/02/22-rdf-syntax-ns#type")))),
@@ -202,7 +202,7 @@ public class TestParser
                 .NewResource(datastore.GetGraphNodeId(RdfResource
                     .NewIri(new IriReference("https://example.com/data#type")))))));
 
-        ont.First().Body.First().Should().Be(RuleAtom.NewPositiveTriple(new Query.TriplePattern(
+        ont.First().Body.First().Should().Be(RuleAtom.NewPositivePattern(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("?node"),
             Query.Term
                 .NewResource(datastore.GetGraphNodeId(RdfResource
