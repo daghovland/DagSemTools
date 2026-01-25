@@ -37,6 +37,10 @@ type Datastore(reifiedTriples: QuadTable,
     member this.AddTriple (triple: Triple) =
         this.NamedGraphs.AddQuad (getDefaultGraphTriple triple)
     
+    member this.AddQuad =
+        this.NamedGraphs.AddQuad 
+    
+    
     member this.GetDefaultTripleTable = new NamedTripleTable(this.NamedGraphs, defaultGraphElementId)
     
     member this.AddNamedGraphTriple(graph: GraphElementId, triple: Triple) =

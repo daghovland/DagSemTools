@@ -12,7 +12,7 @@ using IriTools;
 
 namespace DagSemTools.Datalog.Parser;
 
-internal class TriplePatternVisitor : DatalogBaseVisitor<Query.TriplePattern>
+internal class TriplePatternVisitor : DatalogBaseVisitor<Query.QuadPattern>
 {
     private readonly PredicateVisitor _predicateVisitor;
 
@@ -26,7 +26,7 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.TriplePattern>
     /// </summary>
     /// <param name="context"></param>
     /// <returns></returns>
-    public override Query.TriplePattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
+    public override Query.QuadPattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
     {
         var subject = context.term(0);
         var predicate = context.relation();
@@ -38,11 +38,8 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.TriplePattern>
                                      throw new Exception($"Subject is null  at line {context.Start.Line}, position {context.Start.Column}");
         Query.Term objectResource = _predicateVisitor.Visit(@object) ??
                                     throw new Exception($"Object is null at line {context.Start.Line}, position {context.Start.Column}"); ;
-        return new Query.TriplePattern(
-            subjectResource,
-            predicateResource,
-            objectResource
-        );
+        return new Query.GetDefaultGraphPattern subjectResource predicateResource objectResource
+        
     }
 
     /// <inheritdoc />

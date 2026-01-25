@@ -87,8 +87,10 @@ type RuleAtom =
 
 [<StructuralComparison>]
 [<StructuralEquality>]
-type TripleWildcard = 
-    {Subject: ResourceOrWildcard; Predicate: ResourceOrWildcard; Object: ResourceOrWildcard}
+type QuadWildcard = 
+    {Graph: ResourceOrWildcard; Subject: ResourceOrWildcard; Predicate: ResourceOrWildcard; Object: ResourceOrWildcard}
+
+
 
 [<StructuralComparison>]
 [<StructuralEquality>]
@@ -123,20 +125,23 @@ module Datalog =
     
     /// Generate all 8 possible triple patterns with wildcards for a given triple pattern
     /// Duplicate patterns are ok since these are used as a key in a dictionary
-    let WildcardQuadPattern (quad: QuadPattern) : TripleWildcard list = 
-        let resourceList = [ quad.Subject; quad.Predicate; quad.Object]
-        let rec generatePatterns (triple: Term list) : ResourceOrWildcard list list = 
-              match triple with
+    let WildcardQuadPattern (quad: QuadPattern) = 
+        let resourceList = [quad.Graph; quad.Subject; quad.Predicate; quad.Object]
+        let rec generatePatterns (quad: Term list) : ResourceOrWildcard list list = 
+              match quad with
               | [] -> [[]]
               | head :: tail -> 
                 let rest = generatePatterns tail
                 match head with
                 | Variable _ -> 
-                     rest |> List.map (fun triplePart -> Wildcard :: triplePart)
+                     rest |> List.map (fun quadPart -> Wildcard :: quadPart)
                 | Term.Resource r -> 
-                    rest |> List.collect (fun triplePart -> [Resource r :: triplePart; Wildcard :: triplePart])
-        generatePatterns resourceList |> List.map (fun triplePart ->
-            {Subject = List.item 0 triplePart; Predicate = List.item 1 triplePart; Object = List.item 2 triplePart})
+                    rest |> List.collect (fun quadPart -> [Resource r :: quadPart; Wildcard :: quadPart])
+        generatePatterns resourceList |> List.map (fun quadPart ->
+            {QuadWildcard.Graph = List.item 0 quadPart
+             Subject = List.item 1 quadPart
+             Predicate = List.item 2 quadPart
+             Object = List.item 3 quadPart})
         
     (* Safe rules are those where the head only has variable that are in the body *)
     let GetUnsafeHeadVariables (rule) =
@@ -210,7 +215,7 @@ module Datalog =
     let GetPartialMatch (quad : QuadPattern)  =
         WildcardQuadPattern quad
         
-    let GetPartialMatches (rule : Rule) : Map<TripleWildcard, PartialRule list> =
+    let GetPartialMatches (rule : Rule) : Map<QuadWildcard, PartialRule list> =
        Map.ofSeq (rule.Body
        |> Seq.choose (fun atom -> match atom with
                                     | RuleAtom.PositivePattern t -> Some t

@@ -14,7 +14,7 @@ open Stratifier
     
 module Reasoner =
 
-    type DatalogProgram (Rules: Rule list, tripleStore : Datastore) =
+    type DatalogProgram (Rules: Rule list, datastore: Datastore) =
         
         let GetUnsafeRules (rules : Rule seq) =
             rules |> Seq.filter (not << isSafeRule)
@@ -28,7 +28,7 @@ module Reasoner =
                                                 
                 raise (new System.ArgumentException("These rules are not safe: " + String.concat "" unsafeRuleStrings))
                 
-        let mutable RuleMap : Map<TripleWildcard, PartialRule list>  =
+        let mutable RuleMap : Map<QuadWildcard, PartialRule list>  =
                             Rules
                                 |> List.map GetPartialMatches
                                 |> mergeMaps
@@ -67,20 +67,22 @@ module Reasoner =
             Usually called from the evaluate function, which will stratify the ruleset
         *)
         member internal this.materialiseNaive() =
-                this.GetFacts() |> Seq.iter tripleStore.Add
-                for triple in tripleStore.NamedGraphs.GetQuads do
-                    for rules in this.GetRulesForFact triple do
+                this.GetFacts() |> Seq.iter datastore.NamedGraphs.AddQuad
+                for quad in datastore.NamedGraphs.GetQuads do
+                    for rules in this.GetRulesForFact quad do
                         let ruleMatchHead = match rules.Match.Rule.Head with
-                                            | Contradiction -> failwith $"Contradiction occurred during reasoning: {rules.Match.Rule.ToString(tripleStore.Resources)}"
+                                            | Contradiction -> failwith $"Contradiction occurred during reasoning: {rules.Match.Rule.ToString(
+                                                                                                                        datastore
+                                                                                                                            .Resources)}"
                                             | NormalHead head -> head
-                        for subs in evaluate tripleStore.Triples rules  do
-                            let newTriple = ApplySubstitutionQuad subs ruleMatchHead
-                            tripleStore.AddTriple newTriple
+                        for subs in evaluate datastore.NamedGraphs rules  do
+                            let newQuad = ApplySubstitutionQuad subs ruleMatchHead
+                            datastore.NamedGraphs.AddQuad newQuad
 
     let evaluate (logger: ILogger, rules: Rule list, triplestore: Datastore) =
             // let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates(rules, triplestore) |> Seq.toList
             let stratifier = RulePartitioner (logger, rules, triplestore.Resources)
             let stratification = stratifier.orderRules()
             for partition in stratification do
-                let program = DatalogProgram(Rules = Seq.toList partition, tripleStore = triplestore)
+                let program = DatalogProgram(Rules = Seq.toList partition, datastore = triplestore)
                 program.materialiseNaive()
