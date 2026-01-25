@@ -38,12 +38,12 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.QuadPattern>
                                      throw new Exception($"Subject is null  at line {context.Start.Line}, position {context.Start.Column}");
         Query.Term objectResource = _predicateVisitor.Visit(@object) ??
                                     throw new Exception($"Object is null at line {context.Start.Line}, position {context.Start.Column}"); ;
-        return new Query.GetDefaultGraphPattern subjectResource predicateResource objectResource
-        
+        return Query.GetDefaultGraphPattern(subjectResource, predicateResource, objectResource);
+
     }
 
     /// <inheritdoc />
-    public override Query.TriplePattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
+    public override Query.QuadPattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
     {
         var subject = context.term();
         var predicate = Query.Term
@@ -52,7 +52,7 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.QuadPattern>
                     .NewIri(new IriReference(Namespaces.RdfType))));
         var @class = context.relation();
 
-        return new Query.TriplePattern(
+        return Query.GetDefaultGraphPattern(
                 _predicateVisitor.Visit(subject),
                 predicate,
                 _predicateVisitor.Visit(@class)

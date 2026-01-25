@@ -136,8 +136,8 @@ public class TestParser
         ont.First().Body.Count().Should().Be(1);
         var ruleAtom = ont.First().Body.First();
         ruleAtom.Should().NotBeNull();
-        ruleAtom.IsPositiveTriple.Should().BeTrue();
-        var ruleTriplePattern = ((RuleAtom.PositiveTriple)ruleAtom).Item;
+        ruleAtom.IsPositivePattern.Should().BeTrue();
+        var ruleTriplePattern = ((RuleAtom.PositivePattern)ruleAtom).Item;
         ruleTriplePattern.Subject.Should().Be(Query.Term.NewVariable("?s"));
 
         var predicateResource = Query.Term
@@ -150,7 +150,7 @@ public class TestParser
                 .NewIri(new IriReference("https://example.com/data3#obj"))));
         ruleTriplePattern.Object.Should().Be(objectResource);
 
-        ruleAtom.Should().Be(RuleAtom.NewPositiveTriple(new Query.TriplePattern(
+        ruleAtom.Should().Be(RuleAtom.NewPositivePattern(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("?s"),
             predicateResource,
             objectResource)));
@@ -167,14 +167,14 @@ public class TestParser
         ont.Should().HaveCount(1);
         var parsedDatalogRule = ont.First();
         parsedDatalogRule.Body.Count().Should().Be(2);
-        parsedDatalogRule.Body.First().Should().Be(RuleAtom.NewPositiveTriple(new Query.TriplePattern(
+        parsedDatalogRule.Body.First().Should().Be(RuleAtom.NewPositivePattern(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("?x"),
             Query.Term.NewVariable("?p"),
             Query.Term.NewVariable("?y"))));
         var rdfTypeResource = Query.Term
             .NewResource(datastore.AddNodeResource(RdfResource
                 .NewIri(new IriReference(Namespaces.RdfType))));
-        var expectedHead = RuleHead.NewNormalHead(new Query.TriplePattern(
+        var expectedHead = RuleHead.NewNormalHead(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("?x"),
             rdfTypeResource,
             Query.Term.NewVariable("?c")));
