@@ -42,10 +42,9 @@ module Tests =
         let predIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicate"))
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
         let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
-        let triplepattern =  {
-                             TriplePattern.Subject = Term.Resource subjectIndex
-                             TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = Term.Resource objdIndex}
+        let triplepattern =  Query.GetDefaultGraphPattern  ( Term.Resource subjectIndex)
+                             ( Variable "p")
+                             ( Term.Resource objdIndex)
         let triplepattern2 = PositivePattern {
                              TriplePattern.Subject = Term.Resource subjectIndex
                              TriplePattern.Predicate =  Variable "p"
@@ -70,16 +69,16 @@ module Tests =
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
         let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
         let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
-        let triplepattern = {
-                             TriplePattern.Subject = Term.Resource subjectIndex
-                             TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = Term.Resource objdIndex}
-        let triplepattern2 = PositiveTriple{
-                             TriplePattern.Subject = Term.Resource subjectIndex
-                             TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = Term.Resource objdIndex2
-                             }
-        let tripleFact : Triple = {
+        let triplepattern = Query.GetDefaultGraphPattern 
+                             (Term.Resource subjectIndex)
+                             (Variable "p")
+                             ( Term.Resource objdIndex)
+        let triplepattern2 = PositivePattern (Query.GetDefaultGraphPattern 
+                                                 (Term.Resource subjectIndex)
+                                                 (Variable "p")
+                                                 (Term.Resource objdIndex2))
+                             
+        let tripleFact : Quad  = Ingress.getDefaultGraphTriple {
                              subject = subjectIndex
                              predicate =  predIndex
                              obj = objdIndex3

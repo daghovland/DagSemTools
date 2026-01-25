@@ -101,7 +101,7 @@ module Ingress =
         }
     
     let defaultGraphElementId = uint32 0
-    let getDefaultGraphTriple triple =
+    let internal getDefaultGraphTriple triple =
         tripleToQuad triple defaultGraphElementId
       
     let doubleArraySize (originalArray: 'T array) : 'T array =
