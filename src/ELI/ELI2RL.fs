@@ -41,7 +41,7 @@ module ELI2RL =
         let obj = match objectValue with
                     | NamedIndividual (FullIri name) -> resources.AddNodeResource(Iri name) 
                     | AnonymousIndividual anonId -> resources.GetOrCreateNamedAnonResource($"{anonId}")
-        GetDefaultGraphPattern ( Term.Variable subjectVar)
+        Query.GetDefaultGraphPattern ( Term.Variable subjectVar)
           (Term.Resource role)
           (Term.Resource obj )
 

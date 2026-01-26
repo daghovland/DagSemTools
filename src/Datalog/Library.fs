@@ -123,7 +123,7 @@ module Datalog =
          Subject = Term.Resource quad.subject
          Predicate = Term.Resource quad.predicate; Object = Term.Resource quad.obj}
     
-    /// Generate all 8 possible triple patterns with wildcards for a given triple pattern
+    /// Generate all 16 possible quad patterns with wildcards for a given quad pattern
     /// Duplicate patterns are ok since these are used as a key in a dictionary
     let WildcardQuadPattern (quad: QuadPattern) = 
         let resourceList = [quad.Graph; quad.Subject; quad.Predicate; quad.Object]

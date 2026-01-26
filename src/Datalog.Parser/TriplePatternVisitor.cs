@@ -42,7 +42,6 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.QuadPattern>
 
     }
 
-    /// <inheritdoc />
     public override Query.QuadPattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
     {
         var subject = context.term();
