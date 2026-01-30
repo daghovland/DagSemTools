@@ -67,17 +67,17 @@ module Reasoner =
             Usually called from the evaluate function, which will stratify the ruleset
         *)
         member internal this.materialiseNaive() =
-                this.GetFacts() |> Seq.iter datastore.NamedGraphs.AddQuad
-                for quad in datastore.NamedGraphs.GetQuads do
-                    for rules in this.GetRulesForFact quad do
+                this.GetFacts() |> Seq.iter tripleStore.AddQuad
+                for triple in tripleStore.NamedGraphs.GetQuads do
+                    for rules in this.GetRulesForFact triple do
                         let ruleMatchHead = match rules.Match.Rule.Head with
                                             | Contradiction -> failwith $"Contradiction occurred during reasoning: {rules.Match.Rule.ToString(
                                                                                                                         datastore
                                                                                                                             .Resources)}"
                                             | NormalHead head -> head
-                        for subs in evaluate datastore.NamedGraphs rules  do
+                        for subs in evaluate tripleStore.NamedGraphs rules  do
                             let newQuad = ApplySubstitutionQuad subs ruleMatchHead
-                            datastore.NamedGraphs.AddQuad newQuad
+                            tripleStore.AddQuad newQuad
 
     let evaluate (logger: ILogger, rules: Rule list, triplestore: Datastore) =
             // let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates(rules, triplestore) |> Seq.toList
