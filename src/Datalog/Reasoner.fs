@@ -67,22 +67,22 @@ module Reasoner =
             Usually called from the evaluate function, which will stratify the ruleset
         *)
         member internal this.materialiseNaive() =
-                this.GetFacts() |> Seq.iter tripleStore.AddQuad
-                for triple in tripleStore.NamedGraphs.GetQuads do
+                this.GetFacts() |> Seq.iter datastore.AddQuad
+                for triple in datastore.NamedGraphs.GetQuads do
                     for rules in this.GetRulesForFact triple do
                         let ruleMatchHead = match rules.Match.Rule.Head with
                                             | Contradiction -> failwith $"Contradiction occurred during reasoning: {rules.Match.Rule.ToString(
                                                                                                                         datastore
                                                                                                                             .Resources)}"
                                             | NormalHead head -> head
-                        for subs in evaluate tripleStore.NamedGraphs rules  do
+                        for subs in evaluate datastore.NamedGraphs rules  do
                             let newQuad = ApplySubstitutionQuad subs ruleMatchHead
-                            tripleStore.AddQuad newQuad
+                            datastore.AddQuad newQuad
 
-    let evaluate (logger: ILogger, rules: Rule list, triplestore: Datastore) =
-            // let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates(rules, triplestore) |> Seq.toList
-            let stratifier = RulePartitioner (logger, rules, triplestore.Resources)
+    let evaluate (logger: ILogger, rules: Rule list, datastore: Datastore) =
+            // let rules_with_iri_predicates = PredicateGrounder.groundRulePredicates(rules, datastore) |> Seq.toList
+            let stratifier = RulePartitioner (logger, rules, datastore.Resources)
             let stratification = stratifier.orderRules()
             for partition in stratification do
-                let program = DatalogProgram(Rules = Seq.toList partition, datastore = triplestore)
+                let program = DatalogProgram(Rules = Seq.toList partition, datastore = datastore)
                 program.materialiseNaive()
