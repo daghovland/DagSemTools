@@ -48,7 +48,9 @@ module Tests =
                              subject = subjectIndex
                              predicate =  predIndex
                              obj = objdIndex2})
-        let rule = { Head =  NormalHead quadpattern; Body = [quadpattern2]}
+
+        
+        let rule = {Head =  NormalHead quadpattern; Body = [quadpattern2]}
         let prog = Reasoner.DatalogProgram ([rule], tripleTable)
         let rules = prog.GetRulesForFact tripleFact
         Assert.Single(rules) |> ignore
@@ -244,7 +246,7 @@ module Tests =
                              (Term.Resource objdIndex))
 
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch //; negativeMatch
-                                                                     ])
+                                                                     ]}
             let prog = Reasoner.DatalogProgram([rule], tripleTable)
             let triple = Subject1Obj1
             for rules in prog.GetRulesForFact (Ingress.getDefaultGraphTriple triple) do
@@ -261,26 +263,25 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex3
-)
-            let positiveMatch = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern
+                                (Term.Variable "s")
+                                (Term.Resource predIndex)
+                                (Term.Resource objdIndex3)
+
+            let positiveMatch = RuleAtom.PositivePattern (GetDefaultGraphPattern
+                             (Term.Variable "s")
+                             (Term.Resource predIndex)
+                             (Term.Resource objdIndex))
             
             let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch //; negativeMatch
-                                                                     ])
+                                                                     ]}
             Reasoner.evaluate(logger, [rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3) |> List.ofSeq
             Assert.Equal(2, matches.Length)
@@ -297,9 +298,9 @@ module Tests =
             let subClassOfIndex = tripleTable.AddNodeResource(Iri(new IriReference(Namespaces.RdfsSubClassOf)));
             let subClassIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/subClass"));
             let superClassIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/superClass"));
-            let typeTriple = {Triple.subject = subjectIndex; predicate = rdfTypeIndex; obj = subClassIndex)
+            let typeTriple = {Triple.subject = subjectIndex; predicate = rdfTypeIndex; obj = subClassIndex}
             tripleTable.AddTriple(typeTriple)
-            let subClassTriple = {Triple.subject = subClassIndex; predicate = subClassOfIndex; obj = superClassIndex)
+            let subClassTriple = {Triple.subject = subClassIndex; predicate = subClassOfIndex; obj = superClassIndex}
             tripleTable.AddTriple(subClassTriple)
             
             let matchesBefore = tripleTable.GetTriplesWithSubjectObject(subjectIndex, superClassIndex) |> List.ofSeq
