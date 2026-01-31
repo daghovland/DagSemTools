@@ -171,17 +171,17 @@ type QuadTable(quadList: Quad array,
             let objectMatch = this.GetQuadsWithIdObject (id, object)
             if  (Seq.length predicateMatch) < (Seq.length objectMatch) then
                 predicateMatch 
-                    |> Seq.where (fun q -> q.obj = predicate)
+                    |> Seq.where (fun q -> q.obj = object)
             else
                 objectMatch
-                |> Seq.where (fun q -> q.subject = object)
+                |> Seq.where (fun q -> q.predicate = predicate)
         
         member internal this.GetQuadsWithIdSubjectPredicate (id: GraphElementId, subject: GraphElementId, predicate: GraphElementId) : Quad seq =
             let subjectMatch = this.GetQuadsWithIdSubject (id, subject)
-            let predicateMatch = this.GetQuadsWithIdObject (id, predicate)
+            let predicateMatch = this.GetQuadsWithIdPredicate (id, predicate)
             if  (Seq.length subjectMatch) < (Seq.length predicateMatch) then
                 subjectMatch 
-                    |> Seq.where (fun q -> q.obj = predicate)
+                    |> Seq.where (fun q -> q.predicate = predicate)
             else
                 predicateMatch
                 |> Seq.where (fun q -> q.subject = subject)

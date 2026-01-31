@@ -99,7 +99,8 @@ module Ingress =
             predicate = triple.predicate
             obj = triple.obj
         }
-    
+    // The default graph IRI is always 0, this is also
+    // fixed in GraphElementManager.fs
     let defaultGraphElementId = uint32 0
     let internal getDefaultGraphTriple triple =
         tripleToQuad triple defaultGraphElementId
