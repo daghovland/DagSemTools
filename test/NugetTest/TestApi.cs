@@ -50,7 +50,7 @@ public class TestApi(ITestOutputHelper output)
         var ont = TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
-        var subjects = ont.GetTriplesWithPredicate(new IriReference("http://purl.org/dc/terms/subject"));
+        var subjects = ont.GetDefaultGraph().GetTriplesWithPredicate(new IriReference("http://purl.org/dc/terms/subject"));
         subjects.Count().Should().BeGreaterThan(200, "There are many triples with subjects");
     }
 
@@ -63,7 +63,7 @@ public class TestApi(ITestOutputHelper output)
         var ont = TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
-        var labels = ont.GetTriplesWithSubjectPredicate(
+        var labels = ont.GetDefaultGraph().GetTriplesWithSubjectPredicate(
             new IriReference("http://dbpedia.org/ontology/NaturalEvent"),
             new IriReference("http://www.w3.org/2000/01/rdf-schema#label"));
         labels.Count().Should().Be(7, "There are two labels on natural event");
@@ -75,18 +75,18 @@ public class TestApi(ITestOutputHelper output)
     {
         var ontology = new FileInfo("TestData/data.ttl");
         var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetTriplesWithPredicateObject(
+        var resultsData = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object"));
         resultsData.Should().HaveCount(1);
-        var resultsBefore = ont.GetTriplesWithPredicateObject(
+        var resultsBefore = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsBefore.Should().BeEmpty();
         Assert.NotNull(ont);
         var datalogFile = new FileInfo("TestData/rules.datalog");
         ont.LoadDatalog(datalogFile);
-        var resultsAfter = ont.GetTriplesWithPredicateObject(
+        var resultsAfter = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsAfter.Should().HaveCount(1);
