@@ -306,22 +306,10 @@ module Tests =
             let matchesBefore = tripleTable.GetTriplesWithSubjectObject(subjectIndex, superClassIndex) |> List.ofSeq
             Assert.Equal(0, matchesBefore.Length)
           
-            let headPattern = {
-                             Subject = Term.Variable "?x"
-                             Predicate = Term.Resource rdfTypeIndex
-                             Object = Term.Variable "?super"
-)
-            let subClassTypeAtom = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "?x"
-                             Predicate = Term.Resource rdfTypeIndex
-                             Object = Term.Variable "?sub"
-)
-            let isSubClassOfAtom = RuleAtom.PositivePattern {
-                                    Subject = Term.Variable "?sub"
-                                    Predicate = Term.Resource subClassOfIndex
-                                    Object = Term.Variable "?super" 
-)
-            let rule =  {Head = NormalHead (headPattern); Body = [ subClassTypeAtom; isSubClassOfAtom ])
+            let headPattern = GetDefaultGraphPattern (Term.Variable "?x") (Term.Resource rdfTypeIndex) (Term.Variable "?super")
+            let subClassTypeAtom = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "?x") (Term.Resource rdfTypeIndex) (Term.Variable "?sub"))
+            let isSubClassOfAtom = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "?sub") (Term.Resource subClassOfIndex) (Term.Variable "?super"))
+            let rule =  {Head = NormalHead (headPattern); Body = [ subClassTypeAtom; isSubClassOfAtom ]}
             
             //Act
             Reasoner.evaluate(logger, [rule], tripleTable)
@@ -341,19 +329,15 @@ module Tests =
             let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2)
-            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
+            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             tripleTable.AddTriple(Subject1Subj2)
             
             
-            let triplePattern2 = {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex2
-                             Object = Term.Variable "s"
-)
+            let triplePattern2 = GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex2) (Term.Variable "s")
            
             let typedTriples = tripleTable.GetTriplesWithObject(objdIndex)
             Assert.Single typedTriples |> ignore
@@ -372,32 +356,18 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2)
-            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
+            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             tripleTable.AddTriple(Subject1Subj2)
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
-            let positiveMatch1 = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex)
+            let positiveMatch1 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex) (Term.Resource objdIndex))
+            let positiveMatch2 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex2) (Term.Variable "s"))
             
-            let positiveMatch2 = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex2
-                             Object = Term.Variable "s"
-)
-            
-            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2
-                                                                     ])
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2 ]}
             Reasoner.evaluate(logger, [rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex) |> List.ofSeq
             Assert.Equal(2, matches.Length)
@@ -414,35 +384,21 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2)
-            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
+            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             tripleTable.AddTriple(Subject1Subj2)
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
-            let positiveMatch1 = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex)
+            let positiveMatch1 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex) (Term.Resource objdIndex))
+            let positiveMatch2 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex2) (Term.Variable "s"))
             
-            let positiveMatch2 = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex2
-                             Object = Term.Variable "s"
-)
-            
-            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2
-                                                                     ])
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2 ]}
             let stratifier = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let returned_cycles = stratifier.cycle_finder [] 0u
-            let expected = seq { seq { 0u))
+            let expected = seq { seq { 0u } }
             (returned_cycles |> Seq.length).Should().Be(1, "There is a cycle that should have been detected.") |> ignore
             let returned_cycle = returned_cycles |> Seq.head
             (returned_cycle |> Seq.length).Should().Be(1, "The program has a single recursive rule.")
@@ -458,32 +414,18 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2)
-            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
+            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             tripleTable.AddTriple(Subject1Subj2)
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
-            let positiveMatch1 = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex)
+            let positiveMatch1 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex) (Term.Resource objdIndex))
+            let positiveMatch2 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex2) (Term.Variable "s"))
             
-            let positiveMatch2 = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex2
-                             Object = Term.Variable "s"
-)
-            
-            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2
-                                                                     ])
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2 ]}
             let stratifier = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             stratifier.handle_cycle()
             stratifier.GetReadyElementsQueue().IsEmpty.Should().BeFalse("There is a cycle that should have been detected.") |> ignore
@@ -500,32 +442,18 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2)
-            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
+            let Subject1Subj2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex2; obj = subjectIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             tripleTable.AddTriple(Subject1Subj2)
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
-            let positiveMatch1 = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex)
+            let positiveMatch1 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex) (Term.Resource objdIndex))
+            let positiveMatch2 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s2") (Term.Resource predIndex2) (Term.Variable "s"))
             
-            let positiveMatch2 = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s2"
-                             Predicate = Term.Resource predIndex2
-                             Object = Term.Variable "s"
-)
-            
-            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2
-                                                                     ])
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch1 ; positiveMatch2 ]}
             let stratifier = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let covered = stratifier.RuleIsCoveredByCycle [0u] rule
             covered.Should().BeTrue()
@@ -542,33 +470,18 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex3
-)
-            let positiveMatch = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex3)
+            let positiveMatch = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex))
+            let negativeMatch = RuleAtom.NotPattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex2))
             
-            let negativeMatch = RuleAtom.NotPattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex2
-)
-            
-            let rule =  {Head = NormalHead (headPattern)
-                         Body = [ positiveMatch; negativeMatch ]
-)
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch; negativeMatch ]}
             let partitioner  = DagSemTools.Datalog.Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRules()
             ordered_relations.Should().HaveLength(1) |> ignore
@@ -592,19 +505,10 @@ module Tests =
             let predIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicate"))
             let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
-            let positiveMatch = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex)
+            let positiveMatch = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex))
             
-            
-            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ])
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ]}
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let cycles = partitioner.cycle_finder [] 0u
             cycles.Should().HaveLength(1) |> ignore
@@ -622,14 +526,9 @@ module Tests =
             let query1 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
             query1.Should().HaveLength(0) |> ignore
             
-            let headPattern = {
-                             Subject = Term.Resource subjIndex
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Resource subjIndex) (Term.Resource predIndex) (Term.Resource objdIndex)
             
-            
-            let rule =  {Head = NormalHead (headPattern); Body = [  ])
+            let rule =  {Head = NormalHead (headPattern); Body = [  ]}
             DagSemTools.Datalog.Reasoner.evaluate (logger, [rule], tripleTable)
             let query2 = tripleTable.GetTriplesWithSubjectObject(subjIndex, objdIndex)
             query2.Should().HaveLength(1) |> ignore
@@ -645,19 +544,10 @@ module Tests =
             let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
             
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
-            let positiveMatch = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex)
+            let positiveMatch = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex))
             
-            
-            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ])
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch ]}
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let orderedRules = partitioner.orderRules()
             orderedRules.Should().HaveLength(1) |> ignore
@@ -674,21 +564,10 @@ module Tests =
             let predIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicate"))
             let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex)
+            let negativeMatch = RuleAtom.NotPattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex))
             
-            let negativeMatch = RuleAtom.NotPattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
-            
-            let rule =  {Head = NormalHead (headPattern); Body = [ negativeMatch
-                                                       ]
-)
+            let rule =  {Head = NormalHead (headPattern); Body = [ negativeMatch ]}
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             (fun () -> partitioner.orderRules()).Should().Throw<Exception,_>() |> ignore
               
@@ -703,33 +582,19 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex3
-)
-            let positiveMatch = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
-            
-            let negativeMatch = RuleAtom.NotPattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex3
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex3)
+            let positiveMatch = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex))
+            let negativeMatch = RuleAtom.NotPattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex3))
             
             let rule =  {Head =  NormalHead headPattern
-                         Body = [ positiveMatch; negativeMatch ]
-)
+                         Body = [ positiveMatch; negativeMatch ]}
             let partitioner  = Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRules()
             ordered_relations.Should().HaveLength(1) |> ignore
@@ -760,40 +625,14 @@ module Tests =
             let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             
-            let headPatternA = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndexA
-                             Object = Term.Resource objdIndex
-)
-            let headPatternB = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndexB
-                             Object = Term.Resource objdIndex
-)
-            let positiveMatchA = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndexA
-                             Object = Term.Resource objdIndex
-)
+            let headPatternA = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndexA) (Term.Resource objdIndex)
+            let headPatternB = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndexB) (Term.Resource objdIndex)
+            let positiveMatchA = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndexA) (Term.Resource objdIndex))
+            let positiveMatchB = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndexB) (Term.Resource objdIndex))
+            let negativeMatch = RuleAtom.NotPattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndexC) (Term.Resource objdIndex2))
             
-            let positiveMatchB = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndexB
-                             Object = Term.Resource objdIndex
-)
-            
-            let negativeMatch = RuleAtom.NotPattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndexC
-                             Object = Term.Resource objdIndex2
-)
-            
-            let ruleA =  {Head = NormalHead (headPatternA)
-                          Body = [ positiveMatchA; positiveMatchB ]
-)
-            let ruleB = {Head = NormalHead (headPatternB)
-                         Body = [ negativeMatch ]
-)
+            let ruleA =  {Head = NormalHead (headPatternA); Body = [ positiveMatchA; positiveMatchB ]}
+            let ruleB = {Head = NormalHead (headPatternB); Body = [ negativeMatch ]}
             let partitioner  = Stratifier.RulePartitioner (logger, [ruleA; ruleB], tripleTable.Resources)
             let ordered_relations = partitioner.GetOrderedRules()
             ordered_relations.Should().HaveLength(2) |> ignore 
@@ -815,33 +654,18 @@ module Tests =
             let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
             let objdIndex3 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object3"))
             
-            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex)
-            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex2; obj = objdIndex2)
+            let Subject1Obj1 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj1 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objdIndex}
+            let Subject2Obj2 = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex2; obj = objdIndex2}
             tripleTable.AddTriple(Subject1Obj1)
             tripleTable.AddTriple(Subject2Obj1)
             tripleTable.AddTriple(Subject2Obj2)
             
-            let headPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex3
-)
-            let positiveMatch = RuleAtom.PositivePattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex
-                             Object = Term.Resource objdIndex
-)
+            let headPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex3)
+            let positiveMatch = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex) (Term.Resource objdIndex))
+            let negativeMatch = RuleAtom.NotPattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Resource predIndex2) (Term.Resource objdIndex2))
             
-            let negativeMatch = RuleAtom.NotPattern {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource predIndex2
-                             Object = Term.Resource objdIndex2
-)
-            
-            let rule =  {Head = NormalHead (headPattern)
-                         Body = [ positiveMatch; negativeMatch ]
-)
+            let rule =  {Head = NormalHead (headPattern); Body = [ positiveMatch; negativeMatch ]}
             Reasoner.evaluate(logger, [rule], tripleTable)
             let matches = tripleTable.GetTriplesWithObject(objdIndex3)
             Assert.Single matches
@@ -862,13 +686,10 @@ module Tests =
         
     [<Fact>]
     let ``Can get substitutions option``() =
-        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u)
-        let factPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Variable "p"
-                             Object = Term.Variable "o")
+        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u}
+        let factPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Variable "p") (Term.Variable "o")
         
-        let subbed = GetSubstitutions Map.empty fact factPattern 
+        let subbed = GetSubstitutions Map.empty (Ingress.getDefaultGraphTriple fact) factPattern 
         Assert.Equal(1u, subbed.Value.["s"])
         Assert.Equal(2u, subbed.Value.["p"])
         Assert.Equal(3u, subbed.Value.["o"])
@@ -876,27 +697,20 @@ module Tests =
             
     [<Fact>]
     let ``Can get substitutions option map``() =
-        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u)
-        let factPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource 2u
-                             Object = Term.Variable "o")
+        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u}
+        let factPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource 2u) (Term.Variable "o")
         
-        let subbed = GetSubstitutions Map.empty fact factPattern 
+        let subbed = GetSubstitutions Map.empty (Ingress.getDefaultGraphTriple fact) factPattern 
         Assert.Equal(1u, subbed.Value.["s"])
         Assert.Equal(3u, subbed.Value.["o"])
         
         
-                    
     [<Fact>]
     let ``Can increase substitutions option map``() =
-        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u)
-        let factPattern = {
-                             Subject = Term.Variable "s"
-                             Predicate = Term.Resource 2u
-                             Object = Term.Variable "o")
+        let fact = {Ingress.Triple.subject = 1u; predicate = 2u; obj = 3u}
+        let factPattern = GetDefaultGraphPattern (Term.Variable "s") (Term.Resource 2u) (Term.Variable "o")
         
-        let subbed = GetSubstitutions (Map.empty.Add ("t", 2u)) fact factPattern 
+        let subbed = GetSubstitutions (Map.empty.Add ("t", 2u)) (Ingress.getDefaultGraphTriple fact) factPattern 
         Assert.Equal(1u, subbed.Value.["s"])
         Assert.Equal(3u, subbed.Value.["o"])
         
@@ -915,7 +729,7 @@ module Tests =
         let subjectIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/subject"))
         let predIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicate"))
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
-        let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex)
+        let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
         tripleTable.AddTriple(Triple)
         Assert.Equal(3u, tripleTable.Resources.ResourceCount)
         Assert.Equal(1u, tripleTable.NamedGraphs.QuadCount)
@@ -923,10 +737,10 @@ module Tests =
         Assert.Equal(Ingress.getDefaultGraphTriple Triple, mappedTriple)
         
         let objdIndex2 = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object2"))
-        let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2)
+        let Triple2 = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex2}
         
         let rule =  {Head = ConstantQuadPattern (Ingress.getDefaultGraphTriple Triple2) |> NormalHead
-                     Body = [RuleAtom.PositivePattern(ConstantQuadPattern (Ingress.getDefaultGraphTriple Triple))])
+                     Body = [RuleAtom.PositivePattern(ConstantQuadPattern (Ingress.getDefaultGraphTriple Triple))]}
         let tripleAnswersBefore = tripleTable.GetTriplesWithSubjectPredicate(subjectIndex, predIndex)
         Assert.Equal(1, tripleAnswersBefore |> Seq.length)
         let triples2Answers = tripleAnswersBefore |> Seq.filter (fun tr -> tr = Triple2)

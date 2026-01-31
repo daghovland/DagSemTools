@@ -94,22 +94,20 @@ module TestClassAxioms =
         let translatedRules = ELI.ELI2RL.GenerateTBoxRL logger resources [ axiom ]
         //Assert
         let expectedRules: Datalog.Rule seq =
-            [ { Head = NormalHead
-                  { Subject = Term.Variable "X"
-                    Predicate = Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
-                    Object =
-                      Term.Resource(
+            [ { Head = NormalHead (GetDefaultGraphPattern
+                  (Term.Variable "X")
+                    (Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType))))
+                      (Term.Resource(
                           resources.AddNodeResource(Iri(IriReference "https://example.com/superclass"))
-                      ) }
+                      ) ))
                 Body =
-                  [ PositiveTriple
-                        { Subject = Term.Variable "X"
-                          Predicate =
-                            Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
-                          Object =
-                            Term.Resource(
+                  [ PositivePattern (GetDefaultGraphPattern
+                        (Term.Variable "X")
+                          (Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType))))
+                            (Term.Resource(
                                 resources.AddNodeResource(Iri(IriReference "https://example.com/subclass"))
-                            ) } ] } ]
+                            ) ))]
+                  }]
 
         Assert.Equal<Rule seq>(expectedRules, translatedRules)
         inMemorySink.LogEvents.Should().BeEmpty
