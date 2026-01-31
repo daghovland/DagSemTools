@@ -85,10 +85,10 @@ public class TestParser
         var rule = ont.First();
         rule.Head.IsNormalHead.Should().BeTrue();
         var head = ((RuleHead.NormalHead)rule.Head).pattern;
-        
+
         var graphVariable = Query.Term.NewVariable("?graph");
         head.Graph.Should().Be(graphVariable);
-        
+
         rule.Body.Count().Should().Be(1);
         var bodyAtom = rule.Body.First();
         bodyAtom.IsPositivePattern.Should().BeTrue();
