@@ -26,7 +26,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestSparql()
     {
         var ontology = new FileInfo("TestData/example1.ttl");
-        var ont = TurtleParser.Parse(ontology, outputWriter);
+        var ont = TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var enemies = ont.AnswerSelectQuery("SELECT * WHERE where{?hero <http://www.perceive.net/schemas/relationship/enemyOf> ?enemy.}").ToList();
@@ -47,7 +47,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestDbPedia()
     {
         var ontology = new FileInfo("DbpediaTests/test2.ttl");
-        var ont = TurtleParser.Parse(ontology, outputWriter);
+        var ont = TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var subjects = ont.GetTriplesWithPredicate(new IriReference("http://purl.org/dc/terms/subject"));
@@ -60,7 +60,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestDbPediaOntology()
     {
         var ontology = new FileInfo("DbpediaTests/test1.ttl");
-        var ont = TurtleParser.Parse(ontology, outputWriter);
+        var ont = TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var labels = ont.GetTriplesWithSubjectPredicate(
@@ -74,7 +74,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestDatalog()
     {
         var ontology = new FileInfo("TestData/data.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
         var resultsData = ont.GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object"));
