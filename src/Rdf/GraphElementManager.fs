@@ -10,7 +10,7 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
                  resourceCount: uint) =
     
     let mutable ResourceList = resourceList
-    let mutable anonResourceCount = 0
+    let mutable anonResourceCount = (int resourceCount) - 1 // Assume only default graph so far
     let mutable anonResourceMap : Map<string, GraphElementId> = Map.empty
     member val ResourceCount = resourceCount with get, set
     
@@ -50,12 +50,16 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
                     match node with
                     |  Iri _ -> Some res.Value
                     | _ -> None)
-    new(init_rdf_size : uint) =
+    new(init_rdf_size : uint) as this =
         let init_resources = max 10 (int init_rdf_size / 10)
         let init_triples = max 10 (int init_rdf_size / 60)
-        GraphElementManager(new Dictionary<GraphElement, GraphElementId>(),
-                    Array.zeroCreate init_resources,
-                    0u
+        let resMap = new Dictionary<GraphElement, GraphElementId>()
+        let resList = Array.zeroCreate init_resources
+        resMap.Add(defaultGraphResource, defaultGraphElementId)
+        resList.[int defaultGraphElementId] <- defaultGraphResource
+        GraphElementManager(resMap,
+                    resList,
+                    1u
                     )
     member this.doubleResourceListSize () =
         ResourceList <- doubleArraySize ResourceList

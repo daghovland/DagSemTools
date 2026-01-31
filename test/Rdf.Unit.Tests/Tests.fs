@@ -18,26 +18,26 @@ open IriTools
 [<Fact>]
 let ``Can add resource to tripletable`` () =
     let tripleTable = Datastore(1u)
-    Assert.Equal(0u, tripleTable.Resources.ResourceCount)
-    let newIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com"))
-    Assert.Equal(0u, newIndex)
     Assert.Equal(1u, tripleTable.Resources.ResourceCount)
+    let newIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com"))
+    Assert.Equal(1u, newIndex)
+    Assert.Equal(2u, tripleTable.Resources.ResourceCount)
     let mappedResourceId = tripleTable.GetGraphNodeId(Ingress.RdfResource.Iri(new IriReference "http://example.com"))
-    Assert.Equal(0u, mappedResourceId)
+    Assert.Equal(1u, mappedResourceId)
     let mappedResource = tripleTable.Resources.GetGraphElement (mappedResourceId)
     Assert.Equal(GraphElement.NodeOrEdge (RdfResource.Iri(new IriReference "http://example.com")), mappedResource)
     
 [<Fact>]
 let ``Can add triple to tripletable`` () =
     let tripleTable = Rdf.Datastore(60u)
-    Assert.Equal(0u, tripleTable.Resources.ResourceCount)
+    Assert.Equal(1u, tripleTable.Resources.ResourceCount)
     Assert.Equal(0u, tripleTable.NamedGraphs.QuadCount)
     let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
     let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
     let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
     let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
     tripleTable.AddTriple(Triple)
-    Assert.Equal(3u, tripleTable.Resources.ResourceCount)
+    Assert.Equal(4u, tripleTable.Resources.ResourceCount)
     Assert.Equal(1u, tripleTable.NamedGraphs.QuadCount)
     let mappedTriple = tripleTable.NamedGraphs.GetQuads
                        |> Seq.head
@@ -167,6 +167,15 @@ let ``Can query with subject predicate when object is literal`` () =
     Assert.Equal(Triple, Seq.head squery)
     let literal = tripleTable.Resources.GetGraphElement(objdIndex)
     Assert.Equal(GraphElement.GraphLiteral(RdfLiteral.LangLiteral("object", "en")), literal)
+
+
+[<Fact>]
+let ``GraphElementManager starts with default graph at ID 0`` () =
+    let manager = GraphElementManager(10u)
+    Assert.Equal(1u, manager.ResourceCount)
+    let defaultGraph = manager.GetGraphElement(0u)
+    Assert.Equal(defaultGraphResource, defaultGraph)
+    Assert.Equal(0u, manager.AddResource(defaultGraphResource))
 
 
     

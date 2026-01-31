@@ -25,7 +25,7 @@ type NamedTripleTable(quads: QuadTable, graphName: GraphElementId) =
         member this.Contains (triple : Triple) : bool =
             quads.Contains (tripleToQuad triple graphName)
         member this.GetTriplesWithSubject subject : Triple seq =
-            quads.GetTriplesWithIdSubject (Ingress.defaultGraphElementId, subject)
+            quads.GetTriplesWithIdSubject (graphName, subject)
         member this.GetTriplesWithPredicate (predicate: GraphElementId) : Triple seq =
             quads.GetTriplesWithIdPredicate (graphName, predicate)
         member this.GetTriplesWithObject (obj: GraphElementId) : Triple seq =
