@@ -30,7 +30,7 @@ public class Dataset : IDataset
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
-        DefaultGraph = new Graph(quads.Triples, quads.Resources, logger);
+        DefaultGraph = new Graph(quads.GetDefaultTripleTable, quads.Resources, logger);
     }
 
     private Datastore Quads { get; init; }
@@ -137,7 +137,7 @@ public class Dataset : IDataset
     }
 
     /// <inheritdoc />
-    public bool IsEmpty() => Quads.Triples.TripleCount == 0;
+    public bool IsEmpty() => Quads.NamedGraphs.QuadCount == 0;
 
 
     /// <inheritdoc />
@@ -245,7 +245,7 @@ public class Dataset : IDataset
     /// <inheritdoc />
     public void EnableOwlReasoning()
     {
-        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Quads.Triples, Quads.Resources, _logger).extractOntology;
+        var ontology = new DagSemTools.RdfOwlTranslator.Rdf2Owl(Quads.GetDefaultTripleTable, Quads.Resources, _logger).extractOntology;
         var ontologyRules = DagSemTools.OWL2RL2Datalog.Library.owl2Datalog(_logger, Quads.Resources, ontology.Ontology);
         LoadDatalog(ontologyRules);
     }

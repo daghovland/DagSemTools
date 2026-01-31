@@ -43,7 +43,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         query.Should().HaveLength(1) |> ignore
         
         //Act
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.GetDefaultTripleTable, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology.Ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
@@ -65,14 +65,12 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let objextIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
         tripleTable.AddTriple(Triple)
-        let triplePattern varName : TriplePattern =
-            {
-                Subject = Term.Resource subjectIndex
-                Predicate = Term.Variable varName
-                Object = Term.Resource objextIndex
-            }
-        let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
-                           Body = [PositiveTriple (triplePattern "s2")]}
+        let quadPattern varName = GetDefaultGraphPattern
+                                        (Term.Resource subjectIndex)
+                                        (Term.Variable varName)
+                                        (Term.Resource objextIndex)
+        let rule : Rule = {Head = NormalHead ( quadPattern "s1" )
+                           Body = [PositivePattern (quadPattern "s2")]}
         let partitioner = DagSemTools.Datalog.Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
         let stratification = partitioner.orderRules()
         stratification.Should().HaveLength(1) |> ignore
@@ -87,14 +85,12 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let objextIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
         tripleTable.AddTriple(Triple)
-        let triplePattern varName : TriplePattern =
-            {
-                Subject = Term.Resource subjectIndex
-                Predicate = Term.Variable varName
-                Object = Term.Resource objextIndex
-            }
+        let triplePattern varName = GetDefaultGraphPattern
+                                        (Term.Resource subjectIndex)
+                                        (Term.Variable varName)
+                                        (Term.Resource objextIndex)
         let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
-                           Body = [PositiveTriple (triplePattern "s2")]}
+                           Body = [PositivePattern (triplePattern "s2")]}
         let evaluatorFunction = fun () -> DagSemTools.Datalog.Reasoner.evaluate (logger, [rule], tripleTable)
         Assert.Throws<ArgumentException>(evaluatorFunction) |> ignore
         
