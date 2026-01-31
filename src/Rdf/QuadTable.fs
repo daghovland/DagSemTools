@@ -197,7 +197,7 @@ type QuadTable(quadList: Quad array,
                 |> Seq.where (fun q -> q.subject = subject)
         
         member internal this.GetQuadsWithId (graphName: GraphElementId) : Quad seq =
-             this.TripleIdIndex.[graphName]
+             this.TripleIdIndex.GetValueOrDefault(graphName, [])
                 |> Seq.map (fun e -> this.GetQuadListEntry e)
         
        member internal this.GetTriplesWithIdSubject (id: GraphElementId, subject: GraphElementId) =

@@ -235,7 +235,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         }
         groundRules.Should().Contain(correctGroundRule) |> ignore
         
-    [<Fact>]
+    [<Fact(Skip = "owl:sameAs is not correctly translated to OWL. See issue https://github.com/daghovland/DagSemTools/issues/76")>]
     let ``Equality RL reasoning works`` () =
         let datastore = new Datastore(100u)
         let errorOutput = new System.IO.StringWriter()

@@ -189,3 +189,11 @@ let ``Can query with predicate to tripletable`` () =
     tripleTable.AddTriple(Triple)
     let query = tripleTable.GetTriplesWithPredicate(predIndex)
     Assert.Single(query)
+
+
+[<Fact>]
+let ``GetQuadsWithId returns empty for non-existent graph`` () =
+    let datastore = Datastore(60u)
+    let nonExistentGraphId = 999u
+    let result = datastore.NamedGraphs.GetQuadsWithId nonExistentGraphId
+    Assert.Empty(result)
