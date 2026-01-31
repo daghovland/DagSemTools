@@ -15,7 +15,7 @@ public class TestApi(ITestOutputHelper output)
     public void Test1()
     {
         var ontology = new FileInfo("TestData/example1.ttl");
-        var ont = TurtleParser.Parse(ontology, outputWriter);
+        var ont = TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var enemies = ont.GetTriplesWithPredicate(new IriReference("http://www.perceive.net/schemas/relationship/enemyOf"));
