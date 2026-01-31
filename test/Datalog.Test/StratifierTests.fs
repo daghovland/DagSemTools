@@ -129,8 +129,8 @@ module TermsUnifiableTests =
             let predicate = Term.Resource((2u))
             let obj = Term.Resource((3u))
 
-            let triple1 = { TriplePattern.Subject = subject; Predicate = predicate; Object = obj }
-            let triple2 = { TriplePattern.Subject = subject; Predicate = predicate; Object = obj }
+            let triple1 = GetDefaultGraphPattern subject predicate obj
+            let triple2 = GetDefaultGraphPattern subject predicate obj
 
             // Act
             let result = Unification.quadPatternsUnifiable triple1 triple2
@@ -141,15 +141,9 @@ module TermsUnifiableTests =
         [<Fact>]
         let ``Triple patterns are not unifiable because of different subjects`` () =
             // Arrange
-            let triple1 = { 
-                TriplePattern.Subject = Term.Resource((1u))
-                Predicate = Term.Resource((2u))
-                Object = Term.Resource((3u)) }
+            let triple1 = GetDefaultGraphPattern (Term.Resource((1u))) (Term.Resource((2u))) (Term.Resource((3u)))
 
-            let triple2 = { 
-                TriplePattern.Subject = Term.Resource((99u)) // Different subject
-                Predicate = Term.Resource((2u))
-                Object = Term.Resource((3u)) }
+            let triple2 = GetDefaultGraphPattern (Term.Resource((99u))) (Term.Resource((2u))) (Term.Resource((3u)))
 
             // Act
             let result = Unification.quadPatternsUnifiable triple1 triple2
@@ -160,15 +154,9 @@ module TermsUnifiableTests =
         [<Fact>]
         let ``Triple patterns are not unifiable because of different predicates`` () =
             // Arrange
-            let triple1 = { 
-                TriplePattern.Subject = Term.Resource((1u))
-                Predicate = Term.Resource((2u))
-                Object = Term.Resource((3u)) }
+            let triple1 = GetDefaultGraphPattern (Term.Resource((1u))) (Term.Resource((2u))) (Term.Resource((3u)))
 
-            let triple2 = { 
-                TriplePattern.Subject = Term.Resource((1u))
-                Predicate = Term.Resource((99u)) // Different predicate
-                Object = Term.Resource((3u)) }
+            let triple2 = GetDefaultGraphPattern (Term.Resource((1u))) (Term.Resource((99u))) (Term.Resource((3u)))
 
             // Act
             let result = Unification.quadPatternsUnifiable triple1 triple2
@@ -179,15 +167,9 @@ module TermsUnifiableTests =
         [<Fact>]
         let ``Triple patterns are not unifiable because of different objects`` () =
             // Arrange
-            let triple1 = { 
-                TriplePattern.Subject = Term.Resource((1u))
-                Predicate = Term.Resource((2u))
-                Object = Term.Resource((3u)) }
+            let triple1 = GetDefaultGraphPattern (Term.Resource((1u))) (Term.Resource((2u))) (Term.Resource((3u)))
 
-            let triple2 = { 
-                TriplePattern.Subject = Term.Resource((1u))
-                Predicate = Term.Resource((2u))
-                Object = Term.Resource((99u)) } // Different object
+            let triple2 = GetDefaultGraphPattern (Term.Resource((1u))) (Term.Resource((2u))) (Term.Resource((99u)))
 
             // Act
             let result = Unification.quadPatternsUnifiable triple1 triple2
@@ -198,15 +180,9 @@ module TermsUnifiableTests =
         [<Fact>]
         let ``Triple patterns with variable and resource are unifiable`` () =
             // Arrange
-            let triple1 = { 
-                TriplePattern.Subject = Term.Resource((1u))
-                Predicate = Term.Variable("p") // Variable predicate
-                Object = Term.Variable("o") } // Variable object
+            let triple1 = GetDefaultGraphPattern (Term.Resource((1u))) (Term.Variable("p")) (Term.Variable("o"))
 
-            let triple2 = { 
-                TriplePattern.Subject = Term.Resource((1u))
-                Predicate = Term.Resource((2u)) // Matching resource for predicate variable
-                Object = Term.Resource((3u)) } // Matching resource for object variable
+            let triple2 = GetDefaultGraphPattern (Term.Resource((1u))) (Term.Resource((2u))) (Term.Resource((3u)))
 
             // Act
             let result = Unification.quadPatternsUnifiable triple1 triple2

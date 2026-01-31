@@ -101,7 +101,7 @@ module Tests =
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
         let quadpattern = Query.GetDefaultGraphPattern (Term.Resource subjectIndex) (Variable "p") (Term.Resource objdIndex)
         let wildcards = WildcardQuadPattern quadpattern
-        Assert.Equal(4, wildcards.Length)
+        Assert.Equal(8, wildcards.Length)
         
         
         
@@ -109,7 +109,7 @@ module Tests =
     let ``Wildcard triple patterns with three variables are correctly generated`` () =
         let quadpattern = Query.GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o")
         let wildcards = WildcardQuadPattern quadpattern
-        Assert.Equal(1, wildcards.Length)
+        Assert.Equal(2, wildcards.Length)
         
         
     [<Fact>]
@@ -121,7 +121,7 @@ module Tests =
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
         let quadpattern = Query.GetDefaultGraphPattern (Term.Resource subjectIndex) (Term.Resource predIndex) (Term.Resource objdIndex)
         let wildcards = WildcardQuadPattern quadpattern
-        Assert.Equal(8, wildcards.Length)
+        Assert.Equal(16, wildcards.Length)
         
     [<Fact>]
     let ``Can get matches on rule`` () =
@@ -306,9 +306,9 @@ module Tests =
             let matchesBefore = tripleTable.GetTriplesWithSubjectObject(subjectIndex, superClassIndex) |> List.ofSeq
             Assert.Equal(0, matchesBefore.Length)
           
-            let headPattern = GetDefaultGraphPattern (Term.Variable "?x") (Term.Resource rdfTypeIndex) (Term.Variable "?super")
-            let subClassTypeAtom = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "?x") (Term.Resource rdfTypeIndex) (Term.Variable "?sub"))
-            let isSubClassOfAtom = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "?sub") (Term.Resource subClassOfIndex) (Term.Variable "?super"))
+            let headPattern = GetDefaultGraphPattern (Term.Variable "x") (Term.Resource rdfTypeIndex) (Term.Resource superClassIndex)
+            let subClassTypeAtom = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "x") (Term.Resource rdfTypeIndex) (Term.Resource subClassIndex))
+            let isSubClassOfAtom = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Resource subClassIndex) (Term.Resource subClassOfIndex) (Term.Resource superClassIndex))
             let rule =  {Head = NormalHead (headPattern); Body = [ subClassTypeAtom; isSubClassOfAtom ]}
             
             //Act

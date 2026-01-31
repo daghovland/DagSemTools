@@ -113,15 +113,8 @@ module PredicateGrounderTests =
             let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
             let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
-            let triplepattern =  {
-                                 TriplePattern.Subject = Term.Resource subjectIndex
-                                 TriplePattern.Predicate =  Variable "p"
-                                 TriplePattern.Object = Term.Resource objdIndex}
-            let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = Term.Resource subjectIndex
-                             TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = Term.Resource objdIndex2
-                             }
+            let triplepattern = GetDefaultGraphPattern (Term.Resource subjectIndex) (Variable "p") (Term.Resource objdIndex)
+            let triplepattern2 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Resource subjectIndex) (Variable "p") (Term.Resource objdIndex2))
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let groundRules = PredicateGrounder.groundRulePredicates ([rule], tripleTable)
@@ -136,15 +129,8 @@ module PredicateGrounderTests =
             let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
             let objdIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
             let objdIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
-            let triplepattern =  {
-                                 TriplePattern.Subject = Term.Resource subjectIndex
-                                 TriplePattern.Predicate =  Term.Resource predIndex
-                                 TriplePattern.Object = Term.Resource objdIndex}
-            let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = Term.Resource subjectIndex
-                             TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = Term.Resource objdIndex2
-                             }
+            let triplepattern = GetDefaultGraphPattern (Term.Resource subjectIndex) (Term.Resource predIndex) (Term.Resource objdIndex)
+            let triplepattern2 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Resource subjectIndex) (Variable "p") (Term.Resource objdIndex2))
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let predicate = PredicateGrounder.getRuleHeadPredicate rule.Head
@@ -165,15 +151,8 @@ module PredicateGrounderTests =
                                  obj =  objdIndex
                                  }
             tripleTable.AddTriple triple
-            let triplepattern =  {
-                                 TriplePattern.Subject = Term.Resource subjectIndex
-                                 TriplePattern.Predicate =  Variable "p"
-                                 TriplePattern.Object = Term.Resource objdIndex}
-            let triplepattern2 = PositiveTriple {
-                             TriplePattern.Subject = Term.Resource subjectIndex
-                             TriplePattern.Predicate =  Variable "p"
-                             TriplePattern.Object = Term.Resource objdIndex2
-                            }
+            let triplepattern = GetDefaultGraphPattern (Term.Resource subjectIndex) (Variable "p") (Term.Resource objdIndex)
+            let triplepattern2 = RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Resource subjectIndex) (Variable "p") (Term.Resource objdIndex2))
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let predicates = PredicateGrounder.getPredicatesInUse ([rule], tripleTable)
