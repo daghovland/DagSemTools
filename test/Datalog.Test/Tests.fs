@@ -126,14 +126,14 @@ module Tests =
     [<Fact>]
     let ``Can get matches on rule`` () =
         let tripleTable = Rdf.Datastore(60u)
-        Assert.Equal(0u, tripleTable.Resources.ResourceCount)
+        Assert.Equal(1u, tripleTable.Resources.ResourceCount)
         Assert.Equal(0u, tripleTable.NamedGraphs.QuadCount)
         let subjectIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/subject"))
         let predIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicate"))
         let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
         tripleTable.AddTriple(Triple)
-        Assert.Equal(3u, tripleTable.Resources.ResourceCount)
+        Assert.Equal(4u, tripleTable.Resources.ResourceCount)
         Assert.Equal(1u, tripleTable.NamedGraphs.QuadCount)
         let allTriples = tripleTable.NamedGraphs.GetQuads
         let mappedTriple = allTriples |> Seq.head
@@ -152,14 +152,14 @@ module Tests =
     [<Fact>]
     let ``Can get matches on rule with negative atom`` () =
             let tripleTable = Rdf.Datastore(60u)
-            Assert.Equal(0u, tripleTable.Resources.ResourceCount)
+            Assert.Equal(1u, tripleTable.Resources.ResourceCount)
             Assert.Equal(0u, tripleTable.NamedGraphs.QuadCount)
             let subjectIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/subject"))
             let predIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/predicate"))
             let objdIndex = tripleTable.AddNodeResource(Iri(new IriReference "http://example.com/object"))
             let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objdIndex}
             tripleTable.AddTriple(Triple)
-            Assert.Equal(3u, tripleTable.Resources.ResourceCount)
+            Assert.Equal(4u, tripleTable.Resources.ResourceCount)
             Assert.Equal(1u, tripleTable.NamedGraphs.QuadCount)
             let mappedTriple = tripleTable.NamedGraphs.GetQuads |> Seq.head
             Assert.Equal(Ingress.getDefaultGraphTriple Triple, mappedTriple)

@@ -225,7 +225,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let groundRules = PredicateGrounder.groundRulePredicates ([sameAsRule2], tripleTable)
         
         // Assert
-        groundRules.Should().HaveLength(5) |> ignore
+        groundRules.Should().HaveLength(6) |> ignore
         let correctGroundRule =  {
             Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Term.Resource predIndex2) (Variable "o"))
             Body = [

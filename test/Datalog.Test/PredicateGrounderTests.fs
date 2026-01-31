@@ -91,7 +91,7 @@ module PredicateGrounderTests =
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let groundRules = PredicateGrounder.groundRulePredicates ([rule], tripleTable)
-            groundRules.Should().HaveLength(4) |> ignore
+            groundRules.Should().HaveLength(5) |> ignore
             let predGroundRules = groundRules
                                   |> Seq.choose (fun rule -> match rule.Head with
                                                                 | Contradiction -> None
@@ -118,7 +118,7 @@ module PredicateGrounderTests =
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let groundRules = PredicateGrounder.groundRulePredicates ([rule], tripleTable)
-            groundRules.Should().HaveLength(3) |> ignore
+            groundRules.Should().HaveLength(4) |> ignore
             
             
         [<Fact>]
@@ -156,4 +156,4 @@ module PredicateGrounderTests =
             let rule = {Head = NormalHead triplepattern; Body = [triplepattern2]}
             
             let predicates = PredicateGrounder.getPredicatesInUse ([rule], tripleTable)
-            predicates.Should().HaveLength(4) |> ignore
+            predicates.Should().HaveLength(5) |> ignore
