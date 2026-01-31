@@ -21,7 +21,7 @@ Install the nuget package [DagSemTools.Api](https://www.nuget.org/packages/DagSe
 To load an rdf graph in turtle format, try f.ex.
 ```csharp
 var file = new FileInfo("graph.ttl");
-var graph = TriGParser.Parse(file, Console.Error);
+var graph = TriGParser.Parse(file, Console.Error).GetDefaultGraph();
 ```
 
 To get answers to single basic graph patterns, use functions on the graph, like this:
@@ -44,7 +44,7 @@ and then parse the rdf into an ontology with `Ontology.create`, extract it as da
 like this:
 ```csharp
 var ontology_file = new FileInfo("graph.ttl");
-var ontology_graph = TriGParser.Parse(ontology_file, Console.Error);
+var ontology_graph = TriGParser.Parse(ontology_file, Console.Error).GetDefaultGraph();
 graph.LoadDatalog(Ontology.create(ontology_graph).GetAxiomRules());
 ```
 This materializes the new answers which can be fetched as before: 
