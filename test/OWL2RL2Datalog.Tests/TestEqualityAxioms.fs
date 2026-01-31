@@ -106,19 +106,9 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let objextIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
         tripleTable.AddTriple(Triple)
-        let headPattern : TriplePattern  =
-            {
-                Subject = Term.Resource subjectIndex
-                Predicate = Term.Variable "p"
-                Object = Term.Resource objextIndex2
-            }
-        let bodyPattern : TriplePattern  =
-            {
-                Subject = Term.Resource subjectIndex
-                Predicate = Term.Variable "p"
-                Object = Term.Resource objextIndex
-            }
-        let rule : Rule = {Head = NormalHead headPattern; Body = [PositiveTriple (bodyPattern)]}
+        let headPattern = GetDefaultGraphPattern (Term.Resource subjectIndex) (Term.Variable "p") (Term.Resource objextIndex2)
+        let bodyPattern = GetDefaultGraphPattern (Term.Resource subjectIndex) (Term.Variable "p") (Term.Resource objextIndex)
+        let rule : Rule = {Head = NormalHead headPattern; Body = [PositivePattern (bodyPattern)]}
         
         let query1 = tripleTable.GetTriplesWithObject(objextIndex2)
         query1.Should().HaveLength(0) |> ignore
@@ -151,22 +141,10 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = NormalHead{
-                Subject = Variable "s"
-                Predicate = Variable "p2"
-                Object = Variable "o" 
-            }
+            Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Variable "p2") (Variable "o"))
             Body = [
-                PositiveTriple {
-                    Subject = Variable "p"
-                    Predicate = Term.Resource sameAsIndex
-                    Object = Variable "p2"
-                }
-                PositiveTriple {
-                    Subject = Variable "s"
-                    Predicate = Variable "p"
-                    Object = Variable "o"
-                }
+                PositivePattern (GetDefaultGraphPattern (Variable "p") (Term.Resource sameAsIndex) (Variable "p2"))
+                PositivePattern (GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o"))
             ] 
         }
         // Act
@@ -199,22 +177,10 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = NormalHead {
-                Subject = Variable "s"
-                Predicate = Variable "p2"
-                Object = Variable "o" 
-            }
+            Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Variable "p2") (Variable "o"))
             Body = [
-                PositiveTriple {
-                    Subject = Variable "p"
-                    Predicate = Term.Resource sameAsIndex
-                    Object = Variable "p2"
-                }
-                PositiveTriple {
-                    Subject = Variable "s"
-                    Predicate = Variable "p"
-                    Object = Variable "o"
-                }
+                PositivePattern (GetDefaultGraphPattern (Variable "p") (Term.Resource sameAsIndex) (Variable "p2"))
+                PositivePattern (GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o"))
             ] 
         }
         // Act
@@ -249,22 +215,10 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = NormalHead {
-                Subject = Variable "s"
-                Predicate = Variable "p2"
-                Object = Variable "o" 
-            }
+            Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Variable "p2") (Variable "o"))
             Body = [
-                PositiveTriple {
-                    Subject = Variable "p"
-                    Predicate = Term.Resource sameAsIndex
-                    Object = Variable "p2"
-                }
-                PositiveTriple {
-                    Subject = Variable "s"
-                    Predicate = Variable "p"
-                    Object = Variable "o"
-                }
+                PositivePattern (GetDefaultGraphPattern (Variable "p") (Term.Resource sameAsIndex) (Variable "p2"))
+                PositivePattern (GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o"))
             ] 
         }
         // Act
@@ -273,27 +227,15 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         // Assert
         groundRules.Should().HaveLength(5) |> ignore
         let correctGroundRule =  {
-            Head = NormalHead {
-                Subject = Variable "s"
-                Predicate = Term.Resource predIndex2
-                Object = Variable "o" 
-            }
+            Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Term.Resource predIndex2) (Variable "o"))
             Body = [
-                PositiveTriple {
-                    Subject = Variable "p"
-                    Predicate = Term.Resource sameAsIndex
-                    Object = Term.Resource predIndex2
-                }
-                PositiveTriple {
-                    Subject = Variable "s"
-                    Predicate = Variable "p"
-                    Object = Variable "o"
-                }
+                PositivePattern (GetDefaultGraphPattern (Variable "p") (Term.Resource sameAsIndex) (Term.Resource predIndex2))
+                PositivePattern (GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o"))
             ] 
         }
         groundRules.Should().Contain(correctGroundRule) |> ignore
         
-    // [<Fact>]
+    [<Fact>]
     let ``Equality RL reasoning works`` () =
         let tripleTable = new Datastore(100u)
         let errorOutput = new System.IO.StringWriter()
@@ -312,7 +254,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let query1a = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex)
         query1a.Should().HaveLength(0) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.GetDefaultTripleTable, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology.Ontology
         
