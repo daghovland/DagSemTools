@@ -21,11 +21,28 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.QuadPattern>
         _predicateVisitor = predicateVisitor;
     }
 
-    /// <summary>
-    /// Visit a triple atom. Eitheor of the form [subject, predicate, object] or predicat [subject, object]
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
+    public override Query.QuadPattern VisitQuadPatternAtom(DatalogParser.QuadPatternAtomContext context)
+    {
+        var quadPattern = VisitTripleAtom(context.t);
+        if (context.g != null)
+        {
+            var graphName = _predicateVisitor.Visit(context.g.term());
+            quadPattern = new Query.QuadPattern(graphName, quadPattern.Subject, quadPattern.Predicate, quadPattern.Object);
+        }
+        return quadPattern;
+    }
+
+    public override Query.QuadPattern VisitTypePatternAtom(DatalogParser.TypePatternAtomContext context)
+    {
+        var quadPattern = VisitTypeAtom(context.ty);
+        if (context.g != null)
+        {
+            var graphName = _predicateVisitor.Visit(context.g.term());
+            quadPattern = new Query.QuadPattern(graphName, quadPattern.Subject, quadPattern.Predicate, quadPattern.Object);
+        }
+        return quadPattern;
+    }
+
     public override Query.QuadPattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
     {
         var subject = context.term(0);

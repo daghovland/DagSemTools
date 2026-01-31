@@ -23,7 +23,9 @@ ruleAtom : NOT positiveRuleAtom #NegativeRuleAtom
 
 
 
-positiveRuleAtom : tripleAtom graphname? | typeAtom graphname? ;
+positiveRuleAtom : t=tripleAtom g=graphname? #QuadPatternAtom
+    | ty=typeAtom g=graphname? #TypePatternAtom
+    ;
 
 graphname: term;
 

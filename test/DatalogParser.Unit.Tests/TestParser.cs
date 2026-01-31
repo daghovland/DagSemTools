@@ -72,10 +72,28 @@ public class TestParser
     [Fact]
     public void TestNamedGraphRule()
     {
+        // Arrange
+        var datastore = new Datastore(1000);
         var fInfo = File.ReadAllText("TestData/namedgraph.datalog");
-        var ont = TestProgram(fInfo).ToList();
+
+        // Act
+        var ont = DagSemTools.Datalog.Parser.Parser.ParseString(fInfo, _outputWriter, datastore).ToList();
+
+        // Assert
         ont.Should().NotBeNull();
         ont.Should().HaveCount(1);
+        var rule = ont.First();
+        rule.Head.IsNormalHead.Should().BeTrue();
+        var head = ((RuleHead.NormalHead)rule.Head).pattern;
+        
+        var graphVariable = Query.Term.NewVariable("?graph");
+        head.Graph.Should().Be(graphVariable);
+        
+        rule.Body.Count().Should().Be(1);
+        var bodyAtom = rule.Body.First();
+        bodyAtom.IsPositivePattern.Should().BeTrue();
+        var bodyPattern = ((RuleAtom.PositivePattern)bodyAtom).Item;
+        bodyPattern.Graph.Should().Be(graphVariable);
     }
 
     [Fact]
