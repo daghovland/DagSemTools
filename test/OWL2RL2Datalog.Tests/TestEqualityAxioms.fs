@@ -237,33 +237,33 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         
     [<Fact>]
     let ``Equality RL reasoning works`` () =
-        let tripleTable = new Datastore(100u)
+        let datastore = new Datastore(100u)
         let errorOutput = new System.IO.StringWriter()
         
-        let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
-        let sameAsIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlSameAs)))
-        let subjectIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject2"))
-        let objIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
-        let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+        let subjectIndex = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+        let sameAsIndex = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlSameAs)))
+        let subjectIndex2 = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject2"))
+        let objIndex = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+        let predIndex = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
         let SameAsTriple = {Ingress.Triple.subject = subjectIndex; predicate = sameAsIndex; obj = subjectIndex2}
         let contentTriple = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objIndex}
-        tripleTable.AddTriple(SameAsTriple)
-        tripleTable.AddTriple(contentTriple)
-        let query = tripleTable.GetTriplesWithObject(objIndex)
+        datastore.AddTriple(SameAsTriple)
+        datastore.AddTriple(contentTriple)
+        let query = datastore.GetTriplesWithObject(objIndex)
         query.Should().HaveLength(1) |> ignore
-        let query1a = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex)
+        let query1a = datastore.GetTriplesWithSubjectObject(subjectIndex, objIndex)
         query1a.Should().HaveLength(0) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.GetDefaultTripleTable, tripleTable.Resources, logger)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(datastore.GetDefaultTripleTable, datastore.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
-        let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology.Ontology
+        let rlProgram = Library.owl2Datalog logger datastore.Resources ontology.Ontology
         
-        DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
-        let query2 = tripleTable.GetTriplesWithObject(objIndex)
-        query2.Should().HaveLength(3) |> ignore
-        let query3 = tripleTable.GetTriplesWithPredicate(predIndex)
+        DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, datastore)
+        let query2 = datastore.GetTriplesWithObject(objIndex)
+        query2.Should().HaveLength(2) |> ignore
+        let query3 = datastore.GetTriplesWithPredicate(predIndex)
         query3.Should().HaveLength(2) |> ignore
-        let query1b = tripleTable.GetTriplesWithSubjectObject(subjectIndex2, objIndex)
+        let query1b = datastore.GetTriplesWithSubjectObject(subjectIndex2, objIndex)
         query1b.Should().HaveLength(1) |> ignore
         inMemorySink.LogEvents.Should().BeEmpty
         

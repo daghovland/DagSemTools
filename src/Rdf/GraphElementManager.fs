@@ -10,7 +10,7 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
                  resourceCount: uint) =
     
     let mutable ResourceList = resourceList
-    let mutable anonResourceCount = (int resourceCount) - 1 // Assume only default graph so far
+    let mutable anonResourceCount = 0
     let mutable anonResourceMap : Map<string, GraphElementId> = Map.empty
     member val ResourceCount = resourceCount with get, set
     
