@@ -67,6 +67,14 @@ public interface IGraph
     public IEnumerable<Triple> GetTriplesWithObject(IriReference obj);
 
     /// <summary>
+    /// Answers a SPARQL SELECT query over the whole dataset
+    /// </summary>
+    /// <param name="query"></param>
+    /// <returns>An enumerable of solutions. Each solution is a dictionary of the bindings</returns>
+    public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query);
+
+    
+    /// <summary>
     /// Returns true if and only if the triple is in the Graph
     /// Similar to the sparql query "ASK WHERE { subject predicate object }".
     /// </summary>

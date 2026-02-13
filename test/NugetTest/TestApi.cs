@@ -26,7 +26,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestSparql()
     {
         var ontology = new FileInfo("TestData/example1.ttl");
-        var ont = TriGParser.Parse(ontology, outputWriter).GetDefaultGraph();
+        var ont = TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var enemies = ont.AnswerSelectQuery("SELECT * WHERE where{?hero <http://www.perceive.net/schemas/relationship/enemyOf> ?enemy.}").ToList();
@@ -47,7 +47,7 @@ public class TestApi(ITestOutputHelper output)
     public void TestDbPedia()
     {
         var ontology = new FileInfo("DbpediaTests/test2.ttl");
-        var ont = TriGParser.Parse(ontology, outputWriter).GetDefaultGraph();
+        var ont = TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
         var subjects = ont.GetDefaultGraph().GetTriplesWithPredicate(new IriReference("http://purl.org/dc/terms/subject"));

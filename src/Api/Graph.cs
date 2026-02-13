@@ -39,6 +39,12 @@ public class Graph : IGraph
     private IEnumerable<Rule> _rules = Enumerable.Empty<Rule>();
 
     /// <inheritdoc />
+    public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query)
+    {
+       throw new NotImplementedException();
+    }
+
+    /// <inheritdoc />
     public bool ContainsTriple(Triple apiTriple) =>
         apiTriple.TryGetRdfTriple(apiTriple, out var rdfTriple)
          && Triples
