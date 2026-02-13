@@ -13,8 +13,8 @@ open DagSemTools.Rdf.Query
 
 module QueryProcessor =
     
-    let GetBindingsForBGP(datastore: Datastore) (bgp: TriplePattern list) : Map<string, GraphElementId> list =
-        let rec aux (patterns: TriplePattern list) (currentBindings: Map<string, GraphElementId> list) : Map<string, GraphElementId> list =
+    let GetBindingsForBGP(datastore: Datastore) (bgp: QuadPattern list) : Map<string, GraphElementId> list =
+        let rec aux (patterns: QuadPattern list) (currentBindings: Map<string, GraphElementId> list) : Map<string, GraphElementId> list =
             match patterns with
             | [] -> currentBindings
             | pattern :: rest ->
@@ -22,7 +22,11 @@ module QueryProcessor =
                     currentBindings
                     |> List.collect (fun binding ->
                         let boundPattern =
-                            { Subject = 
+                            { Graph = 
+                                  match pattern.Graph with
+                                  | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
+                                  | _ -> pattern.Graph
+                              Subject = 
                                 match pattern.Subject with
                                 | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
                                 | _ -> pattern.Subject
@@ -34,10 +38,13 @@ module QueryProcessor =
                                 match pattern.Object with
                                 | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
                                 | _ -> pattern.Object }
-                        datastore.GetTriples(boundPattern)
+                        datastore.GetQuads(boundPattern)
                         |> Seq.map (fun triple ->
                             let newBinding =
-                                [ match pattern.Subject with
+                                [ match pattern.Graph with
+                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.tripleId)
+                                  | _ -> ()
+                                  match pattern.Subject with
                                   | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.subject)
                                   | _ -> ()
                                   match pattern.Predicate with

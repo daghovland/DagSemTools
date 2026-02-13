@@ -10,6 +10,7 @@ namespace DagSemTools.RdfOwlTranslator.Tests
 open System.IO
 open System.Numerics
 open DagSemTools.OwlOntology
+open DagSemTools.Rdf
 open Xunit.Abstractions
 open Xunit
 open IriTools
@@ -35,7 +36,7 @@ type TestTurtle(output : ITestOutputHelper) =
         let rdf = DagSemTools.Turtle.Parser.Parser.ParseString(ontology, outputWriter)
         
         //Act
-        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(rdf.Triples, rdf.Resources, logger)
+        let translator = new DagSemTools.RdfOwlTranslator.Rdf2Owl(rdf.GetDefaultTripleTable, rdf.Resources, logger)
         let ontology = translator.extractOntology
 
         //Assert

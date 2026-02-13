@@ -15,11 +15,9 @@ open System
 open DagSemTools.Ingress
 open IriTools
 
-type Datastore(triples: TripleTable,
-               reifiedTriples: QuadTable,
+type Datastore(reifiedTriples: QuadTable,
                namedGraphs: QuadTable,
                resources: GraphElementManager) =
-    member val Triples = triples with get, set
     member val ReifiedTriples = reifiedTriples with get, set
     member val NamedGraphs = namedGraphs with get, set
     member val Resources = resources with get, set
@@ -27,19 +25,21 @@ type Datastore(triples: TripleTable,
     new(init_rdf_size : uint) =
         let init_resources : uint = uint ( max 10 (int init_rdf_size / 10) )
         let init_triples = uint ( max 10 (int init_rdf_size / 60) )
-        Datastore(new TripleTable(init_triples),
-                  new QuadTable(init_triples),
+        Datastore(new QuadTable(init_triples),
                   new QuadTable(init_triples),
                   new GraphElementManager(init_resources))
         
     
     new(elementManager : GraphElementManager, init_triples : uint) =
-        Datastore(new TripleTable(init_triples),
-                  new QuadTable(init_triples),
+        Datastore(new QuadTable(init_triples),
                   new QuadTable(init_triples),
                   elementManager)
     member this.AddTriple (triple: Triple) =
-        this.Triples.AddTriple triple
+        this.NamedGraphs.AddQuad (getDefaultGraphTriple triple)
+    
+    member this.AddQuad =
+        this.NamedGraphs.AddQuad
+    member this.GetDefaultTripleTable = new NamedTripleTable(this.NamedGraphs, defaultGraphElementId)
     
     member this.AddNamedGraphTriple(graph: GraphElementId, triple: Triple) =
         this.NamedGraphs.AddQuad{ tripleId = graph; subject = triple.subject; predicate = triple.predicate; obj = triple.obj}
@@ -54,14 +54,9 @@ type Datastore(triples: TripleTable,
     member this.AddNodeResource (resource: RdfResource) : GraphElementId =
         this.Resources.AddNodeResource resource
     
-    member this.GetGraphElement (resourceId: GraphElementId) : GraphElement =
-        ArgumentOutOfRangeException.ThrowIfGreaterThanOrEqual(resourceId, this.Resources.ResourceCount);
-        this.Resources.GetGraphElement(resourceId)
+
         
-    member this.GetGraphNode (resourceId: GraphElementId) : RdfResource option =
-        match this.GetGraphElement(resourceId) with
-        | NodeOrEdge node -> Some node
-        | GraphLiteral _ -> None
+
         
     member this.GetGraphElementId (resource : GraphElement) =
         this.Resources.GraphElementMap.[resource]
@@ -73,46 +68,49 @@ type Datastore(triples: TripleTable,
         this.Resources.CreateUnnamedAnonResource()
     member this.GetResourceTriple (triple: Triple) =
         this.Resources.GetResourceTriple triple
-        
-    member this.GetNamedGraph (graphId : GraphElementId) : Triple seq =
-        this.NamedGraphs.GetGraph graphId
-        |> Seq.map (fun quad -> quad.GetTriple )
+    member this.GetResourceQuad quad =
+        this.Resources.GetResourceQuad quad
+    member this.GetNamedGraph (graphId : GraphElementId) : ITripleTable
+        = NamedTripleTable(this.NamedGraphs, graphId)
     member this.GetTriplesWithSubject (subject: GraphElementId) : Triple seq =
-        this.Triples.GetTriplesWithSubject subject
+        this.NamedGraphs.GetTriplesWithIdSubject (defaultGraphElementId, subject)
     member this.GetTriplesWithSubject (graphid: GraphElementId, subject: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdSubject (graphid, subject)
+        this.NamedGraphs.GetTriplesWithIdSubject (graphid, subject)
     
     member this.GetTriplesWithObject (object: GraphElementId) : Triple seq =
-        this.Triples.GetTriplesWithObject object
+        this.NamedGraphs.GetTriplesWithIdObject (defaultGraphElementId, object)
     member this.GetTriplesWithObject (graphid: GraphElementId, object: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdObject (graphid, object)
+        this.NamedGraphs.GetTriplesWithIdObject (graphid, object)
     member this.GetTriplesWithPredicate (predicate: GraphElementId) : Triple seq =
-        this.Triples.GetTriplesWithPredicate predicate
-    
+        this.NamedGraphs.GetTriplesWithIdPredicate (defaultGraphElementId, predicate)
     member this.GetTriplesWithPredicate (graphid: GraphElementId, predicate: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdPredicate (graphid, predicate)
+        this.NamedGraphs.GetTriplesWithIdPredicate (graphid, predicate)
     
     member this.GetTriplesWithSubjectPredicate (subject: GraphElementId, predicate: GraphElementId) =
-        this.Triples.GetTriplesWithSubjectPredicate (subject, predicate)
-    
+        this.NamedGraphs.GetTriplesWithIdSubjectPredicate(defaultGraphElementId, subject, predicate)
+        
     member this.GetTriplesWithSubjectPredicate (graphId : GraphElementId, subject: GraphElementId, predicate: GraphElementId) =
-        this.NamedGraphs.GetQuadsWithIdSubjectPredicate(graphId, subject, predicate)
+        this.NamedGraphs.GetTriplesWithIdSubjectPredicate(graphId, subject, predicate)
     member this.GetTriplesWithObjectPredicate (object: GraphElementId, predicate: GraphElementId) =
-        this.Triples.GetTriplesWithObjectPredicate (object, predicate)
+        this.NamedGraphs.GetTriplesWithIdObjectPredicate (defaultGraphElementId, object, predicate)
     member this.GetTriplesWithObjectPredicate (graphId : GraphElementId, object: GraphElementId, predicate: GraphElementId) =
-        this.NamedGraphs.GetQuadsWithIdObjectPredicate(graphId, object, predicate)
+        this.NamedGraphs.GetTriplesWithIdObjectPredicate(graphId, object, predicate)
     
-        
     member this.GetTriplesWithSubjectObject (subject: GraphElementId, object: GraphElementId)  =
-        this.Triples.GetTriplesWithSubjectObject (subject, object)
+        this.NamedGraphs.GetTriplesWithIdSubjectObject (defaultGraphElementId, subject, object)
     member this.GetTriplesWithSubjectObject (graphId: GraphElementId, subject: GraphElementId, object: GraphElementId)  =
-        this.NamedGraphs.GetQuadsWithIdSubjectPredicate (graphId, subject, object)
+        this.NamedGraphs.GetTriplesWithIdSubjectPredicate (graphId, subject, object)
         
-    member this.ContainsTriple (triple : Triple) : bool =
-            this.Triples.Contains triple
-        
-    member this.GetReifiedTriplesWithId(id: GraphElementId) : Quad seq =
-        this.ReifiedTriples.GetGraph id
+    member this.ContainsTriple (triple : Triple) : bool  =
+            this.NamedGraphs.Contains { Quad.tripleId = defaultGraphElementId
+                                        Quad.subject = triple.subject
+                                        predicate = triple.predicate
+                                        obj = triple.obj }
+    member this.ContainsQuad quad =
+        this.NamedGraphs.Contains quad
+    member this.GetReifiedTriplesWithId(id: GraphElementId) : Triple seq =
+        this.ReifiedTriples.GetQuadsWithId (id)
+        |> Seq.map _.GetTriple
     member this.GetReifiedTriplesWithSubject(subject: GraphElementId) : Quad seq =
         this.ReifiedTriples.GetQuadsWithSubject subject
     member this.GetReifiedTriplesWithPredicate(predicate: GraphElementId) : Quad seq =
@@ -123,34 +121,50 @@ type Datastore(triples: TripleTable,
         this.ReifiedTriples.GetQuadsWithSubjectPredicate (subject, predicate)
 
     member this.GetResourceInfoForErrorMessage(subject: GraphElementId) : string =
-           this.Triples.GetTriplesMentioning subject
-            |> Seq.map this.Resources.GetResourceTriple
+           this.NamedGraphs.GetQuadsMentioningResource subject
+            |> Seq.map this.Resources.GetResourceQuad
             |> Seq.map _.ToString()
             |> String.concat ". "
             
-    member this.GetTriples(pat: Query.TriplePattern) : Triple seq =
+    member this.GetQuads(pat: Query.QuadPattern) : Quad seq =
+        let g = pat.Graph       
         let s = pat.Subject
         let p = pat.Predicate
         let o = pat.Object
-        match s, p, o with
-        | Resource sRes, Resource pRes, Resource oRes ->
-            let t = { Triple.subject =  sRes; predicate = pRes; obj = oRes }
-            if this.ContainsTriple t then
-                seq { yield t }
+        match g, s, p, o with
+        | Resource gRes, Resource sRes, Resource pRes, Resource oRes ->
+            let q = { Quad.tripleId = gRes; subject =  sRes; predicate = pRes; obj = oRes }
+            if this.NamedGraphs.Contains q then
+                seq { yield q }
             else
                 Seq.empty
-        | Resource sRes, Resource pRes, Variable _ ->
-            this.GetTriplesWithSubjectPredicate (sRes, pRes)
-        | Resource sRes, Variable _, Resource oRes ->
-            this.GetTriplesWithSubjectObject (sRes, oRes)
-        | Variable _, Resource pRes, Resource oRes ->
-            this.GetTriplesWithObjectPredicate (oRes, pRes)
-        | Resource sRes, Variable _, Variable _ ->
-            this.GetTriplesWithSubject sRes
-        | Variable _, Resource pRes, Variable _ ->
-            this.GetTriplesWithPredicate pRes
-        | Variable _, Variable _, Resource oRes ->
-            this.GetTriplesWithObject oRes
-        | Variable _, Variable _, Variable _ ->
-            this.Triples.GetTriples()
-            
+        | Resource gRes,  Resource sRes, Resource pRes, Variable _ ->
+            this.NamedGraphs.GetQuadsWithIdSubjectPredicate (gRes, sRes, pRes)
+        | Resource gRes, Resource sRes, Variable _, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithIdSubjectObject (gRes, sRes, oRes)
+        | Resource gRes, Variable _, Resource pRes, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithIdObjectPredicate (gRes, oRes, pRes)
+        | Resource gRes,  Resource sRes, Variable _, Variable _ ->
+            this.NamedGraphs.GetQuadsWithIdSubject (gRes, sRes)
+        | Resource gRes, Variable _, Resource pRes, Variable _ ->
+            this.NamedGraphs.GetQuadsWithIdPredicate (gRes, pRes)
+        | Resource gRes, Variable _, Variable _, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithIdObject (gRes, oRes)
+        | Resource gRes, Variable _, Variable _, Variable _ ->
+            this.NamedGraphs.GetQuadsWithId (gRes)
+        | Variable _,  Resource sRes, Resource pRes, Variable _ ->
+            this.NamedGraphs.GetQuadsWithSubjectPredicate (sRes, pRes)
+        | Variable _, Resource sRes, Variable _, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithSubjectObject (sRes, oRes)
+        | Variable _, Variable _, Resource pRes, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithObjectPredicate (oRes, pRes)
+        | Variable _,  Resource sRes, Variable _, Variable _ ->
+            this.NamedGraphs.GetQuadsWithSubject (sRes)
+        | Variable _, Variable _, Resource pRes, Variable _ ->
+            this.NamedGraphs.GetQuadsWithPredicate (pRes)
+        | Variable _, Variable _, Variable _, Resource oRes ->
+            this.NamedGraphs.GetQuadsWithObject (oRes)
+        | Variable _, Variable _, Variable _, Variable _ ->
+            this.NamedGraphs.GetQuads
+        | Variable s, Resource i, Resource i1, Resource i2 ->
+            this.NamedGraphs.GetQuadsWithTriple (i, i1, i2)

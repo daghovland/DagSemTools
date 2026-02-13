@@ -16,10 +16,10 @@ public class TestApi(ITestOutputHelper output)
     public void Test1()
     {
         var ontology = new FileInfo("TestData/example1.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
 
         Assert.NotNull(ont);
-        var labels = ont.GetTriplesWithSubjectPredicate(
+        var labels = ont.GetDefaultGraph().GetTriplesWithSubjectPredicate(
             new IriReference("http://dbpedia.org/datatype/FuelEfficiency"),
             new IriReference("http://www.w3.org/2000/01/rdf-schema#label"));
         labels.Count().Should().Be(1, "There is one label on fuel efficiency");
@@ -29,26 +29,26 @@ public class TestApi(ITestOutputHelper output)
     public void TestAbbreviatedBlankNode()
     {
         var ontology = new FileInfo("TestData/abbreviated_blank_nodes.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
         Assert.NotNull(ont);
 
 
-        var knows = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/knows")).ToList();
+        var knows = ont.GetDefaultGraph().GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/knows")).ToList();
         knows.Should().HaveCount(2);
 
 
-        var name = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name")).ToList();
+        var name = ont.GetDefaultGraph().GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name")).ToList();
         name.Should().HaveCount(3);
         var isKnown = knows.First().Object;
         var bobHasName = name.Skip(1).First().Subject;
         isKnown.Should().Be(bobHasName);
 
-        var mbox = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/mbox"));
+        var mbox = ont.GetDefaultGraph().GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/mbox"));
 
         mbox.Should().HaveCount(1);
 
-        var eve = ont.GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name"))
-            .Where(tr => tr.Object.Equals(RdfLiteral.StringRdfLiteral("Eve")));
+        var eve = ont.GetDefaultGraph().GetTriplesWithPredicate(new IriReference("http://xmlns.com/foaf/0.1/name"))
+            .Where(tr => tr.Object.Equals(ont.GetResourceManager().CreateRdfStringLiteral("Eve")));
         eve.Should().HaveCount(1);
     }
 
@@ -56,30 +56,53 @@ public class TestApi(ITestOutputHelper output)
     public void TestDatalogReasoning()
     {
         var ontology = new FileInfo("TestData/data.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetTriplesWithPredicateObject(
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object"));
         resultsData.Should().HaveCount(1);
-        var resultsBefore = ont.GetTriplesWithPredicateObject(
+        var resultsBefore = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsBefore.Should().BeEmpty();
         Assert.NotNull(ont);
         var datalogFile = new FileInfo("TestData/rules.datalog");
         ont.LoadDatalog(datalogFile);
-        var resultsAfter = ont.GetTriplesWithPredicateObject(
+        var resultsAfter = ont.GetDefaultGraph().GetTriplesWithPredicateObject(
             new IriReference("https://example.com/data#predicate"),
             new IriReference("https://example.com/data#object2"));
         resultsAfter.Should().HaveCount(1);
+    }
+
+
+    [Fact]
+    public void TestNamedGraphDatalogReasoning()
+    {
+        var ontology = new FileInfo("TestData/namedgraph.trig");
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetNamedGraph("https://example.com/data#graph").GetTriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object"));
+        resultsData.Should().HaveCount(1);
+        var resultsBefore = ont.GetNamedGraph("https://example.com/data#graph").GetTriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object2"));
+        resultsBefore.Should().BeEmpty();
+        Assert.NotNull(ont);
+        var datalogFile = new FileInfo("TestData/namedgraph.datalog");
+        ont.LoadDatalog(datalogFile);
+        var resultsAfter = ont.GetNamedGraph("https://example.com/data#graph").GetTriplesWithPredicateObject(
+            new IriReference("https://example.com/data#predicate"),
+            new IriReference("https://example.com/data#object2"));
+        resultsAfter.Should().HaveCount(1, "Datalog reasoning should have added this triple");
     }
 
     [Fact]
     public void TestA()
     {
         var ontology = new FileInfo("TestData/test2.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetTriplesWithObject(
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
@@ -89,9 +112,9 @@ public class TestApi(ITestOutputHelper output)
     [Fact]
     public void TestStreamParsing()
     {
-        var ontology = new FileStream("TestData/test2.ttl", FileMode.Open, FileAccess.Read);
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetTriplesWithObject(
+        var ontology = new FileInfo("TestData/test2.ttl");
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
@@ -101,8 +124,8 @@ public class TestApi(ITestOutputHelper output)
     public void TestDatalog2()
     {
         var ontology = new FileInfo("TestData/test2.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetTriplesWithObject(
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
@@ -110,7 +133,7 @@ public class TestApi(ITestOutputHelper output)
         var datalogFile = new FileInfo("TestData/test2.datalog");
         ont.LoadDatalog(datalogFile);
 
-        resultsData = ont.GetTriplesWithObject(
+        resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#property")).ToList();
         resultsData.Should().HaveCount(3);
 
@@ -122,20 +145,20 @@ public class TestApi(ITestOutputHelper output)
     public void TestDatalogStratified()
     {
         var ontology = new FileInfo("TestData/test_stratified.ttl");
-        var ont = DagSemTools.Api.TurtleParser.Parse(ontology, outputWriter);
-        var resultsData = ont.GetTriplesWithObject(
+        var ont = DagSemTools.Api.TriGParser.Parse(ontology, outputWriter);
+        var resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#Type")).ToList();
         resultsData.Should().HaveCount(1);
         resultsData.First().Predicate.Should().Be(new IriReference(Namespaces.RdfType));
 
-        resultsData = ont.GetTriplesWithObject(
+        resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#Type3")).ToList();
         resultsData.Should().HaveCount(0);
 
         var datalogFile = new FileInfo("TestData/test_stratified.datalog");
         ont.LoadDatalog(datalogFile);
 
-        resultsData = ont.GetTriplesWithObject(
+        resultsData = ont.GetDefaultGraph().GetTriplesWithObject(
             new IriReference("http://example.com/data#Type3")).ToList();
         resultsData.Should().HaveCount(1);
 
@@ -162,7 +185,7 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["title"];
-        var expected = RdfLiteral.StringRdfLiteral("SPARQL Tutorial");
+        var expected = graph.GetResourceManager().CreateRdfStringLiteral("SPARQL Tutorial");
         Assert.Equal(actual, expected);
 
     }
@@ -198,12 +221,12 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(2);
         var actual = answer["name"];
-        var expected1 = RdfLiteral.StringRdfLiteral("Johnny Lee Outlaw");
-        var expected2 = RdfLiteral.StringRdfLiteral("Peter Goodguy");
+        var expected1 = graph.GetResourceManager().CreateRdfStringLiteral("Johnny Lee Outlaw");
+        var expected2 = graph.GetResourceManager().CreateRdfStringLiteral("Peter Goodguy");
         (actual.Equals(expected1) || actual.Equals(expected2)).Should().BeTrue();
         var actualMbox = answer["mbox"];
-        var expectedMbox1 = new IriResource(new IriReference("mailto:peter@example.org"));
-        var expectedMbox2 = new IriResource(new IriReference("mailto:carol@example.org"));
+        var expectedMbox1 = graph.GetResourceManager().CreateIriResource("mailto:peter@example.org");
+        var expectedMbox2 = graph.GetResourceManager().CreateIriResource("mailto:carol@example.org");
         (actualMbox.Equals(expectedMbox1) || actualMbox.Equals(expectedMbox2)).Should().BeTrue();
 
     }
@@ -243,7 +266,7 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["v"];
-        var expected = new IriResource(new IriReference("http://example.org/ns#x"));
+        var expected = graph.GetResourceManager().CreateIriResource("http://example.org/ns#x");
         actual.Should().Be(expected);
     }
 
@@ -274,7 +297,7 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["v"];
-        var expected = new IriResource(new IriReference("http://example.org/ns#y"));
+        var expected = graph.GetResourceManager().CreateIriResource("http://example.org/ns#y");
         actual.Should().Be(expected);
     }
 
@@ -306,7 +329,7 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["v"];
-        var expected = new IriResource(new IriReference("http://example.org/ns#z"));
+        var expected = graph.GetResourceManager().CreateIriResource("http://example.org/ns#z");
         actual.Should().Be(expected);
     }
 
@@ -336,8 +359,8 @@ public class TestApi(ITestOutputHelper output)
         {
             answer.Count.Should().Be(2);
             var actual = answer["name"];
-            var alice = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("Alice"));
-            var bob = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("Bob"));
+            var alice = graph.GetResourceManager().CreateRdfStringLiteral("Alice");
+            var bob = graph.GetResourceManager().CreateRdfStringLiteral("Bob");
             (actual.Equals(alice) || actual.Equals(bob)).Should().BeTrue();
             var actualX = answer["x"];
             actualX.Should().BeOfType<BlankNodeResource>();
@@ -369,8 +392,8 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["name"];
-        var expected = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
-        actual.Should().Be(expected);
+        actual.Should().BeOfType<RdfLiteral>();
+        actual.ToString().Should().Be("John Doe");
     }
 
 
@@ -402,13 +425,13 @@ public class TestApi(ITestOutputHelper output)
         var answer = answers.First();
         answer.Count.Should().Be(1);
         var actual = answer["name"];
-        var expected = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("John Doe"));
-        actual.Should().Be(expected);
+        actual.Should().BeOfType<RdfLiteral>();
+        actual.ToString().Should().Be("John Doe");
     }
-    private IGraph ParseTurtleData(string data)
+    private IDataset ParseTurtleData(string data)
     {
         var writer = new StringWriter();
-        var graph = TurtleParser.Parse(data, writer);
+        var graph = TriGParser.Parse(data, writer);
         if (!string.IsNullOrEmpty(writer.ToString()))
         {
             output.WriteLine("Parser warnings/errors:");

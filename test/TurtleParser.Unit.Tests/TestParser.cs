@@ -46,8 +46,8 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ont = TestOntology("<http://example.org/subject> a <http://example.org/object> .");
         Assert.NotNull(ont);
-        Assert.Equal(1u, ont.Triples.TripleCount);
-        Assert.NotNull(ont.Triples.GetTriples());
+        Assert.Equal(1u, ont.NamedGraphs.QuadCount);
+        Assert.NotNull(ont.NamedGraphs.GetQuads);
     }
 
     [Fact]
@@ -61,7 +61,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """);
         Assert.NotNull(ont);
         ont.Resources.ResourceCount.Should().BeGreaterThanOrEqualTo(3);
-        Assert.Equal(1u, ont.Triples.TripleCount);
+        Assert.Equal(1u, ont.NamedGraphs.QuadCount);
     }
 
 
@@ -88,9 +88,9 @@ public class TestParser : IDisposable, IAsyncDisposable
             
             """);
         Assert.NotNull(ont);
-        ont.Triples.TripleCount.Should().Be(1);
-        var subjectId = ont.Triples.GetTriples().First().subject;
-        var subject = ont.GetGraphElement(subjectId);
+        ont.NamedGraphs.QuadCount.Should().Be(1);
+        var subjectId = ont.NamedGraphs.GetQuads.First().subject;
+        var subject = ont.Resources.GetGraphElement(subjectId);
         subject.Should().Be(GraphElement.NewNodeOrEdge(RdfResource.NewIri("http://one.example/subject2")));
     }
 
@@ -148,9 +148,9 @@ public class TestParser : IDisposable, IAsyncDisposable
                                @prefix p: <path/> .                    # prefix p: now stands for http://one.example/path/
                                p:subject4 p:predicate4 p:object4 .     # prefixed name, e.g., http://one.example/path/subject4
                                """);
-        ont.Triples.TripleCount.Should().Be(1);
-        ont.Triples.GetTriples().First().subject.Should().BeGreaterThanOrEqualTo(0);
-        ont.Triples.GetTriples().First().predicate.Should().BeGreaterThanOrEqualTo(0);
+        ont.NamedGraphs.QuadCount.Should().Be(1);
+        ont.NamedGraphs.GetQuads.First().subject.Should().BeGreaterThanOrEqualTo(0);
+        ont.NamedGraphs.GetQuads.First().predicate.Should().BeGreaterThanOrEqualTo(0);
     }
 
     [Fact]
@@ -187,8 +187,8 @@ public class TestParser : IDisposable, IAsyncDisposable
             :spiderman :enemyOf :green-goblin .
             """);
         Assert.NotNull(ont);
-        ont.Triples.TripleCount.Should().Be(1);
-        var triple = ont.Triples.GetTriples().First();
+        ont.NamedGraphs.QuadCount.Should().Be(1);
+        var triple = ont.NamedGraphs.GetQuads.First();
         triple.subject.Should().BeGreaterThanOrEqualTo(0);
         triple.predicate.Should().BeGreaterThanOrEqualTo(0);
         triple.obj.Should().BeGreaterThanOrEqualTo(0);
@@ -202,7 +202,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                 :subject :predicate 1, 2, 3 .
             """);
         Assert.NotNull(ont);
-        ont.Triples.TripleCount.Should().Be(3);
+        ont.NamedGraphs.QuadCount.Should().Be(3);
     }
 
 
@@ -214,7 +214,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                                    :subject :predicate "string1", "string2", "3" .
                                """);
         Assert.NotNull(ont);
-        ont.Triples.TripleCount.Should().Be(3);
+        ont.NamedGraphs.QuadCount.Should().Be(3);
     }
 
     [Fact]
@@ -265,7 +265,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/example26.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(4);
+        ont.NamedGraphs.QuadCount.Should().Be(4);
     }
 
 
@@ -277,8 +277,8 @@ public class TestParser : IDisposable, IAsyncDisposable
         var example31 = File.ReadAllText("TestData/example31.ttl");
         var expandedList = TestOntology(example31);
 
-        abreviatedList.Triples.TripleCount.Should().Be(5);
-        expandedList.Triples.TripleCount.Should().Be(5);
+        abreviatedList.NamedGraphs.QuadCount.Should().Be(5);
+        expandedList.NamedGraphs.QuadCount.Should().Be(5);
         // TODO Why are these not equal?
         //abreviatedList.Resources.ResourceCount.Should().Be(expandedList.Resources.ResourceCount);
     }
@@ -289,7 +289,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var example32 = File.ReadAllText("TestData/example32.ttl");
         var newLineExample = TestOntology(example32);
-        newLineExample.Triples.TripleCount.Should().Be(1);
+        newLineExample.NamedGraphs.QuadCount.Should().Be(1);
 
     }
 
@@ -299,7 +299,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/example30.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(7);
+        ont.NamedGraphs.QuadCount.Should().Be(7);
     }
 
     [Fact]
@@ -307,7 +307,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/reified_triple.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(2);
+        ont.NamedGraphs.QuadCount.Should().Be(2);
         var reifiedTriples = ont.GetReifiedTriplesWithPredicate(
             ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://www.example.org/jobTitle"))))
             .ToList();
@@ -322,7 +322,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/reified_triple_example23.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(2);
+        ont.NamedGraphs.QuadCount.Should().Be(2);
         var reifiedTriples = ont.GetReifiedTriplesWithPredicate(
                 ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://www.example.org/jobTitle"))))
             .ToList();
@@ -336,7 +336,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/annotated_triple.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(3);
+        ont.NamedGraphs.QuadCount.Should().Be(3);
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
 
@@ -346,7 +346,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/annotated_triple_expanded_example27.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(3);
+        ont.NamedGraphs.QuadCount.Should().Be(3);
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
 
@@ -355,7 +355,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/annotated_triple_expanded_triple_terms_example28.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(3);
+        ont.NamedGraphs.QuadCount.Should().Be(3);
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
     [Fact]
@@ -363,7 +363,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/triple_term.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(2);
+        ont.NamedGraphs.QuadCount.Should().Be(2);
         ont.ReifiedTriples.QuadCount.Should().Be(1);
         var tripleId = ont.ReifiedTriples.QuadList.First().tripleId;
         ont.GetReifiedTriplesWithId(tripleId).Should().HaveCount(1);
@@ -375,7 +375,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/reified_triple_with_iri.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(2);
+        ont.NamedGraphs.QuadCount.Should().Be(2);
         ont.ReifiedTriples.QuadCount.Should().Be(1);
     }
 
@@ -384,7 +384,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/triple-subset-qualified-restriction.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(16);
+        ont.NamedGraphs.QuadCount.Should().Be(16);
         ont.ReifiedTriples.QuadCount.Should().Be(0);
     }
 
@@ -394,7 +394,7 @@ public class TestParser : IDisposable, IAsyncDisposable
     {
         var ontology = File.ReadAllText("TestData/collections.ttl");
         var ont = TestOntology(ontology);
-        ont.Triples.TripleCount.Should().Be(8);
+        ont.NamedGraphs.QuadCount.Should().Be(8);
         var rdfNilId = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference(Namespaces.RdfNil)));
         ont.GetTriplesWithObject(rdfNilId)
             .Should().HaveCount(2);
@@ -471,23 +471,23 @@ public class TestParser : IDisposable, IAsyncDisposable
 
         var mbox = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox")));
 
-        var triplesWithMail = ont.GetTriplesWithPredicate(mbox).ToList();
+        var triplesWithMail = ont.NamedGraphs.GetQuadsWithPredicate(mbox).ToList();
         triplesWithMail.Should().HaveCount(1);
-        var ontTriples = ont.Triples.GetTriples().Select(tr => ont.GetResourceTriple(tr));
+        var ontTriples = ont.NamedGraphs.GetQuads.Select(tr => ont.GetResourceQuad(tr));
 
         var eve = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Eve")));
+            .Where(tr => ont.Resources.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Eve")));
         eve.Should().HaveCount(1);
 
 
         var alice = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
+            .Where(tr => ont.Resources.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
         alice.Should().HaveCount(1);
 
 
-        ont.Triples.TripleCount.Should().Be(
+        ont.NamedGraphs.QuadCount.Should().Be(
             6);
 
 
@@ -495,9 +495,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var ontexp = TestOntology(ontologyExp);
         Assert.NotNull(ontexp);
 
-        var ontexpTriples = ontexp.Triples.GetTriples().Select(tr => ont.GetResourceTriple(tr));
+        var ontexpTriples = ontexp.NamedGraphs.GetQuads.Select(tr => ont.GetResourceQuad(tr));
         ontexpTriples.Should().BeEquivalentTo(ontTriples);
-        ontexp.Triples.TripleCount.Should().Be(ont.Triples.TripleCount);
+        ontexp.NamedGraphs.QuadCount.Should().Be(ont.NamedGraphs.QuadCount);
         ontexp.Resources.ResourceCount.Should().Be(ont.Resources.ResourceCount);
 
         var triplesWithKnowsE = ontexp.GetTriplesWithPredicate(knows).ToList();
@@ -515,7 +515,7 @@ public class TestParser : IDisposable, IAsyncDisposable
             """, _outputWriter);
         var alice = ont
             .GetTriplesWithPredicate(ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name"))))
-            .Where(tr => ont.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
+            .Where(tr => ont.Resources.GetGraphElement(tr.obj).literal.Equals(RdfLiteral.NewLiteralString("Alice")));
         alice.Should().HaveCount(1);
 
     }
@@ -565,7 +565,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                                _:a  ex:name   "Firstname" .
                                """);
         Assert.NotNull(ont);
-        ont.Triples.TripleCount.Should().Be(1);
+        ont.NamedGraphs.QuadCount.Should().Be(1);
         var knows = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://example.com#name")));
         ont.GetTriplesWithPredicate(knows).Should().HaveCount(1);
 
@@ -585,7 +585,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                                    _:c  foaf:mbox   <mailto:carol@example.org> .
                                """);
         Assert.NotNull(ont);
-        ont.Triples.TripleCount.Should().Be(5);
+        ont.NamedGraphs.QuadCount.Should().Be(5);
         var name = ont.GetGraphNodeId(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")));
         var nameTriples = ont.GetTriplesWithPredicate(name).ToList();
         nameTriples.Should().HaveCount(2);

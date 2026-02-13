@@ -32,19 +32,19 @@ module Library =
         objProp =
         match objProp with
         | NamedObjectProperty(FullIri iri) ->
-                    { TriplePattern.Subject = Term.Variable "x"
-                      Predicate = (Term.Resource (resources.AddNodeResource(RdfResource.Iri iri)))
-                      Object = Term.Variable "y" } |> Some
+                    Query.GetDefaultGraphPattern (Term.Variable "x")
+                      (Term.Resource (resources.AddNodeResource(RdfResource.Iri iri)))
+                      (Term.Variable "y") |> Some
         | AnonymousObjectProperty bNode ->
-                    { TriplePattern.Subject = Term.Variable "x"
-                      Predicate = Term.Resource (resources.AddNodeResource(AnonymousBlankNode bNode))
-                      Object = Term.Variable "y" } |> Some
+                    Query.GetDefaultGraphPattern (Term.Variable "x")
+                      (Term.Resource (resources.AddNodeResource(AnonymousBlankNode bNode)))
+                      (Term.Variable "y") |> Some
         | InverseObjectProperty innerObjProp ->
                     getObjectPropertyExpressionResource logger resources innerObjProp
                     |> Option.map (fun innerPattern ->
-                    { TriplePattern.Subject = innerPattern.Object
-                      Predicate = innerPattern.Predicate
-                      Object = innerPattern.Subject } )
+                    { innerPattern with 
+                        Subject = innerPattern.Object
+                        Object = innerPattern.Subject } )
         | ObjectPropertyChain _ -> logger.Warning "Invalid Owl Ontology: Domain of object property chain not supported"
                                    None
 
@@ -98,15 +98,15 @@ module Library =
         =
         match getObjectPropertyExpressionResource logger resources objProp with 
         | None -> Seq.empty
-        | Some bodyTriple ->
+        | Some bodyQuad ->
             getClassExpressionResource logger resources domExp
             |> Seq.map (fun domainClassResource ->
                 { Rule.Head = NormalHead
-                      { TriplePattern.Subject = Term.Variable "x"
-                        TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
-                        TriplePattern.Object = Term.Resource domainClassResource }
+                      (Query.GetDefaultGraphPattern (Term.Variable "x")
+                        (Term.Resource resourceMap.[Namespaces.RdfType])
+                        (Term.Resource domainClassResource))
                   Rule.Body =
-                      [ (RuleAtom.PositiveTriple bodyTriple ) ]
+                      [ (RuleAtom.PositivePattern bodyQuad ) ]
                 }
             )
 
@@ -120,14 +120,14 @@ module Library =
             getClassExpressionResource logger resources domExp
             |> Seq.map (fun domainClassResource ->
                 { Rule.Head = NormalHead
-                      { TriplePattern.Subject = Term.Variable "x"
-                        TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
-                        TriplePattern.Object = Term.Resource domainClassResource }
+                      (Query.GetDefaultGraphPattern (Term.Variable "x")
+                        (Term.Resource resourceMap.[Namespaces.RdfType])
+                        (Term.Resource domainClassResource))
                   Rule.Body =
-                      [ (RuleAtom.PositiveTriple
-                             { TriplePattern.Subject = Term.Variable "x"
-                               Predicate = (Term.Resource (resources.AddNodeResource(RdfResource.Iri dProp)))
-                               Object = Term.Variable "y" } ) ]
+                      [ (RuleAtom.PositivePattern
+                             (Query.GetDefaultGraphPattern (Term.Variable "x")
+                               (Term.Resource (resources.AddNodeResource(RdfResource.Iri dProp)))
+                               (Term.Variable "y"))) ]
                 }
             )
 
@@ -141,14 +141,14 @@ module Library =
             let range = DataRange2Datalog logger resourceMap resources rangeExp 
             [
               { Rule.Head = NormalHead
-                  { TriplePattern.Subject = Term.Variable "y"
-                    TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
-                    TriplePattern.Object = Term.Resource range }
+                  (Query.GetDefaultGraphPattern (Term.Variable "y")
+                    (Term.Resource resourceMap.[Namespaces.RdfType])
+                    (Term.Resource range))
                 Rule.Body =
-                  [ (RuleAtom.PositiveTriple
-                         { TriplePattern.Subject = Term.Variable "x"
-                           Predicate = (Term.Resource (resources.AddNodeResource(RdfResource.Iri dProp)))
-                           Object = Term.Variable "y" } ) ]
+                  [ (RuleAtom.PositivePattern
+                         (Query.GetDefaultGraphPattern (Term.Variable "x")
+                           (Term.Resource (resources.AddNodeResource(RdfResource.Iri dProp)))
+                           (Term.Variable "y") ) ) ]
             }]
              
 
@@ -161,16 +161,16 @@ module Library =
         =
         match getObjectPropertyExpressionResource logger resources objProp with 
         | None -> Seq.empty
-        | Some bodyTriple ->
+        | Some bodyQuad ->
         getClassExpressionResource logger resources rangeExp
         |> Seq.map (fun rangeClassResource ->
           { Rule.Head = NormalHead
-              { TriplePattern.Subject = Term.Variable "y"
-                TriplePattern.Predicate = Term.Resource resourceMap.[Namespaces.RdfType]
-                TriplePattern.Object = Term.Resource rangeClassResource }
+              (Query.GetDefaultGraphPattern (Term.Variable "y")
+                (Term.Resource resourceMap.[Namespaces.RdfType])
+                (Term.Resource rangeClassResource))
             Rule.Body =
-              [ (RuleAtom.PositiveTriple
-                    bodyTriple) ] } )
+              [ (RuleAtom.PositivePattern
+                    bodyQuad) ] } )
     (* prp-symp 	T(?p, rdf:type, owl:SymmetricProperty) T(?x, ?p, ?y) ->	T(?y, ?p, ?x)  *)
     let SymmetricObjectProperty2Datalog
         (logger : Serilog.ILogger)
@@ -180,15 +180,15 @@ module Library =
         =
         match getObjectPropertyExpressionResource logger resources objProp with 
         | None -> Seq.empty
-        | Some bodyTriple ->
+        | Some bodyQuad ->
         
         [ { Rule.Head = NormalHead
-              { TriplePattern.Subject = bodyTriple.Object
-                TriplePattern.Predicate = bodyTriple.Predicate
-                TriplePattern.Object = bodyTriple.Subject }
+              { bodyQuad with 
+                    Subject = bodyQuad.Object
+                    Object = bodyQuad.Subject }
             Rule.Body =
-              [ (RuleAtom.PositiveTriple
-                    bodyTriple) ] } ]
+              [ (RuleAtom.PositivePattern
+                    bodyQuad) ] } ]
 
 
 

@@ -23,7 +23,12 @@ module Ingress =
             subject: GraphElementId
             predicate: GraphElementId
             obj: GraphElementId
-        }
+        } with
+        override this.ToString() =
+            sprintf "(%A, %A, %A)" 
+                this.subject 
+                this.predicate 
+                this.obj
         
     [<Struct>]
     [<StructuralEquality>]
@@ -46,7 +51,7 @@ module Ingress =
                 predicate = this.predicate
                 obj = this.obj
             }
-    
+
     [<Struct>]
     [<StructuralEquality>]
     [<NoComparison>]
@@ -84,7 +89,22 @@ module Ingress =
                     predicate = this.predicate
                     obj = this.obj
                 }
-    
+    [<Struct>]
+    type GraphSubjectKey = { Graph: uint32; Subject: uint32 }
+
+    let tripleToQuad (triple: Triple) (tripleId: GraphElementId) : Quad =
+        {
+            tripleId = tripleId
+            subject = triple.subject
+            predicate = triple.predicate
+            obj = triple.obj
+        }
+    // The default graph IRI is always 0, this is also
+    // fixed in GraphElementManager.fs
+    let defaultGraphElementId = uint32 0
+    let defaultGraphResource = NodeOrEdge (Iri (IriTools.IriReference "urn:x-arq:DefaultGraph"))
+    let internal getDefaultGraphTriple triple =
+        tripleToQuad triple defaultGraphElementId
       
     let doubleArraySize (originalArray: 'T array) : 'T array =
         let newSize = originalArray.Length * 2

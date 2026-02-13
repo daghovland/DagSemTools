@@ -43,7 +43,7 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         query.Should().HaveLength(1) |> ignore
         
         //Act
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.GetDefaultTripleTable, tripleTable.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
         let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology.Ontology
         DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
@@ -65,14 +65,12 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let objextIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
         tripleTable.AddTriple(Triple)
-        let triplePattern varName : TriplePattern =
-            {
-                Subject = Term.Resource subjectIndex
-                Predicate = Term.Variable varName
-                Object = Term.Resource objextIndex
-            }
-        let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
-                           Body = [PositiveTriple (triplePattern "s2")]}
+        let quadPattern varName = GetDefaultGraphPattern
+                                        (Term.Resource subjectIndex)
+                                        (Term.Variable varName)
+                                        (Term.Resource objextIndex)
+        let rule : Rule = {Head = NormalHead ( quadPattern "s1" )
+                           Body = [PositivePattern (quadPattern "s2")]}
         let partitioner = DagSemTools.Datalog.Stratifier.RulePartitioner (logger, [rule], tripleTable.Resources)
         let stratification = partitioner.orderRules()
         stratification.Should().HaveLength(1) |> ignore
@@ -87,14 +85,12 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let objextIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
         tripleTable.AddTriple(Triple)
-        let triplePattern varName : TriplePattern =
-            {
-                Subject = Term.Resource subjectIndex
-                Predicate = Term.Variable varName
-                Object = Term.Resource objextIndex
-            }
+        let triplePattern varName = GetDefaultGraphPattern
+                                        (Term.Resource subjectIndex)
+                                        (Term.Variable varName)
+                                        (Term.Resource objextIndex)
         let rule : Rule = {Head = NormalHead ( triplePattern "s1" )
-                           Body = [PositiveTriple (triplePattern "s2")]}
+                           Body = [PositivePattern (triplePattern "s2")]}
         let evaluatorFunction = fun () -> DagSemTools.Datalog.Reasoner.evaluate (logger, [rule], tripleTable)
         Assert.Throws<ArgumentException>(evaluatorFunction) |> ignore
         
@@ -110,19 +106,9 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         let objextIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object2"))
         let Triple = {Ingress.Triple.subject = subjectIndex; predicate = predIndex; obj = objextIndex}
         tripleTable.AddTriple(Triple)
-        let headPattern : TriplePattern  =
-            {
-                Subject = Term.Resource subjectIndex
-                Predicate = Term.Variable "p"
-                Object = Term.Resource objextIndex2
-            }
-        let bodyPattern : TriplePattern  =
-            {
-                Subject = Term.Resource subjectIndex
-                Predicate = Term.Variable "p"
-                Object = Term.Resource objextIndex
-            }
-        let rule : Rule = {Head = NormalHead headPattern; Body = [PositiveTriple (bodyPattern)]}
+        let headPattern = GetDefaultGraphPattern (Term.Resource subjectIndex) (Term.Variable "p") (Term.Resource objextIndex2)
+        let bodyPattern = GetDefaultGraphPattern (Term.Resource subjectIndex) (Term.Variable "p") (Term.Resource objextIndex)
+        let rule : Rule = {Head = NormalHead headPattern; Body = [PositivePattern (bodyPattern)]}
         
         let query1 = tripleTable.GetTriplesWithObject(objextIndex2)
         query1.Should().HaveLength(0) |> ignore
@@ -155,22 +141,10 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = NormalHead{
-                Subject = Variable "s"
-                Predicate = Variable "p2"
-                Object = Variable "o" 
-            }
+            Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Variable "p2") (Variable "o"))
             Body = [
-                PositiveTriple {
-                    Subject = Variable "p"
-                    Predicate = Term.Resource sameAsIndex
-                    Object = Variable "p2"
-                }
-                PositiveTriple {
-                    Subject = Variable "s"
-                    Predicate = Variable "p"
-                    Object = Variable "o"
-                }
+                PositivePattern (GetDefaultGraphPattern (Variable "p") (Term.Resource sameAsIndex) (Variable "p2"))
+                PositivePattern (GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o"))
             ] 
         }
         // Act
@@ -203,22 +177,10 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = NormalHead {
-                Subject = Variable "s"
-                Predicate = Variable "p2"
-                Object = Variable "o" 
-            }
+            Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Variable "p2") (Variable "o"))
             Body = [
-                PositiveTriple {
-                    Subject = Variable "p"
-                    Predicate = Term.Resource sameAsIndex
-                    Object = Variable "p2"
-                }
-                PositiveTriple {
-                    Subject = Variable "s"
-                    Predicate = Variable "p"
-                    Object = Variable "o"
-                }
+                PositivePattern (GetDefaultGraphPattern (Variable "p") (Term.Resource sameAsIndex) (Variable "p2"))
+                PositivePattern (GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o"))
             ] 
         }
         // Act
@@ -228,8 +190,8 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         
         //Assert
         let predRelsInfo = relationInfos.[(int) predIndex]
-        predRelsInfo.num_predecessors.Should().Be((uint) 5) |> ignore
-        predRelsInfo.Successors.Should().HaveLength(5) |> ignore
+        predRelsInfo.num_predecessors.Should().Be((uint) 6) |> ignore
+        predRelsInfo.Successors.Should().HaveLength(6) |> ignore
         
     [<Fact>]
     let ``Equality axioms can be grounded`` () =
@@ -253,79 +215,55 @@ module DagSemTools.OWL2RL2Datalog.TestEqualityAxioms
         predQuery1.Should().HaveLength(0) |> ignore
         
         let sameAsRule2 : Rule = {
-            Head = NormalHead {
-                Subject = Variable "s"
-                Predicate = Variable "p2"
-                Object = Variable "o" 
-            }
+            Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Variable "p2") (Variable "o"))
             Body = [
-                PositiveTriple {
-                    Subject = Variable "p"
-                    Predicate = Term.Resource sameAsIndex
-                    Object = Variable "p2"
-                }
-                PositiveTriple {
-                    Subject = Variable "s"
-                    Predicate = Variable "p"
-                    Object = Variable "o"
-                }
+                PositivePattern (GetDefaultGraphPattern (Variable "p") (Term.Resource sameAsIndex) (Variable "p2"))
+                PositivePattern (GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o"))
             ] 
         }
         // Act
         let groundRules = PredicateGrounder.groundRulePredicates ([sameAsRule2], tripleTable)
         
         // Assert
-        groundRules.Should().HaveLength(5) |> ignore
+        groundRules.Should().HaveLength(6) |> ignore
         let correctGroundRule =  {
-            Head = NormalHead {
-                Subject = Variable "s"
-                Predicate = Term.Resource predIndex2
-                Object = Variable "o" 
-            }
+            Head = NormalHead (GetDefaultGraphPattern (Variable "s") (Term.Resource predIndex2) (Variable "o"))
             Body = [
-                PositiveTriple {
-                    Subject = Variable "p"
-                    Predicate = Term.Resource sameAsIndex
-                    Object = Term.Resource predIndex2
-                }
-                PositiveTriple {
-                    Subject = Variable "s"
-                    Predicate = Variable "p"
-                    Object = Variable "o"
-                }
+                PositivePattern (GetDefaultGraphPattern (Variable "p") (Term.Resource sameAsIndex) (Term.Resource predIndex2))
+                PositivePattern (GetDefaultGraphPattern (Variable "s") (Variable "p") (Variable "o"))
             ] 
         }
         groundRules.Should().Contain(correctGroundRule) |> ignore
         
-    // [<Fact>]
+    [<Fact(Skip = "owl:sameAs is not correctly translated to OWL. See issue https://github.com/daghovland/DagSemTools/issues/76")>]
     let ``Equality RL reasoning works`` () =
-        let tripleTable = new Datastore(100u)
+        let datastore = new Datastore(100u)
         let errorOutput = new System.IO.StringWriter()
         
-        let subjectIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
-        let sameAsIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlSameAs)))
-        let subjectIndex2 = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject2"))
-        let objIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
-        let predIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
+        let subjectIndex = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject"))
+        let sameAsIndex = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlSameAs)))
+        let subjectIndex2 = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/subject2"))
+        let objIndex = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/object"))
+        let predIndex = datastore.AddNodeResource(Ingress.RdfResource.Iri(new IriReference "http://example.com/predicate"))
         let SameAsTriple = {Ingress.Triple.subject = subjectIndex; predicate = sameAsIndex; obj = subjectIndex2}
         let contentTriple = {Ingress.Triple.subject = subjectIndex2; predicate = predIndex; obj = objIndex}
-        tripleTable.AddTriple(SameAsTriple)
-        tripleTable.AddTriple(contentTriple)
-        let query = tripleTable.GetTriplesWithObject(objIndex)
+        datastore.AddTriple(SameAsTriple)
+        datastore.AddTriple(contentTriple)
+        let query = datastore.GetTriplesWithObject(objIndex)
         query.Should().HaveLength(1) |> ignore
-        let query1a = tripleTable.GetTriplesWithSubjectObject(subjectIndex, objIndex)
+        let query1a = datastore.GetTriplesWithSubjectObject(subjectIndex, objIndex)
         query1a.Should().HaveLength(0) |> ignore
         
-        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
+        let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(datastore.GetDefaultTripleTable, datastore.Resources, logger)
         let ontology = ontologyTranslator.extractOntology
-        let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology.Ontology
+        let rlProgram = Library.owl2Datalog logger datastore.Resources ontology.Ontology
         
-        DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)
-        let query2 = tripleTable.GetTriplesWithObject(objIndex)
-        query2.Should().HaveLength(3) |> ignore
-        let query3 = tripleTable.GetTriplesWithPredicate(predIndex)
+        DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, datastore)
+        let query2 = datastore.GetTriplesWithObject(objIndex)
+        query2.Should().HaveLength(2) |> ignore
+        let query3 = datastore.GetTriplesWithPredicate(predIndex)
         query3.Should().HaveLength(2) |> ignore
-        let query1b = tripleTable.GetTriplesWithSubjectObject(subjectIndex2, objIndex)
+        let query1b = datastore.GetTriplesWithSubjectObject(subjectIndex2, objIndex)
         query1b.Should().HaveLength(1) |> ignore
         inMemorySink.LogEvents.Should().BeEmpty
         

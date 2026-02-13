@@ -1,3 +1,10 @@
+/*
+    Copyright (C) 2024 Dag Hovland
+    This program is free software: you can redistribute it and/or modify it under the terms of the GNU General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.
+    This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU General Public License for more details.
+    You should have received a copy of the GNU General Public License along with this program. If not, see <https://www.gnu.org/licenses/>.
+    Contact: hovlanddag@gmail.com
+*/
 using IriTools;
 using DagSemTools.Datalog;
 using DagSemTools.Rdf;
@@ -22,6 +29,13 @@ public interface IGraph
     /// <param name="obj"></param>
     /// <returns></returns>
     public IEnumerable<Triple> GetTriplesWithPredicateObject(IriReference predicate, IriReference obj);
+
+    /// <summary>
+    /// Factory method for creating an owl ontology.
+    /// </summary>
+    /// <returns></returns>
+    public OwlOntology ParseToOntology();
+
     /// <summary>
     /// Returns an enumerator over all triples in the graph that have the given subject and predicate.
     /// Similar to the sparql query "SELECT * WHERE { subject predicate ?o }".
@@ -53,16 +67,7 @@ public interface IGraph
     public IEnumerable<Triple> GetTriplesWithObject(IriReference obj);
 
     /// <summary>
-    /// Returns true if and only if the triple is in the Graph
-    /// Similar to the sparql query "ASK WHERE { subject predicate object }".
-    /// </summary>
-    /// <param name="triple"></param>
-    /// <returns></returns>
-    public bool ContainsTriple(Triple triple);
-
-
-    /// <summary>
-    /// Answers a SPARQL SELECT query
+    /// Answers a SPARQL SELECT query over the whole dataset
     /// </summary>
     /// <param name="query"></param>
     /// <returns>An enumerable of solutions. Each solution is a dictionary of the bindings</returns>
@@ -70,41 +75,13 @@ public interface IGraph
 
 
     /// <summary>
-    /// Loads and runs datalog rules from the file
-    /// Note that this adds new triples to the datastore
+    /// Returns true if and only if the triple is in the Graph
+    /// Similar to the sparql query "ASK WHERE { subject predicate object }".
     /// </summary>
-    /// <param name="datalog">The file with the datalog program</param>
-    /// <exception cref="InvalidOperationException"></exception>
-    public void LoadDatalog(FileInfo datalog);
+    /// <param name="triple"></param>
+    /// <returns></returns>
+    public bool ContainsTriple(Triple triple);
 
-    /// <summary>
-    /// Loads and runs datalog rules from the file
-    /// The rules are added to (not replacing) the existing rules
-    /// Note that this adds new triples to the datastore (materialises)
-    /// </summary>
-    /// <param name="newRules">The new rules to be added</param>
-    public void LoadDatalog(IEnumerable<Rule> newRules);
-
-    /// <summary>
-    /// Enables OWL 2 RL Reasoning
-    /// https://www.w3.org/TR/owl2-profiles/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules
-    /// Note that this adds new triples to the datastore
-    /// </summary>
-    public void EnableOwlReasoning();
-
-    /// <summary>
-    /// Experimental: Enables owl:sameAs reasoning 
-    /// https://www.w3.org/TR/owl2-profiles/#Reasoning_in_OWL_2_RL_and_RDF_Graphs_using_Rules
-    /// Note that this adds new triples to the datastore
-    /// Also it limits the reasoners functionality on negation, since very few programs are stratifiable after these axioms are added
-    /// </summary>
-    public void EnableEqualityReasoning();
-
-
-    /// <summary>
-    /// Gives access to the underlying F# Datastore structure
-    /// This is not stable, and only provided for exceptional cases
-    /// </summary>
-    public Datastore Datastore { get; }
+    internal ResourceManager GetResourceManager();
 
 }

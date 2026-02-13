@@ -51,18 +51,30 @@ module Query =
     
     [<StructuralComparison>]
     [<StructuralEquality>]
-    type TriplePattern =
-        {Subject: Term; Predicate: Term; Object: Term}
+    type QuadPattern =
+        {Graph: Term; Subject: Term; Predicate: Term; Object: Term}
         member private this.GeneralToString(termToStringFunction : Term -> string ) : string  =
-            $"[{termToStringFunction this.Subject}, {termToStringFunction this.Predicate}, {termToStringFunction this.Object}]"
+            $"{termToStringFunction this.Graph} [{termToStringFunction this.Subject}, {termToStringFunction this.Predicate}, {termToStringFunction this.Object}]"
         override this.ToString() =
             this.GeneralToString(fun t -> t.ToString())
         member this.ToString(manager : GraphElementManager) =
             this.GeneralToString(fun (t : Term) ->t.ToString(manager))
+        member this.GetVariables() =
+            [this.Graph; this.Subject; this.Predicate; this.Object]
+            |> Seq.choose (fun r -> match r with
+                                    | Variable v -> Some (v)
+                                    | _ -> None)
+    let public GetDefaultGraphPattern Subject Predicate Object =
+        {QuadPattern.Graph = Term.Resource Ingress.defaultGraphElementId
+         Subject = Subject
+         Predicate = Predicate
+         Object = Object}
+        
+
     
     [<StructuralComparison>]
     [<StructuralEquality>]
     (* The projection is the list of variable names used in the select clause, without the question mark.
        The Basic Graph Pattern is a list of Triple Patterns *)
     type SelectQuery =
-        {Projection: string list; BasicGraphPattern: TriplePattern list }
+        {Projection: string list; BasicGraphPattern: QuadPattern list }

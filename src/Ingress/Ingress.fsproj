@@ -21,9 +21,7 @@
         <SymbolPackageFormat>snupkg</SymbolPackageFormat>
         <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
         <Platforms>AnyCPU</Platforms>
-
         <RootNamespace>Resource</RootNamespace>
-
     </PropertyGroup>
 
     <ItemGroup>

@@ -39,5 +39,8 @@ namespace DagSemTools.Api
                 _ => throw new ArgumentException("Object is not a Resource")
             };
 
+        internal abstract bool GetGraphElementId(out uint idx);
+
+
     }
 }

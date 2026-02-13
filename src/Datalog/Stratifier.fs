@@ -90,8 +90,8 @@ module internal Stratifier =
             | NormalHead pattern -> Some pattern
     let GetRuleAtomPattern (atom : RuleAtom)  =
         match atom with
-                        | PositiveTriple t -> Some t
-                        | NotTriple t -> Some t
+                        | PositivePattern t -> Some t
+                        | NotPattern t -> Some t
                         | NotEqualsAtom (t1, t2) -> None 
                  
     let GetBodyTriplePatterns rules = rules
@@ -104,7 +104,7 @@ module internal Stratifier =
                             
                 
     (* The intensional triple patterns are those that occur in the head of at least one rule *)       
-    let GetIntentionalTriplePatterns (rules : Rule list) =
+    let GetIntentionalQuadPatterns (rules : Rule list) =
             GetHeadPattern rules
     
     (* The extensional relations (properties) are those that only occur in the body of rules *)       
@@ -118,11 +118,12 @@ module internal Stratifier =
     let NegativeIntentionalProperties (rules : Rule list) =
         let intentionalTriplePatterns =
                 rules
-                |> GetIntentionalTriplePatterns
+                |> GetIntentionalQuadPatterns
+
         rules |> Seq.filter (fun rule ->
                             rule.Body |> Seq.exists (fun atom ->
                                 match atom with
-                                    | NotTriple t -> intentionalTriplePatterns |> Seq.exists ( triplePatternsUnifiable t)
+                                    | NotPattern t -> intentionalTriplePatterns |> Seq.exists (quadPatternsUnifiable t)
                                     | _ -> false
                                 ) 
                             )

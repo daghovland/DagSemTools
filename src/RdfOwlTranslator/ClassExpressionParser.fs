@@ -21,7 +21,7 @@ open Serilog
     Assumes the IRI-based declarations CE, DR, etc. are already made
     This table / function only handles anonymous nodes/blank IRIs
 *)
-type ClassExpressionParser (triples : TripleTable,
+type ClassExpressionParser (triples : ITripleTable,
               resourceManager : GraphElementManager,
               logger : ILogger) =
 

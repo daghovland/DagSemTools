@@ -15,7 +15,7 @@ open DagSemTools.OwlOntology
 open DagSemTools.RdfOwlTranslator.Ingress
 open IriTools
 
-type AxiomParser (triples : TripleTable,
+type AxiomParser (triples : ITripleTable,
               resourceManager : GraphElementManager,
               classExpressions : GraphElementId -> ClassExpression,
               dataRanges : GraphElementId -> DataRange,
