@@ -466,9 +466,7 @@ public class TestApi(ITestOutputHelper output)
         {
             answer.Count.Should().Be(2);
             var actual = answer["name"];
-            var alice = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("Alice"));
-            var bob = new RdfLiteral(DagSemTools.Ingress.RdfLiteral.NewLiteralString("Bob"));
-            actual.Should().BeOneOf(alice, bob);
+            actual.ToString().Should().BeOneOf("Alice", "Bob");
         }
     }
     

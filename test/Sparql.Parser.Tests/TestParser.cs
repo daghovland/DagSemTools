@@ -117,7 +117,44 @@ public class TestParser : IDisposable, IAsyncDisposable
             Query.Term.NewVariable("p"),
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLangLiteral("cat", "en"))])));
     }
+    
+    /// <summary>
+    /// Example from sparql-1.2 spec, section 6.1
+    /// </summary>
 
+    [Fact]
+    public void TestSparql12ExampleOptional()
+    {
+        var sparql = """
+                          PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                          SELECT ?name ?mbox
+                          WHERE  {
+                              ?x foaf:name  ?name .
+                              OPTIONAL { ?x  foaf:mbox  ?mbox }
+                          }
+                          """;
+
+        var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
+        var q = result.Item1;
+        var e = result.Item2;
+        q.Should().NotBeNull();
+        q.Projection.Length.Should().Be(2, "There are two projected variables");
+        q.Projection[0].Should().Be("name", "The projected variable is 'name'");
+        q.Projection[0].Should().Be("mbox", "The projected variable is 'mbox'");
+        q.BasicGraphPattern.Length.Should().Be(2, "There is one BGP");
+        var bgp = q.BasicGraphPattern[0];
+        bgp.Should().Be(Query.GetDefaultGraphPattern(
+            Query.Term.NewVariable("x"),
+            Query.Term.NewResource(e.GraphElementMap[
+                GraphElement.NewNodeOrEdge(
+                    RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")))]),
+            Query.Term.NewVariable("name")
+        ));
+        var optionalPattern = q.BasicGraphPattern[1];
+        optionalPattern.Should().NotBeNull();
+    }
+
+    
     public void Dispose()
     {
         _outputWriter.Dispose();
