@@ -73,7 +73,7 @@ public interface IGraph
     /// <returns>An enumerable of solutions. Each solution is a dictionary of the bindings</returns>
     public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query);
 
-    
+
     /// <summary>
     /// Returns true if and only if the triple is in the Graph
     /// Similar to the sparql query "ASK WHERE { subject predicate object }".

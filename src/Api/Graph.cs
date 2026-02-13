@@ -41,7 +41,7 @@ public class Graph : IGraph
     /// <inheritdoc />
     public IEnumerable<Dictionary<string, GraphElement>> AnswerSelectQuery(string query)
     {
-       throw new NotImplementedException();
+        throw new NotImplementedException();
     }
 
     /// <inheritdoc />
