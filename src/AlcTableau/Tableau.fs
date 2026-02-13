@@ -67,10 +67,10 @@ let internal individual_is_asserted_concept state (concept : Concept) (individua
                          
 let internal has_new_collision state (new_assertion)   =
     match new_assertion with
-    | ConceptAssertion (individual, ALC.ConceptName(C)) ->
-        individual_is_asserted_concept state (ALC.Negation (ALC.ConceptName(C))) individual   
-    | ConceptAssertion (individual, ALC.Negation (ALC.ConceptName(C))) ->
-       individual_is_asserted_concept state (ALC.ConceptName(C)) individual  
+    | ConceptAssertion (individual, ALC.ConceptName(concept)) ->
+        individual_is_asserted_concept state (ALC.Negation (ALC.ConceptName(concept))) individual   
+    | ConceptAssertion (individual, ALC.Negation (ALC.ConceptName(concept))) ->
+       individual_is_asserted_concept state (ALC.ConceptName(concept)) individual  
     | _ -> false
 
 let internal add_assertion (state : ReasonerState) (new_assertion) =
@@ -119,8 +119,8 @@ let internal init_expander ((tbox, abox) : ALC.knowledgeBase) =
 
 let internal expandAxiom state new_assertion =
     match new_assertion with
-    | ConceptAssertion (individual, C) -> 
-        state.subclass_assertions.GetValueOrDefault(C, [])
+    | ConceptAssertion (individual, concept) -> 
+        state.subclass_assertions.GetValueOrDefault(concept, [])
         |> List.where (fun superclass -> 
             not (individual_is_asserted_concept state superclass individual)
             )
@@ -170,8 +170,8 @@ let internal expandRoleAssertion state left right role =
             |> NewAssertions.Known
 let internal expandAssertion state  (assertion : ALC.ABoxAssertion) =
     match assertion with
-    | ConceptAssertion (individual, ALC.Conjunction(C,D)) -> expandConjunction state C D individual
-    | ConceptAssertion (individual, ALC.Disjunction(C,D)) -> expandDisjunction state C D individual
+    | ConceptAssertion (individual, ALC.Conjunction(left,right)) -> expandConjunction state left right individual
+    | ConceptAssertion (individual, ALC.Disjunction(left,right)) -> expandDisjunction state left right individual
     | ConceptAssertion (individual, ALC.Existential(role, concept)) -> expandExistential state role concept individual 
     | ConceptAssertion (individual, ALC.Universal(role, concept)) -> expandUniversal state role concept individual
     | ConceptAssertion (_individual, ALC.Bottom)  -> NewAssertions.Nothing

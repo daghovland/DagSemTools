@@ -14,6 +14,7 @@ using IriTools;
 using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Manchester.Parser;
+
 using DagSemTools;
 
 internal class ConceptVisitor : ManchesterBaseVisitor<ClassExpression>

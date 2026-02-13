@@ -30,7 +30,11 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
         | Some (Iri i) -> Some i
         | _ -> None
     
-    
+    member this.GetGraphNode (resourceId: GraphElementId) : RdfResource option =
+        match this.GetGraphElement(resourceId) with
+        | NodeOrEdge node -> Some node
+        | GraphLiteral _ -> None
+        
     (* This should be called wheneer the context or file or RDF dataset that is loaded changes. Then blank node names will not overlap *)
     member this.ResetBlankNodesMap() =
         anonResourceMap <- Map.empty
@@ -46,12 +50,16 @@ type GraphElementManager(resourceMap: Dictionary<GraphElement, GraphElementId>,
                     match node with
                     |  Iri _ -> Some res.Value
                     | _ -> None)
-    new(init_rdf_size : uint) =
+    new(init_rdf_size : uint) as this =
         let init_resources = max 10 (int init_rdf_size / 10)
         let init_triples = max 10 (int init_rdf_size / 60)
-        GraphElementManager(new Dictionary<GraphElement, GraphElementId>(),
-                    Array.zeroCreate init_resources,
-                    0u
+        let resMap = new Dictionary<GraphElement, GraphElementId>()
+        let resList = Array.zeroCreate init_resources
+        resMap.Add(defaultGraphResource, defaultGraphElementId)
+        resList.[int defaultGraphElementId] <- defaultGraphResource
+        GraphElementManager(resMap,
+                    resList,
+                    1u
                     )
     member this.doubleResourceListSize () =
         ResourceList <- doubleArraySize ResourceList

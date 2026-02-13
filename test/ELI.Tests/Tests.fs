@@ -94,22 +94,20 @@ module TestClassAxioms =
         let translatedRules = ELI.ELI2RL.GenerateTBoxRL logger resources [ axiom ]
         //Assert
         let expectedRules: Datalog.Rule seq =
-            [ { Head = NormalHead
-                  { Subject = Term.Variable "X"
-                    Predicate = Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
-                    Object =
-                      Term.Resource(
+            [ { Head = NormalHead (GetDefaultGraphPattern
+                  (Term.Variable "X")
+                    (Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType))))
+                      (Term.Resource(
                           resources.AddNodeResource(Iri(IriReference "https://example.com/superclass"))
-                      ) }
+                      ) ))
                 Body =
-                  [ PositiveTriple
-                        { Subject = Term.Variable "X"
-                          Predicate =
-                            Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
-                          Object =
-                            Term.Resource(
+                  [ PositivePattern (GetDefaultGraphPattern
+                        (Term.Variable "X")
+                          (Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType))))
+                            (Term.Resource(
                                 resources.AddNodeResource(Iri(IriReference "https://example.com/subclass"))
-                            ) } ] } ]
+                            ) ))]
+                  }]
 
         Assert.Equal<Rule seq>(expectedRules, translatedRules)
         inMemorySink.LogEvents.Should().BeEmpty
@@ -210,11 +208,11 @@ module TestClassAxioms =
         
         let roleIri = IriReference "https://example.com/property/t"
         let role = NamedObjectProperty (FullIri roleIri)
-        let negative_equality = NotTriple {
-            Subject = Term.Variable "Y1"
-            Predicate = Term.Resource owlSameAsResource
-            Object = Term.Variable "Y2"
-        }
+        let negative_equality = NotPattern (GetDefaultGraphPattern
+            (Term.Variable "Y1") 
+            (Term.Resource owlSameAsResource)
+            (Term.Variable "Y2")
+            )
         
         //Act
         let translatedRules = ELI.ELI2RL.getQualifiedAtMostOneNormalizedRule tripleTable.Resources [A] role E 

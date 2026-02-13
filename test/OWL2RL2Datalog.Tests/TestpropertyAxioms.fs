@@ -47,6 +47,7 @@ let ``Object Property Domain and Range RL reasoning works`` () =
     tripleTable.AddTriple(domainTriple)
     let rangeTriple = {Triple.subject = propertyIndex; predicate = owlRangeId; obj = rangeIndex}
     tripleTable.AddTriple(rangeTriple)
+    let sameAsIndex = tripleTable.AddNodeResource(Ingress.RdfResource.Iri(new IriReference (Namespaces.OwlSameAs)))
     let objPropAssertion = {Triple.subject = subjectIndex; predicate = propertyIndex; obj = objectIndex}
     tripleTable.AddTriple(objPropAssertion)
     let query = tripleTable.GetTriplesWithSubjectObject(subjectIndex, domainIndex)
@@ -54,7 +55,7 @@ let ``Object Property Domain and Range RL reasoning works`` () =
     let query = tripleTable.GetTriplesWithSubjectObject(objectIndex, rangeIndex)
     query.Should().HaveLength(0) |> ignore
     
-    let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.Triples, tripleTable.Resources, logger)
+    let ontologyTranslator = new RdfOwlTranslator.Rdf2Owl(tripleTable.GetDefaultTripleTable, tripleTable.Resources, logger)
     let ontology = ontologyTranslator.extractOntology
     let rlProgram = Library.owl2Datalog logger tripleTable.Resources ontology.Ontology 
     DagSemTools.Datalog.Reasoner.evaluate (logger, rlProgram |> Seq.toList, tripleTable)

@@ -41,7 +41,7 @@ module Ingress =
         | NodeOrEdge _ -> handleLiteralError gel
         | GraphLiteral res -> res
         
-    let GetResourceInfoForErrorMessage (tripleTable : TripleTable) (resources : GraphElementManager) subject : string =
+    let GetResourceInfoForErrorMessage (tripleTable : ITripleTable) (resources : GraphElementManager) subject : string =
            tripleTable.GetTriplesMentioning subject
             |> Seq.map resources.GetResourceTriple
             |> Seq.map _.ToString()
@@ -51,7 +51,7 @@ module Ingress =
         Assumes head is the head of some rdf list in the triple-table
         The requirements in the specs includes non-circular lists, so blindly assumes this is true
      *)
-    let rec _GetRdfListElements (tripleTable : TripleTable) (resources : GraphElementManager) listId acc  =
+    let rec _GetRdfListElements (tripleTable : ITripleTable) (resources : GraphElementManager) listId acc  =
         let rdfNilId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfNil)))
         let rdfFirstId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfFirst)))
         let rdfRestId = resources.AddNodeResource(RdfResource.Iri (new IriReference(Namespaces.RdfRest)))
@@ -71,7 +71,7 @@ module Ingress =
                 failwith $"Invalid cyclic list defined at {resources.GetGraphElement(listId)}: {GetResourceInfoForErrorMessage tripleTable resources listId}"
             else
                 _GetRdfListElements tripleTable resources rest ((head, rest) :: acc)     
-    let GetRdfListElements  (tripleTable : TripleTable) (resources : GraphElementManager) listId=
+    let GetRdfListElements  (tripleTable : ITripleTable) (resources : GraphElementManager) listId=
         _GetRdfListElements tripleTable resources listId []
         |> List.map fst
         

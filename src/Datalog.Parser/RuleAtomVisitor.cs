@@ -14,11 +14,11 @@ internal class RuleAtomVisitor : DatalogBaseVisitor<RuleAtom>
 
     public override RuleAtom VisitYesRuleAtom(DatalogParser.YesRuleAtomContext context)
     {
-        return RuleAtom.NewPositiveTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
+        return RuleAtom.NewPositivePattern(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
     }
     public override RuleAtom VisitNegativeRuleAtom(DatalogParser.NegativeRuleAtomContext context)
     {
-        return RuleAtom.NewNotTriple(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
+        return RuleAtom.NewNotPattern(TriplePatternVisitor.Visit(context.positiveRuleAtom()));
     }
 
 }

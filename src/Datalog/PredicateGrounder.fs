@@ -18,19 +18,19 @@ open DagSemTools.Rdf.Query
 module PredicateGrounder =
     open DagSemTools.Rdf
     
-    let getTriplePredicate (triple: TriplePattern)  =
-        match triple.Predicate with
+    let getQuadPredicate (quad: QuadPattern)  =
+        match quad.Predicate with
         | Variable _ -> None
         | Term.Resource r -> Some r
 
     let getRuleHeadPredicate (head : RuleHead) =
         match head with
         | Contradiction -> None
-        | NormalHead tp -> getTriplePredicate tp
+        | NormalHead tp -> getQuadPredicate tp
     let getAtomPredicate (atom: RuleAtom)  =
         match atom with
-        | PositiveTriple triple -> getTriplePredicate triple
-        | NotTriple triple -> getTriplePredicate triple
+        | PositivePattern triple -> getQuadPredicate triple
+        | NotPattern triple -> getQuadPredicate triple
         | NotEqualsAtom (t1, t2) -> None
     let getPredicatesInUse (rules: Rule seq, triplestore: Datastore) =
         let headPredicates = rules |> Seq.choose (fun rule -> getRuleHeadPredicate rule.Head)
@@ -42,11 +42,11 @@ module PredicateGrounder =
                     | _variableName when _variableName = variableName -> Term.Resource predicate
                     | _ -> res
     
-    let instantiateTripleWithVariableMapping (triple : TriplePattern) (variableName : Term) predicate : TriplePattern =
+    let instantiateTripleWithVariableMapping (quad) (variableName : Term) predicate =
         let tripleList =
-            [triple.Subject; triple.Predicate; triple.Object]
+            [ quad.Graph;  quad.Subject; quad.Predicate; quad.Object]
             |> List.map (instantiateResourceWithVariableMapping variableName predicate)
-        {Subject = tripleList.[0]; Predicate = tripleList.[1]; Object = tripleList.[2]}
+        {Graph = tripleList[0]; Subject = tripleList.[1]; Predicate = tripleList.[2]; Object = tripleList.[3]}
         
     let instantiateRuleWithVariableMapping (predicate, rule: Rule, variableName) =
         let newHead = match rule.Head with
@@ -55,8 +55,8 @@ module PredicateGrounder =
         let newBody = rule.Body |> List.map (
             fun atom ->
                 match atom with
-                | PositiveTriple triple -> PositiveTriple (instantiateTripleWithVariableMapping triple variableName predicate)
-                | RuleAtom.NotTriple triple -> NotTriple (instantiateTripleWithVariableMapping triple variableName predicate)
+                | PositivePattern triple -> PositivePattern (instantiateTripleWithVariableMapping triple variableName predicate)
+                | RuleAtom.NotPattern triple -> NotPattern (instantiateTripleWithVariableMapping triple variableName predicate)
                 | NotEqualsAtom (t1, t2) -> NotEqualsAtom (instantiateResourceWithVariableMapping variableName predicate t1,
                                                            instantiateResourceWithVariableMapping variableName predicate t2)
                 )
@@ -71,7 +71,7 @@ module PredicateGrounder =
                                         |> Seq.map (fun p -> instantiateRuleWithVariableMapping(p, rule, Variable s))
                         | Term.Resource _ -> [rule]
 
-    let getTripleRelationVariable (triple : TriplePattern) =
+    let getTripleRelationVariable (triple : QuadPattern) =
         match triple.Predicate with
         | Variable s -> Some s
         | Term.Resource _ -> None
@@ -79,8 +79,8 @@ module PredicateGrounder =
     let getBodyRelationVariables (rule: Rule) =
         rule.Body |> List.choose (fun atom ->
             match atom with
-            | PositiveTriple triple -> getTripleRelationVariable triple
-            | NotTriple triple -> getTripleRelationVariable triple
+            | PositivePattern triple -> getTripleRelationVariable triple
+            | NotPattern triple -> getTripleRelationVariable triple
             | NotEqualsAtom (t1, t2) -> None
             )
     

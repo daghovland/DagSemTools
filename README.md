@@ -14,19 +14,23 @@ Sparql with simple selects over basic graph patterns is supported.
 * Sparql 1.2. Only simple selects over basic graph patterns are supported.
 
 ## Usage
+
+### Rdf
 Install the nuget package [DagSemTools.Api](https://www.nuget.org/packages/DagSemTools.Api/), f.ex. by `dotnet add package DagSemTools.Api`
 
 To load an rdf graph in turtle format, try f.ex.
 ```csharp
 var file = new FileInfo("graph.ttl");
-var graph = TurtleParser.Parse(file, Console.Error);
+var graph = TriGParser.Parse(file, Console.Error).GetDefaultGraph();
 ```
 
 To get answers to single basic graph patterns, use functions on the graph, like this:
 ```csharp
 var tripleAnswers = graph.GetTriplesWithPredicate(new IriReference("https://exampe.com/some/predicate"));
 ```
-or if you prefer SPARQL, 
+
+### SPARQL
+Continuing the example above, you can also run simple SPARQL select queries like this:
 ```csharp
 var sparqlAnswerMap = graph.AnswerSelectQuery("SELECT * WHERE where{?s <https://example.com/some/predicate> ?o.}");
 ```
@@ -34,18 +38,36 @@ The output (called `sparqlAnswerMap` above) is an `IEnumerable<Dictionary<string
 Only the basic syntax as shown in this example is supported.
 There is no built-in protection against SPARQL injection.
 
+### OWL RL Reasoning
 To load an ontology and use that to reason over the data, first load it as rdf (as above) 
 and then parse the rdf into an ontology with `Ontology.create`, extract it as datalog rules with `GetAxiomRules`, 
 like this:
 ```csharp
 var ontology_file = new FileInfo("graph.ttl");
-var ontology_graph = TurtleParser.Parse(ontology_file, Console.Error);
+var ontology_graph = TriGParser.Parse(ontology_file, Console.Error).GetDefaultGraph();
 graph.LoadDatalog(Ontology.create(ontology_graph).GetAxiomRules());
 ```
 This materializes the new answers which can be fetched as before: 
 ```csharp
 var tripleAnswersWithReasoning = graph.GetTriplesWithPredicate(new IriReference("https://exampe.com/some/predicate"));
 ```
+### Datalog
+Datalog with negation (and recursion) is supported, with the normal restriction on stratification when negation and recursion are combined. No extensions are implemented.
+Triples are written `ex:predicate[?s, ex:object]` or `[?s, ex:predicate, ex:object]` in the datalog rules. Negation is written with `not`, like `not ex:predicate[?s, ex:object]`.
+Example rules:
+```prolog
+prefix ex: <https://example.com/data#>
+
+[?s, ex:predicate, ex:object2] :- ex:predicate[?s, ex:object].
+```
+
+Rules can be loaded directly from a file like this:
+```csharp
+var datalog_file = new FileInfo("rules.datalog");
+graph.LoadDatalog(datalogfile);
+```
+After loading, the new inferred answers can be fetched as above.
+
 See examples in [test/NugetTest](test/NugetTest)
 
 ## Contributing and/or Building from source

@@ -22,28 +22,28 @@ open Serilog
 module ELI2RL =
 
     let internal GetTypeTriplePattern (resources: GraphElementManager) varName className =
-        { TriplePattern.Subject = Term.Variable varName
-          Predicate = Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
-          Object = Term.Resource (resources.AddNodeResource(Iri className)) }
+        Query.GetDefaultGraphPattern (Term.Variable varName)
+                                     (Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType))))
+                                     (Term.Resource (resources.AddNodeResource(Iri className)))
 
     
     let internal GetAnonymousTypeTriplePattern (resources: GraphElementManager) varName=
-        { TriplePattern.Subject = Term.Variable varName
-          Predicate = Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType)))
-          Object = Term.Resource (resources.CreateUnnamedAnonResource()) }
+        Query.GetDefaultGraphPattern (Term.Variable varName)
+                                     (Term.Resource(resources.AddNodeResource(Iri(IriReference Namespaces.RdfType))))
+                                     ( Term.Resource (resources.CreateUnnamedAnonResource()) )
     
     let internal GetRoleTriplePattern (resources: GraphElementManager) role subjectVar objectVar =
-        { TriplePattern.Subject = Term.Variable subjectVar
-          Predicate = (Term.Resource role)
-          Object = Term.Variable objectVar }
+        Query.GetDefaultGraphPattern ( Term.Variable subjectVar)
+          (Term.Resource role)
+          (Term.Variable objectVar )
 
     let internal GetRoleValueTriplePattern (resources: GraphElementManager) role subjectVar (objectValue : Individual) =
         let obj = match objectValue with
                     | NamedIndividual (FullIri name) -> resources.AddNodeResource(Iri name) 
                     | AnonymousIndividual anonId -> resources.GetOrCreateNamedAnonResource($"{anonId}")
-        { TriplePattern.Subject = Term.Variable subjectVar
-          Predicate = (Term.Resource role)
-          Object = Term.Resource obj }
+        Query.GetDefaultGraphPattern ( Term.Variable subjectVar)
+          (Term.Resource role)
+          (Term.Resource obj )
 
     
     (* 
@@ -90,7 +90,7 @@ module ELI2RL =
         let (FullIri superConceptIri) = superConcept
 
         { Head = NormalHead ( GetTypeTriplePattern resources "X" (superConceptIri))
-          Body = (translateELI resources subConcept "X" 1) |> List.map RuleAtom.PositiveTriple }
+          Body = (translateELI resources subConcept "X" 1) |> List.map RuleAtom.PositivePattern }
 
     
     (* 
@@ -115,7 +115,7 @@ module ELI2RL =
           Body = subConcepts
                            |> List.map (fun (FullIri name) -> name)
                            |> List.map (GetTypeTriplePattern resources "X")
-                           |> List.map PositiveTriple
+                           |> List.map PositivePattern
                            }
     
     (* The second case of Table 2 in https://arxiv.org/pdf/2008.02232:
@@ -125,7 +125,7 @@ module ELI2RL =
           Body = subConceptIntersection
                            |> List.map (fun (FullIri name) -> name)
                            |> List.map (GetTypeTriplePattern resources "X")
-                           |> List.map PositiveTriple
+                           |> List.map PositivePattern
                            }]
 
     (* The anonymous class version of the second case of Table 2 in https://arxiv.org/pdf/2008.02232:
@@ -135,7 +135,7 @@ module ELI2RL =
           Body = subConceptIntersection
                            |> List.map (fun (FullIri name) -> name)
                            |> List.map (GetTypeTriplePattern resources "X")
-                           |> List.map PositiveTriple
+                           |> List.map PositivePattern
                            }]
 
     
@@ -146,8 +146,8 @@ module ELI2RL =
           Body = subConceptIntersection
                            |> Seq.map (fun (FullIri name) -> name)
                            |> Seq.map (GetTypeTriplePattern resources "X")
-                           |> Seq.map PositiveTriple
-                           |> Seq.append [(PositiveTriple (GetObjPropTriplePattern resources objectProperty "X" "Y"))]
+                           |> Seq.map PositivePattern
+                           |> Seq.append [(PositivePattern (GetObjPropTriplePattern resources objectProperty "X" "Y"))]
                            |> Seq.toList
                            }]
     (* The fourth case of Table 2 in https://arxiv.org/pdf/2008.02232:
@@ -179,10 +179,10 @@ module ELI2RL =
           Body = subConceptIntersection
                            |> Seq.map (fun (FullIri name) -> name)
                            |> Seq.map (GetTypeTriplePattern resources "X")
-                           |> Seq.map PositiveTriple
-                           |> Seq.append [PositiveTriple (GetObjPropTriplePattern resources objectProperty "X" "Y1")
-                                          PositiveTriple (GetObjPropTriplePattern resources objectProperty "X" "Y2")
-                                          NotTriple (GetObjPropTriplePattern resources sameAs "Y1" "Y2")]
+                           |> Seq.map PositivePattern
+                           |> Seq.append [PositivePattern (GetObjPropTriplePattern resources objectProperty "X" "Y1")
+                                          PositivePattern (GetObjPropTriplePattern resources objectProperty "X" "Y2")
+                                          NotPattern (GetObjPropTriplePattern resources sameAs "Y1" "Y2")]
                            |> Seq.toList
                            }]
     (*  A_1 and ... and A_n <=  ObjectHasValue(R, i) *) 
@@ -192,7 +192,7 @@ module ELI2RL =
           Body = subConceptIntersection
                            |> Seq.map (fun (FullIri name) -> name)
                            |> Seq.map (GetTypeTriplePattern resources "X")
-                           |> Seq.map PositiveTriple
+                           |> Seq.map PositivePattern
                            |> Seq.toList
                            }]
     

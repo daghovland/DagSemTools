@@ -19,65 +19,28 @@ module Equality =
 
     let internal GetSymmetryAxiom (resources : GraphElementManager) =
         let owlSameAs = (resources.AddNodeResource( Iri(new IriReference (Namespaces.OwlSameAs))))
-        { Head = NormalHead ({Subject = Term.Variable "x"
-                              Predicate = Term.Resource owlSameAs
-                              Object = Term.Variable "y"
-                            })
-          Body =  [PositiveTriple ({Subject = Term.Variable "y"
-                                    Predicate = Term.Resource owlSameAs
-                                    Object = Term.Variable "x"
-                     })]}
+        { Head = NormalHead (GetDefaultGraphPattern (Term.Variable "x") (Term.Resource owlSameAs) (Term.Variable "y"))
+          Body =  [RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "y") (Term.Resource owlSameAs) (Term.Variable "x"))]}
     
     let internal GetTransitivityAxiom (resources : GraphElementManager) =
         let owlSameAs = (resources.AddNodeResource( Iri(new IriReference (Namespaces.OwlSameAs))))
-        { Head = NormalHead ({Subject = Term.Variable "x"
-                              Predicate = Term.Resource owlSameAs
-                              Object = Term.Variable "z"
-                            })
-          Body =  [PositiveTriple ({Subject = Term.Variable "x"
-                                    Predicate = Term.Resource owlSameAs
-                                    Object = Term.Variable "y"
-                     });
-                     PositiveTriple ({Subject = Term.Variable "y"
-                                                Predicate = Term.Resource owlSameAs
-                                                Object = Term.Variable "z"
-                                 })
-          
-          ]
+        { Head = NormalHead (GetDefaultGraphPattern (Term.Variable "x") (Term.Resource owlSameAs) (Term.Variable "z"))
+          Body =  [RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "x") (Term.Resource owlSameAs) (Term.Variable "y"));
+                   RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "y") (Term.Resource owlSameAs) (Term.Variable "z"))]
           }
         
         
     let internal GetSubjectEqualityAxiom (resources : GraphElementManager) =
         let owlSameAs = (resources.AddNodeResource( Iri(new IriReference (Namespaces.OwlSameAs))))
-        { Head = NormalHead ({Subject = Term.Variable "s2"
-                              Predicate = Term.Variable "p"
-                              Object = Term.Variable "o"
-                            })
-          Body =  [PositiveTriple ({Subject = Term.Variable "s1"
-                                    Predicate = Term.Resource owlSameAs
-                                    Object = Term.Variable "s2"
-                     }) ;
-                    PositiveTriple {Subject = Term.Variable "s1"
-                                    Predicate = Term.Variable "p"
-                                    Object = Term.Variable "o"
-                            }
-                ]
+        { Head = NormalHead (GetDefaultGraphPattern (Term.Variable "s2") (Term.Variable "p") (Term.Variable "o"))
+          Body =  [RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s1") (Term.Resource owlSameAs) (Term.Variable "s2")) ;
+                   RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s1") (Term.Variable "p") (Term.Variable "o"))]
           }
     let internal GetObjectEqualityAxiom (resources : GraphElementManager) =
         let owlSameAs = (resources.AddNodeResource( Iri(new IriReference (Namespaces.OwlSameAs))))
-        { Head = NormalHead ({Subject = Term.Variable "s"
-                              Predicate = Term.Variable "p"
-                              Object = Term.Variable "o2"
-                            })
-          Body =  [PositiveTriple ({Subject = Term.Variable "o1"
-                                    Predicate = Term.Resource owlSameAs
-                                    Object = Term.Variable "o2"
-                     }) ;
-                    PositiveTriple {Subject = Term.Variable "s"
-                                    Predicate = Term.Variable "p"
-                                    Object = Term.Variable "o1"
-                            }
-                ]
+        { Head = NormalHead (GetDefaultGraphPattern (Term.Variable "s") (Term.Variable "p") (Term.Variable "o2"))
+          Body =  [RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "o1") (Term.Resource owlSameAs) (Term.Variable "o2")) ;
+                   RuleAtom.PositivePattern (GetDefaultGraphPattern (Term.Variable "s") (Term.Variable "p") (Term.Variable "o1"))]
           }
         
         

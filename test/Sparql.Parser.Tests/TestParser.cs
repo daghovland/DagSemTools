@@ -45,7 +45,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[0].Should().Be("name", "The projected variable is 'name'");
         q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
         var bgp = q.BasicGraphPattern[0];
-        bgp.Should().Be(new Query.TriplePattern(
+        bgp.Should().Be(Query.GetDefaultGraphPattern(
                 Query.Term.NewVariable("person"),
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")))]),
                 Query.Term.NewVariable("name")),
@@ -71,7 +71,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[0].Should().Be("title", "The projected variable is 'title'");
         q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
         var bgp = q.BasicGraphPattern[0];
-        bgp.Should().Be(new Query.TriplePattern(
+        bgp.Should().Be(Query.GetDefaultGraphPattern(
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://example.org/book/book1")))]),
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://purl.org/dc/elements/1.1/title")))]),
                 Query.Term.NewVariable("title")));
@@ -91,7 +91,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[0].Should().Be("v", "The projected variable is 'v'");
         q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
         var bgp = q.BasicGraphPattern[0];
-        bgp.Should().Be(new Query.TriplePattern(
+        bgp.Should().Be(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("v"),
             Query.Term.NewVariable("p"),
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString("cat"))])));
@@ -112,7 +112,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[0].Should().Be("v", "The projected variable is 'v'");
         q.BasicGraphPattern.Length.Should().Be(1, "There is one BGP");
         var bgp = q.BasicGraphPattern[0];
-        bgp.Should().Be(new Query.TriplePattern(
+        bgp.Should().Be(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("v"),
             Query.Term.NewVariable("p"),
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLangLiteral("cat", "en"))])));

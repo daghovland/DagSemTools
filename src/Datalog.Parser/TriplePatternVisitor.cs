@@ -12,7 +12,7 @@ using IriTools;
 
 namespace DagSemTools.Datalog.Parser;
 
-internal class TriplePatternVisitor : DatalogBaseVisitor<Query.TriplePattern>
+internal class TriplePatternVisitor : DatalogBaseVisitor<Query.QuadPattern>
 {
     private readonly PredicateVisitor _predicateVisitor;
 
@@ -21,12 +21,29 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.TriplePattern>
         _predicateVisitor = predicateVisitor;
     }
 
-    /// <summary>
-    /// Visit a triple atom. Eitheor of the form [subject, predicate, object] or predicat [subject, object]
-    /// </summary>
-    /// <param name="context"></param>
-    /// <returns></returns>
-    public override Query.TriplePattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
+    public override Query.QuadPattern VisitQuadPatternAtom(DatalogParser.QuadPatternAtomContext context)
+    {
+        var quadPattern = VisitTripleAtom(context.t);
+        if (context.g != null)
+        {
+            var graphName = _predicateVisitor.Visit(context.g.term());
+            quadPattern = new Query.QuadPattern(graphName, quadPattern.Subject, quadPattern.Predicate, quadPattern.Object);
+        }
+        return quadPattern;
+    }
+
+    public override Query.QuadPattern VisitTypePatternAtom(DatalogParser.TypePatternAtomContext context)
+    {
+        var quadPattern = VisitTypeAtom(context.ty);
+        if (context.g != null)
+        {
+            var graphName = _predicateVisitor.Visit(context.g.term());
+            quadPattern = new Query.QuadPattern(graphName, quadPattern.Subject, quadPattern.Predicate, quadPattern.Object);
+        }
+        return quadPattern;
+    }
+
+    public override Query.QuadPattern VisitTripleAtom(DatalogParser.TripleAtomContext context)
     {
         var subject = context.term(0);
         var predicate = context.relation();
@@ -38,15 +55,11 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.TriplePattern>
                                      throw new Exception($"Subject is null  at line {context.Start.Line}, position {context.Start.Column}");
         Query.Term objectResource = _predicateVisitor.Visit(@object) ??
                                     throw new Exception($"Object is null at line {context.Start.Line}, position {context.Start.Column}"); ;
-        return new Query.TriplePattern(
-            subjectResource,
-            predicateResource,
-            objectResource
-        );
+        return Query.GetDefaultGraphPattern(subjectResource, predicateResource, objectResource);
+
     }
 
-    /// <inheritdoc />
-    public override Query.TriplePattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
+    public override Query.QuadPattern VisitTypeAtom(DatalogParser.TypeAtomContext context)
     {
         var subject = context.term();
         var predicate = Query.Term
@@ -55,7 +68,7 @@ internal class TriplePatternVisitor : DatalogBaseVisitor<Query.TriplePattern>
                     .NewIri(new IriReference(Namespaces.RdfType))));
         var @class = context.relation();
 
-        return new Query.TriplePattern(
+        return Query.GetDefaultGraphPattern(
                 _predicateVisitor.Visit(subject),
                 predicate,
                 _predicateVisitor.Visit(@class)

@@ -162,5 +162,5 @@ module ALC =
     type OntologyDocument with
         member x.TryGetOntology() =
             match x with
-            | Ontology (prefixes, ontologyVersion, KB) -> (prefixes, ontologyVersion, KB)
+            | Ontology (prefixes, ontologyVersion, knowledgebase) -> (prefixes, ontologyVersion, knowledgebase)
             

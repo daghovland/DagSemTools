@@ -7,6 +7,7 @@
 */
 
 using DagSemTools.AlcTableau;
+using DagSemTools.Rdf;
 using IriTools;
 using LanguageExt;
 using Microsoft.FSharp.Collections;
@@ -22,28 +23,32 @@ public class TableauReasoner
 {
     private readonly ILogger _logger;
     private readonly Tableau.ReasonerState _reasoningState;
-    private TableauReasoner(Tableau.ReasonerState reasonerState, ILogger? logger = null)
+    private readonly GraphElementManager _elementManager;
+    private TableauReasoner(Tableau.ReasonerState reasonerState, GraphElementManager elementManager, ILogger? logger = null)
     {
         _logger = logger ?? new LoggerConfiguration()
             .WriteTo.Console()
             .CreateLogger();
         _reasoningState = reasonerState;
+        _elementManager = elementManager;
     }
 
-    internal static TableauReasoner Create(Tableau.ReasonerState reasonerState, ILogger logger) =>
-        new(reasonerState, logger);
+    internal static TableauReasoner Create(Tableau.ReasonerState reasonerState, GraphElementManager elementManager, ILogger logger) =>
+        new(reasonerState, elementManager, logger);
 
-    internal static IriResource GetConceptResource(ALC.Concept concept) =>
-        concept switch
-        {
-            ALC.Concept.ConceptName cName => new IriResource(cName.Item),
-            ALC.Concept.Conjunction conjunction => throw new NotImplementedException(),
-            ALC.Concept.Disjunction disjunction => throw new NotImplementedException(),
-            ALC.Concept.Existential existential => throw new NotImplementedException(),
-            ALC.Concept.Negation negation => throw new NotImplementedException(),
-            ALC.Concept.Universal universal => throw new NotImplementedException(),
-            _ => throw new NotImplementedException("Unknown concept type: " + concept.GetType().Name + "")
-        };
+    internal static Func<ALC.Concept, IriResource> GetConceptResource(GraphElementManager elementManager) =>
+        (ALC.Concept concept) =>
+            concept switch
+            {
+                ALC.Concept.ConceptName cName => new IriResource(elementManager, cName.Item),
+                ALC.Concept.Conjunction conjunction => throw new NotImplementedException(),
+                ALC.Concept.Disjunction disjunction => throw new NotImplementedException(),
+                ALC.Concept.Existential existential => throw new NotImplementedException(),
+                ALC.Concept.Negation negation => throw new NotImplementedException(),
+                ALC.Concept.Universal universal => throw new NotImplementedException(),
+                _ => throw new NotImplementedException("Unknown concept type: " + concept.GetType().Name + "")
+            };
+
     /// <summary>
     /// Get iris of all types of the individual
     /// </summary>
@@ -52,5 +57,5 @@ public class TableauReasoner
     public IEnumerable<IriResource> GetTypes(IriReference individual) =>
         SeqModule.ToList(ReasonerService
             .get_individual_types(_reasoningState, individual)
-            .Select(GetConceptResource));
+            .Select(GetConceptResource(_elementManager)));
 }

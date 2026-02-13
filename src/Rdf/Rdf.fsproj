@@ -30,8 +30,10 @@
         </Content>
         <Compile Include="Ingress.fs" />
         <Compile Include="GraphElementManager.fs" />
+        <Compile Include="ITripleTable.fs" />
         <Compile Include="TripleTable.fs" />
         <Compile Include="QuadTable.fs" />
+        <Compile Include="NamedTripleTable.fs" />
         <Compile Include="Query.fs" />
         <Compile Include="Datastore.fs" />
         <Compile Include="AssemblyInfo.fs" />
@@ -39,7 +41,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="IriTools" Version="2.2.0" />
+        <PackageReference Include="IriTools" Version="2.3.0" />
         <PackageReference Update="FSharp.Core" Version="9.0.303" />
         <PackageReference Include="Serilog" Version="4.3.0" />
     </ItemGroup>

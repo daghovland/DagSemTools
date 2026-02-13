@@ -40,7 +40,7 @@ public class TestTriGParser : IDisposable, IAsyncDisposable
         var knows = ont.GetGraphElementId(GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://www.example.org/vocabulary#name"))));
         ont.GetTriplesWithPredicate(knows).Should().HaveCount(0);
         var graphIri = ont.GetGraphElementId(GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://www.example.org/exampleDocument#G1"))));
-        ont.NamedGraphs.GetGraph(graphIri).Should().HaveCount(6);
+        ont.NamedGraphs.GetQuadsWithId(graphIri).Should().HaveCount(6);
 
     }
 
@@ -54,7 +54,7 @@ public class TestTriGParser : IDisposable, IAsyncDisposable
         var bob = ont.GetGraphElementId(GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://example.org/bob"))));
         var defaultBobTriples = ont.GetTriplesWithSubject(bob);
         defaultBobTriples.Should().HaveCount(1);
-        var bobGraphTriples = ont.GetNamedGraph(bob).ToList();
+        var bobGraphTriples = ont.GetNamedGraph(bob).GetTriples().ToList();
         bobGraphTriples.Should().HaveCount(3);
         var resourceTriplesBob = bobGraphTriples.Select(ont.Resources.GetResourceTriple);
         var bobString = ont.GetGraphElementId(GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString("Bob")));
@@ -71,7 +71,7 @@ public class TestTriGParser : IDisposable, IAsyncDisposable
         var bob = ont.GetGraphElementId(GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://example.org/bob"))));
         var defaultBobTriples = ont.GetTriplesWithSubject(bob);
         defaultBobTriples.Should().HaveCount(1);
-        var bobGraphTriples = ont.GetNamedGraph(bob).ToList();
+        var bobGraphTriples = ont.GetNamedGraph(bob).GetTriples().ToList();
         bobGraphTriples.Should().HaveCount(3);
         var resourceTriplesBob = bobGraphTriples.Select(ont.Resources.GetResourceTriple);
         var bobString = ont.GetGraphElementId(GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString("Bob")));

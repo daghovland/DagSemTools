@@ -11,11 +11,11 @@ using static DagSemTools.Rdf.Ingress;
 
 namespace DagSemTools.Sparql.Parser;
 
-internal class PropertyPathVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<Func<Query.Term, List<Query.TriplePattern>>>
+internal class PropertyPathVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<Func<Query.Term, List<Query.QuadPattern>>>
 {
     private readonly PathVisitor _pathVisitor = new(termVisitor);
 
-    public override Func<Query.Term, List<Query.TriplePattern>> VisitPropertyListPathNotEmpty(
+    public override Func<Query.Term, List<Query.QuadPattern>> VisitPropertyListPathNotEmpty(
         SparqlParser.PropertyListPathNotEmptyContext context)
         => (subject =>
             context.propertyPath()
@@ -23,7 +23,7 @@ internal class PropertyPathVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
                 .SelectMany(f => f(subject))
                 .ToList());
 
-    public override Func<Query.Term, List<Query.TriplePattern>> VisitVerbPathObjectList(SparqlParser.VerbPathObjectListContext context)
+    public override Func<Query.Term, List<Query.QuadPattern>> VisitVerbPathObjectList(SparqlParser.VerbPathObjectListContext context)
     {
         return (subject) =>
         {
@@ -33,13 +33,13 @@ internal class PropertyPathVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
                 .objectPath()
                 .Select(obj => termVisitor.Visit(obj.graphNodePath().varOrTerm()));
             return objs
-                .Select(obj => new Query.TriplePattern(subject, predicate, obj))
+                .Select(obj => Query.GetDefaultGraphPattern(subject, predicate, obj))
                 .ToList();
         };
 
     }
 
-    public override Func<Query.Term, List<Query.TriplePattern>> VisitVerbSimpleObjectList(SparqlParser.VerbSimpleObjectListContext context)
+    public override Func<Query.Term, List<Query.QuadPattern>> VisitVerbSimpleObjectList(SparqlParser.VerbSimpleObjectListContext context)
     {
         return (subject) =>
         {
@@ -49,7 +49,7 @@ internal class PropertyPathVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
                 .objectPath()
                 .Select(obj => termVisitor.Visit(obj.graphNodePath().varOrTerm()));
             return objs
-                .Select(obj => new Query.TriplePattern(subject, predicate, obj))
+                .Select(obj => Query.GetDefaultGraphPattern(subject, predicate, obj))
                 .ToList();
         };
 
