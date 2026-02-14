@@ -11,15 +11,15 @@ using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Sparql.Parser;
 
-internal class GroupPatternVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<IEnumerable<Query.QuadPattern>>
+internal class GroupPatternVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<IEnumerable<Query.QueryComponent>>
 {
     private readonly PropertyPathVisitor _propertyPathVisitor = new(termVisitor);
 
-    public override IEnumerable<Query.QuadPattern> VisitGroupGraphPattern(
+    public override IEnumerable<Query.QueryComponent> VisitGroupGraphPattern(
         SparqlParser.GroupGraphPatternContext context)
         => Visit(context.groupGraphPatternSub());
 
-    public override IEnumerable<Query.QuadPattern> VisitGroupGraphPatternSub(SparqlParser.GroupGraphPatternSubContext context)
+    public override IEnumerable<Query.QueryComponent> VisitGroupGraphPatternSub(SparqlParser.GroupGraphPatternSubContext context)
     {
         return context
             .triplesBlock()
@@ -27,7 +27,7 @@ internal class GroupPatternVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
             .ToList();
     }
 
-    public override IEnumerable<Query.QuadPattern> VisitTriplesBlock(SparqlParser.TriplesBlockContext context)
+    public override IEnumerable<Query.QueryComponent> VisitTriplesBlock(SparqlParser.TriplesBlockContext context)
     {
         var triplePatterns = Visit(context.triplesSameSubjectPath());
         if (triplePatterns == null)
@@ -37,12 +37,12 @@ internal class GroupPatternVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
         return triplePatterns.ToList();
     }
 
-    public override IEnumerable<Query.QuadPattern> VisitNamedSubjectTriplesPath(SparqlParser.NamedSubjectTriplesPathContext context)
+    public override IEnumerable<Query.QueryComponent> VisitNamedSubjectTriplesPath(SparqlParser.NamedSubjectTriplesPathContext context)
     {
         var subject = termVisitor.Visit(context.varOrTerm());
         var propPath = _propertyPathVisitor.Visit(context.propertyListPathNotEmpty());
         if (subject == null || propPath == null)
             throw new NotImplementedException("VarOrTerm or propertyPath is not properly parsed. This is a bug in the parser. Sorry");
-        return propPath(subject);
+        return propPath(subject).Select(qc => Query.QueryComponent.NewPattern(qc));
     }
 }
