@@ -13,11 +13,13 @@ open DagSemTools.Rdf.Query
 
 module QueryProcessor =
     
-    let GetBindingsForBGP(datastore: Datastore) (bgp: QuadPattern list) : Map<string, GraphElementId> list =
-        let rec aux (patterns: QuadPattern list) (currentBindings: Map<string, GraphElementId> list) : Map<string, GraphElementId> list =
-            match patterns with
-            | [] -> currentBindings
-            | pattern :: rest ->
+    let rec GetBindingsForGraphGroup (datastore : Datastore) (patterns: QueryComponent list) (currentBindings: Map<string, GraphElementId> list) : Map<string, GraphElementId> list =
+        match patterns with
+        | [] -> currentBindings
+        | pattern :: rest ->
+            match pattern with
+            | Group groupPattern -> GetBindingsForGraphGroup datastore groupPattern currentBindings
+            | Pattern pattern -> 
                 let newBindings =
                     currentBindings
                     |> List.collect (fun binding ->
@@ -56,8 +58,9 @@ module QueryProcessor =
                                 |> Map.ofList
                             Map.fold (fun acc k v -> Map.add k v acc) binding newBinding)
                         |> Seq.toList)
-                aux rest newBindings
-        aux bgp [Map.empty]
+
+                GetBindingsForGraphGroup datastore rest newBindings
+        
     
     let RemoveNonProjectedBindings (projectedVars: string list) (binding: Map<string, GraphElementId>) : Map<string, GraphElementId> =
             projectedVars
@@ -66,6 +69,6 @@ module QueryProcessor =
                 | Some value -> Map.add var value acc
                 | None -> acc) Map.empty
     let public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
-        GetBindingsForBGP datastore query.BasicGraphPattern
+        GetBindingsForGraphGroup datastore query.Query [Map.empty]
         |> List.map (RemoveNonProjectedBindings query.Projection)
         
