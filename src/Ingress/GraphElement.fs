@@ -41,10 +41,10 @@ open IriTools
         | TypedLiteral of typeIri: IriReference * typedLiteral: string
         override this.ToString() =
                 match this with
-                | LiteralString literal -> $"(%s{literal})"
+                | LiteralString literal -> $"%s{literal}"
                 | BooleanLiteral literalBool -> match literalBool with
-                                                    | true -> $"(true)"
-                                                    | false -> $"(false)"
+                                                    | true -> "true"
+                                                    | false -> "false"
                 | DecimalLiteral literalDec -> $"DecimalLiteral(%M{literalDec})"
                 | FloatLiteral literalFloat -> $"FloatLiteral(%f{literalFloat})"
                 | DoubleLiteral literalDouble -> $"DoubleLiteral(%f{literalDouble})"

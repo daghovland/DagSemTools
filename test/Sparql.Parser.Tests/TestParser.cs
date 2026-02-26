@@ -151,7 +151,17 @@ public class TestParser : IDisposable, IAsyncDisposable
             Query.Term.NewVariable("name")
         )));
         var optionalPattern = q.Query[1];
-        optionalPattern.Should().NotBeNull();
+        optionalPattern.IsOptional.Should().BeTrue();
+        var opt = ((Query.QueryComponent.Optional)optionalPattern).Item;
+        var optGroup = opt.Item;
+        optGroup.Length.Should().Be(1);
+        optGroup[0].Should().Be(Query.QueryComponent.NewPattern( Query.GetDefaultGraphPattern(
+            Query.Term.NewVariable("x"),
+            Query.Term.NewResource(e.GraphElementMap[
+                GraphElement.NewNodeOrEdge(
+                    RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/mbox")))]),
+            Query.Term.NewVariable("mbox")
+        )));
     }
 
     

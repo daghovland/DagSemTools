@@ -464,7 +464,6 @@ public class TestApi(ITestOutputHelper output)
         answers.Count.Should().Be(3);
         foreach (var answer in answers)
         {
-            answer.Count.Should().Be(2);
             var actual = answer["name"];
             actual.ToString().Should().BeOneOf("Alice", "Bob");
         }

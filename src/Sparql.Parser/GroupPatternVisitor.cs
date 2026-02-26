@@ -21,10 +21,35 @@ internal class GroupPatternVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<
 
     public override IEnumerable<Query.QueryComponent> VisitGroupGraphPatternSub(SparqlParser.GroupGraphPatternSubContext context)
     {
-        return context
-            .triplesBlock()
-            .SelectMany(Visit)
-            .ToList();
+        var components = new List<Query.QueryComponent>();
+        if (context.triplesBlock(0) != null)
+        {
+            components.AddRange(Visit(context.triplesBlock(0)));
+        }
+
+        for (int i = 0; i < context.graphPatternNotTriples().Length; i++)
+        {
+            components.AddRange(Visit(context.graphPatternNotTriples(i)));
+            if (context.triplesBlock(i + 1) != null)
+            {
+                components.AddRange(Visit(context.triplesBlock(i + 1)));
+            }
+        }
+
+        return components;
+    }
+
+    public override IEnumerable<Query.QueryComponent> VisitGraphPatternNotTriples(SparqlParser.GraphPatternNotTriplesContext context)
+    {
+        if (context.optionalGraphPattern() != null)
+            return Visit(context.optionalGraphPattern());
+        throw new NotImplementedException($"GraphPatternNotTriples is not yet fully parsed. {context.GetText()} is not supported. Sorry");
+    }
+
+    public override IEnumerable<Query.QueryComponent> VisitOptionalGraphPattern(SparqlParser.OptionalGraphPatternContext context)
+    {
+        var group = Visit(context.groupGraphPattern());
+        return new[] { Query.QueryComponent.NewOptional(Query.OptionalPattern.NewOptional(ListModule.OfSeq(group))) };
     }
 
     public override IEnumerable<Query.QueryComponent> VisitTriplesBlock(SparqlParser.TriplesBlockContext context)
