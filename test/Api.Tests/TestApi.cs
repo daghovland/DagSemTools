@@ -428,10 +428,10 @@ public class TestApi(ITestOutputHelper output)
         actual.Should().BeOfType<RdfLiteral>();
         actual.ToString().Should().Be("John Doe");
     }
-    
-    
-        
-        
+
+
+
+
     /// <summary>
     /// Example from sparql-1.2 spec, section 6.1
     /// </summary>
@@ -468,7 +468,7 @@ public class TestApi(ITestOutputHelper output)
             actual.ToString().Should().BeOneOf("Alice", "Bob");
         }
     }
-    
+
     private IDataset ParseTurtleData(string data)
     {
         var writer = new StringWriter();

@@ -45,7 +45,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[0].Should().Be("name", "The projected variable is 'name'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
-        bgp.Should().Be(Query.QueryComponent.NewPattern( Query.GetDefaultGraphPattern(
+        bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
                 Query.Term.NewVariable("person"),
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://xmlns.com/foaf/0.1/name")))]),
                 Query.Term.NewVariable("name"))),
@@ -71,7 +71,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[0].Should().Be("title", "The projected variable is 'title'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
-        bgp.Should().Be(Query.QueryComponent.NewPattern( Query.GetDefaultGraphPattern(
+        bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://example.org/book/book1")))]),
                 Query.Term.NewResource(e.GraphElementMap[GraphElement.NewNodeOrEdge(RdfResource.NewIri(new IriReference("http://purl.org/dc/elements/1.1/title")))]),
                 Query.Term.NewVariable("title"))));
@@ -91,7 +91,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[0].Should().Be("v", "The projected variable is 'v'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
-        bgp.Should().Be(Query.QueryComponent.NewPattern( Query.GetDefaultGraphPattern(
+        bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("v"),
             Query.Term.NewVariable("p"),
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLiteralString("cat"))]))));
@@ -112,12 +112,12 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[0].Should().Be("v", "The projected variable is 'v'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
-        bgp.Should().Be(Query.QueryComponent.NewPattern( Query.GetDefaultGraphPattern(
+        bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("v"),
             Query.Term.NewVariable("p"),
             Query.Term.NewResource(e.GraphElementMap[GraphElement.NewGraphLiteral(RdfLiteral.NewLangLiteral("cat", "en"))]))));
     }
-    
+
     /// <summary>
     /// Example from sparql-1.2 spec, section 6.1
     /// </summary>
@@ -143,7 +143,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         q.Projection[1].Should().Be("mbox", "The projected variable is 'mbox'");
         q.Query.Length.Should().Be(2, "There is one pattern and one optional");
         var bgp = q.Query[0];
-        bgp.Should().Be(Query.QueryComponent.NewPattern( Query.GetDefaultGraphPattern(
+        bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("x"),
             Query.Term.NewResource(e.GraphElementMap[
                 GraphElement.NewNodeOrEdge(
@@ -155,7 +155,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         var opt = ((Query.QueryComponent.Optional)optionalPattern).Item;
         var optGroup = opt.Item;
         optGroup.Length.Should().Be(1);
-        optGroup[0].Should().Be(Query.QueryComponent.NewPattern( Query.GetDefaultGraphPattern(
+        optGroup[0].Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
             Query.Term.NewVariable("x"),
             Query.Term.NewResource(e.GraphElementMap[
                 GraphElement.NewNodeOrEdge(
@@ -164,7 +164,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         )));
     }
 
-    
+
     public void Dispose()
     {
         _outputWriter.Dispose();
