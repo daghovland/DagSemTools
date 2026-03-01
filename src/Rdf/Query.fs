@@ -71,10 +71,19 @@ module Query =
          Object = Object}
         
 
+    type GroupGraphPattern =
+            QueryComponent list
+    and QueryComponent =
+        | Pattern of QuadPattern
+        | Group of GroupGraphPattern
+        | Optional of OptionalPattern
+    and OptionalPattern = Optional of GroupGraphPattern
     
     [<StructuralComparison>]
     [<StructuralEquality>]
     (* The projection is the list of variable names used in the select clause, without the question mark.
        The Basic Graph Pattern is a list of Triple Patterns *)
     type SelectQuery =
-        {Projection: string list; BasicGraphPattern: QuadPattern list }
+        {Projection: string list; Query: GroupGraphPattern }
+    
+     

@@ -6,4 +6,4 @@ and for translating ELI axioms into Datalog in the DagSemTools.Datalog format.
 
 ## References:
 * DaRLIng [https://arxiv.org/abs/2008.02232](https://arxiv.org/abs/2008.02232)
-* An Inroduction to Description Logic
+* An Introduction to Description Logic

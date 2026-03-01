@@ -8,16 +8,33 @@
 
 namespace DagSemTools.Rdf
 
+open Microsoft.FSharp.Collections
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Rdf.Query
 
 module QueryProcessor =
     
-    let GetBindingsForBGP(datastore: Datastore) (bgp: QuadPattern list) : Map<string, GraphElementId> list =
-        let rec aux (patterns: QuadPattern list) (currentBindings: Map<string, GraphElementId> list) : Map<string, GraphElementId> list =
-            match patterns with
-            | [] -> currentBindings
-            | pattern :: rest ->
+    let rec GetBindingsForGraphGroup
+        (datastore : Datastore)
+        (patterns: QueryComponent list)
+        (currentBindings: Map<string, GraphElementId> list)
+        : Map<string, GraphElementId> list =
+        match patterns with
+        | [] -> currentBindings
+        | pattern :: rest ->
+            match pattern with
+            | Group groupPattern -> GetBindingsForGraphGroup datastore groupPattern currentBindings
+            | Query.QueryComponent.Optional (Query.OptionalPattern.Optional optionalGroup) ->
+                let (newBindings : Map<string, GraphElementId> list) =
+                    currentBindings
+                    |> List.collect (fun binding ->
+                        let optionalMatches = GetBindingsForGraphGroup datastore optionalGroup [binding]
+                        if List.isEmpty optionalMatches then
+                            [binding]
+                        else
+                            optionalMatches)
+                GetBindingsForGraphGroup datastore rest newBindings
+            | Query.QueryComponent.Pattern pattern -> 
                 let newBindings =
                     currentBindings
                     |> List.collect (fun binding ->
@@ -40,7 +57,7 @@ module QueryProcessor =
                                 | _ -> pattern.Object }
                         datastore.GetQuads(boundPattern)
                         |> Seq.map (fun triple ->
-                            let newBinding =
+                            let newBindingPairs =
                                 [ match pattern.Graph with
                                   | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.tripleId)
                                   | _ -> ()
@@ -53,11 +70,11 @@ module QueryProcessor =
                                   match pattern.Object with
                                   | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.obj)
                                   | _ -> () ]
-                                |> Map.ofList
-                            Map.fold (fun acc k v -> Map.add k v acc) binding newBinding)
+                            List.fold (fun acc (k, v) -> Map.add k v acc) binding newBindingPairs)
                         |> Seq.toList)
-                aux rest newBindings
-        aux bgp [Map.empty]
+
+                GetBindingsForGraphGroup datastore rest newBindings
+        
     
     let RemoveNonProjectedBindings (projectedVars: string list) (binding: Map<string, GraphElementId>) : Map<string, GraphElementId> =
             projectedVars
@@ -66,6 +83,7 @@ module QueryProcessor =
                 | Some value -> Map.add var value acc
                 | None -> acc) Map.empty
     let public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
-        GetBindingsForBGP datastore query.BasicGraphPattern
-        |> List.map (RemoveNonProjectedBindings query.Projection)
+        let results = GetBindingsForGraphGroup datastore query.Query [Map.empty]
+        results
+        |> List.map (RemoveNonProjectedBindings (query.Projection |> Seq.toList))
         

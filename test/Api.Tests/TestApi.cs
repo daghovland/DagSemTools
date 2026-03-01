@@ -428,6 +428,47 @@ public class TestApi(ITestOutputHelper output)
         actual.Should().BeOfType<RdfLiteral>();
         actual.ToString().Should().Be("John Doe");
     }
+
+
+
+
+    /// <summary>
+    /// Example from sparql-1.2 spec, section 6.1
+    /// </summary>
+    [Fact]
+    public void TestSparqlOptionalPatterns()
+    {
+        var data = """
+                   PREFIX foaf:       <http://xmlns.com/foaf/0.1/>
+                   PREFIX rdf:        <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+                   _:a  rdf:type        foaf:Person .
+                       _:a  foaf:name       "Alice" .
+                   _:a  foaf:mbox       <mailto:alice@example.com> .
+                   _:a  foaf:mbox       <mailto:alice@work.example> .
+                   
+                   _:b  rdf:type        foaf:Person .
+                       _:b  foaf:name       "Bob" .
+                   
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                          SELECT ?name ?mbox
+                          WHERE  {
+                              ?x foaf:name  ?name .
+                              OPTIONAL { ?x  foaf:mbox  ?mbox }
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(3);
+        foreach (var answer in answers)
+        {
+            var actual = answer["name"];
+            actual.ToString().Should().BeOneOf("Alice", "Bob");
+        }
+    }
+
     private IDataset ParseTurtleData(string data)
     {
         var writer = new StringWriter();

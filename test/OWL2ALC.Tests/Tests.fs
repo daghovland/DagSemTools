@@ -178,7 +178,7 @@ module Tests =
                                                NamedIndividual (FullIri leftIri),
                                                 data)
         let translatedClass = Translator.translateAssertion logger assertion
-        translatedClass.Should().Be(ABoxAssertion.LiteralAssertion (leftIri, roleIri, "(data)"))
+        translatedClass.Should().Be(ABoxAssertion.LiteralAssertion (leftIri, roleIri, "data"))
     
     [<Fact>]
     let ``Negative data property fact is translated`` () =
@@ -190,6 +190,6 @@ module Tests =
                                                NamedIndividual (FullIri leftIri),
                                                 data)
         let translatedClass = Translator.translateAssertion logger assertion
-        translatedClass.Should().Be(ABoxAssertion.NegativeAssertion (ABoxAssertion.LiteralAssertion (leftIri, roleIri, "(data)")))
+        translatedClass.Should().Be(ABoxAssertion.NegativeAssertion (ABoxAssertion.LiteralAssertion (leftIri, roleIri, "data")))
     
     
