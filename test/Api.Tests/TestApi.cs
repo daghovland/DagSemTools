@@ -482,4 +482,36 @@ public class TestApi(ITestOutputHelper output)
 
         return graph;
     }
+
+    [Fact(Skip = "Aggregates and GROUP BY are not yet supported in the QueryProcessor")]
+    public void TestSparqlAggregate()
+    {
+        var data = """
+                   PREFIX : <http://books.example/>
+                   :org1 :hasBook :book1 .
+                   :book1 :price 10 .
+                   :org1 :hasBook :book2 .
+                   :book2 :price 20 .
+                   :org2 :hasBook :book3 .
+                   :book3 :price 30 .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX : <http://books.example/>
+                          SELECT (SUM(?lprice) AS ?totalPrice)
+                          WHERE {
+                            ?org :hasBook ?book .
+                            ?book :price ?lprice .
+                          }
+                          GROUP BY ?org
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(2);
+
+        var org1Result = answers.FirstOrDefault(a => a["totalPrice"].ToString().Equals("30"));
+        var org2Result = answers.FirstOrDefault(a => a["totalPrice"].ToString().Equals("30"));
+        org1Result.Should().NotBeNull();
+        org2Result.Should().NotBeNull();
+    }
 }
