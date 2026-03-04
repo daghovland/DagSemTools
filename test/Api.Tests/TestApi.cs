@@ -483,7 +483,7 @@ public class TestApi(ITestOutputHelper output)
         return graph;
     }
 
-    [Fact(Skip = "Aggregates and GROUP BY are not yet supported in the QueryProcessor")]
+    [Fact]
     public void TestSparqlAggregate()
     {
         var data = """
@@ -498,7 +498,7 @@ public class TestApi(ITestOutputHelper output)
         var graph = ParseTurtleData(data);
         var queryString = """
                           PREFIX : <http://books.example/>
-                          SELECT (SUM(?lprice) AS ?totalPrice)
+                          SELECT ?org (SUM(?lprice) AS ?totalPrice)
                           WHERE {
                             ?org :hasBook ?book .
                             ?book :price ?lprice .
@@ -506,12 +506,17 @@ public class TestApi(ITestOutputHelper output)
                           GROUP BY ?org
                           """;
         var answers = graph.AnswerSelectQuery(queryString).ToList();
+        
         Assert.NotNull(answers);
         answers.Count.Should().Be(2);
 
-        var org1Result = answers.FirstOrDefault(a => a["totalPrice"].ToString().Equals("30"));
-        var org2Result = answers.FirstOrDefault(a => a["totalPrice"].ToString().Equals("30"));
+        var org1Result = answers.FirstOrDefault(a => a["org"].ToString().Contains("org1"));
+        var org2Result = answers.FirstOrDefault(a => a["org"].ToString().Contains("org2"));
+        
         org1Result.Should().NotBeNull();
         org2Result.Should().NotBeNull();
+        
+        org1Result["totalPrice"].ToString().Should().Be("IntegerLiteral(30)");
+        org2Result["totalPrice"].ToString().Should().Be("IntegerLiteral(30)");
     }
 }

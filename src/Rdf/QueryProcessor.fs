@@ -8,6 +8,7 @@
 
 namespace DagSemTools.Rdf
 
+open System.Numerics
 open Microsoft.FSharp.Collections
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Rdf.Query
@@ -76,22 +77,128 @@ module QueryProcessor =
                 GetBindingsForGraphGroup datastore rest newBindings
         
     
-    let RemoveNonProjectedBindings (projectedVars: ProjectionElement list) (binding: Map<string, GraphElementId>) : Map<string, GraphElementId> =
-            projectedVars
+    let public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
+        let results = GetBindingsForGraphGroup datastore query.Query [Map.empty]
+        
+        let evalExpr (binding: Map<string, GraphElementId>) (expr: Expression) : GraphElementId option =
+            match expr with
+            | ExprVariable v -> binding.TryFind v
+            | ExprAggregate _ -> None // Aggregates handled after grouping
+
+        let resultsAfterGrouping =
+            if query.GroupBy.IsEmpty then
+                let hasAggregates = 
+                    query.Projection 
+                    |> List.exists (function ProjectionElement.ProjectExpression(ExprAggregate _, _) -> true | _ -> false)
+                if hasAggregates then
+                    if results.IsEmpty then [[]] // One empty group for aggregates over empty set
+                    else [results]
+                else
+                    results |> List.map (fun r -> [r])
+            else
+                results
+                |> List.groupBy (fun binding ->
+                    query.GroupBy 
+                    |> List.map (fun expr -> evalExpr binding expr)
+                )
+                |> List.map snd
+
+        let evalAggregate (group: Map<string, GraphElementId> list) (agg: Aggregate) : GraphElementId option =
+            match agg with
+            | Sum(distinct, Term.Variable v) ->
+                let values = 
+                    let allValues = 
+                        group 
+                        |> List.choose (fun b -> b.TryFind v)
+                    if distinct then
+                        allValues |> List.distinct
+                    else
+                        allValues
+                    |> List.choose (fun id -> 
+                        let gel = datastore.Resources.GetGraphElement id
+                        DagSemTools.Rdf.Ingress.tryGetNonNegativeIntegerLiteral gel)
+                if values.IsEmpty then 
+                    Some (datastore.Resources.AddLiteralResource (DagSemTools.Ingress.RdfLiteral.IntegerLiteral (BigInteger 0)))
+                else
+                    let sum = values |> List.reduce (+)
+                    Some (datastore.Resources.AddLiteralResource (DagSemTools.Ingress.RdfLiteral.IntegerLiteral sum))
+            | Count(distinct, termOpt) ->
+                let count = 
+                    match termOpt with
+                    | None -> // COUNT(*)
+                        group.Length
+                    | Some (Term.Variable v) ->
+                        let values = 
+                            group 
+                            |> List.choose (fun b -> b.TryFind v)
+                        if distinct then
+                            (values |> List.distinct).Length
+                        else
+                            values.Length
+                    | Some (Term.Resource r) ->
+                        if distinct then 1 else group.Length
+                Some (datastore.Resources.AddLiteralResource (DagSemTools.Ingress.RdfLiteral.IntegerLiteral (BigInteger count)))
+            | Min(distinct, Term.Variable v) ->
+                let values = 
+                    group 
+                    |> List.choose (fun b -> b.TryFind v)
+                    |> List.choose (fun id -> 
+                        let gel = datastore.Resources.GetGraphElement id
+                        DagSemTools.Rdf.Ingress.tryGetNonNegativeIntegerLiteral gel)
+                if values.IsEmpty then None
+                else
+                    let min = values |> List.min
+                    Some (datastore.Resources.AddLiteralResource (DagSemTools.Ingress.RdfLiteral.IntegerLiteral min))
+            | Max(distinct, Term.Variable v) ->
+                let values = 
+                    group 
+                    |> List.choose (fun b -> b.TryFind v)
+                    |> List.choose (fun id -> 
+                        let gel = datastore.Resources.GetGraphElement id
+                        DagSemTools.Rdf.Ingress.tryGetNonNegativeIntegerLiteral gel)
+                if values.IsEmpty then None
+                else
+                    let max = values |> List.max
+                    Some (datastore.Resources.AddLiteralResource (DagSemTools.Ingress.RdfLiteral.IntegerLiteral max))
+            | Avg(distinct, Term.Variable v) ->
+                let values = 
+                    let allValues = 
+                        group 
+                        |> List.choose (fun b -> b.TryFind v)
+                    if distinct then
+                        allValues |> List.distinct
+                    else
+                        allValues
+                    |> List.choose (fun id -> 
+                        let gel = datastore.Resources.GetGraphElement id
+                        DagSemTools.Rdf.Ingress.tryGetNonNegativeIntegerLiteral gel)
+                if values.IsEmpty then None
+                else
+                    let sum = values |> List.reduce (+)
+                    let avg = sum / (BigInteger values.Length)
+                    Some (datastore.Resources.AddLiteralResource (DagSemTools.Ingress.RdfLiteral.IntegerLiteral avg))
+            | _ -> None
+
+        resultsAfterGrouping
+        |> List.map (fun group ->
+            let firstBinding = group.Head
+            query.Projection
             |> List.fold (fun acc element ->
                 match element with
                 | ProjectionElement.ProjectVariable var ->
-                    match binding.TryFind var with
+                    match firstBinding.TryFind var with
                     | Some value -> Map.add var value acc
                     | None -> acc
-                | ProjectionElement.ProjectExpression (_, alias) ->
-                    // Aggregates are not yet supported in the Answer processor
-                    match binding.TryFind alias with
-                    | Some value -> Map.add alias value acc
-                    | None -> acc
-                ) Map.empty
-    let public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
-        let results = GetBindingsForGraphGroup datastore query.Query [Map.empty]
-        results
-        |> List.map (RemoveNonProjectedBindings query.Projection)
+                | ProjectionElement.ProjectExpression (expr, alias) ->
+                    match expr with
+                    | ExprAggregate agg ->
+                        match evalAggregate group agg with
+                        | Some value -> Map.add alias value acc
+                        | None -> acc
+                    | _ ->
+                        match evalExpr firstBinding expr with
+                        | Some value -> Map.add alias value acc
+                        | None -> acc
+            ) Map.empty
+        )
         
