@@ -469,6 +469,192 @@ public class TestApi(ITestOutputHelper output)
         }
     }
 
+    [Fact(Skip = "Select Expressions are not yet supported")]
+    public void TestSparqlSelectExpressions()
+    {
+        var data = """
+                   PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+                   PREFIX ns:   <http://example.org/ns#>
+                   <http://example.org/book/book1> dc:title "SPARQL Tutorial" ; ns:price 42 ; ns:discount 0.2 .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+                          PREFIX ns:   <http://example.org/ns#>
+                          SELECT ?title (?p*(1-?discount) AS ?price)
+                          WHERE { ?book dc:title ?title ; ns:price ?p ; ns:discount ?discount }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+    }
+
+    [Fact(Skip = "UNION is not yet supported")]
+    public void TestSparqlUnion()
+    {
+        var data = """
+                   PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
+                   PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
+                   _:a dc10:title "SPARQL 1.0" .
+                   _:b dc11:title "SPARQL 1.1" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
+                          PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
+                          SELECT ?title
+                          WHERE  { { ?book dc10:title ?title } UNION { ?book dc11:title ?title } }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(2);
+    }
+
+    [Fact(Skip = "FILTER is not yet supported")]
+    public void TestSparqlFilter()
+    {
+        var data = """
+                   PREFIX dc:  <http://purl.org/dc/elements/1.1/>
+                   PREFIX ns:  <http://example.org/ns#>
+                   _:a ns:price 20 ; dc:title "Cheap Book" .
+                   _:b ns:price 40 ; dc:title "Expensive Book" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+                          PREFIX  ns:  <http://example.org/ns#>
+                          SELECT  ?title ?price
+                          WHERE   { ?x ns:price ?price .
+                                    FILTER (?price < 30) .
+                                    ?x dc:title ?title . }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+    }
+
+    [Fact(Skip = "Subqueries are not yet supported")]
+    public void TestSparqlSubquery()
+    {
+        var data = """
+                   PREFIX : <http://people.example/>
+                   :alice :knows :bob .
+                   :bob :name "Bob" .
+                   :alice :knows :carol .
+                   :carol :name "Carol" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX : <http://people.example/>
+                          SELECT ?y ?minName
+                          WHERE {
+                            :alice :knows ?y .
+                            {
+                              SELECT ?y (MIN(?name) AS ?minName)
+                              WHERE {
+                                ?y :name ?name .
+                              }
+                              GROUP BY ?y
+                            }
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+    }
+
+    [Fact(Skip = "VALUES is not yet supported")]
+    public void TestSparqlValues()
+    {
+        var data = """
+                   PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+                   PREFIX :     <http://example.org/book/>
+                   :book1 dc:title "Book 1" .
+                   :book2 dc:title "Book 2" .
+                   :book3 dc:title "Book 3" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX dc:   <http://purl.org/dc/elements/1.1/> 
+                          PREFIX :     <http://example.org/book/> 
+                          SELECT ?book ?title
+                          WHERE {
+                             ?book dc:title ?title .
+                             VALUES ?book { :book1 :book3 }
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(2);
+    }
+
+    [Fact(Skip = "MINUS is not yet supported")]
+    public void TestSparqlMinus()
+    {
+        var data = """
+                   PREFIX : <http://example.org/>
+                   :s1 :p :o1 .
+                   :s1 :q :o2 .
+                   :s2 :p :o3 .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX : <http://example.org/>
+                          SELECT ?s
+                          WHERE {
+                            ?s :p ?o .
+                            MINUS { ?s :q ?o2 }
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+    }
+
+    [Fact(Skip = "Property Paths are not yet supported")]
+    public void TestSparqlPropertyPath()
+    {
+        var data = """
+                   PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                   _:a foaf:mbox <mailto:alice@example.org> .
+                   _:a foaf:knows _:b .
+                   _:b foaf:name "Bob" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+                          SELECT ?name
+                          WHERE {
+                            ?x foaf:mbox <mailto:alice@example.org> .
+                            ?x foaf:knows/foaf:name ?name .
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+    }
+
+    [Fact(Skip = "EXISTS is not yet supported")]
+    public void TestSparqlExists()
+    {
+        var data = """
+                   PREFIX : <http://example.org/>
+                   :alice :name "Alice" ; :mbox <mailto:alice@example.org> .
+                   :bob :name "Bob" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX  :       <http://example.org/>
+                          SELECT ?person
+                          WHERE {
+                            ?person :name ?name .
+                            FILTER EXISTS { ?person :mbox ?mbox }
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        Assert.NotNull(answers);
+        answers.Count.Should().Be(1);
+    }
+
     private IDataset ParseTurtleData(string data)
     {
         var writer = new StringWriter();
@@ -506,16 +692,16 @@ public class TestApi(ITestOutputHelper output)
                           GROUP BY ?org
                           """;
         var answers = graph.AnswerSelectQuery(queryString).ToList();
-        
+
         Assert.NotNull(answers);
         answers.Count.Should().Be(2);
 
         var org1Result = answers.FirstOrDefault(a => a["org"].ToString().Contains("org1"));
         var org2Result = answers.FirstOrDefault(a => a["org"].ToString().Contains("org2"));
-        
+
         org1Result.Should().NotBeNull();
         org2Result.Should().NotBeNull();
-        
+
         org1Result["totalPrice"].ToString().Should().Be("IntegerLiteral(30)");
         org2Result["totalPrice"].ToString().Should().Be("IntegerLiteral(30)");
     }

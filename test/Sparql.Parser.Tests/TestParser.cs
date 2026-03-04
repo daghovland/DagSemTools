@@ -377,7 +377,7 @@ public class TestParser : IDisposable, IAsyncDisposable
         expr.IsExprAggregate.Should().BeTrue();
         var agg = ((Query.Expression.ExprAggregate)expr).Item;
         agg.IsSum.Should().BeTrue();
-        
+
         q.GroupBy.Length.Should().Be(1);
         var groupByElement = q.GroupBy[0];
         groupByElement.IsExprVariable.Should().BeTrue();
