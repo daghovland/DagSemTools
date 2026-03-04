@@ -41,34 +41,34 @@ module QueryProcessor =
                         let boundPattern =
                             { Graph = 
                                   match pattern.Graph with
-                                  | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
+                                  | Term.Variable vName when binding.ContainsKey vName -> Term.Resource binding.[vName]
                                   | _ -> pattern.Graph
                               Subject = 
                                 match pattern.Subject with
-                                | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
+                                | Term.Variable vName when binding.ContainsKey vName -> Term.Resource binding.[vName]
                                 | _ -> pattern.Subject
                               Predicate = 
                                 match pattern.Predicate with
-                                | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
+                                | Term.Variable vName when binding.ContainsKey vName -> Term.Resource binding.[vName]
                                 | _ -> pattern.Predicate
                               Object = 
                                 match pattern.Object with
-                                | Variable vName when binding.ContainsKey vName -> Resource binding.[vName]
+                                | Term.Variable vName when binding.ContainsKey vName -> Term.Resource binding.[vName]
                                 | _ -> pattern.Object }
                         datastore.GetQuads(boundPattern)
                         |> Seq.map (fun triple ->
                             let newBindingPairs =
                                 [ match pattern.Graph with
-                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.tripleId)
+                                  | Term.Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.tripleId)
                                   | _ -> ()
                                   match pattern.Subject with
-                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.subject)
+                                  | Term.Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.subject)
                                   | _ -> ()
                                   match pattern.Predicate with
-                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.predicate)
+                                  | Term.Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.predicate)
                                   | _ -> ()
                                   match pattern.Object with
-                                  | Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.obj)
+                                  | Term.Variable vName when not (binding.ContainsKey vName) -> yield (vName, triple.obj)
                                   | _ -> () ]
                             List.fold (fun acc (k, v) -> Map.add k v acc) binding newBindingPairs)
                         |> Seq.toList)
@@ -76,14 +76,22 @@ module QueryProcessor =
                 GetBindingsForGraphGroup datastore rest newBindings
         
     
-    let RemoveNonProjectedBindings (projectedVars: string list) (binding: Map<string, GraphElementId>) : Map<string, GraphElementId> =
+    let RemoveNonProjectedBindings (projectedVars: ProjectionElement list) (binding: Map<string, GraphElementId>) : Map<string, GraphElementId> =
             projectedVars
-            |> List.fold (fun acc var ->
-                match binding.TryFind var with
-                | Some value -> Map.add var value acc
-                | None -> acc) Map.empty
+            |> List.fold (fun acc element ->
+                match element with
+                | ProjectionElement.ProjectVariable var ->
+                    match binding.TryFind var with
+                    | Some value -> Map.add var value acc
+                    | None -> acc
+                | ProjectionElement.ProjectExpression (_, alias) ->
+                    // Aggregates are not yet supported in the Answer processor
+                    match binding.TryFind alias with
+                    | Some value -> Map.add alias value acc
+                    | None -> acc
+                ) Map.empty
     let public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
         let results = GetBindingsForGraphGroup datastore query.Query [Map.empty]
         results
-        |> List.map (RemoveNonProjectedBindings (query.Projection |> Seq.toList))
+        |> List.map (RemoveNonProjectedBindings query.Projection)
         

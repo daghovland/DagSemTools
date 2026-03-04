@@ -118,7 +118,34 @@ internal class SparqlListener : SparqlBaseListener
         var whereClause = context.whereClause().groupGraphPattern();
         var parsedWhereClause = _groupPatternVisitor.Visit(whereClause);
         var solutionModifier = context.solutionModifier();
-        _result = new Query.SelectQuery(ListModule.OfSeq(parsedVars), ListModule.OfSeq(parsedWhereClause));
+
+        var groupBy = new List<Query.Expression>();
+        if (solutionModifier.groupClause() != null)
+        {
+            var expressionVisitor = new ExpressionVisitor();
+            foreach (var groupCondition in solutionModifier.groupClause().groupCondition())
+            {
+                if (groupCondition.var() != null)
+                {
+                    groupBy.Add(Query.Expression.NewExprVariable(ParserUtils.GetVariableName(groupCondition.var().GetText())));
+                }
+                else if (groupCondition.expression() != null)
+                {
+                    groupBy.Add(expressionVisitor.Visit(groupCondition.expression()));
+                }
+                else if (groupCondition.builtInCall() != null)
+                {
+                    groupBy.Add(expressionVisitor.Visit(groupCondition.builtInCall()));
+                }
+                else if (groupCondition.functionCall() != null)
+                {
+                    // Function call not fully supported in Query.Expression yet, but we can try
+                    // For now, we might need to extend Expression if we want to support it properly
+                }
+            }
+        }
+
+        _result = new Query.SelectQuery(ListModule.OfSeq(parsedVars), ListModule.OfSeq(parsedWhereClause), ListModule.OfSeq(groupBy));
     }
 
 

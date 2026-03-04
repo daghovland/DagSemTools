@@ -42,7 +42,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("name", "The projected variable is 'name'");
+        var element = q.Projection[0];
+        element.IsProjectVariable.Should().BeTrue();
+        ((Query.ProjectionElement.ProjectVariable)element).Item.Should().Be("name", "The projected variable is 'name'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
         bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -68,7 +70,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("title", "The projected variable is 'title'");
+        var element = q.Projection[0];
+        element.IsProjectVariable.Should().BeTrue();
+        ((Query.ProjectionElement.ProjectVariable)element).Item.Should().Be("title", "The projected variable is 'title'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
         bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -88,7 +92,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("v", "The projected variable is 'v'");
+        var element = q.Projection[0];
+        element.IsProjectVariable.Should().BeTrue();
+        ((Query.ProjectionElement.ProjectVariable)element).Item.Should().Be("v", "The projected variable is 'v'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
         bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -109,7 +115,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("v", "The projected variable is 'v'");
+        var element = q.Projection[0];
+        element.IsProjectVariable.Should().BeTrue();
+        ((Query.ProjectionElement.ProjectVariable)element).Item.Should().Be("v", "The projected variable is 'v'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
         bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -129,7 +137,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("v", "The projected variable is 'v'");
+        var element = q.Projection[0];
+        element.IsProjectVariable.Should().BeTrue();
+        ((Query.ProjectionElement.ProjectVariable)element).Item.Should().Be("v", "The projected variable is 'v'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
         bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -149,7 +159,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
-        q.Projection[0].Should().Be("v", "The projected variable is 'v'");
+        var element = q.Projection[0];
+        element.IsProjectVariable.Should().BeTrue();
+        ((Query.ProjectionElement.ProjectVariable)element).Item.Should().Be("v", "The projected variable is 'v'");
         q.Query.Length.Should().Be(1, "There is one BGP");
         var bgp = q.Query[0];
         bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -173,7 +185,10 @@ public class TestParser : IDisposable, IAsyncDisposable
         var q = result.Item1;
         var e = result.Item2;
         q.Should().NotBeNull();
-        q.Projection.Length.Should().Be(2, "There are two projected variables");
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
+        projection.Count.Should().Be(2, "There are two projected variables");
+        projection.Should().Contain("name");
+        projection.Should().Contain("mbox");
         q.Query.Length.Should().Be(2, "There are two triple patterns");
         var bgp1 = q.Query[0];
         bgp1.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -202,6 +217,9 @@ public class TestParser : IDisposable, IAsyncDisposable
         var e = result.Item2;
         q.Should().NotBeNull();
         q.Projection.Length.Should().Be(1, "There is one projected variable");
+        var element = q.Projection[0];
+        element.IsProjectVariable.Should().BeTrue();
+        ((Query.ProjectionElement.ProjectVariable)element).Item.Should().Be("x", "The projected variable is 'x'");
         q.Query.Length.Should().Be(2, "There are two triple patterns");
         var bgp1 = q.Query[0];
         bgp1.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -235,9 +253,10 @@ public class TestParser : IDisposable, IAsyncDisposable
         var q = result.Item1;
         var e = result.Item2;
         q.Should().NotBeNull();
-        q.Projection.Length.Should().Be(2, "There are two projected variables");
-        q.Projection[0].Should().Be("name", "The projected variable is 'name'");
-        q.Projection[1].Should().Be("mbox", "The projected variable is 'mbox'");
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
+        projection.Count.Should().Be(2, "There are two projected variables");
+        projection.Should().Contain("name");
+        projection.Should().Contain("mbox");
         q.Query.Length.Should().Be(2, "There is one pattern and one optional");
         var bgp = q.Query[0];
         bgp.Should().Be(Query.QueryComponent.NewPattern(Query.GetDefaultGraphPattern(
@@ -274,7 +293,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
         projection.Should().Contain("title");
         projection.Should().Contain("price");
     }
@@ -295,7 +314,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
         projection.Should().Contain("title");
         projection.Should().Contain("price");
     }
@@ -311,7 +330,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
         projection.Should().Contain("title");
     }
 
@@ -328,12 +347,12 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias);
         projection.Should().Contain("title");
         projection.Should().Contain("price");
     }
 
-    [Fact(Skip = "Aggregates are not yet implemented")]
+    [Fact]
     public void TestSparql12ExampleAggregate()
     {
         string sparql = """
@@ -347,8 +366,22 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
-        projection.Should().Contain("totalPrice");
+        var projection = q.Projection;
+        projection.Length.Should().Be(1);
+        var element = projection[0];
+        element.IsProjectExpression.Should().BeTrue();
+        var projExpr = (Query.ProjectionElement.ProjectExpression)element;
+        var expr = projExpr.Item1;
+        var alias = projExpr.alias;
+        alias.Should().Be("totalPrice");
+        expr.IsExprAggregate.Should().BeTrue();
+        var agg = ((Query.Expression.ExprAggregate)expr).Item;
+        agg.IsSum.Should().BeTrue();
+        
+        q.GroupBy.Length.Should().Be(1);
+        var groupByElement = q.GroupBy[0];
+        groupByElement.IsExprVariable.Should().BeTrue();
+        ((Query.Expression.ExprVariable)groupByElement).Item.Should().Be("org");
     }
 
     [Fact(Skip = "Subqueries are not yet implemented")]
@@ -370,7 +403,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
         projection.Should().Contain("y");
         projection.Should().Contain("minName");
     }
@@ -389,7 +422,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
         projection.Should().Contain("book");
         projection.Should().Contain("title");
     }
@@ -407,7 +440,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
         projection.Should().Contain("s");
     }
 
@@ -424,7 +457,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
         projection.Should().Contain("name");
     }
 
@@ -441,7 +474,7 @@ public class TestParser : IDisposable, IAsyncDisposable
                         """;
         var result = DagSemTools.Sparql.Parser.Parser.ParseString(sparql, _outputWriter);
         var q = result.Item1;
-        IEnumerable<string> projection = q.Projection;
+        var projection = q.Projection.Select(p => p.IsProjectVariable ? ((Query.ProjectionElement.ProjectVariable)p).Item : ((Query.ProjectionElement.ProjectExpression)p).alias).ToList();
         projection.Should().Contain("person");
     }
 
