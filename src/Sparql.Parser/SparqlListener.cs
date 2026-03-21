@@ -113,7 +113,7 @@ internal class SparqlListener : SparqlBaseListener
     {
         var projection = context.selectClause();
         var parsedVars = projection.projection().
-            Select(v => new ProjectionVisitor().Visit(v))
+            Select(v => new ProjectionVisitor(_termVisitor).Visit(v))
             .ToList();
         var whereClause = context.whereClause().groupGraphPattern();
         var parsedWhereClause = _groupPatternVisitor.Visit(whereClause);
@@ -122,7 +122,7 @@ internal class SparqlListener : SparqlBaseListener
         var groupBy = new List<Query.Expression>();
         if (solutionModifier.groupClause() != null)
         {
-            var expressionVisitor = new ExpressionVisitor();
+            var expressionVisitor = new ExpressionVisitor(_termVisitor);
             foreach (var groupCondition in solutionModifier.groupClause().groupCondition())
             {
                 if (groupCondition.var() != null)

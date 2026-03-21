@@ -12,9 +12,9 @@ using Microsoft.FSharp.Collections;
 
 namespace DagSemTools.Sparql.Parser;
 
-internal class ProjectionVisitor() : SparqlBaseVisitor<Query.ProjectionElement>
+internal class ProjectionVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<Query.ProjectionElement>
 {
-    private ExpressionVisitor _expressionVisitor = new();
+    private ExpressionVisitor _expressionVisitor = new(termVisitor);
     public override Query.ProjectionElement VisitVar(SparqlParser.VarContext context)
         => Query.ProjectionElement.NewProjectVariable(ParserUtils.GetVariableName(context.GetText()));
 

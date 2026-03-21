@@ -503,4 +503,14 @@ public class TestParser
 
     }
 
+    [Fact]
+    public void TestTwoClassExample()
+    {
+        var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/shared_connectors.man.owl", _errorOutput);
+        var aboxAxioms = parsedOntology.Ontology.Axioms.Where(
+            axiom => axiom.IsAxiomAssertion).ToList();
+        aboxAxioms.Should().HaveCount(5);
+        parsedOntology.Ontology.ToString();
+    }
+    
 }

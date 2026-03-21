@@ -95,6 +95,7 @@ module Query =
     type Expression =
         | ExprVariable of string
         | ExprAggregate of Aggregate
+        | ExprTerm of Term
         (* Add more as needed, e.g., Function call, literals, etc. *)
 
     [<StructuralComparison>]

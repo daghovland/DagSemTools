@@ -141,12 +141,55 @@ numericExpression :    additiveExpression;
 additiveExpression:    multiplicativeExpression ( '+' multiplicativeExpression | '-' multiplicativeExpression | ( numericLiteral ) ( ( '*' unaryExpression ) | ( '/' unaryExpression ) )* )*;
 multiplicativeExpression: unaryExpression ( '*' unaryExpression | '/' unaryExpression )*;
 unaryExpression   :    '!' primaryExpression | '+' primaryExpression | '-' primaryExpression | primaryExpression;
-primaryExpression :    brackettedExpression | builtInCall | iriOrFunction | rdfLiteral | numericLiteral | booleanLiteral | var | exprTripleTerm;
+
+primaryExpression :    brackettedExpression #BracketedPrimaryExpression
+| builtInCall #BuiltInCallPrimaryExpression 
+| iriOrFunction #IriOrFunctionPrimaryExpression 
+| rdfLiteral #RdfLiteralPrimaryExpression 
+| numericLiteral #NumericLiteralPrimaryExpression 
+| booleanLiteral #BooleanLiteralPrimaryExpression
+| var #VariablePrimaryExpression
+| exprTripleTerm #ExprTripleTermPrimaryExpression
+;
 exprTripleTerm    :    '<<(' exprTripleTermSubject verb exprTripleTermObject ')>>';
 exprTripleTermSubject: iri | rdfLiteral | numericLiteral | booleanLiteral | var;
 exprTripleTermObject: iri | rdfLiteral | numericLiteral | booleanLiteral | var | exprTripleTerm;
 brackettedExpression: '(' expression ')';
-builtInCall       :    aggregate | 'STR' '(' expression ')' | 'LANG' '(' expression ')' | 'LANGMATCHES' '(' expression ',' expression ')' | 'LANGDIR' '(' expression ')' | 'DATATYPE' '(' expression ')' | 'BOUND' '(' var ')' | 'IRI' '(' expression ')' | 'URI' '(' expression ')' | 'BNODE' ( '(' expression ')' | NIL ) | 'RAND' NIL | 'ABS' '(' expression ')' | 'CEIL' '(' expression ')' | 'FLOOR' '(' expression ')' | 'ROUND' '(' expression ')' | 'CONCAT' expressionList | substringExpression | 'STRLEN' '(' expression ')' | strReplaceExpression | 'UCASE' '(' expression ')' | 'LCASE' '(' expression ')' | 'ENCODE_FOR_URI' '(' expression ')' | 'CONTAINS' '(' expression ',' expression ')' | 'STRSTARTS' '(' expression ',' expression ')' | 'STRENDS' '(' expression ',' expression ')' | 'STRBEFORE' '(' expression ',' expression ')' | 'STRAFTER' '(' expression ',' expression ')' | 'YEAR' '(' expression ')' | 'MONTH' '(' expression ')' | 'DAY' '(' expression ')' | 'HOURS' '(' expression ')' | 'MINUTES' '(' expression ')' | 'SECONDS' '(' expression ')' | 'TIMEZONE' '(' expression ')' | 'TZ' '(' expression ')' | 'NOW' NIL | 'UUID' NIL | 'STRUUID' NIL | 'MD5' '(' expression ')' | 'SHA1' '(' expression ')' | 'SHA256' '(' expression ')' | 'SHA384' '(' expression ')' | 'SHA512' '(' expression ')' | 'COALESCE' expressionList | 'IF' '(' expression ',' expression ',' expression ')' | 'STRLANG' '(' expression ',' expression ')' | 'STRLANGDIR' '(' expression ',' expression ',' expression ')' | 'STRDT' '(' expression ',' expression ')' | 'sameTerm' '(' expression ',' expression ')' | 'isIRI' '(' expression ')' | 'isURI' '(' expression ')' | 'isBLANK' '(' expression ')' | 'isLITERAL' '(' expression ')' | 'isNUMERIC' '(' expression ')' | 'hasLANG' '(' expression ')' | 'hasLANGDIR' '(' expression ')' | regexExpression | existsFunc | notExistsFunc | 'isTRIPLE' '(' expression ')' | 'TRIPLE' '(' expression ',' expression ',' expression ')' | 'SUBJECT' '(' expression ')' | 'PREDICATE' '(' expression ')' | 'OBJECT' '(' expression ')';
+builtInCall       :    aggregate 
+| 'STR' '(' expression ')' 
+| 'LANG' '(' expression ')' 
+| 'LANGMATCHES' '(' expression ',' expression ')' 
+| 'LANGDIR' '(' expression ')' 
+| 'DATATYPE' '(' expression ')' 
+| 'BOUND' '(' var ')' 
+| 'IRI' '(' expression ')' 
+| 'URI' '(' expression ')' 
+| 'BNODE' ( '(' expression ')' | NIL ) 
+| 'RAND' NIL 
+| 'ABS' '(' expression ')' 
+| 'CEIL' '(' expression ')' 
+| 'FLOOR' '(' expression ')' 
+| 'ROUND' '(' expression ')' 
+| 'CONCAT' expressionList 
+| substringExpression 
+| 'STRLEN' '(' expression ')' 
+| strReplaceExpression 
+| 'UCASE' '(' expression ')' 
+| 'LCASE' '(' expression ')' 
+| 'ENCODE_FOR_URI' '(' expression ')' 
+| 'CONTAINS' '(' expression ',' expression ')' 
+| 'STRSTARTS' '(' expression ',' expression ')' 
+| 'STRENDS' '(' expression ',' expression ')' 
+| 'STRBEFORE' '(' expression ',' expression ')' 
+| 'STRAFTER' '(' expression ',' expression ')' 
+| 'YEAR' '(' expression ')' 
+| 'MONTH' '(' expression ')' 
+| 'DAY' '(' expression ')' 
+| 'HOURS' '(' expression ')' 
+| 'MINUTES' '(' expression ')' 
+| 'SECONDS' '(' expression ')' 
+| 'TIMEZONE' '(' expression ')' 
+| 'TZ' '(' expression ')' | 'NOW' NIL | 'UUID' NIL | 'STRUUID' NIL | 'MD5' '(' expression ')' | 'SHA1' '(' expression ')' | 'SHA256' '(' expression ')' | 'SHA384' '(' expression ')' | 'SHA512' '(' expression ')' | 'COALESCE' expressionList | 'IF' '(' expression ',' expression ',' expression ')' | 'STRLANG' '(' expression ',' expression ')' | 'STRLANGDIR' '(' expression ',' expression ',' expression ')' | 'STRDT' '(' expression ',' expression ')' | 'sameTerm' '(' expression ',' expression ')' | 'isIRI' '(' expression ')' | 'isURI' '(' expression ')' | 'isBLANK' '(' expression ')' | 'isLITERAL' '(' expression ')' | 'isNUMERIC' '(' expression ')' | 'hasLANG' '(' expression ')' | 'hasLANGDIR' '(' expression ')' | regexExpression | existsFunc | notExistsFunc | 'isTRIPLE' '(' expression ')' | 'TRIPLE' '(' expression ',' expression ',' expression ')' | 'SUBJECT' '(' expression ')' | 'PREDICATE' '(' expression ')' | 'OBJECT' '(' expression ')';
 regexExpression   :    'REGEX' '(' expression ',' expression ( ',' expression )? ')';
 substringExpression: 'SUBSTR' '(' expression ',' expression ( ',' expression )? ')';
 strReplaceExpression: 'REPLACE' '(' expression ',' expression ',' expression ( ',' expression )? ')';
