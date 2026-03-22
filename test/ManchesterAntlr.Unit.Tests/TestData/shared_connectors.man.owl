@@ -1,0 +1,14 @@
+Prefix ex: <https://example.com/>
+Ontology: <https://example.com/ontology> <https://example.com/ontology#1
+
+Class: ex:SharedConnector_Tag1_Tag2
+    EquivalentTo:
+        (inverse (ex:hasConnector) value tag1)
+         and (inverse (ex:hasConnector) value tag2)
+    SubClassOf:
+        owl:Thing
+
+Class: ex:Tag1
+    EquivalentTo: {tag1}
+    SubClassOf:
+        ex:hasConnector max 1 ex:SharedConnector_Tag1_Tag2
