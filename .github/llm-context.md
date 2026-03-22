@@ -10,30 +10,33 @@
 
 ## Current Focus
 - SPARQL query support expansion (check story/sparql-tests branch)
+- Datalog engine extension with similar functions as SPARQL. Ideally similar implementation as for SPARQL
+- Speed of Rdf parsing and parsing Rdf to Owl
 - Parser correctness vs W3C specs
 
 ## When Working on Parsers
-1. Grammar files in grammars/ are source of truth
+1. Grammar files in grammars/ are source of truth. The grammar files in the individual projects are softlinks to the top-level grammar directory
 2. Regenerate parser: `antlr4 -Dlanguage=CSharp -visitor grammar.g4`
-3. Update visitor classes in corresponding parser project
+3. Update visitor and/or listener classes in corresponding parser project
 4. Add test cases covering new syntax
 
 ## Common Pitfalls
 - SPARQL injection: no built-in protection currently
 - Stratification required for Datalog with negation
-- Only OWL 2 DL subset supported (no annotation axioms)
 
 ## Code Navigation Tips
-- **Graph implementation**: src/Api/Graph.cs
-- **SPARQL query evaluation**: src/Api/SparqlQueryEvaluator.cs
-- **Datalog engine**: src/Api/Datalog/
+- **Client-facing API**: src/Api
+- **Graph implementation**: src/Rdf/QuadTable.fs
+- **SPARQL query evaluation**: src/Rdf/QueryProcessor.fs
+- **Datalog engine**: src/Datalog/
 - **Parser visitors**: src/*/Visitor.cs files
+- **Parser listeners**: src/*/Listener.cs files
 
 ## Supported Features
 ### RDF/Turtle
 - ✅ Turtle 1.2
 - ✅ TriG (named graphs)
-- ✅ Basic triple patterns
+- ✅ Blank nodes
 
 ### SPARQL
 - ✅ SELECT queries
@@ -45,12 +48,11 @@
 
 ### OWL
 - ✅ Manchester syntax
-- ✅ OWL 2 DL subset
-- ✅ OWL 2 RL reasoning
-- ❌ Annotation axioms
+- ✅ Rdf syntax (Parser from Rdf to Owl in src/RdfOwlTransator)
+- ✅ OWL 2 RL subset supported with rule-based reasoning (Parser from Owl to Datalog in src/OWL2RL2Datalog)
+- ✅ The most basic Tableau-based reasoning in src/AlcTableau supporting acyclic ALC ontologies
 
 ### Datalog
-- ✅ Stratifiable programs
-- ✅ Negation (with stratification)
-- ✅ Recursion
+- ✅ Supports negation and recursion of stratifiable datalog programs
+- ✅ Rule engine in src/Datalog/Reasoner.fs
 - ❌ Built-in functions beyond triples
