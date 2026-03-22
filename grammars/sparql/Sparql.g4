@@ -189,11 +189,23 @@ builtInCall       :    aggregate
 | 'MINUTES' '(' expression ')' 
 | 'SECONDS' '(' expression ')' 
 | 'TIMEZONE' '(' expression ')' 
-| 'TZ' '(' expression ')' | 'NOW' NIL | 'UUID' NIL | 'STRUUID' NIL | 'MD5' '(' expression ')' | 'SHA1' '(' expression ')' | 'SHA256' '(' expression ')' | 'SHA384' '(' expression ')' | 'SHA512' '(' expression ')' | 'COALESCE' expressionList | 'IF' '(' expression ',' expression ',' expression ')' | 'STRLANG' '(' expression ',' expression ')' | 'STRLANGDIR' '(' expression ',' expression ',' expression ')' | 'STRDT' '(' expression ',' expression ')' | 'sameTerm' '(' expression ',' expression ')' | 'isIRI' '(' expression ')' | 'isURI' '(' expression ')' | 'isBLANK' '(' expression ')' | 'isLITERAL' '(' expression ')' | 'isNUMERIC' '(' expression ')' | 'hasLANG' '(' expression ')' | 'hasLANGDIR' '(' expression ')' | regexExpression | existsFunc | notExistsFunc | 'isTRIPLE' '(' expression ')' | 'TRIPLE' '(' expression ',' expression ',' expression ')' | 'SUBJECT' '(' expression ')' | 'PREDICATE' '(' expression ')' | 'OBJECT' '(' expression ')';
+| 'TZ' '(' expression ')' 
+| 'NOW' NIL 
+| 'UUID' NIL 
+| 'STRUUID' NIL 
+| 'MD5' '(' expression ')' 
+| 'SHA1' '(' expression ')' | 'SHA256' '(' expression ')' | 'SHA384' '(' expression ')' | 'SHA512' '(' expression ')' | 'COALESCE' expressionList | 'IF' '(' expression ',' expression ',' expression ')' | 'STRLANG' '(' expression ',' expression ')' | 'STRLANGDIR' '(' expression ',' expression ',' expression ')' | 'STRDT' '(' expression ',' expression ')' | 'sameTerm' '(' expression ',' expression ')' | 'isIRI' '(' expression ')' | 'isURI' '(' expression ')' | 'isBLANK' '(' expression ')' | 'isLITERAL' '(' expression ')' | 'isNUMERIC' '(' expression ')' | 'hasLANG' '(' expression ')' | 'hasLANGDIR' '(' expression ')' | regexExpression | existsFunc | notExistsFunc | 'isTRIPLE' '(' expression ')' | 'TRIPLE' '(' expression ',' expression ',' expression ')' | 'SUBJECT' '(' expression ')' | 'PREDICATE' '(' expression ')' | 'OBJECT' '(' expression ')';
 regexExpression   :    'REGEX' '(' expression ',' expression ( ',' expression )? ')';
 substringExpression: 'SUBSTR' '(' expression ',' expression ( ',' expression )? ')';
 strReplaceExpression: 'REPLACE' '(' expression ',' expression ',' expression ( ',' expression )? ')';
 existsFunc        :    'EXISTS' groupGraphPattern;
 notExistsFunc     :    'NOT' 'EXISTS' groupGraphPattern;
-aggregate         :    'COUNT' '(' 'DISTINCT'? ( '*' | expression ) ')' | 'SUM' '(' 'DISTINCT'? expression ')' | 'MIN' '(' 'DISTINCT'? expression ')' | 'MAX' '(' 'DISTINCT'? expression ')' | 'AVG' '(' 'DISTINCT'? expression ')' | 'SAMPLE' '(' 'DISTINCT'? expression ')' | 'GROUP_CONCAT' '(' 'DISTINCT'? expression ( ';' 'SEPARATOR' '=' stringLiteral )? ')';
+aggregate         :    'COUNT' '(' 'DISTINCT'? ( '*' | expression ) ')' #CountAggregate
+    | 'SUM' '(' 'DISTINCT'? expression ')' #SumAggregate
+    | 'MIN' '(' 'DISTINCT'? expression ')' #MinAggregate
+    | 'MAX' '(' 'DISTINCT'? expression ')' #MaxAggregate
+    | 'AVG' '(' 'DISTINCT'? expression ')' #AvgAggregate
+    | 'SAMPLE' '(' 'DISTINCT'? expression ')' #SampleAggregate
+    | 'GROUP_CONCAT' '(' 'DISTINCT'? expression ( ';' 'SEPARATOR' '=' stringLiteral )? ')' #GroupConcatAggregate
+    ;
 iriOrFunction     :    iri argList?;
