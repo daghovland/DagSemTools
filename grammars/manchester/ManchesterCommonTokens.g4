@@ -50,4 +50,5 @@ ONLY: 'only';
 EXACTLY: 'exactly';
 MIN: 'min';
 MAX: 'max';
+VALUE: 'value';
 SELF: 'Self';

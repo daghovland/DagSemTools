@@ -1,5 +1,5 @@
-Prefix ex: <https://example.com/>
-Ontology: <https://example.com/ontology> <https://example.com/ontology#1
+Prefix: ex: <https://example.com/>
+Ontology: <https://example.com/ontology> <https://example.com/ontology#>
 
 Class: ex:SharedConnector_Tag1_Tag2
     EquivalentTo:

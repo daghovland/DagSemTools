@@ -507,9 +507,9 @@ public class TestParser
     public void TestTwoClassExample()
     {
         var parsedOntology = Manchester.Parser.Parser.ParseFile("TestData/shared_connectors.man.owl", _errorOutput);
-        var aboxAxioms = parsedOntology.Ontology.Axioms.Where(
-            axiom => axiom.IsAxiomAssertion).ToList();
-        aboxAxioms.Should().HaveCount(5);
+        var axioms = parsedOntology.Ontology.Axioms.ToList();
+        // There are 32 built-in declarations + 2 ClassAxioms in the file
+        axioms.Should().HaveCount(34);
         parsedOntology.Ontology.ToString();
     }
     
