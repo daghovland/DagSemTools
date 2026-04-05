@@ -71,17 +71,9 @@ module Query =
          Object = Object}
         
 
-    type GroupGraphPattern =
-            QueryComponent list
-    and QueryComponent =
-        | Pattern of QuadPattern
-        | Group of GroupGraphPattern
-        | Optional of OptionalPattern
-    and OptionalPattern = Optional of GroupGraphPattern
-    
     [<StructuralComparison>]
     [<StructuralEquality>]
-    type Aggregate = 
+    type Aggregate =
         | Count of distinct: bool * term: Term option (* None for * *)
         | Sum of distinct: bool * term: Term
         | Min of distinct: bool * term: Term
@@ -96,7 +88,9 @@ module Query =
         | ExprVariable of string
         | ExprAggregate of Aggregate
         | ExprTerm of Term
-        (* Add more as needed, e.g., Function call, literals, etc. *)
+        | ExprBinaryOp of op: string * left: Expression * right: Expression
+        | ExprUnaryOp of op: string * operand: Expression
+        | ExprBuiltInCall of name: string * args: Expression list
 
     [<StructuralComparison>]
     [<StructuralEquality>]
@@ -104,11 +98,22 @@ module Query =
         | ProjectVariable of string
         | ProjectExpression of Expression * alias: string
 
-    [<StructuralComparison>]
-    [<StructuralEquality>]
+    type GroupGraphPattern =
+            QueryComponent list
+    and QueryComponent =
+        | Pattern of QuadPattern
+        | Group of GroupGraphPattern
+        | Optional of OptionalPattern
+        | Filter of Expression
+        | Union of GroupGraphPattern list
+        | Minus of GroupGraphPattern
+        | Values of vars: string list * rows: Term list list
+        | Bind of expr: Expression * varName: string
+        | Subquery of SelectQuery
+    and OptionalPattern = Optional of GroupGraphPattern
     (* The projection is the list of variable names used in the select clause, without the question mark.
        The Basic Graph Pattern is a list of Triple Patterns *)
-    type SelectQuery =
+    and SelectQuery =
         {Projection: ProjectionElement list; Query: GroupGraphPattern; GroupBy: Expression list }
     
      

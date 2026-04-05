@@ -48,12 +48,96 @@ internal class ExpressionVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<Qu
     {
         if (context.aggregate() is { } agg)
             return Visit(agg);
-        throw new NotImplementedException("Built-in calls not yet implemented in SPARQL parser");
+        // EXISTS / NOT EXISTS — group pattern is not an expression; represent with empty args
+        if (context.existsFunc() is not null)
+            return Query.Expression.NewExprBuiltInCall("EXISTS", Microsoft.FSharp.Collections.FSharpList<Query.Expression>.Empty);
+        if (context.notExistsFunc() is not null)
+            return Query.Expression.NewExprBuiltInCall("NOT_EXISTS", Microsoft.FSharp.Collections.FSharpList<Query.Expression>.Empty);
+        // Generic built-in: capture as name + args
+        var name = context.GetChild(0).GetText().ToUpperInvariant();
+        var args = context.expression().Select(Visit).ToList();
+        return Query.Expression.NewExprBuiltInCall(name, Microsoft.FSharp.Collections.ListModule.OfSeq(args));
     }
 
     public override Query.Expression VisitIriOrFunctionPrimaryExpression(
         SparqlParser.IriOrFunctionPrimaryExpressionContext context) =>
         throw new NotImplementedException("IRI or function calls not yet implemented in SPARQL parser");
+
+    // --- Binary/unary expression visitors ---
+
+    public override Query.Expression VisitConditionalOrExpression(SparqlParser.ConditionalOrExpressionContext context)
+    {
+        var operands = context.conditionalAndExpression();
+        if (operands.Length == 1)
+            return Visit(operands[0]);
+        return operands.Skip(1).Aggregate(Visit(operands[0]),
+            (acc, rhs) => Query.Expression.NewExprBinaryOp("||", acc, Visit(rhs)));
+    }
+
+    public override Query.Expression VisitConditionalAndExpression(SparqlParser.ConditionalAndExpressionContext context)
+    {
+        var operands = context.valueLogical();
+        if (operands.Length == 1)
+            return Visit(operands[0]);
+        return operands.Skip(1).Aggregate(Visit(operands[0]),
+            (acc, rhs) => Query.Expression.NewExprBinaryOp("&&", acc, Visit(rhs)));
+    }
+
+    public override Query.Expression VisitRelationalExpression(SparqlParser.RelationalExpressionContext context)
+    {
+        var left = Visit(context.numericExpression(0));
+        if (context.numericExpression().Length == 1)
+            return left;
+        var right = Visit(context.numericExpression(1));
+        // Find the operator token — it's the second child (index 1)
+        var op = context.GetChild(1).GetText();
+        return Query.Expression.NewExprBinaryOp(op, left, right);
+    }
+
+    public override Query.Expression VisitAdditiveExpression(SparqlParser.AdditiveExpressionContext context)
+    {
+        var first = Visit(context.multiplicativeExpression(0));
+        var result = first;
+        // Children: multiplicativeExpression ('+'/'-' multiplicativeExpression)*
+        int multIdx = 1;
+        for (int i = 1; i < context.ChildCount; i++)
+        {
+            var childText = context.GetChild(i).GetText();
+            if (childText == "+" || childText == "-")
+            {
+                var rhs = Visit(context.multiplicativeExpression(multIdx++));
+                result = Query.Expression.NewExprBinaryOp(childText, result, rhs);
+                i++; // skip the rhs child
+            }
+        }
+        return result;
+    }
+
+    public override Query.Expression VisitMultiplicativeExpression(SparqlParser.MultiplicativeExpressionContext context)
+    {
+        var first = Visit(context.unaryExpression(0));
+        var result = first;
+        int unaryIdx = 1;
+        for (int i = 1; i < context.ChildCount; i++)
+        {
+            var childText = context.GetChild(i).GetText();
+            if (childText == "*" || childText == "/")
+            {
+                var rhs = Visit(context.unaryExpression(unaryIdx++));
+                result = Query.Expression.NewExprBinaryOp(childText, result, rhs);
+                i++;
+            }
+        }
+        return result;
+    }
+
+    public override Query.Expression VisitUnaryExpression(SparqlParser.UnaryExpressionContext context)
+    {
+        var firstChild = context.GetChild(0).GetText();
+        if (firstChild == "!" || firstChild == "+" || firstChild == "-")
+            return Query.Expression.NewExprUnaryOp(firstChild, Visit(context.primaryExpression()));
+        return Visit(context.primaryExpression());
+    }
 
     // --- Aggregate visitors (one per labeled alternative in the aggregate rule) ---
 

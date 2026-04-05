@@ -35,7 +35,69 @@ module QueryProcessor =
                         else
                             optionalMatches)
                 GetBindingsForGraphGroup datastore rest newBindings
-            | Query.QueryComponent.Pattern pattern -> 
+            | Query.QueryComponent.Filter _expr ->
+                // TODO: implement FILTER evaluation
+                GetBindingsForGraphGroup datastore rest currentBindings
+            | Query.QueryComponent.Union groups ->
+                let unionResults =
+                    groups
+                    |> List.collect (fun group -> GetBindingsForGraphGroup datastore group currentBindings)
+                    |> List.distinct
+                GetBindingsForGraphGroup datastore rest unionResults
+            | Query.QueryComponent.Minus minusPattern ->
+                let minusResults = GetBindingsForGraphGroup datastore minusPattern [Map.empty]
+                let filtered =
+                    currentBindings
+                    |> List.filter (fun binding ->
+                        minusResults
+                        |> List.forall (fun minusBinding ->
+                            // Keep if no compatible binding exists in minus set
+                            not (minusBinding |> Map.forall (fun k v -> binding.TryFind k = Some v))))
+                GetBindingsForGraphGroup datastore rest filtered
+            | Query.QueryComponent.Values (vars, rows) ->
+                let newBindings =
+                    currentBindings
+                    |> List.collect (fun binding ->
+                        rows
+                        |> List.choose (fun row ->
+                            let resolvedRow =
+                                List.zip vars (row |> List.ofSeq)
+                                |> List.choose (fun (v, t) ->
+                                    match t with
+                                    | Term.Resource id -> Some (v, id)
+                                    | Term.Variable _ -> None) // UNDEF - skip
+                                |> Map.ofList
+                            let compatible =
+                                resolvedRow
+                                |> Map.forall (fun k v ->
+                                    match binding.TryFind k with
+                                    | Some existing -> existing = v
+                                    | None -> true)
+                            if compatible then
+                                Some (Map.fold (fun acc k v -> Map.add k v acc) binding resolvedRow)
+                            else None))
+                GetBindingsForGraphGroup datastore rest newBindings
+            | Query.QueryComponent.Bind (expr, varName) ->
+                // TODO: implement expression evaluation; for now skip
+                GetBindingsForGraphGroup datastore rest currentBindings
+            | Query.QueryComponent.Subquery subSelect ->
+                let subResults = Answer datastore subSelect
+                let newBindings =
+                    currentBindings
+                    |> List.collect (fun binding ->
+                        subResults
+                        |> List.choose (fun subBinding ->
+                            let compatible =
+                                subBinding
+                                |> Map.forall (fun k v ->
+                                    match binding.TryFind k with
+                                    | Some existing -> existing = v
+                                    | None -> true)
+                            if compatible then
+                                Some (Map.fold (fun acc k v -> Map.add k v acc) binding subBinding)
+                            else None))
+                GetBindingsForGraphGroup datastore rest newBindings
+            | Query.QueryComponent.Pattern pattern ->
                 let newBindings =
                     currentBindings
                     |> List.collect (fun binding ->
@@ -75,15 +137,20 @@ module QueryProcessor =
                         |> Seq.toList)
 
                 GetBindingsForGraphGroup datastore rest newBindings
-        
-    
-    let public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
+
+
+    and public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
         let results = GetBindingsForGraphGroup datastore query.Query [Map.empty]
         
         let evalExpr (binding: Map<string, GraphElementId>) (expr: Expression) : GraphElementId option =
             match expr with
             | ExprVariable v -> binding.TryFind v
             | ExprAggregate _ -> None // Aggregates handled after grouping
+            | ExprTerm (Term.Resource id) -> Some id
+            | ExprTerm (Term.Variable v) -> binding.TryFind v
+            | ExprBinaryOp _ -> None // TODO: implement
+            | ExprUnaryOp _ -> None  // TODO: implement
+            | ExprBuiltInCall _ -> None // TODO: implement
 
         let resultsAfterGrouping =
             if query.GroupBy.IsEmpty then
