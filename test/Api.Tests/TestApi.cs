@@ -510,7 +510,49 @@ public class TestApi(ITestOutputHelper output)
         answers.Count.Should().Be(2);
     }
 
-    [Fact(Skip = "FILTER is not yet supported")]
+    [Fact]
+    public void TestSparqlBasicJoin()
+    {
+        var data = """
+                   PREFIX ns:  <http://example.org/ns#>
+                   _:a ns:price 20 .
+                   _:a ns:title "Cheap Book" .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX ns:  <http://example.org/ns#>
+                          SELECT ?title ?price
+                          WHERE { 
+                            ?x ns:price ?price .
+                            ?x ns:title ?title .
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        answers.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void TestSparqlBind()
+    {
+        var data = """
+                   PREFIX ns:  <http://example.org/ns#>
+                   _:a ns:price 20 .
+                   """;
+        var graph = ParseTurtleData(data);
+        var queryString = """
+                          PREFIX ns:  <http://example.org/ns#>
+                          SELECT ?price ?double
+                          WHERE { 
+                            ?x ns:price ?price .
+                            BIND(?price AS ?double)
+                          }
+                          """;
+        var answers = graph.AnswerSelectQuery(queryString).ToList();
+        answers.Should().HaveCount(1);
+        answers[0]["double"].ToString().Should().Be(answers[0]["price"].ToString());
+    }
+
+    [Fact]
     public void TestSparqlFilter()
     {
         var data = """
@@ -525,8 +567,9 @@ public class TestApi(ITestOutputHelper output)
                           PREFIX  ns:  <http://example.org/ns#>
                           SELECT  ?title ?price
                           WHERE   { ?x ns:price ?price .
+                                    ?x dc:title ?title .
                                     FILTER (?price < 30) .
-                                    ?x dc:title ?title . }
+                                  }
                           """;
         var answers = graph.AnswerSelectQuery(queryString).ToList();
         Assert.NotNull(answers);

@@ -10,21 +10,164 @@ namespace DagSemTools.Rdf
 
 open System.Numerics
 open Microsoft.FSharp.Collections
+open DagSemTools.Ingress
 open DagSemTools.Rdf.Ingress
 open DagSemTools.Rdf.Query
 
 module QueryProcessor =
     
+    let resolveTerm (binding: Map<string, GraphElementId>) (term: Term) : Term =
+        match term with
+        | Term.Variable v -> 
+            match binding.TryFind v with
+            | Some id -> Term.Resource id
+            | None -> term
+        | _ -> term
+
+    let rec isTrue (gel: GraphElement) : bool =
+        match Ingress.tryGetBoolLiteral gel with
+        | Some b -> b
+        | None ->
+            match Ingress.tryGetNonNegativeIntegerLiteral gel with
+            | Some i -> i <> BigInteger.Zero
+            | None -> false
+
+    let rec evalExpr (datastore : Datastore) (binding: Map<string, GraphElementId>) (expr: Expression) : GraphElementId option =
+        if box expr = null then None else
+        match expr with
+        | ExprVariable v -> binding.TryFind v
+        | ExprAggregate _ -> None // Aggregates handled after grouping
+        | ExprTerm (Term.Resource id) -> Some id
+        | ExprTerm (Term.Variable v) -> binding.TryFind v
+        | ExprUnaryOp (op, operand) ->
+            evalExpr datastore binding operand
+            |> Option.bind (fun operandId ->
+                let operandGel = datastore.Resources.GetGraphElement operandId
+                match op with
+                | "!" ->
+                    let b = isTrue operandGel
+                    Some (datastore.Resources.AddLiteralResource (BooleanLiteral (not b)))
+                | "+" -> Some operandId // Assuming numeric, for now just return
+                | "-" ->
+                    match Ingress.tryGetNonNegativeIntegerLiteral operandGel with
+                    | Some i -> Some (datastore.Resources.AddLiteralResource (IntegerLiteral (-i)))
+                    | None -> None
+                | _ -> None)
+        | ExprBinaryOp (op, left, right) ->
+            match op with
+            | "||" ->
+                let leftTrue = evalExpr datastore binding left |> Option.map (datastore.Resources.GetGraphElement >> isTrue) |> Option.defaultValue false
+                if leftTrue then 
+                    Some (datastore.Resources.AddLiteralResource (BooleanLiteral true))
+                else
+                    let rightTrue = evalExpr datastore binding right |> Option.map (datastore.Resources.GetGraphElement >> isTrue) |> Option.defaultValue false
+                    Some (datastore.Resources.AddLiteralResource (BooleanLiteral rightTrue))
+            | "&&" ->
+                let leftTrue = evalExpr datastore binding left |> Option.map (datastore.Resources.GetGraphElement >> isTrue) |> Option.defaultValue false
+                if not leftTrue then 
+                    Some (datastore.Resources.AddLiteralResource (BooleanLiteral false))
+                else
+                    let rightTrue = evalExpr datastore binding right |> Option.map (datastore.Resources.GetGraphElement >> isTrue) |> Option.defaultValue false
+                    Some (datastore.Resources.AddLiteralResource (BooleanLiteral rightTrue))
+            | "=" | "!=" | "<" | ">" | "<=" | ">=" ->
+                match evalExpr datastore binding left, evalExpr datastore binding right with
+                | Some lId, Some rId ->
+                    let lGel = datastore.Resources.GetGraphElement lId
+                    let rGel = datastore.Resources.GetGraphElement rId
+                    
+                    let tryGetAnyNumeric (gel: GraphElement) =
+                        match gel with
+                        | GraphLiteral (IntegerLiteral i) -> Some (decimal i)
+                        | GraphLiteral (DecimalLiteral d) -> Some d
+                        | GraphLiteral (DoubleLiteral d) -> Some (decimal d)
+                        | GraphLiteral (TypedLiteral (tp, v)) when List.contains (tp.ToString()) [Namespaces.XsdInt; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger; Namespaces.XsdDecimal] ->
+                            match System.Decimal.TryParse(v) with
+                            | true, i -> Some i
+                            | _ -> None
+                        | _ -> None
+
+                    let cmpResult = 
+                        match tryGetAnyNumeric lGel, tryGetAnyNumeric rGel with
+                        | Some lNum, Some rNum -> Some (lNum.CompareTo(rNum))
+                        | _ -> 
+                            match lGel, rGel with
+                            | GraphLiteral(LiteralString l), GraphLiteral(LiteralString r) -> Some (l.CompareTo(r))
+                            | _ -> Some (compare lGel rGel)
+                    
+                    match cmpResult with
+                    | Some cmp ->
+                        let res = 
+                            match op with
+                            | "=" -> cmp = 0
+                            | "!=" -> cmp <> 0
+                            | "<" -> cmp < 0
+                            | ">" -> cmp > 0
+                            | "<=" -> cmp <= 0
+                            | ">=" -> cmp >= 0
+                            | _ -> false
+                        Some (datastore.Resources.AddLiteralResource (BooleanLiteral res))
+                    | None -> None
+                | _ -> None
+            | _ -> None
+        | ExprBuiltInCall (name, args) ->
+            match name.ToUpperInvariant() with
+            | "BOUND" ->
+                match args with
+                | [ExprVariable v] ->
+                    Some (datastore.Resources.AddLiteralResource (BooleanLiteral (binding.ContainsKey v)))
+                | _ -> None
+            | "STR" ->
+                match args with
+                | [arg] ->
+                    evalExpr datastore binding arg 
+                    |> Option.map (fun id -> 
+                        let gel = datastore.Resources.GetGraphElement id
+                        datastore.Resources.AddLiteralResource (LiteralString (gel.ToString())))
+                | _ -> None
+            | _ -> None
+
     let rec GetBindingsForGraphGroup
         (datastore : Datastore)
         (patterns: QueryComponent list)
         (currentBindings: Map<string, GraphElementId> list)
         : Map<string, GraphElementId> list =
+
         match patterns with
         | [] -> currentBindings
         | pattern :: rest ->
             match pattern with
-            | Group groupPattern -> GetBindingsForGraphGroup datastore groupPattern currentBindings
+            | Group groupPattern -> 
+                let groupBindings = GetBindingsForGraphGroup datastore groupPattern currentBindings
+                GetBindingsForGraphGroup datastore rest groupBindings
+            | Pattern q ->
+                let (newBindings : Map<string, GraphElementId> list) =
+                    currentBindings
+                    |> List.collect (fun binding ->
+                        let resolvedPat = { 
+                            Graph = resolveTerm binding q.Graph;
+                            Subject = resolveTerm binding q.Subject;
+                            Predicate = resolveTerm binding q.Predicate;
+                            Object = resolveTerm binding q.Object 
+                        }
+                        let results = datastore.GetQuads(resolvedPat)
+                        results
+                        |> Seq.collect (fun quad ->
+                            let mutable newBinding = binding
+                            let mutable compatible = true
+                            
+                            let checkAndAdd v id (b: Map<string, uint32>) =
+                                match b.TryFind v with
+                                | Some existing when existing <> id -> compatible <- false; b
+                                | _ -> Map.add v id b
+
+                            match q.Subject with | Term.Variable v -> newBinding <- checkAndAdd v quad.subject newBinding | _ -> ()
+                            match q.Predicate with | Term.Variable v -> newBinding <- checkAndAdd v quad.predicate newBinding | _ -> ()
+                            match q.Object with | Term.Variable v -> newBinding <- checkAndAdd v quad.obj newBinding | _ -> ()
+                            match q.Graph with | Term.Variable v -> newBinding <- checkAndAdd v quad.tripleId newBinding | _ -> ()
+                            
+                            if compatible then [newBinding] else [])
+                        |> Seq.toList)
+                GetBindingsForGraphGroup datastore rest newBindings
             | Query.QueryComponent.Optional (Query.OptionalPattern.Optional optionalGroup) ->
                 let (newBindings : Map<string, GraphElementId> list) =
                     currentBindings
@@ -35,9 +178,14 @@ module QueryProcessor =
                         else
                             optionalMatches)
                 GetBindingsForGraphGroup datastore rest newBindings
-            | Query.QueryComponent.Filter _expr ->
-                // TODO: implement FILTER evaluation
-                GetBindingsForGraphGroup datastore rest currentBindings
+            | Query.QueryComponent.Filter expr ->
+                let filtered =
+                    currentBindings
+                    |> List.filter (fun binding ->
+                        match evalExpr datastore binding expr with
+                        | Some id -> isTrue (datastore.Resources.GetGraphElement id)
+                        | None -> false)
+                GetBindingsForGraphGroup datastore rest filtered
             | Query.QueryComponent.Union groups ->
                 let unionResults =
                     groups
@@ -78,8 +226,13 @@ module QueryProcessor =
                             else None))
                 GetBindingsForGraphGroup datastore rest newBindings
             | Query.QueryComponent.Bind (expr, varName) ->
-                // TODO: implement expression evaluation; for now skip
-                GetBindingsForGraphGroup datastore rest currentBindings
+                let newBindings =
+                    currentBindings
+                    |> List.choose (fun binding ->
+                        match evalExpr datastore binding expr with
+                        | Some id -> Some (Map.add varName id binding)
+                        | None -> None)
+                GetBindingsForGraphGroup datastore rest newBindings
             | Query.QueryComponent.Subquery subSelect ->
                 let subResults = Answer datastore subSelect
                 let newBindings =
@@ -142,16 +295,6 @@ module QueryProcessor =
     and public Answer (datastore : Datastore) (query : Query.SelectQuery) : Map<string, GraphElementId> list =
         let results = GetBindingsForGraphGroup datastore query.Query [Map.empty]
         
-        let evalExpr (binding: Map<string, GraphElementId>) (expr: Expression) : GraphElementId option =
-            match expr with
-            | ExprVariable v -> binding.TryFind v
-            | ExprAggregate _ -> None // Aggregates handled after grouping
-            | ExprTerm (Term.Resource id) -> Some id
-            | ExprTerm (Term.Variable v) -> binding.TryFind v
-            | ExprBinaryOp _ -> None // TODO: implement
-            | ExprUnaryOp _ -> None  // TODO: implement
-            | ExprBuiltInCall _ -> None // TODO: implement
-
         let resultsAfterGrouping =
             if query.GroupBy.IsEmpty then
                 let hasAggregates = 
@@ -166,7 +309,7 @@ module QueryProcessor =
                 results
                 |> List.groupBy (fun binding ->
                     query.GroupBy 
-                    |> List.map (fun expr -> evalExpr binding expr)
+                    |> List.map (fun expr -> evalExpr datastore binding expr)
                 )
                 |> List.map snd
 
@@ -263,7 +406,7 @@ module QueryProcessor =
                         | Some value -> Map.add alias value acc
                         | None -> acc
                     | _ ->
-                        match evalExpr firstBinding expr with
+                        match evalExpr datastore firstBinding expr with
                         | Some value -> Map.add alias value acc
                         | None -> acc
             ) Map.empty
