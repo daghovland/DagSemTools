@@ -24,18 +24,26 @@ conjunction_restriction: concept_restriction #ConjunctionRestriction
 concept_restriction:
     objectPropertyExpression SOME primary #ExistentialConceptRestriction
     | objectPropertyExpression ONLY primary #UniversalConceptRestriction
+    | objectPropertyExpression VALUE rdfiri #ValueConceptRestriction
     | objectPropertyExpression EXACTLY INTEGERLITERAL primary? #CardinalityConceptRestriction
+    | objectPropertyExpression MIN INTEGERLITERAL primary? #MinCardinalityConceptRestriction
+    | objectPropertyExpression MAX INTEGERLITERAL primary? #MaxCardinalityConceptRestriction
     | dataPropertyExpression SOME dataPrimary #ExistentialDataRestriction
     | dataPropertyExpression ONLY dataPrimary #UniversalDataRestriction
-    | dataPropertyExpression EXACTLY INTEGERLITERAL dataPrimary? #CardinalityConceptRestriction
+    | dataPropertyExpression EXACTLY INTEGERLITERAL dataPrimary? #CardinalityDataRestriction
+    | dataPropertyExpression MIN INTEGERLITERAL dataPrimary? #MinCardinalityDataRestriction
+    | dataPropertyExpression MAX INTEGERLITERAL dataPrimary? #MaxCardinalityDataRestriction
     ;
 
 primary:
     NOT primary                   #NegatedPrimaryConcept
     | concept_restriction                   #RestrictionPrimaryConcept
     | rdfiri                        #IriPrimaryConcept
+    | '{' individual (COMMA individual)* '}' #NominalPrimaryConcept
     | '(' description ')'     #ParenthesizedPrimaryConcept
     ;
+
+individual: rdfiri ;
 
 objectPropertyExpression: rdfiri #ObjectPropertyIri
     | INVERSE rdfiri #InverseObjectProperty
