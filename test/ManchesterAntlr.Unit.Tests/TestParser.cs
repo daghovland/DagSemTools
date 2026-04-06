@@ -512,5 +512,5 @@ public class TestParser
         axioms.Should().HaveCount(34);
         parsedOntology.Ontology.ToString();
     }
-    
+
 }

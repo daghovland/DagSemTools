@@ -568,10 +568,21 @@ public class TestApi(ITestOutputHelper output)
                           SELECT  ?title ?price
                           WHERE   { ?x ns:price ?price .
                                     ?x dc:title ?title .
-                                    FILTER (?price < 30) .
                                   }
                           """;
         var answers = graph.AnswerSelectQuery(queryString).ToList();
+        answers.Should().HaveCount(2);
+
+        queryString = """
+                          PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+                          PREFIX  ns:  <http://example.org/ns#>
+                          SELECT  ?title ?price
+                          WHERE   { ?x ns:price ?price .
+                                    ?x dc:title ?title .
+                                    FILTER (?price < 30) .
+                                  }
+                          """;
+        answers = graph.AnswerSelectQuery(queryString).ToList();
         Assert.NotNull(answers);
         answers.Count.Should().Be(1);
     }

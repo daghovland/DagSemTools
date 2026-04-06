@@ -81,7 +81,8 @@ module QueryProcessor =
                         | GraphLiteral (DecimalLiteral d) -> Some d
                         | GraphLiteral (DoubleLiteral d) -> Some (decimal d)
                         | GraphLiteral (TypedLiteral (tp, v)) when List.contains (tp.ToString()) [Namespaces.XsdInt; Namespaces.XsdInteger; Namespaces.XsdNonNegativeInteger; Namespaces.XsdDecimal] ->
-                            match System.Decimal.TryParse(v) with
+                            let cleanV = if v.Contains("\"") then v.Replace("\"", "") else v
+                            match System.Decimal.TryParse(cleanV, System.Globalization.NumberStyles.Any, System.Globalization.CultureInfo.InvariantCulture) with
                             | true, i -> Some i
                             | _ -> None
                         | _ -> None
