@@ -22,9 +22,15 @@ internal class ExpressionVisitor(TermVisitor termVisitor) : SparqlBaseVisitor<Qu
         SparqlParser.RdfLiteralPrimaryExpressionContext context) =>
             Query.Expression.NewExprTerm(termVisitor.Visit(context.rdfLiteral()));
 
+    // Handles brackettedExpression used directly in constraint (FILTER, HAVING, ORDER BY).
+    public override Query.Expression VisitBrackettedExpression(
+        SparqlParser.BrackettedExpressionContext context) =>
+            Visit(context.expression());
+
+    // Handles the labeled alternative in primaryExpression.
     public override Query.Expression VisitBracketedPrimaryExpression(
         SparqlParser.BracketedPrimaryExpressionContext context) =>
-            Visit(context.brackettedExpression().expression());
+            Visit(context.brackettedExpression());
 
     public override Query.Expression VisitNumericLiteralPrimaryExpression(
         SparqlParser.NumericLiteralPrimaryExpressionContext context) =>
